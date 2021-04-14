@@ -9,6 +9,9 @@ TARGET = "target"
 class Link:
     name = attr.ib(type=str)
     target = attr.ib(type=str)
+    parent_node = None
+    attributes = None
+    values = None
 
     def as_dict(self):
         return {

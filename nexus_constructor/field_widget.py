@@ -1,7 +1,7 @@
 import logging
 import uuid
 from functools import partial
-from typing import Any, List, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
 import numpy as np
 from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
@@ -23,7 +23,6 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
@@ -36,6 +35,9 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.stream import StreamGroup
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -109,7 +111,7 @@ class FieldWidget(QFrame):
         )
         self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
 
-        self.field_type_combo = QComboBox()
+        self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
 
@@ -117,11 +119,11 @@ class FieldWidget(QFrame):
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
-        self.value_type_combo = QComboBox()
+        self.value_type_combo: QComboBox = QComboBox()
         self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
-        self.value_line_edit = QLineEdit()
+        self.value_line_edit: QLineEdit = QLineEdit()
         self.value_line_edit.setPlaceholderText("value")
 
         self._set_up_value_validator(False)
@@ -195,8 +197,8 @@ class FieldWidget(QFrame):
         return FieldType(self.field_type_combo.currentText())
 
     @field_type.setter
-    def field_type(self, field_type: str):
-        self.field_type_combo.setCurrentText(field_type)
+    def field_type(self, field_type: FieldType):
+        self.field_type_combo.setCurrentText(field_type.value)
         self.field_type_changed()
 
     @property
@@ -216,7 +218,7 @@ class FieldWidget(QFrame):
         self.value_type_combo.setCurrentText(dtype)
 
     @property
-    def attrs(self) -> List[FieldAttribute]:
+    def attrs(self):
         return self.value.attributes
 
     @attrs.setter
@@ -226,6 +228,7 @@ class FieldWidget(QFrame):
     @property
     def value(self) -> Union[Dataset, Group, Link, None]:
         dtype = self.value_type_combo.currentText()
+        return_object: Union[Dataset, StreamGroup, Link]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
             return_object = Dataset(name=self.name, size=[1], type=dtype, values=val,)

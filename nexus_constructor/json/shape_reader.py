@@ -270,6 +270,7 @@ class ShapeReader:
                     f"{self.error_message} Couldn't find {dataset_name} dataset."
                 )
             )
+        return None
 
     def _find_and_validate_data_type(
         self, dataset: Dict, expected_types: List[str], parent_name: str
@@ -303,6 +304,8 @@ class ShapeReader:
                 )
             )
 
+        return None
+
     def _find_and_validate_units(self, vertices_dataset: Dict) -> Union[str, None]:
         """
         Attempts to retrieve and validate the units data.
@@ -317,7 +320,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find attributes list in vertices dataset."
                 )
             )
-            return
+            return None
 
         units = _find_attribute_from_list_or_dict(CommonAttrs.UNITS, attributes_list)
         if not units:
@@ -326,7 +329,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find units attribute in vertices dataset."
                 )
             )
-            return
+            return None
 
         if not units_are_recognised_by_pint(units, False):
             self.warnings.append(
@@ -334,7 +337,7 @@ class ShapeReader:
                     f"{self.error_message} Vertices units are not recognised by pint. Found {units}."
                 )
             )
-            return
+            return None
         if not units_are_expected_dimensionality(units, METRES, False):
             self.warnings.append(
                 InvalidShape(
@@ -342,14 +345,14 @@ class ShapeReader:
                     f"converted to metred but found {units}. "
                 )
             )
-            return
+            return None
         if not units_have_magnitude_of_one(units, False):
             self.warnings.append(
                 InvalidShape(
                     f"{self.error_message} Vertices units do not have magnitude of one. Found {units}."
                 )
             )
-            return
+            return None
 
         return units
 
@@ -440,7 +443,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find values in {parent_name} dataset."
                 )
             )
-            return
+            return None
 
     def _attribute_is_a_list(self, attribute: Any, parent_name: str) -> bool:
         """
@@ -473,7 +476,7 @@ class ShapeReader:
                     f"{self.error_message} Unable to find children list in shape group."
                 )
             )
-            return
+            return None
 
     @property
     def name(self) -> str:
@@ -503,18 +506,18 @@ class ShapeReader:
         """
         values = self._get_values_attribute(dataset, attribute_name)
         if not values:
-            return
+            return None
 
         if not self._attribute_is_a_list(values, attribute_name):
-            return
+            return None
 
         if not self._validate_list_size(dataset, values, attribute_name):
-            return
+            return None
 
         if not self._all_in_list_have_expected_type(
             values, expected_types, attribute_name
         ):
-            return
+            return None
 
         return values
 
@@ -559,14 +562,14 @@ class ShapeReader:
                 self.component.set_field_value(
                     DETECTOR_NUMBER, detector_number, detector_number_dtype
                 )
-                if isinstance(self.shape, CylindricalGeometry):
+                if self.shape and isinstance(self.shape, CylindricalGeometry):
                     self.shape.detector_number = detector_number
 
     def _handle_mapping(self, children: List[Dict]):
         shape_group = self._get_shape_dataset_from_list(
             SHAPE_GROUP_NAME, children, False
         )
-        if shape_group:
+        if shape_group and self.shape:
             detector_faces_dataset = self._get_shape_dataset_from_list(
                 DETECTOR_FACES, shape_group[CommonKeys.CHILDREN], False
             )

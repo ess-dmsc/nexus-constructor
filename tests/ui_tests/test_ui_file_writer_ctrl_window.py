@@ -32,7 +32,7 @@ def settings():
 def test_UI_GIVEN_nothing_WHEN_creating_filewriter_control_window_THEN_broker_field_defaults_are_set_correctly(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
 
     assert not window.command_broker_edit.text()
@@ -47,7 +47,7 @@ def test_UI_GIVEN_nothing_WHEN_creating_filewriter_control_window_THEN_broker_fi
 def test_UI_GIVEN_nothing_WHEN_creating_filewriter_control_window_THEN_broker_validators_are_set_correctly(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
 
     assert isinstance(window.status_broker_edit.validator(), BrokerAndTopicValidator)
@@ -74,7 +74,7 @@ def test_UI_GIVEN_time_string_WHEN_setting_time_THEN_last_time_is_stored(
 def test_UI_GIVEN_no_files_WHEN_stop_file_writing_is_clicked_THEN_button_is_disabled(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.files_list.selectedIndexes = lambda: []
 
@@ -86,7 +86,7 @@ def test_UI_GIVEN_no_files_WHEN_stop_file_writing_is_clicked_THEN_button_is_disa
 def test_UI_GIVEN_files_WHEN_stop_file_writing_is_clicked_THEN_button_is_enabled(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.files_list.selectedIndexes = lambda: [
         1,
@@ -103,7 +103,7 @@ def test_UI_GIVEN_valid_command_WHEN_sending_command_THEN_command_producer_sends
     qtbot, instrument, settings
 ):
 
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.command_producer = Mock()
 
@@ -133,7 +133,7 @@ def test_UI_GIVEN_valid_command_WHEN_sending_command_THEN_command_producer_sends
 def test_UI_GIVEN_no_status_consumer_and_no_command_producer_WHEN_checking_status_connection_THEN_both_leds_are_turned_off(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.status_consumer = None
     window.command_producer = None
@@ -147,7 +147,7 @@ def test_UI_GIVEN_no_status_consumer_and_no_command_producer_WHEN_checking_statu
 def test_UI_GIVEN_status_consumer_but_no_command_producer_WHEN_checking_status_connection_THEN_status_led_is_turned_on(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.command_producer = None
     window.status_consumer = Mock()
@@ -162,7 +162,7 @@ def test_UI_GIVEN_status_consumer_but_no_command_producer_WHEN_checking_status_c
 def test_UI_GIVEN_command_producer_WHEN_checking_connection_status_THEN_command_led_is_turned_on(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.command_producer = Mock()
     window.status_consumer = None
@@ -184,7 +184,7 @@ class DummyInterface:
 def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THEN_nothing_happens(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.status_consumer = None
     window.status_broker_edit.setText("invalid")
@@ -199,7 +199,7 @@ def test_UI_GIVEN_invalid_broker_WHEN_status_broker_timer_callback_is_called_THE
 def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_THEN_nothing_happens(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.command_producer = None
     window.command_broker_edit.setText("invalid")
@@ -214,7 +214,7 @@ def test_UI_GIVEN_invalid_broker_WHEN_command_broker_timer_callback_is_called_TH
 def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN_producer_is_created(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.command_broker_change_timer.stop()
     window.status_broker_change_timer.stop()
@@ -232,7 +232,7 @@ def test_UI_GIVEN_valid_broker_WHEN_command_broker_timer_callback_is_called_THEN
 def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_consumer_is_created(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
     window.command_broker_change_timer.stop()
     window.status_broker_change_timer.stop()
@@ -250,7 +250,7 @@ def test_UI_GIVEN_valid_broker_WHEN_status_broker_timer_callback_is_called_THEN_
 def test_UI_settings_are_saved_when_store_settings_is_called(
     qtbot, instrument, settings
 ):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
 
     command_broker = "broker:9092/topic1"
@@ -306,7 +306,7 @@ def test_UI_stored_settings_are_shown_in_window(qtbot, instrument, settings):
     settings.setValue(FileWriterSettings.FILE_BROKER_ADDR, file_broker)
 
     # _restore_settings should be called on construction
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
 
     assert window.status_broker_edit.text() == status_broker
@@ -318,7 +318,7 @@ def test_UI_stored_settings_are_shown_in_window(qtbot, instrument, settings):
 
 
 def test_UI_disable_stop_button_when_no_files_are_selected(qtbot, instrument, settings):
-    window = FileWriterCtrl(instrument, settings)
+    window = FileWriterCtrl(settings)
     qtbot.addWidget(window)
 
     assert not window.files_list.selectedIndexes()

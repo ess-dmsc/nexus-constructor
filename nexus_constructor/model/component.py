@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 import attr
 import numpy as np
@@ -48,6 +48,9 @@ from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.ui_utils import show_warning_dialog
 
+if TYPE_CHECKING:
+    from nexus_constructor.component_tree_model import ComponentInfo  # noqa: F401
+
 
 def _normalise(input_vector: QVector3D) -> Tuple[QVector3D, float]:
     """
@@ -82,6 +85,8 @@ class Component(Group):
 
     _depends_on = attr.ib(type=Transformation, default=None)
     has_link = attr.ib(type=bool, default=None)
+    component_info: "ComponentInfo" = None
+    stored_transforms: list = None
 
     @property
     def depends_on(self) -> "Transformation":
@@ -238,7 +243,7 @@ class Component(Group):
     def _create_and_add_transform(
         self,
         name: str,
-        transformation_type: TransformationType,
+        transformation_type: str,
         angle_or_magnitude: float,
         units: str,
         vector: QVector3D,
@@ -411,7 +416,7 @@ class Component(Group):
             logging.info(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
             )
-            return
+            return None
         try:
             z_offsets = self.get_field_value(Z_PIXEL_OFFSET)
         except AttributeError:

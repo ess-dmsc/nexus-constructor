@@ -20,7 +20,7 @@ class InstrumentViewAxes(object):
         :param component_root_entity: The root entity for the instrument view components.
         :param line_length: The length of the line in the axes.
         """
-        vertices = [0 for _ in range(3)]
+        vertices: List = [0 for _ in range(3)]
 
         for i, color in enumerate(
             [AxisColors.X.value, AxisColors.Y.value, AxisColors.Z.value]
@@ -39,7 +39,7 @@ class InstrumentViewAxes(object):
             create_qentity([mesh, material], component_root_entity)
 
     @staticmethod
-    def create_data_array(line_vertices: List[float]):
+    def create_data_array(line_vertices: List[int]):
         """
         Takes a list with coordinates of the beginning and end of the line and converts this to a byte array.
         :param line_vertices: A list containing the start and end coordinates.

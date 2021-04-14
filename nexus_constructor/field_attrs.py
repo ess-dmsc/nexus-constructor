@@ -175,7 +175,7 @@ class FieldAttrFrame(QFrame):
         return np.squeeze(self.dialog.model.array)
 
     @value.setter
-    def value(self, new_value: Union[np.generic, np.ndarray]):
+    def value(self, new_value: np.ndarray):
         # Decode the attribute value if it's in byte form
         if isinstance(new_value, bytes):
             new_value = new_value.decode("utf-8")

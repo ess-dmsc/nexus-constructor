@@ -201,7 +201,7 @@ class TransformationReader:
         :param json_transformations: A list of JSON transformation entries.
         """
         for json_transformation in json_transformations:
-
+            # TODO: Breakout if scalar or kafkaStream
             name = self._get_transformation_attribute(
                 CommonKeys.NAME, json_transformation
             )

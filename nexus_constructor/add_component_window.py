@@ -1,6 +1,7 @@
 import logging
 from collections import OrderedDict
 from functools import partial
+from typing import List
 
 from PySide2.QtCore import QObject, Qt, QUrl, Signal
 from PySide2.QtGui import QVector3D
@@ -81,10 +82,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
         self.cad_file_name = None
-        self.possible_fields = []
+        self.possible_fields: List[str] = []
         self.component_to_edit = component_to_edit
         self.valid_file_given = False
-        self.pixel_options = None
+        self.pixel_options: PixelOptions = None
 
     def setupUi(self, parent_dialog, pixel_options: PixelOptions = PixelOptions()):
         """ Sets up push buttons and validators for the add component window. """
@@ -162,7 +163,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         self.pixel_options = pixel_options
-        self.pixel_options.setupUi(self.pixelOptionsWidget)
+        if self.pixel_options:
+            self.pixel_options.setupUi(self.pixelOptionsWidget)
         self.pixelOptionsWidget.ui = self.pixel_options
 
         if self.component_to_edit:
@@ -171,7 +173,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
             self.ok_button.setText("Edit Component")
             self._fill_existing_entries()
-            if self.get_pixel_visibility_condition():
+            if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
 
         self.ok_validator = OkValidator(
@@ -205,9 +207,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
         # Connect the pixel mapping press signal the populate pixel mapping method
-        self.pixel_options.pixel_mapping_button_pressed.connect(
-            self.populate_pixel_mapping_if_necessary
-        )
+        if self.pixel_options:
+            self.pixel_options.pixel_mapping_button_pressed.connect(
+                self.populate_pixel_mapping_if_necessary
+            )
 
         self.cylinderCountSpinBox.valueChanged.connect(
             self.populate_pixel_mapping_if_necessary
@@ -239,7 +242,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         Wipes the previous list of pixel mapping widgets. Required if the file has changed, or if the shape type has
         changed.
         """
-        self.pixel_options.reset_pixel_mapping_list()
+        if self.pixel_options:
+            self.pixel_options.reset_pixel_mapping_list()
 
     def _fill_existing_entries(self):
         """
@@ -420,12 +424,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
-
-        pixel_data = (
-            self.pixel_options.generate_pixel_data()
-            if nx_class in PIXEL_COMPONENT_TYPES
-            else None
-        )
+        if self.pixel_options:
+            pixel_data = (
+                self.pixel_options.generate_pixel_data()
+                if nx_class in PIXEL_COMPONENT_TYPES
+                else None
+            )
+        else:
+            pixel_data = None
 
         if self.component_to_edit:
             shape, positions = self.edit_existing_component(
@@ -489,16 +495,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.parent().sceneWidget.delete_component(self.component_to_edit.name)
 
         # remove previous fields
-        self.component_to_edit.children = []
-
-        self.component_to_edit.name = component_name
-        self.component_to_edit.nx_class = nx_class
-        self.component_to_edit.description = description
+        if self.component_to_edit:
+            self.component_to_edit.children = []
+            self.component_to_edit.name = component_name
+            self.component_to_edit.nx_class = nx_class
+            self.component_to_edit.description = description
 
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-        return self.component_to_edit.shape
+        return self.component_to_edit.shape if self.component_to_edit else None
 
     @staticmethod
     def write_pixel_data_to_component(
@@ -550,7 +556,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             if self.meshRadioButton.isChecked():
                 self.create_pixel_mapping_list_for_mesh()
 
-            if self.CylinderRadioButton.isChecked():
+            if self.CylinderRadioButton.isChecked() and self.pixel_options:
                 self.pixel_options.populate_pixel_mapping_list_with_cylinder_number(
                     self.cylinderCountSpinBox.value()
                 )
@@ -575,7 +581,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         Instruct the PixelOptions widget to carry out another check for input validity.
         """
-        self.pixel_options.update_pixel_input_validity()
+        if self.pixel_options:
+            self.pixel_options.update_pixel_input_validity()
 
 
 def get_fields_and_update_functions_for_component(component: Component):

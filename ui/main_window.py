@@ -1,15 +1,16 @@
-from PySide2.QtCore import QRect, QMetaObject, QSize
+from PySide2.QtCore import QMetaObject, QObject, QRect, QSize
 from PySide2.QtWidgets import (
-    QSplitter,
     QAction,
-    QStatusBar,
-    QMenuBar,
-    QMenu,
-    QWidget,
-    QTabWidget,
     QGridLayout,
     QLayout,
+    QMenu,
+    QMenuBar,
+    QSplitter,
+    QStatusBar,
+    QTabWidget,
+    QWidget,
 )
+
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from ui.treeview_tab import ComponentTreeViewTab
 
@@ -53,7 +54,7 @@ class Ui_MainWindow(object):
         )
         self.tab_widget.addTab(self.component_tree_view_tab, "")
 
-    def _set_up_menus(self, MainWindow):
+    def _set_up_menus(self, MainWindow: QObject):
         self.menu_bar = QMenuBar()
         self.menu_bar.setGeometry(QRect(0, 0, 1280, 720))
         self.file_menu = QMenu(self.menu_bar)
@@ -71,7 +72,10 @@ class Ui_MainWindow(object):
         self.file_menu.addAction(self.export_to_forwarder_config_action)
 
         self.view_menu = QMenu(self.menu_bar)
-        self.show_action_labels = QAction(MainWindow, checkable=True)
+        self.show_action_labels = QAction(MainWindow)
+        self.show_action_labels.setCheckable(True)
+        self.about_window = QAction(MainWindow)
+        self.view_menu.addAction(self.about_window)
         self.view_menu.addAction(self.show_action_labels)
 
         self.menu_bar.addAction(self.file_menu.menuAction())
@@ -93,3 +97,4 @@ class Ui_MainWindow(object):
         self.export_to_forwarder_config_action.setText("Export to Forwarder FlatBuffer")
         self.view_menu.setTitle("View")
         self.show_action_labels.setText("Show Button Labels")
+        self.about_window.setText("About")

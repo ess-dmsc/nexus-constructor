@@ -14,7 +14,6 @@ from streaming_data_types import run_start_pl72, run_stop_6s4t
 from nexus_constructor.kafka.command_producer import CommandProducer
 from nexus_constructor.kafka.kafka_interface import KafkaInterface
 from nexus_constructor.kafka.status_consumer import StatusConsumer
-from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import BrokerAndTopicValidator
 from ui.filewriter_ctrl_frame import Ui_FilewriterCtrl
@@ -53,15 +52,14 @@ def extract_bool_from_qsettings(setting: Union[str, bool]):
 
 
 class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
-    def __init__(self, model: Model, settings: QSettings):
+    def __init__(self, settings: QSettings):
         super().__init__()
         self.settings = settings
-        self.model = model
         self.setupUi()
-        self.known_writers = {}
-        self.known_files = {}
-        self.status_consumer = None
-        self.command_producer = None
+        self.known_writers: Dict[str, FileWriter] = {}
+        self.known_files: Dict[str, File] = {}
+        self.status_consumer: StatusConsumer = None
+        self.command_producer: CommandProducer = None
 
     def _restore_settings(self):
         """
@@ -206,7 +204,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         if result is not None:
             if self.status_consumer is not None:
                 self.status_consumer.close()
-            self.status_consumer = kafka_obj_type(*result)
+            self.status_consumer = StatusConsumer(*result)
 
     def command_broker_timer_changed(self, kafka_obj_type: KafkaInterface):
         result = BrokerAndTopicValidator.extract_addr_and_topic(
@@ -215,7 +213,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
         if result is not None:
             if self.command_producer is not None:
                 self.command_producer.close()
-            self.command_producer = kafka_obj_type(*result)
+            self.command_producer = CommandProducer(*result)
 
     def _update_writer_list(self, updated_list: Dict[str, Dict]):
         for key in updated_list:
@@ -270,7 +268,7 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
     def _set_time(
         model: QAbstractItemModel,
         current_index: Union[File, FileWriter],
-        current_time: str,
+        current_time: int,
         time_str: str,
     ):
         model.setData(model.index(current_index.row, 1), time_str)
@@ -308,6 +306,8 @@ class FileWriterCtrl(Ui_FilewriterCtrl, QMainWindow):
             self.stop_file_writing_button.setEnabled(False)
 
     def stop_file_writing_clicked(self):
+        if not self.command_producer:
+            return
         selected_files = self.files_list.selectedIndexes()
         for index in selected_files:
             for fileKey in self.known_files:

@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QFrame, QGroupBox, QWidget
 
@@ -10,6 +12,9 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.unit_utils import METRES, RADIANS
 from ui.link import Ui_Link
 from ui.transformation import Ui_Transformation
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.value_type import ValueType  # noqa: F401
 
 
 class EditTransformation(QGroupBox):
@@ -66,7 +71,7 @@ class EditTransformation(QGroupBox):
 
         if self.transformation_frame.magnitude_widget.field_type_is_scalar():
             try:
-                value_3d_view = self.transformation_frame.magnitude_widget.value.values
+                value_3d_view: "ValueType" = self.transformation_frame.magnitude_widget.value.values
                 self.transformation_frame.value_spinbox.setValue(float(value_3d_view))
             except ValueError:
                 pass

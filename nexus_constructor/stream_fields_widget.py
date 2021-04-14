@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Union
 
 import numpy as np
 from PySide2.QtCore import Qt
@@ -285,7 +286,9 @@ class StreamFieldsWidget(QDialog):
 
         source = self.source_line_edit.text()
         topic = self.topic_line_edit.text()
-        stream = None
+        stream: Union[
+            F142Stream, EV42Stream, NS10Stream, SENVStream, HS00Stream, TDCTStream
+        ] = None
         type = self.type_combo.currentText()
         current_schema = self.schema_combo.currentText()
         if current_schema == WriterModules.F142.value:
@@ -406,7 +409,7 @@ class StreamFieldsWidget(QDialog):
         self.f142_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
         self.f142_store_latest_into_spinner.setValue(field.store_latest_into)
 
-    def update_existing_stream_info(self, field: StreamGroup):
+    def update_existing_stream_info(self, field):
         """
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group

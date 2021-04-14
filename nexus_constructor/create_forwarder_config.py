@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import TYPE_CHECKING, Any, List
 
 from streaming_data_types.fbschemas.forwarder_config_update_rf5k.Protocol import (
     Protocol,
@@ -11,6 +11,9 @@ from streaming_data_types.forwarder_config_update_rf5k import StreamInfo, serial
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.stream import StreamGroup
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.stream import Stream
 
 provider_str_to_enum = {"pva": Protocol.PVA, "ca": Protocol.CA, "fake": Protocol.FAKE}
 
@@ -42,6 +45,6 @@ def _check_for_streams_in_children(
 
 def create_forwarder_config(model: Model, provider_type: str) -> bytes:
     protocol = provider_str_to_enum[provider_type]
-    streams = []
+    streams: List["Stream"] = []
     _check_for_streams_in_children(streams, model.entry, protocol)
     return serialise_rf5k(UpdateType.ADD, streams)

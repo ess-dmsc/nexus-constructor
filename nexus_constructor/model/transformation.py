@@ -17,6 +17,7 @@ from nexus_constructor.model.value_type import ValueTypes
 
 if TYPE_CHECKING:
     from nexus_constructor.model.component import Component  # noqa: F401
+    from nexus_constructor.model.value_type import ValueType  # noqa: F401
 
 
 @attr.s
@@ -27,7 +28,7 @@ class Transformation(Dataset):
     """
 
     parent_component = attr.ib(type="Component", default=None)
-    _dependents = attr.ib(type=List[Union["Transformation", "Component"]], init=False)
+    _dependents = attr.ib(type=list, init=False)
     _ui_value = attr.ib(type=float, default=None)
 
     @_dependents.default
@@ -59,8 +60,9 @@ class Transformation(Dataset):
         try:
             if isinstance(self.values, Dataset):
                 if np.isscalar(self.values.values):
-                    self.ui_value = float(self.values.values)
-                    return float(self.values.values)
+                    val: "ValueType" = self.values.values
+                    self.ui_value = float(val)
+                    return float(val)
                 else:
                     self.ui_value = float(self.values.values[0])
                     return float(self.values.values[0])
@@ -75,7 +77,7 @@ class Transformation(Dataset):
         return self._ui_value
 
     @ui_value.setter
-    def ui_value(self, new_value: float):
+    def ui_value(self, new_value):
         if np.isscalar(new_value):
             value = new_value
         else:
@@ -134,7 +136,7 @@ class Transformation(Dataset):
     def dependents(self) -> List[Union["Transformation", "Component"]]:
         return self._dependents
 
-    def deregister_dependent(self, old_dependent: ["Transformation", "Component"]):
+    def deregister_dependent(self, old_dependent: Union["Transformation", "Component"]):
         try:
             self._dependents.remove(old_dependent)
         except ValueError:
@@ -163,9 +165,10 @@ class Transformation(Dataset):
 
     def as_dict(self) -> Dict[str, Any]:
         value = None
+        return_dict: Dict = {}
         if isinstance(self.values, Dataset):
             if np.isscalar(self.values.values):
-                value = float(self.values.values)
+                value = float(self.values.values)  # type: ignore
             return_dict = {
                 CommonKeys.NAME: self.name,
                 CommonKeys.TYPE: NodeType.DATASET,
@@ -179,10 +182,11 @@ class Transformation(Dataset):
             return_dict = self.values.as_dict()["children"][0]
 
         # TODO elif array, NXlog,
-        if self.attributes + self.values.attributes:
+        _attributes = self.attributes + self.values.attributes  # type: ignore
+        if _attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
                 attribute.as_dict()
-                for attribute in self.attributes + self.values.attributes
+                for attribute in _attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
             ]
             try:

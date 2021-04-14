@@ -102,9 +102,13 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     for item in children:
         if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
             return item
+    return None
 
 
-def _add_field_to_group(item: Dict, group: Group):
+# Parameter group should be typed with Group but as the inheritance from base class Group
+# by StreamGroup is broken for the attribute children,
+# parameter group cannot be typed here.
+def _add_field_to_group(item: Dict, group):
     field_type = item[CommonKeys.TYPE]
     if (
         field_type == NodeType.STREAM
@@ -115,6 +119,7 @@ def _add_field_to_group(item: Dict, group: Group):
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
     else:
         child_name = item[CommonKeys.NAME]
+        child: Union[Group, Link, Dataset]
         if (
             child_name not in CHILD_EXCLUDELIST
         ):  # ignore transforms, shape etc as these are handled separately
@@ -172,6 +177,8 @@ def _create_stream(json_object: Dict) -> Stream:
         return SENVStream(source=source, topic=topic)
     if writer_module == WriterModules.TDCTIME.value:
         return TDCTStream(source=source, topic=topic)
+
+    return None
 
 
 def __create_ev42_stream(
