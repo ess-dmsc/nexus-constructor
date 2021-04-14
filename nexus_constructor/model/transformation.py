@@ -177,8 +177,8 @@ class Transformation(Dataset):
             }
         elif isinstance(self.values, StreamGroup):
             return_dict = self.values.as_dict()["children"][0]
-            # TODO for loop for multiple transformations
-        # TODO elif array, NXlog, kafka stream, ...
+
+        # TODO elif array, NXlog,
         if self.attributes + self.values.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
                 attribute.as_dict()
