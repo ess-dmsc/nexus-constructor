@@ -33,9 +33,9 @@ class Dataset:
     def as_dict(self) -> Dict[str, Any]:
         return_dict = {
             CommonKeys.NAME: self.name,
-            CommonKeys.TYPE: NodeType.DATASET,
+            CommonKeys.DATA_TYPE: NodeType.DATASET,
             CommonKeys.DATASET: {
-                CommonKeys.TYPE: self.type,
+                CommonKeys.DATA_TYPE: self.type,
                 CommonKeys.SIZE: self.size,
             },
         }

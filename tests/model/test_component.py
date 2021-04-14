@@ -98,10 +98,9 @@ def test_component_as_dict_contains_stream_field():
 
     dictionary_output = test_component.as_dict()
 
-    assert dictionary_output["children"][0]["type"] == "stream"
-    assert dictionary_output["children"][0]["stream"]["topic"] == topic
-    assert dictionary_output["children"][0]["stream"]["source"] == source
-    assert dictionary_output["children"][0]["stream"]["writer_module"] == "ns10"
+    assert dictionary_output["children"][0]["module"] == "ns10"
+    assert dictionary_output["children"][0]["config"]["topic"] == topic
+    assert dictionary_output["children"][0]["config"]["source"] == source
 
 
 def test_component_as_dict_contains_links():

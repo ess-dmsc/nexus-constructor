@@ -63,6 +63,6 @@ class FieldAttribute:
             values = values.tolist()
         return {
             CommonKeys.NAME: self.name,
-            CommonKeys.TYPE: self.type,
+            CommonKeys.DATA_TYPE: self.type,
             CommonKeys.VALUES: values,
         }

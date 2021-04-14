@@ -205,7 +205,7 @@ def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_mes
         attribute_with_dataset_type_to_change, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    invalid_dataset[CommonKeys.DATASET][CommonKeys.TYPE] = "string"
+    invalid_dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE] = "string"
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -228,7 +228,7 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
         attribute_with_dataset_type_to_delete, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    del invalid_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    del invalid_dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE]
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -692,19 +692,19 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
         DETECTOR_NUMBER, pixel_grid_list
     )
     detector_number = detector_number_dataset[CommonKeys.VALUES]
-    detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE]
 
     x_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
         X_PIXEL_OFFSET, pixel_grid_list
     )
     x_pixel_offset = np.array(x_offset_dataset[CommonKeys.VALUES])
-    x_pixel_dtype = x_offset_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    x_pixel_dtype = x_offset_dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE]
 
     y_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
         Y_PIXEL_OFFSET, pixel_grid_list
     )
     y_pixel_offset = np.array(y_offset_dataset[CommonKeys.VALUES])
-    y_pixel_dtype = y_offset_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    y_pixel_dtype = y_offset_dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE]
 
     mock_component.set_field_value.assert_has_calls(
         [call(DETECTOR_NUMBER, detector_number, detector_number_dtype,)]
@@ -733,7 +733,7 @@ def test_GIVEN_valid_pixel_mapping_and_cylindrical_shape_WHEN_reading_pixel_data
         DETECTOR_NUMBER, pixel_grid_list
     )
     detector_number = detector_number_dataset[CommonKeys.VALUES]
-    detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE]
 
     mock_component.set_field_value.assert_called_once_with(
         DETECTOR_NUMBER, detector_number, detector_number_dtype

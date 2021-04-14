@@ -14,5 +14,5 @@ class Link:
         return {
             CommonKeys.NAME: self.name,
             TARGET: self.target,
-            CommonKeys.TYPE: NodeType.LINK,
+            CommonKeys.DATA_TYPE: NodeType.LINK,
         }

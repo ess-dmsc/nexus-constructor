@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union, List
 
 from PySide2.QtGui import QVector3D
 
@@ -6,6 +6,7 @@ from nexus_constructor.common_attrs import (
     NX_TRANSFORMATIONS,
     CommonAttrs,
     CommonKeys,
+    NodeType,
     TransformationType,
 )
 from nexus_constructor.json.json_warnings import (
@@ -102,7 +103,7 @@ class TransformationReader:
 
     def _get_transformation_attribute(
         self,
-        attribute_name: str,
+        attribute_name: Union[str, List[str]],
         json_transformation: dict,
         transform_name: str = None,
         failure_value: Any = None,
@@ -117,7 +118,13 @@ class TransformationReader:
         found in the dictionary then the failure_value is returned.
         """
         try:
-            return json_transformation[attribute_name]
+            if isinstance(attribute_name, str):
+                return json_transformation[attribute_name]
+            else:
+                for key in attribute_name:
+                    if key in json_transformation:
+                        return json_transformation[key]
+                raise KeyError
         except KeyError:
             if transform_name:
                 msg = (
@@ -202,22 +209,22 @@ class TransformationReader:
         """
         for json_transformation in json_transformations:
 
+            config = self._get_transformation_attribute(
+                NodeType.CONFIG, json_transformation
+            )
+            if not config:
+                continue
+
             name = self._get_transformation_attribute(
-                CommonKeys.NAME, json_transformation
+                CommonKeys.NAME, config
             )
 
             values = self._get_transformation_attribute(
-                CommonKeys.VALUES, json_transformation, name
+                CommonKeys.VALUES, config, name
             )
             if values is None:
                 continue
-
-            dataset = self._get_transformation_attribute(
-                CommonKeys.DATASET, json_transformation, name
-            )
-            if not dataset:
-                continue
-            dtype = self._get_transformation_attribute(CommonKeys.TYPE, dataset, name,)
+            dtype = self._get_transformation_attribute([CommonKeys.DATA_TYPE, CommonKeys.TYPE], config, name, )
             if not dtype:
                 continue
             dtype = self._parse_dtype(dtype, name)

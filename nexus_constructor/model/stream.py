@@ -14,12 +14,12 @@ INDEX_EVERY_KB = "nexus.indices.index_every_kb"
 INDEX_EVERY_MB = "nexus.indices.index_every_mb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
 STORE_LATEST_INTO = "store_latest_into"
-WRITER_MODULE = "writer_module"
 SOURCE = "source"
 TOPIC = "topic"
 
 
 class WriterModules(Enum):
+    DATASET = "dataset"  # Reserved
     F142 = "f142"
     EV42 = "ev42"
     TDCTIME = "TdcTime"
@@ -36,9 +36,8 @@ class NS10Stream:
 
     def as_dict(self):
         return {
-            CommonKeys.TYPE: NodeType.STREAM,
-            NodeType.STREAM: {
-                WRITER_MODULE: self.writer_module,
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
                 SOURCE: self.source,
                 TOPIC: self.topic,
             },
@@ -53,9 +52,8 @@ class SENVStream:
 
     def as_dict(self):
         return {
-            CommonKeys.TYPE: NodeType.STREAM,
-            NodeType.STREAM: {
-                WRITER_MODULE: self.writer_module,
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
                 SOURCE: self.source,
                 TOPIC: self.topic,
             },
@@ -70,9 +68,8 @@ class TDCTStream:
 
     def as_dict(self):
         return {
-            CommonKeys.TYPE: NodeType.STREAM,
-            NodeType.STREAM: {
-                WRITER_MODULE: self.writer_module,
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
                 SOURCE: self.source,
                 TOPIC: self.topic,
             },
@@ -92,9 +89,8 @@ class EV42Stream:
 
     def as_dict(self):
         dict = {
-            CommonKeys.TYPE: NodeType.STREAM,
-            NodeType.STREAM: {
-                WRITER_MODULE: self.writer_module,
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
                 SOURCE: self.source,
                 TOPIC: self.topic,
             },
@@ -126,24 +122,23 @@ class F142Stream:
 
     def as_dict(self):
         dict = {
-            CommonKeys.TYPE: NodeType.STREAM,
-            NodeType.STREAM: {
-                WRITER_MODULE: self.writer_module,
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
                 SOURCE: self.source,
                 TOPIC: self.topic,
-                CommonKeys.TYPE: self.type,
+                CommonKeys.DATA_TYPE: self.type,
             },
         }
         if self.value_units is not None:
-            dict[NodeType.STREAM][VALUE_UNITS] = self.value_units
+            dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units
         if self.array_size is not None:
-            dict[NodeType.STREAM][ARRAY_SIZE] = self.array_size
+            dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
         if self.nexus_indices_index_every_mb is not None:
-            dict[NodeType.STREAM][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
         if self.nexus_indices_index_every_kb is not None:
-            dict[NodeType.STREAM][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
         if self.store_latest_into is not None:
-            dict[NodeType.STREAM][STORE_LATEST_INTO] = self.store_latest_into
+            dict[NodeType.CONFIG][STORE_LATEST_INTO] = self.store_latest_into
         return dict
 
 
@@ -169,9 +164,8 @@ class HS00Stream:
 
     def as_dict(self):
         return {
-            CommonKeys.TYPE: NodeType.STREAM,
-            NodeType.STREAM: {
-                WRITER_MODULE: self.writer_module,
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
                 SOURCE: self.source,
                 TOPIC: self.topic,
                 DATA_TYPE: self.data_type,

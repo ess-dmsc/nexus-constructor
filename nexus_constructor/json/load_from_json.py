@@ -50,7 +50,6 @@ from nexus_constructor.model.stream import (
     STORE_LATEST_INTO,
     TOPIC,
     VALUE_UNITS,
-    WRITER_MODULE,
     EV42Stream,
     F142Stream,
     HS00Stream,
@@ -105,31 +104,27 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
 
 
 def _add_field_to_group(item: Dict, group: Group):
-    field_type = item[CommonKeys.TYPE]
-    if (
-        field_type == NodeType.STREAM
-    ):  # streams do not have a name field so need to be dealt with differently from other fields.
-        stream = _create_stream(item)
+    if CommonKeys.DATA_TYPE in item:
+        field_type = item[CommonKeys.DATA_TYPE]
+        child_name = item[CommonKeys.NAME]
+        if field_type == NodeType.GROUP:
+            child = _create_group(item, group)
+        elif field_type == NodeType.LINK:
+            child = _create_link(item)
+        else:
+            raise Exception(
+                f"Found unknown field type when loading JSON - {child_name}"
+            )
+        group[child_name] = child
+    elif CommonKeys.MODULE in item:
+        writer_module = item[CommonKeys.MODULE]
+        if writer_module == WriterModules.DATASET:
+            stream = _create_dataset(item, group)
+        else:
+            stream = _create_stream(item)
         group.children.append(
             stream
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
-    else:
-        child_name = item[CommonKeys.NAME]
-        if (
-            child_name not in CHILD_EXCLUDELIST
-        ):  # ignore transforms, shape etc as these are handled separately
-            if field_type == NodeType.GROUP:
-                child = _create_group(item, group)
-            elif field_type == NodeType.DATASET:
-                child = _create_dataset(item, group)
-            elif field_type == NodeType.LINK:
-                child = _create_link(item)
-            else:
-                raise Exception(
-                    f"Found unknown field type when loading JSON - {child_name}"
-                )
-            # Add the child to the parent group
-            group[child_name] = child
 
 
 def _create_stream(json_object: Dict) -> Stream:
@@ -138,8 +133,8 @@ def _create_stream(json_object: Dict) -> Stream:
     :param json_object: JSON dictionary containing a stream.
     :return: A stream object containing relevant data from the JSON.
     """
-    stream_object = json_object[NodeType.STREAM]
-    writer_module = stream_object[WRITER_MODULE]
+    stream_object = json_object[NodeType.CONFIG]
+    writer_module = json_object[CommonKeys.MODULE]
     source = stream_object[SOURCE]
     topic = stream_object[TOPIC]
     # Common to ev42 and f142 stream objects
@@ -198,7 +193,7 @@ def __create_ev42_stream(
 def __create_f142_stream(
     index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
 ):
-    value_type = stream_object[CommonKeys.TYPE]
+    value_type = stream_object[CommonKeys.DATA_TYPE]
     value_units = stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
     array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
     store_latest_into = (
@@ -418,7 +413,7 @@ def _create_group(json_object: Dict, parent: Group) -> Group:
     name = json_object[CommonKeys.NAME]
     group = Group(name=name, parent_node=parent)
     for item in children:
-        if item[CommonKeys.TYPE] == NodeType.STREAM:
+        if CommonKeys.MODULE in item:
             group = StreamGroup(name=name, parent_node=parent)
             break
 
@@ -430,18 +425,14 @@ def _create_group(json_object: Dict, parent: Group) -> Group:
 
 
 def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
-    try:
-        size = json_object[NodeType.DATASET][CommonKeys.SIZE]
-    except KeyError:
-        size = 1
-    value_type = json_object[NodeType.DATASET][CommonKeys.TYPE]
-    name = json_object[CommonKeys.NAME]
-    values = json_object[CommonKeys.VALUES]
+    value_type = json_object[NodeType.CONFIG][CommonKeys.DATA_TYPE]
+    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
+    values = json_object[NodeType.CONFIG][CommonKeys.VALUES]
     if isinstance(values, list):
         # convert to a numpy array using specified type
         values = np.array(values, dtype=VALUE_TYPE_TO_NP[value_type])
     ds = Dataset(
-        name=name, values=values, type=value_type, size=size, parent_node=parent
+        name=name, values=values, type=value_type, parent_node=parent
     )
     _add_attributes(json_object, ds)
     return ds

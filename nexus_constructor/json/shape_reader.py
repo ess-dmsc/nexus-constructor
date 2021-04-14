@@ -284,7 +284,7 @@ class ShapeReader:
         try:
             if not any(
                 [
-                    expected_type in dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+                    expected_type in dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE]
                     for expected_type in expected_types
                 ]
             ):
@@ -295,7 +295,7 @@ class ShapeReader:
                     )
                 )
             else:
-                return dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+                return dataset[CommonKeys.DATASET][CommonKeys.DATA_TYPE]
         except KeyError:
             self.warnings.append(
                 InvalidShape(
