@@ -26,6 +26,25 @@ DETECTOR_FACES = "detector_faces"
 
 
 class OFFGeometry(ABC):
+    _units: str = ""
+    _file_path: str = ""
+
+    @property
+    def units(self) -> str:
+        return self._units
+
+    @units.setter
+    def units(self, units: str):
+        self._units = units
+
+    @property
+    def file_path(self):
+        return self._file_path
+
+    @file_path.setter
+    def file_path(self, file_path: str):
+        self._file_path = file_path
+
     @property
     @abstractmethod
     def winding_order(self) -> List[int]:
@@ -48,28 +67,28 @@ class OFFGeometry(ABC):
     def off_geometry(self) -> "OFFGeometry":
         pass
 
-    @property
+    @property  # type: ignore
     @abstractmethod
     def vertices(self) -> List[QVector3D]:
         pass
 
-    @vertices.setter
+    @vertices.setter  # type: ignore
     @abstractmethod
     def vertices(self, new_vertices: List[QVector3D]):
         pass
 
-    @property
+    @property  # type: ignore
     @abstractmethod
     def faces(self) -> List[List[int]]:
         pass
 
-    @faces.setter
+    @faces.setter  # type: ignore
     @abstractmethod
     def faces(self, new_faces: List[List[int]]):
         pass
 
 
-class OFFGeometryNoNexus(OFFGeometry):
+class OFFGeometryNoNexus(OFFGeometry, Group):
     """
     3D mesh description of the shape of an object, based on the OFF file format.
     This class does not store its data in the NeXus file, used for placeholder shape
@@ -87,6 +106,8 @@ class OFFGeometryNoNexus(OFFGeometry):
         :param faces: list of integer lists. Each sublist is a winding path around the corners of a polygon.
             Each sublist item is an index into the vertices list to identify a specific point in 3D space
         """
+        Group.__init__(self, name)
+        OFFGeometry.__init__(self)
         self.name = name
         self._vertices = vertices
         self._faces = faces
@@ -152,8 +173,10 @@ class CylindricalGeometry(Group):
         # so effectively any cylinder after the first one is ignored
         cylinders = self.cylinders.flatten()
         vertices = self.get_field_value(CommonAttrs.VERTICES)
-        return tuple(
-            numpy_array_to_qvector3d(vertices[cylinders[i], :]) for i in range(3)
+        return (
+            numpy_array_to_qvector3d(vertices[cylinders[0], :]),
+            numpy_array_to_qvector3d(vertices[cylinders[1], :]),
+            numpy_array_to_qvector3d(vertices[cylinders[2], :]),
         )
 
     @staticmethod
@@ -206,7 +229,8 @@ class CylindricalGeometry(Group):
         return QVector3D(0, 0, 1)
 
     @property
-    def off_geometry(self, steps: int = 10) -> OFFGeometry:
+    def off_geometry(self) -> OFFGeometry:
+        steps: int = 10
         unit_conversion_factor = calculate_unit_conversion_factor(self.units, METRES)
 
         # A list of vertices describing the circle at the bottom of the cylinder
@@ -275,9 +299,6 @@ class OFFGeometryNexus(OFFGeometry, Group):
     http://download.nexusformat.org/sphinx/classes/base_classes/NXoff_geometry.html
     """
 
-    _cad_file_units = ""
-    _cad_file_path = ""
-
     @property
     def detector_faces(self) -> List[Tuple[int, int]]:
         return self.get_field_value(DETECTOR_FACES).tolist()
@@ -339,22 +360,6 @@ class OFFGeometryNexus(OFFGeometry, Group):
     def faces(self, new_faces: List[List[int]]):
         self.record_faces(new_faces)
 
-    @property
-    def units(self) -> str:
-        return self._cad_file_units
-
-    @units.setter
-    def units(self, units: str):
-        self._cad_file_units = units
-
-    @property
-    def file_path(self):
-        return self._cad_file_path
-
-    @file_path.setter
-    def file_path(self, file_path: str):
-        self._cad_file_path = file_path
-
     def record_faces(self, new_faces: List[List[int]]):
         """
         Record face data in file
@@ -410,6 +415,22 @@ class NoShapeGeometry:
     """
     Dummy object for components with no geometry.
     """
+
+    @property
+    def cylinders(self):
+        return None
+
+    @cylinders.setter
+    def cylinders(self, value):
+        pass
+
+    @property
+    def detector_number(self):
+        return None
+
+    @detector_number.setter
+    def detector_number(self, value):
+        pass
 
     def __init__(self):
         pass

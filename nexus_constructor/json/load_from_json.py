@@ -20,7 +20,6 @@ from nexus_constructor.json.json_warnings import (
 )
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
-    _find_attribute_from_list_or_dict,
     _find_nx_class,
 )
 from nexus_constructor.json.shape_reader import ShapeReader
@@ -136,7 +135,7 @@ def _find_depends_on_path(items: List[Dict]) -> str:
     for item in items:
         try:
             config = item[NodeType.CONFIG]
-            if config[CommonKeys.NAME] != "depends_on":
+            if config[CommonKeys.NAME] != CommonAttrs.DEPENDS_ON:
                 continue
             return config[CommonKeys.VALUES]
         except KeyError:
@@ -184,6 +183,8 @@ def _create_stream(json_object: Dict) -> Stream:
         return SENVStream(source=source, topic=topic)
     if writer_module == WriterModules.TDCTIME.value:
         return TDCTStream(source=source, topic=topic)
+
+    return None
 
 
 def __create_ev42_stream(

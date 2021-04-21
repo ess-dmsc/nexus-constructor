@@ -1,16 +1,21 @@
-from PySide2.QtCore import QSize, QMetaObject
+from typing import TYPE_CHECKING
+
+from PySide2.QtCore import QMetaObject, QSize
 from PySide2.QtWidgets import (
-    QLabel,
-    QFormLayout,
     QApplication,
     QDoubleSpinBox,
-    QHBoxLayout,
+    QFormLayout,
     QFrame,
+    QHBoxLayout,
+    QLabel,
     QLineEdit,
     QVBoxLayout,
 )
 
 from nexus_constructor.field_widget import FieldWidget
+
+if TYPE_CHECKING:
+    from nexus_constructor.transformation_view import EditTransformation
 
 
 class Ui_Transformation(object):
