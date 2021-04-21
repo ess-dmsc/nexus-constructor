@@ -424,7 +424,7 @@ def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_compo
         if component.name == "test_component":
             component_found = True
             assert len(component.transforms) == 1
-            assert component.transforms[0].config.name == "location"
+            assert component.transforms[0].name == "location"
     assert component_found
 
 

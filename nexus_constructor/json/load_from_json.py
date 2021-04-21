@@ -130,6 +130,20 @@ def _add_field_to_group(item: Dict, group: Group):
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
 
 
+def _find_depends_on_path(items: List[Dict]) -> str:
+    if not isinstance(items, list):
+        raise RuntimeError("Items is not a list.")
+    for item in items:
+        try:
+            config = item[NodeType.CONFIG]
+            if config[CommonKeys.NAME] != "depends_on":
+                continue
+            return config[CommonKeys.VALUES]
+        except KeyError:
+            pass
+    return None
+
+
 def _create_stream(json_object: Dict) -> Stream:
     """
     Given a dictionary containing a stream, create a corresponding stream object to be used in the model.
@@ -365,9 +379,7 @@ class JSONReader:
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
 
-        depends_on_path = _find_attribute_from_list_or_dict(
-            CommonAttrs.DEPENDS_ON, children
-        )
+        depends_on_path = _find_depends_on_path(children)
 
         if depends_on_path not in DEPENDS_ON_IGNORE:
             depends_on_id = TransformId(
