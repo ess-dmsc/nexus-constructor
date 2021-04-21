@@ -96,15 +96,15 @@ class EV42Stream:
             },
         }
         if self.adc_pulse_debug is not None:
-            dict[NodeType.STREAM][ADC_PULSE_DEBUG] = self.adc_pulse_debug
+            dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
         if self.nexus_indices_index_every_mb is not None:
-            dict[NodeType.STREAM][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
         if self.nexus_indices_index_every_kb is not None:
-            dict[NodeType.STREAM][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
         if self.nexus_chunk_chunk_mb is not None:
-            dict[NodeType.STREAM][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
+            dict[NodeType.CONFIG][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
         if self.nexus_chunk_chunk_kb is not None:
-            dict[NodeType.STREAM][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
+            dict[NodeType.CONFIG][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
         return dict
 
 

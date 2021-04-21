@@ -98,14 +98,17 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     :param children: The list of dictionaries.
     :return: The shape attribute if it could be found, otherwise None.
     """
-    for item in children:
-        if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
-            return item
+    try:
+        for item in children:
+            if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
+                return item
+    except KeyError:
+        return None
 
 
 def _add_field_to_group(item: Dict, group: Group):
-    if CommonKeys.DATA_TYPE in item:
-        field_type = item[CommonKeys.DATA_TYPE]
+    if CommonKeys.TYPE in item:
+        field_type = item[CommonKeys.TYPE]
         child_name = item[CommonKeys.NAME]
         if field_type == NodeType.GROUP:
             child = _create_group(item, group)
@@ -118,7 +121,7 @@ def _add_field_to_group(item: Dict, group: Group):
         group[child_name] = child
     elif CommonKeys.MODULE in item:
         writer_module = item[CommonKeys.MODULE]
-        if writer_module == WriterModules.DATASET:
+        if writer_module == WriterModules.DATASET.value:
             stream = _create_dataset(item, group)
         else:
             stream = _create_stream(item)
@@ -424,8 +427,16 @@ def _create_group(json_object: Dict, parent: Group) -> Group:
     return group
 
 
+def _get_data_type(json_object: Dict):
+    if CommonKeys.DATA_TYPE in json_object:
+        return json_object[CommonKeys.DATA_TYPE]
+    elif CommonKeys.TYPE in json_object:
+        return json_object[CommonKeys.TYPE]
+    raise KeyError
+
+
 def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
-    value_type = json_object[NodeType.CONFIG][CommonKeys.DATA_TYPE]
+    value_type = _get_data_type(json_object[NodeType.CONFIG])
     name = json_object[NodeType.CONFIG][CommonKeys.NAME]
     values = json_object[NodeType.CONFIG][CommonKeys.VALUES]
     if isinstance(values, list):

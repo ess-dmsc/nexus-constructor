@@ -170,11 +170,10 @@ class Transformation(Dataset):
 
         return_dict = {
             CommonKeys.NAME: self.name,
-            CommonKeys.DATA_TYPE: NodeType.DATASET,
-            CommonKeys.VALUES: value if value is not None else [],
-            CommonKeys.DATASET: {
+            CommonKeys.TYPE: "dataset",
+            NodeType.CONFIG: {
                 CommonKeys.DATA_TYPE: self.type,
-                CommonKeys.SIZE: self.size,
+                CommonKeys.VALUES: value if value is not None else [],
             },
         }
         if self.attributes:

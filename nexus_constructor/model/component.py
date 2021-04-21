@@ -431,7 +431,7 @@ class Component(Group):
             # Add transformations in a child group
             dictionary[CommonKeys.CHILDREN].append(
                 {
-                    CommonKeys.DATA_TYPE: NodeType.GROUP,
+                    CommonKeys.TYPE: NodeType.GROUP,
                     CommonKeys.NAME: TRANSFORMS_GROUP_NAME,
                     CommonKeys.CHILDREN: [
                         transform.as_dict() for transform in self.transforms

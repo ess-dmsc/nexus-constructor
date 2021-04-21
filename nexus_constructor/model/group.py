@@ -76,7 +76,7 @@ class Group:
         return self[name].values
 
     def as_dict(self) -> Dict[str, Any]:
-        return_dict = {CommonKeys.NAME: self.name, CommonKeys.DATA_TYPE: NodeType.GROUP}
+        return_dict = {CommonKeys.NAME: self.name, CommonKeys.TYPE: NodeType.GROUP}
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
         return_dict[CommonKeys.CHILDREN] = (
