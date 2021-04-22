@@ -16,6 +16,7 @@ ADC_PULSE_DEBUG = "adc_pulse_debug"
 STORE_LATEST_INTO = "store_latest_into"
 SOURCE = "source"
 TOPIC = "topic"
+DATASET = "dataset"
 
 
 class WriterModules(Enum):

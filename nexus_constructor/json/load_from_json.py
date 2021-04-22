@@ -58,6 +58,7 @@ from nexus_constructor.model.stream import (
     StreamGroup,
     TDCTStream,
     WriterModules,
+    DATASET
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
@@ -120,7 +121,7 @@ def _add_field_to_group(item: Dict, group: Group):
         group[child_name] = child
     elif CommonKeys.MODULE in item:
         writer_module = item[CommonKeys.MODULE]
-        if writer_module == WriterModules.DATASET.value:
+        if writer_module == DATASET:
             stream = _create_dataset(item, group)
         else:
             stream = _create_stream(item)

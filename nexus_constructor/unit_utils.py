@@ -58,7 +58,10 @@ def units_have_magnitude_of_one(input: str, emit_logging_msg=True) -> bool:
     :param input: The units string.
     :return: True if the unit has a magnitude of one, False otherwise.
     """
-    if ureg(input).magnitude != 1:
+    unit = ureg(input)
+    if not isinstance(unit, ureg.Quantity):
+        return False
+    if unit.magnitude != 1:
         if emit_logging_msg:
             logging.info(
                 f"Unit input {input} has wrong magnitude. The input should have a magnitude of one."
