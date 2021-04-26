@@ -41,6 +41,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometry,
     OFFGeometryNexus,
 )
+from nexus_constructor.model.stream import DATASET
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.helpers import _generate_incremental_name
 from nexus_constructor.model.transformation import Transformation
@@ -453,9 +454,12 @@ class Component(Group):
             if self.depends_on is not None:
                 dictionary[CommonKeys.CHILDREN].append(
                     {
-                        CommonKeys.NAME: CommonAttrs.DEPENDS_ON,
-                        CommonKeys.DATA_TYPE: ValueTypes.STRING,
-                        CommonKeys.VALUES: self.depends_on.absolute_path,
+                        CommonKeys.MODULE: DATASET,
+                        NodeType.CONFIG: {
+                            CommonKeys.NAME: CommonAttrs.DEPENDS_ON,
+                            CommonKeys.DATA_TYPE: ValueTypes.STRING,
+                            CommonKeys.VALUES: self.depends_on.absolute_path,
+                        }
                     }
                 )
         except AttributeError:
