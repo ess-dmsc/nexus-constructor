@@ -108,6 +108,8 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
 
 def _add_field_to_group(item: Dict, group: Group):
     if CommonKeys.TYPE in item:
+        if item[CommonKeys.NAME] == TRANSFORMS_GROUP_NAME:
+            return
         field_type = item[CommonKeys.TYPE]
         child_name = item[CommonKeys.NAME]
         if field_type == NodeType.GROUP:
@@ -122,6 +124,8 @@ def _add_field_to_group(item: Dict, group: Group):
     elif CommonKeys.MODULE in item:
         writer_module = item[CommonKeys.MODULE]
         if writer_module == DATASET:
+            if item[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
+                return
             stream = _create_dataset(item, group)
         else:
             stream = _create_stream(item)
