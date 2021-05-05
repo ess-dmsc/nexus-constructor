@@ -9,7 +9,7 @@ from nexus_constructor.model.value_type import ValueType, ValueTypes
 
 
 class Attributes(list):
-    """Abstract class used for common functionality between a group and dataset. """
+    """Abstract class used for common functionality between a group and dataset."""
 
     def set_attribute_value(
         self,

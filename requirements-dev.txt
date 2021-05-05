@@ -12,7 +12,7 @@ setuptools<45.0.0
 jsonschema==2.6.0
 
 # Formatting/linting
-black==19.10b0
+black==21.5b0
 pre-commit
 flake8
 mypy==0.812
