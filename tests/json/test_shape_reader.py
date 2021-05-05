@@ -349,7 +349,7 @@ def test_GIVEN_missing_units_WHEN_finding_off_units_THEN_error_message_is_create
         CommonAttrs.VERTICES, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    units = off_shape_reader._get_shape_dataset_from_list(
+    off_shape_reader._get_shape_dataset_from_list(
         CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
     )
     del vertices_dataset[CommonKeys.ATTRIBUTES][0]
@@ -478,7 +478,7 @@ def test_GIVEN_missing_units_WHEN_finding_cylindrical_units_THEN_error_message_i
         CommonAttrs.VERTICES, cylindrical_shape_json[CommonKeys.CHILDREN]
     )
 
-    units = cylindrical_shape_reader._get_shape_dataset_from_list(
+    cylindrical_shape_reader._get_shape_dataset_from_list(
         CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
     )
     del vertices_dataset[CommonKeys.ATTRIBUTES][0]

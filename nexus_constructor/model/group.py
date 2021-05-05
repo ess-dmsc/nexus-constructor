@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import attr
 
@@ -12,9 +12,6 @@ from nexus_constructor.model.helpers import (
     get_absolute_path,
 )
 from nexus_constructor.model.link import Link
-
-if TYPE_CHECKING:
-    from nexus_constructor.model.stream import StreamGroup
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
