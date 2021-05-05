@@ -11,6 +11,7 @@ from streaming_data_types.forwarder_config_update_rf5k import StreamInfo, serial
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.stream import StreamGroup
+from nexus_constructor.model.stream import Stream
 
 provider_str_to_enum = {"pva": Protocol.PVA, "ca": Protocol.CA, "fake": Protocol.FAKE}
 
