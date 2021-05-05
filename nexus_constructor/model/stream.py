@@ -96,15 +96,15 @@ class EV42Stream:
             },
         }
         if self.adc_pulse_debug is not None:
-            dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
+            dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug  # type: ignore
         if self.nexus_indices_index_every_mb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb  # type: ignore
         if self.nexus_indices_index_every_kb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb  # type: ignore
         if self.nexus_chunk_chunk_mb is not None:
-            dict[NodeType.CONFIG][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
+            dict[NodeType.CONFIG][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb  # type: ignore
         if self.nexus_chunk_chunk_kb is not None:
-            dict[NodeType.CONFIG][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
+            dict[NodeType.CONFIG][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb  # type: ignore
         return dict
 
 
@@ -130,15 +130,15 @@ class F142Stream:
             },
         }
         if self.value_units is not None:
-            dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units
+            dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units  # type: ignore
         if self.array_size is not None:
-            dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
+            dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size  # type: ignore
         if self.nexus_indices_index_every_mb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb
+            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb  # type: ignore
         if self.nexus_indices_index_every_kb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb
+            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb  # type: ignore
         if self.store_latest_into is not None:
-            dict[NodeType.CONFIG][STORE_LATEST_INTO] = self.store_latest_into
+            dict[NodeType.CONFIG][STORE_LATEST_INTO] = self.store_latest_into  # type: ignore
         return dict
 
 

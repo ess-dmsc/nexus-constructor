@@ -90,6 +90,7 @@ def _retrieve_children_list(json_dict: Dict) -> List:
         return entry[CommonKeys.CHILDREN]
     except (KeyError, IndexError, TypeError):
         return []
+    return []
 
 
 def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
@@ -104,9 +105,11 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
                 return item
     except KeyError:
         return None
+    return None
 
 
 def _add_field_to_group(item: Dict, group: Group):
+    child: Union[Group, Link]
     if CommonKeys.TYPE in item:
         if item[CommonKeys.NAME] == TRANSFORMS_GROUP_NAME:
             return
@@ -122,6 +125,7 @@ def _add_field_to_group(item: Dict, group: Group):
             )
         group[child_name] = child
     elif CommonKeys.MODULE in item:
+        stream: Union[Dataset, Stream]
         writer_module = item[CommonKeys.MODULE]
         if writer_module == DATASET:
             if item[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
@@ -130,7 +134,7 @@ def _add_field_to_group(item: Dict, group: Group):
         else:
             stream = _create_stream(item)
         group.children.append(
-            stream
+            stream  # type: ignore
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
 
 

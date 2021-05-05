@@ -1,4 +1,9 @@
-from typing import Any, List, Union
+from typing import TYPE_CHECKING, Any, List, Union
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.attributes import Attributes
+    from nexus_constructor.model.dataset import Dataset
+    from nexus_constructor.model.group import Group
 
 
 def __find_item_index(list_to_look_in: List[Any], item_name: str):
