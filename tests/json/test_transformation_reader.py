@@ -221,9 +221,7 @@ def test_GIVEN_no_values_WHEN_attempting_to_create_transformations_THEN_create_t
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
-def test_no_transformation_without_config(
-    transformation_reader, transformation_json
-):
+def test_no_transformation_without_config(transformation_reader, transformation_json):
     del transformation_json["children"][0]["config"]
     transformation_reader._create_transformations(transformation_json["children"])
 
@@ -358,10 +356,14 @@ def test_GIVEN_transformation_has_depends_on_WHEN_creating_transformations_THEN_
     transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 
-    transform1 = transformation_reader._transforms_with_dependencies[TransformId(PARENT_COMPONENT_NAME, transformation_name)][1]
+    transform1 = transformation_reader._transforms_with_dependencies[
+        TransformId(PARENT_COMPONENT_NAME, transformation_name)
+    ][1]
     transform2 = TransformId(depends_on_component_name, depends_on_transform_name)
 
-    assert transform1 == transform2, "Expected to find details of dependency stored in dictionary"
+    assert (
+        transform1 == transform2
+    ), "Expected to find details of dependency stored in dictionary"
 
 
 @pytest.mark.parametrize("depends_on_path", [".", None])
@@ -376,7 +378,8 @@ def test_GIVEN_transformation_has_no_depends_on_WHEN_creating_transformations_TH
     assert (
         transformation_reader._transforms_with_dependencies[
             TransformId(
-                PARENT_COMPONENT_NAME, transformation_json["children"][0]["config"]["name"]
+                PARENT_COMPONENT_NAME,
+                transformation_json["children"][0]["config"]["name"],
             )
         ][1]
         is None

@@ -231,12 +231,20 @@ class FieldWidget(QFrame):
         return_object: Union[Dataset, StreamGroup, Link]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
-            return_object = Dataset(name=self.name, size=[1], type=dtype, values=val,)
+            return_object = Dataset(
+                name=self.name,
+                size=[1],
+                type=dtype,
+                values=val,
+            )
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
-                name=self.name, size=array.size, type=dtype, values=array,
+                name=self.name,
+                size=array.size,
+                type=dtype,
+                values=array,
             )
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()

@@ -10,7 +10,7 @@ from nexus_constructor.common_attrs import (
     SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
-    NodeType
+    NodeType,
 )
 from nexus_constructor.json.json_warnings import InvalidShape, JsonWarningsContainer
 from nexus_constructor.json.load_from_json_utils import (
@@ -39,7 +39,9 @@ from nexus_constructor.unit_utils import (
 )
 
 
-def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
+def _convert_vertices_to_qvector3d(
+    vertices: List[List[float]],
+) -> List[QVector3D]:
     """
     Converts a list of vertices to QVector3D
     :param vertices: The list of vertices.

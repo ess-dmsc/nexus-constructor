@@ -480,7 +480,14 @@ def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN
 
 @pytest.mark.parametrize(
     "test_input",
-    ({}, {"module": "dataset", "config": {"values": 0}, }, {"attributes": []},),  # noqa E231
+    (
+        {},
+        {
+            "module": "dataset",
+            "config": {"values": 0},
+        },
+        {"attributes": []},
+    ),  # noqa E231
 )
 def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
     test_input,
@@ -534,7 +541,7 @@ def test_GIVEN_dataset_with_string_value_WHEN_adding_dataset_THEN_dataset_object
     parent = Group(name="test")
     test_dict = {
         "module": "dataset",
-        "config": {"type": ValueTypes.STRING, "values": values, "name": name}
+        "config": {"type": ValueTypes.STRING, "values": values, "name": name},
     }
 
     ds = _create_dataset(test_dict, parent)
@@ -554,7 +561,7 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
 
     test_dict = {
         "module": "dataset",
-        "config": {"type": dtype, "values": values, "name": name}
+        "config": {"type": dtype, "values": values, "name": name},
     }
     parent = Group(name="test")
     ds = _create_dataset(test_dict, parent)

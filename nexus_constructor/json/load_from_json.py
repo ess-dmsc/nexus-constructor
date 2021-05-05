@@ -58,7 +58,7 @@ from nexus_constructor.model.stream import (
     StreamGroup,
     TDCTStream,
     WriterModules,
-    DATASET
+    DATASET,
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
@@ -300,7 +300,10 @@ class JSONReader:
         """
         for (
             component_name,
-            (component, depends_on_id,),
+            (
+                component,
+                depends_on_id,
+            ),
         ) in self._components_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
@@ -322,7 +325,10 @@ class JSONReader:
         """
         for (
             transform_id,
-            (transform, depends_on_id,),
+            (
+                transform,
+                depends_on_id,
+            ),
         ) in self._transforms_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
@@ -460,9 +466,7 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
     if isinstance(values, list):
         # convert to a numpy array using specified type
         values = np.array(values, dtype=VALUE_TYPE_TO_NP[value_type])
-    ds = Dataset(
-        name=name, values=values, type=value_type, parent_node=parent
-    )
+    ds = Dataset(name=name, values=values, type=value_type, parent_node=parent)
     _add_attributes(json_object, ds)
     return ds
 

@@ -53,7 +53,12 @@ def _create_transformation_dataset(
     :param name: The transformation name.
     :return: A dataset containing the above information.
     """
-    return Dataset(name, size=[1], type=dtype, values=angle_or_magnitude,)
+    return Dataset(
+        name,
+        size=[1],
+        type=dtype,
+        values=angle_or_magnitude,
+    )
 
 
 def get_component_and_transform_name(depends_on_string: str):
@@ -215,16 +220,16 @@ class TransformationReader:
             if not config:
                 continue
 
-            name = self._get_transformation_attribute(
-                CommonKeys.NAME, config
-            )
+            name = self._get_transformation_attribute(CommonKeys.NAME, config)
 
-            values = self._get_transformation_attribute(
-                CommonKeys.VALUES, config, name
-            )
+            values = self._get_transformation_attribute(CommonKeys.VALUES, config, name)
             if values is None:
                 continue
-            dtype = self._get_transformation_attribute([CommonKeys.DATA_TYPE, CommonKeys.TYPE], config, name, )
+            dtype = self._get_transformation_attribute(
+                [CommonKeys.DATA_TYPE, CommonKeys.TYPE],
+                config,
+                name,
+            )
             if not dtype:
                 continue
             dtype = self._parse_dtype(dtype, name)
@@ -242,7 +247,9 @@ class TransformationReader:
                 continue
 
             transformation_type = self._find_attribute_in_list(
-                CommonAttrs.TRANSFORMATION_TYPE, name, attributes,
+                CommonAttrs.TRANSFORMATION_TYPE,
+                name,
+                attributes,
             )
             if not transformation_type:
                 continue

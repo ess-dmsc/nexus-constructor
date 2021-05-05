@@ -20,7 +20,8 @@ def _find_attribute_from_dict(attribute_name: str, entry: dict) -> Any:
 
 
 def _find_attribute_from_list_or_dict(
-    attribute_name: str, entry: Union[list, dict],
+    attribute_name: str,
+    entry: Union[list, dict],
 ) -> Any:
     """
     Attempts to determine the value of an attribute in a dictionary or a list of dictionaries.

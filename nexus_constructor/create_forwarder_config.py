@@ -29,7 +29,10 @@ def _check_for_streams_in_children(
             for stream in child.children:
                 streams.append(
                     StreamInfo(
-                        stream.source, stream.writer_module, stream.topic, protocol,
+                        stream.source,
+                        stream.writer_module,
+                        stream.topic,
+                        protocol,
                     )
                 )
         elif isinstance(child, Group):

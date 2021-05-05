@@ -12,7 +12,7 @@ from nexus_constructor.common_attrs import (
     SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
-    NodeType
+    NodeType,
 )
 from nexus_constructor.json.json_warnings import JsonWarningsContainer
 from nexus_constructor.json.load_from_json import _get_data_type
@@ -377,7 +377,8 @@ def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
-        [off_shape_reader.error_message, invalid_units], off_shape_reader.warnings,
+        [off_shape_reader.error_message, invalid_units],
+        off_shape_reader.warnings,
     )
 
 
@@ -411,11 +412,14 @@ def test_GIVEN_off_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expect
         CommonAttrs.VERTICES, children
     )
     vertices = list(
-        map(lambda vertex: QVector3D(*vertex), vertices_dataset[NodeType.CONFIG][CommonKeys.VALUES])
+        map(
+            lambda vertex: QVector3D(*vertex),
+            vertices_dataset[NodeType.CONFIG][CommonKeys.VALUES],
+        )
     )
-    faces = off_shape_reader._get_shape_dataset_from_list("faces", children)[NodeType.CONFIG][
-        CommonKeys.VALUES
-    ]
+    faces = off_shape_reader._get_shape_dataset_from_list("faces", children)[
+        NodeType.CONFIG
+    ][CommonKeys.VALUES]
     units = _find_attribute_from_list_or_dict(
         CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
     )
@@ -648,7 +652,13 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
     y_pixel_dtype = _get_data_type(y_offset_dataset[NodeType.CONFIG])
 
     mock_component.set_field_value.assert_has_calls(
-        [call(DETECTOR_NUMBER, detector_number, detector_number_dtype,)]
+        [
+            call(
+                DETECTOR_NUMBER,
+                detector_number,
+                detector_number_dtype,
+            )
+        ]
     )
 
     assert X_PIXEL_OFFSET == mock_component.set_field_value.call_args_list[1].args[0]

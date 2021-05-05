@@ -222,13 +222,16 @@ class ChopperChecker:
         """
         correct_slits_type = self._check_data_type(SLITS_NAME, INT_TYPES)
         correct_radius_type = self._check_data_type(
-            RADIUS_NAME, FLOAT_TYPES + INT_TYPES,
+            RADIUS_NAME,
+            FLOAT_TYPES + INT_TYPES,
         )
         correct_slit_height_type = self._check_data_type(
-            SLIT_HEIGHT_NAME, FLOAT_TYPES + INT_TYPES,
+            SLIT_HEIGHT_NAME,
+            FLOAT_TYPES + INT_TYPES,
         )
         correct_slit_edges_type = self._check_data_type(
-            SLIT_EDGES_NAME, FLOAT_TYPES + INT_TYPES,
+            SLIT_EDGES_NAME,
+            FLOAT_TYPES + INT_TYPES,
         )
 
         if (
@@ -251,7 +254,9 @@ class ChopperChecker:
             logging.info(
                 UNABLE
                 + _incorrect_data_type_message(
-                    self.fields_dict, RADIUS_NAME, EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME],
+                    self.fields_dict,
+                    RADIUS_NAME,
+                    EXPECTED_TYPE_ERROR_MSG[RADIUS_NAME],
                 )
             )
 

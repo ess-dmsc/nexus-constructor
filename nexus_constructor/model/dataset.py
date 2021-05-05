@@ -42,7 +42,7 @@ class Dataset:
             NodeType.CONFIG: {
                 CommonKeys.NAME: self.name,
                 CommonKeys.DATA_TYPE: self.type,
-                CommonKeys.VALUES: values
+                CommonKeys.VALUES: values,
             },
         }
         if self.attributes:

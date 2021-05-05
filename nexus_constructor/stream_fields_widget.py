@@ -177,11 +177,15 @@ class StreamFieldsWidget(QDialog):
             self.ev42_adc_pulse_debug_label, self.ev42_adc_pulse_debug_checkbox
         )
 
-        self.ev42_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            INDEX_EVERY_MB, self.ev42_advanced_group_box
+        self.ev42_index_every_mb_spinner = (
+            self.create_label_and_spinbox_for_advanced_option(
+                INDEX_EVERY_MB, self.ev42_advanced_group_box
+            )
         )
-        self.ev42_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            INDEX_EVERY_KB, self.ev42_advanced_group_box
+        self.ev42_index_every_kb_spinner = (
+            self.create_label_and_spinbox_for_advanced_option(
+                INDEX_EVERY_KB, self.ev42_advanced_group_box
+            )
         )
         self.ev42_chunk_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
             CHUNK_CHUNK_MB, self.ev42_advanced_group_box
@@ -215,14 +219,20 @@ class StreamFieldsWidget(QDialog):
         )
         self.f142_advanced_group_box.setLayout(QFormLayout())
 
-        self.f142_index_every_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            INDEX_EVERY_MB, self.f142_advanced_group_box
+        self.f142_index_every_mb_spinner = (
+            self.create_label_and_spinbox_for_advanced_option(
+                INDEX_EVERY_MB, self.f142_advanced_group_box
+            )
         )
-        self.f142_index_every_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            INDEX_EVERY_KB, self.f142_advanced_group_box
+        self.f142_index_every_kb_spinner = (
+            self.create_label_and_spinbox_for_advanced_option(
+                INDEX_EVERY_KB, self.f142_advanced_group_box
+            )
         )
-        self.f142_store_latest_into_spinner = self.create_label_and_spinbox_for_advanced_option(
-            STORE_LATEST_INTO, self.f142_advanced_group_box
+        self.f142_store_latest_into_spinner = (
+            self.create_label_and_spinbox_for_advanced_option(
+                STORE_LATEST_INTO, self.f142_advanced_group_box
+            )
         )
 
     def _show_advanced_options(self, show):
@@ -417,7 +427,10 @@ class StreamFieldsWidget(QDialog):
         field = field.children[
             0
         ]  # only the first stream in the stream group can be edited currently
-        schema = field.writer_module
+        try:
+            schema = field.writer_module
+        except AttributeError:
+            pass
         self.schema_combo.setCurrentText(schema)
         self.topic_line_edit.setText(field.topic)
         self.source_line_edit.setText(field.source)

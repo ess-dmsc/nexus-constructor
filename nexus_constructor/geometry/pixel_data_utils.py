@@ -41,7 +41,9 @@ def get_detector_faces_from_pixel_mapping(
     return detector_faces
 
 
-def get_detector_number_from_pixel_mapping(mapping: PixelMapping,) -> List[int]:
+def get_detector_number_from_pixel_mapping(
+    mapping: PixelMapping,
+) -> List[int]:
     """
     Returns a list of pixel IDs. Used for writing information to the detector_number field in NXdetector and
     NXcylindrical_geometry.
