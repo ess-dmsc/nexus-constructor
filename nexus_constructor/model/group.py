@@ -12,7 +12,6 @@ from nexus_constructor.model.helpers import (
     get_absolute_path,
 )
 from nexus_constructor.model.link import Link
-from nexus_constructor.model.stream import StreamGroup
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -28,7 +27,7 @@ class Group:
 
     name = attr.ib(type=str)
     parent_node = attr.ib(type="Group", default=None)
-    children: List[Union[Dataset, Link, "StreamGroup"]] = attr.ib(
+    children: List[Union[Dataset, Link, "StreamGroup"]] = attr.ib(  # noqa: F821
         factory=list, init=False
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
