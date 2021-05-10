@@ -81,12 +81,12 @@ def get_fields_with_update_functions(
     Tuple[
         Union[
             Dataset,
-            NS10Stream,
-            SENVStream,
-            TDCTStream,
-            EV42Stream,
-            F142Stream,
-            HS00Stream,
+            "NS10Stream",
+            "SENVStream",
+            "TDCTStream",
+            "EV42Stream",
+            "F142Stream",
+            "HS00Stream",
         ],
         Callable,
     ]

@@ -40,12 +40,12 @@ class Group:
     children: List[
         Union[
             Dataset,
-            NS10Stream,
-            SENVStream,
-            TDCTStream,
-            EV42Stream,
-            F142Stream,
-            HS00Stream,
+            "NS10Stream",
+            "SENVStream",
+            "TDCTStream",
+            "EV42Stream",
+            "F142Stream",
+            "HS00Stream",
         ]
     ] = attr.ib(  # noqa: F821
         factory=list, init=False
