@@ -40,6 +40,7 @@ from nexus_constructor.model.stream import (
     CHUNK_CHUNK_KB,
     CHUNK_CHUNK_MB,
     DATA_TYPE,
+    DATASET,
     EDGE_TYPE,
     ERROR_TYPE,
     INDEX_EVERY_KB,
@@ -58,7 +59,6 @@ from nexus_constructor.model.stream import (
     StreamGroup,
     TDCTStream,
     WriterModules,
-    DATASET,
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
@@ -125,7 +125,15 @@ def _add_field_to_group(item: Dict, group: Group):
             )
         group[child_name] = child
     elif CommonKeys.MODULE in item:
-        stream: Union[Dataset, Stream]
+        stream: Union[
+            Dataset,
+            NS10Stream,
+            SENVStream,
+            TDCTStream,
+            EV42Stream,
+            F142Stream,
+            HS00Stream,
+        ]
         writer_module = item[CommonKeys.MODULE]
         if writer_module == DATASET:
             if item[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
@@ -134,7 +142,7 @@ def _add_field_to_group(item: Dict, group: Group):
         else:
             stream = _create_stream(item)
         group.children.append(
-            stream  # type: ignore
+            stream
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
 
 
@@ -304,10 +312,7 @@ class JSONReader:
         """
         for (
             component_name,
-            (
-                component,
-                depends_on_id,
-            ),
+            (component, depends_on_id,),
         ) in self._components_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
@@ -329,10 +334,7 @@ class JSONReader:
         """
         for (
             transform_id,
-            (
-                transform,
-                depends_on_id,
-            ),
+            (transform, depends_on_id,),
         ) in self._transforms_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to

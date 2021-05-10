@@ -14,6 +14,14 @@ from nexus_constructor.validators import FieldType
 if TYPE_CHECKING:
     from PySide2.QtWidgets import QFrame  # noqa: F401
 
+    from nexus_constructor.model.stream import (  # noqa: F401
+        EV42Stream,
+        F142Stream,
+        HS00Stream,
+        NS10Stream,
+        SENVStream,
+        TDCTStream,
+    )
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
     from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
 
@@ -69,7 +77,20 @@ def update_existing_stream_field(
 
 def get_fields_with_update_functions(
     component: Component,
-) -> List[Tuple[Union[Dataset, Link, StreamGroup], Callable]]:
+) -> List[
+    Tuple[
+        Union[
+            Dataset,
+            NS10Stream,
+            SENVStream,
+            TDCTStream,
+            EV42Stream,
+            F142Stream,
+            HS00Stream,
+        ],
+        Callable,
+    ]
+]:
     """
     Return a list of fields in a given component group.
     :param component: The component to check for fields
