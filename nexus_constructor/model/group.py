@@ -57,7 +57,9 @@ class Group:
         return _get_item(self.children, key)
 
     def __setitem__(
-        self, key: str, value: Union["Group", Dataset, Link],
+        self,
+        key: str,
+        value: Union["Group", Dataset, Link],
     ):
         try:
             value.parent_node = self
