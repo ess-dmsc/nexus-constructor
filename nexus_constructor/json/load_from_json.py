@@ -314,7 +314,10 @@ class JSONReader:
         """
         for (
             component_name,
-            (component, depends_on_id,),
+            (
+                component,
+                depends_on_id,
+            ),
         ) in self._components_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
@@ -336,7 +339,10 @@ class JSONReader:
         """
         for (
             transform_id,
-            (transform, depends_on_id,),
+            (
+                transform,
+                depends_on_id,
+            ),
         ) in self._transforms_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
