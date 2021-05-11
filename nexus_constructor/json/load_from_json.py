@@ -85,12 +85,13 @@ def _retrieve_children_list(json_dict: Dict) -> List:
     :param json_dict: The JSON dictionary loaded by the user.
     :return: The children value is returned if it was found, otherwise an empty list is returned.
     """
+    value = []
     try:
         entry = json_dict[CommonKeys.CHILDREN][0]
-        return entry[CommonKeys.CHILDREN]
+        value = entry[CommonKeys.CHILDREN]
     except (KeyError, IndexError, TypeError):
-        return []
-    return []
+        pass
+    return value
 
 
 def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
@@ -99,13 +100,14 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     :param children: The list of dictionaries.
     :return: The shape attribute if it could be found, otherwise None.
     """
+    value = None
     try:
         for item in children:
             if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
-                return item
+                value = item
     except KeyError:
-        return None
-    return None
+        pass
+    return value
 
 
 def _add_field_to_group(item: Dict, group: Group):
@@ -146,7 +148,7 @@ def _add_field_to_group(item: Dict, group: Group):
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
 
 
-def _find_depends_on_path(items: List[Dict]) -> str:
+def _find_depends_on_path(items: List[Dict]) -> Optional[str]:
     if not isinstance(items, list):
         raise RuntimeError("Items is not a list.")
     for item in items:
@@ -312,10 +314,7 @@ class JSONReader:
         """
         for (
             component_name,
-            (
-                component,
-                depends_on_id,
-            ),
+            (component, depends_on_id,),
         ) in self._components_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
@@ -337,10 +336,7 @@ class JSONReader:
         """
         for (
             transform_id,
-            (
-                transform,
-                depends_on_id,
-            ),
+            (transform, depends_on_id,),
         ) in self._transforms_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
