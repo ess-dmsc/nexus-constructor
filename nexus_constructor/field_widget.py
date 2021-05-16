@@ -26,7 +26,7 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -121,6 +121,10 @@ class FieldWidget(QFrame):
 
         self.value_type_combo: QComboBox = QComboBox()
         self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
+        for i, item in enumerate(VALUE_TYPE_TO_NP.keys()):
+            if item == ValueTypes.DOUBLE:
+                self.value_type_combo.setCurrentIndex(i)
+                break
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit: QLineEdit = QLineEdit()

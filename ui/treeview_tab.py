@@ -7,6 +7,10 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
+from PySide2.QtWidgets import (
+    QSizePolicy,
+)
+
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
@@ -79,13 +83,18 @@ class ComponentTreeViewTab(QWidget):
             self.component_tool_bar,
             self,
         )
-        self.delete_action = create_and_add_toolbar_action(
-            "delete.png", "Delete", self.on_delete_item, self.component_tool_bar, self
-        )
         self.zoom_action = create_and_add_toolbar_action(
             "zoom.svg", "Zoom", self.on_zoom_item, self.component_tool_bar, self,
         )
         self.component_tool_bar.insertSeparator(self.zoom_action)
+
+        self.spacer = QWidget()
+        self.spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.component_tool_bar.addWidget(self.spacer)
+        self.delete_action = create_and_add_toolbar_action(
+            "delete.png", "Delete", self.on_delete_item, self.component_tool_bar, self
+        )
+        self.component_tool_bar.insertSeparator(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
     def set_up_model(self, model: Model):
