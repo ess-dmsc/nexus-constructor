@@ -123,7 +123,7 @@ def _add_field_to_group(item: Dict, group: Group):
             child = _create_link(item)
         else:
             raise Exception(
-                f"Found unknown field type when loading JSON - {child_name}"
+                f"Found unknown field type (\"{field_type}\") when loading JSON - {child_name}"
             )
         group[child_name] = child
     elif CommonKeys.MODULE in item:
@@ -146,11 +146,15 @@ def _add_field_to_group(item: Dict, group: Group):
         group.children.append(
             stream
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
+    else:
+        raise Exception(
+            f"Unable to add field as neither writer module type nor child type was found in the current node."
+        )
 
 
-def _find_depends_on_path(items: List[Dict]) -> Optional[str]:
+def _find_depends_on_path(items: List[Dict], name: str) -> Optional[str]:
     if not isinstance(items, list):
-        raise RuntimeError("Items is not a list.")
+        raise RuntimeError(f"List of children in node with the name \"{name}\" is not a list.")
     for item in items:
         try:
             config = item[NodeType.CONFIG]
@@ -158,7 +162,7 @@ def _find_depends_on_path(items: List[Dict]) -> Optional[str]:
                 continue
             return config[CommonKeys.VALUES]
         except KeyError:
-            pass
+            pass  # Not all items has a config node, ignore those that do not.
     return None
 
 
@@ -405,7 +409,7 @@ class JSONReader:
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
 
-        depends_on_path = _find_depends_on_path(children)
+        depends_on_path = _find_depends_on_path(children, name)
 
         if depends_on_path not in DEPENDS_ON_IGNORE:
             depends_on_id = TransformId(
