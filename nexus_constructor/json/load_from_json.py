@@ -40,6 +40,7 @@ from nexus_constructor.model.stream import (
     CHUNK_CHUNK_KB,
     CHUNK_CHUNK_MB,
     DATA_TYPE,
+    DATASET,
     EDGE_TYPE,
     ERROR_TYPE,
     INDEX_EVERY_KB,
@@ -58,7 +59,6 @@ from nexus_constructor.model.stream import (
     StreamGroup,
     TDCTStream,
     WriterModules,
-    DATASET,
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
@@ -85,12 +85,13 @@ def _retrieve_children_list(json_dict: Dict) -> List:
     :param json_dict: The JSON dictionary loaded by the user.
     :return: The children value is returned if it was found, otherwise an empty list is returned.
     """
+    value = []
     try:
         entry = json_dict[CommonKeys.CHILDREN][0]
-        return entry[CommonKeys.CHILDREN]
+        value = entry[CommonKeys.CHILDREN]
     except (KeyError, IndexError, TypeError):
-        return []
-    return []
+        pass
+    return value
 
 
 def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
@@ -99,13 +100,14 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     :param children: The list of dictionaries.
     :return: The shape attribute if it could be found, otherwise None.
     """
+    value = None
     try:
         for item in children:
             if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
-                return item
+                value = item
     except KeyError:
-        return None
-    return None
+        pass
+    return value
 
 
 def _add_field_to_group(item: Dict, group: Group):
@@ -121,11 +123,19 @@ def _add_field_to_group(item: Dict, group: Group):
             child = _create_link(item)
         else:
             raise Exception(
-                f"Found unknown field type when loading JSON - {child_name}"
+                f'Found unknown field type ("{field_type}") when loading JSON - {child_name}'
             )
         group[child_name] = child
     elif CommonKeys.MODULE in item:
-        stream: Union[Dataset, Stream]
+        stream: Union[
+            Dataset,
+            NS10Stream,
+            SENVStream,
+            TDCTStream,
+            EV42Stream,
+            F142Stream,
+            HS00Stream,
+        ]
         writer_module = item[CommonKeys.MODULE]
         if writer_module == DATASET:
             if item[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
@@ -134,13 +144,19 @@ def _add_field_to_group(item: Dict, group: Group):
         else:
             stream = _create_stream(item)
         group.children.append(
-            stream  # type: ignore
+            stream
         )  # Can't use the `[]` operator because streams do not have a name to use as a key
+    else:
+        raise Exception(
+            "Unable to add field as neither writer module type nor child type was found in the current node."
+        )
 
 
-def _find_depends_on_path(items: List[Dict]) -> str:
+def _find_depends_on_path(items: List[Dict], name: str) -> Optional[str]:
     if not isinstance(items, list):
-        raise RuntimeError("Items is not a list.")
+        raise RuntimeError(
+            f'List of children in node with the name "{name}" is not a list.'
+        )
     for item in items:
         try:
             config = item[NodeType.CONFIG]
@@ -148,7 +164,7 @@ def _find_depends_on_path(items: List[Dict]) -> str:
                 continue
             return config[CommonKeys.VALUES]
         except KeyError:
-            pass
+            pass  # Not all items has a config node, ignore those that do not.
     return None
 
 
@@ -395,7 +411,7 @@ class JSONReader:
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
 
-        depends_on_path = _find_depends_on_path(children)
+        depends_on_path = _find_depends_on_path(children, name)
 
         if depends_on_path not in DEPENDS_ON_IGNORE:
             depends_on_id = TransformId(

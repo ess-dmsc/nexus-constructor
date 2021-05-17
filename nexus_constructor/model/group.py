@@ -14,7 +14,14 @@ from nexus_constructor.model.helpers import (
 from nexus_constructor.model.link import Link
 
 if TYPE_CHECKING:
-    from nexus_constructor.model.stream import StreamGroup
+    from nexus_constructor.model.stream import (  # noqa: F401
+        EV42Stream,
+        F142Stream,
+        HS00Stream,
+        NS10Stream,
+        SENVStream,
+        TDCTStream,
+    )
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -30,7 +37,17 @@ class Group:
 
     name = attr.ib(type=str)
     parent_node = attr.ib(type="Group", default=None)
-    children: List[Union[Dataset, Link, "StreamGroup"]] = attr.ib(  # noqa: F821
+    children: List[
+        Union[
+            Dataset,
+            "NS10Stream",
+            "SENVStream",
+            "TDCTStream",
+            "EV42Stream",
+            "F142Stream",
+            "HS00Stream",
+        ]
+    ] = attr.ib(  # noqa: F821
         factory=list, init=False
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)

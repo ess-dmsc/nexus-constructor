@@ -269,7 +269,7 @@ class ShapeReader:
                 if dataset[NodeType.CONFIG][CommonKeys.NAME] == dataset_name:
                     return dataset
         except KeyError:
-            pass  # Create warning message
+            pass  # This "pass" ensures that we create a warning message.
         if warning:
             self.warnings.append(
                 InvalidShape(

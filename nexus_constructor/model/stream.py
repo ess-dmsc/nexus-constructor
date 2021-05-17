@@ -37,10 +37,7 @@ class NS10Stream:
     def as_dict(self):
         return {
             CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {
-                SOURCE: self.source,
-                TOPIC: self.topic,
-            },
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
         }
 
 
@@ -53,10 +50,7 @@ class SENVStream:
     def as_dict(self):
         return {
             CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {
-                SOURCE: self.source,
-                TOPIC: self.topic,
-            },
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
         }
 
 
@@ -69,10 +63,7 @@ class TDCTStream:
     def as_dict(self):
         return {
             CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {
-                SOURCE: self.source,
-                TOPIC: self.topic,
-            },
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
         }
 
 
@@ -88,24 +79,25 @@ class EV42Stream:
     nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        dict = {
+        config_dict: dict = {
             CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {
-                SOURCE: self.source,
-                TOPIC: self.topic,
-            },
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
         }
         if self.adc_pulse_debug is not None:
-            dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug  # type: ignore
+            config_dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
         if self.nexus_indices_index_every_mb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb  # type: ignore
+            config_dict[NodeType.CONFIG][
+                INDEX_EVERY_MB
+            ] = self.nexus_indices_index_every_mb
         if self.nexus_indices_index_every_kb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb  # type: ignore
+            config_dict[NodeType.CONFIG][
+                INDEX_EVERY_KB
+            ] = self.nexus_indices_index_every_kb
         if self.nexus_chunk_chunk_mb is not None:
-            dict[NodeType.CONFIG][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb  # type: ignore
+            config_dict[NodeType.CONFIG][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
         if self.nexus_chunk_chunk_kb is not None:
-            dict[NodeType.CONFIG][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb  # type: ignore
-        return dict
+            config_dict[NodeType.CONFIG][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
+        return config_dict
 
 
 @attr.s
@@ -121,7 +113,7 @@ class F142Stream:
     store_latest_into = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        dict = {
+        config_dict: dict = {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {
                 SOURCE: self.source,
@@ -130,16 +122,20 @@ class F142Stream:
             },
         }
         if self.value_units is not None:
-            dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units  # type: ignore
+            config_dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units
         if self.array_size is not None:
-            dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size  # type: ignore
+            config_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
         if self.nexus_indices_index_every_mb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_MB] = self.nexus_indices_index_every_mb  # type: ignore
+            config_dict[NodeType.CONFIG][
+                INDEX_EVERY_MB
+            ] = self.nexus_indices_index_every_mb
         if self.nexus_indices_index_every_kb is not None:
-            dict[NodeType.CONFIG][INDEX_EVERY_KB] = self.nexus_indices_index_every_kb  # type: ignore
+            config_dict[NodeType.CONFIG][
+                INDEX_EVERY_KB
+            ] = self.nexus_indices_index_every_kb
         if self.store_latest_into is not None:
-            dict[NodeType.CONFIG][STORE_LATEST_INTO] = self.store_latest_into  # type: ignore
-        return dict
+            config_dict[NodeType.CONFIG][STORE_LATEST_INTO] = self.store_latest_into
+        return config_dict
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
