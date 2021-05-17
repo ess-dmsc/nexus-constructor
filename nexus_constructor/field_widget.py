@@ -371,7 +371,10 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.kafka_stream:
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
-        self.edit_dialog.show()
+        if self.edit_dialog.isVisible():
+            self.edit_dialog.raise_()
+        else:
+            self.edit_dialog.show()
 
     def show_attrs_dialog(self):
         self.attrs_dialog.show()
