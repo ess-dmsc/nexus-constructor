@@ -34,18 +34,17 @@ class Dataset:
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def as_dict(self) -> Dict[str, Any]:
+        values = self.values
+        if isinstance(values, np.ndarray):
+            values = values.tolist()
         return_dict = {
-            CommonKeys.NAME: self.name,
-            CommonKeys.TYPE: NodeType.DATASET,
-            CommonKeys.DATASET: {
-                CommonKeys.TYPE: self.type,
-                CommonKeys.SIZE: self.size,
+            CommonKeys.MODULE: "dataset",
+            NodeType.CONFIG: {
+                CommonKeys.NAME: self.name,
+                CommonKeys.DATA_TYPE: self.type,
+                CommonKeys.VALUES: values,
             },
         }
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
-        values = self.values
-        if isinstance(values, np.ndarray):
-            values = values.tolist()
-        return_dict[CommonKeys.VALUES] = values
         return return_dict

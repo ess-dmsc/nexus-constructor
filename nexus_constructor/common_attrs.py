@@ -20,15 +20,14 @@ class CommonKeys:
     NAME = "name"
     VALUES = "values"
     TYPE = "type"
-    SIZE = "size"
+    DATA_TYPE = "dtype"
+    MODULE = "module"
     CHILDREN = "children"
     ATTRIBUTES = "attributes"
-    DATASET = "dataset"
 
 
 class NodeType:
-    STREAM = "stream"
-    DATASET = "dataset"
+    CONFIG = "config"
     GROUP = "group"
     LINK = "link"
 

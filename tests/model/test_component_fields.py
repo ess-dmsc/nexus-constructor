@@ -59,7 +59,12 @@ def test_GIVEN_single_scalar_field_and_string_WHEN_adding_fields_to_component_TH
     field_name = "test_field"
     field_value_raw = np.string_(b"some_value")
 
-    field_value = Dataset(name=field_name, size=[1], type=str, values=field_value_raw,)
+    field_value = Dataset(
+        name=field_name,
+        size=[1],
+        type=str,
+        values=field_value_raw,
+    )
 
     field = DummyField(field_name, field_value, str)
     list_widget = DummyListWidget()

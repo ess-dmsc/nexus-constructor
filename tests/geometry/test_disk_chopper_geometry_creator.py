@@ -350,8 +350,10 @@ def test_GIVEN_second_angle_greater_than_first_angle_THEN_intermediate_angles_me
     first_angle = 0.5
     second_angle = 1.5
 
-    trimmed_array = geometry_creator.get_intermediate_angle_values_from_resolution_array(
-        resolution_array, first_angle, second_angle
+    trimmed_array = (
+        geometry_creator.get_intermediate_angle_values_from_resolution_array(
+            resolution_array, first_angle, second_angle
+        )
     )
 
     assert all(trimmed_array > first_angle)
@@ -367,8 +369,10 @@ def test_GIVEN_first_angle_greater_than_second_angle_THEN_intermediate_angles_me
     first_angle = 1.5
     second_angle = 0.5
 
-    trimmed_array = geometry_creator.get_intermediate_angle_values_from_resolution_array(
-        resolution_array, first_angle, second_angle
+    trimmed_array = (
+        geometry_creator.get_intermediate_angle_values_from_resolution_array(
+            resolution_array, first_angle, second_angle
+        )
     )
 
     diff = np.diff(trimmed_array)

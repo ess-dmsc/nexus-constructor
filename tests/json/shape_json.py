@@ -160,75 +160,68 @@ def off_shape_json() -> Dict:
       "name":"shape",
       "children":[
         {
-          "type":"dataset",
-          "name":"faces",
-          "dataset":{
+          "module":"dataset",
+          "config":{
+            "name":"faces",
             "type":"int32",
-            "size":[
-              6
-            ]
-          },
-          "values":[
-            0,
-            4,
-            8,
-            12,
-            16,
-            20
-          ]
+            "values":[
+                0,
+                4,
+                8,
+                12,
+                16,
+                20
+              ]
+          }
         },
         {
-          "type":"dataset",
-          "name":"vertices",
-          "dataset":{
+          "module":"dataset",
+          "config":{
+            "name":"vertices",
             "type":"float",
-            "size":[
-              8,
-              3
+            "values":[
+            [
+              -0.5,
+              -0.5,
+              0.5
+            ],
+            [
+              0.5,
+              -0.5,
+              0.5
+            ],
+            [
+              -0.5,
+              0.5,
+              0.5
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ],
+            [
+              -0.5,
+              0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5,
+              -0.5
+            ],
+            [
+              -0.5,
+              -0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              -0.5,
+              -0.5
             ]
+          ]
           },
-          "values":[
-            [
-              -0.5,
-              -0.5,
-              0.5
-            ],
-            [
-              0.5,
-              -0.5,
-              0.5
-            ],
-            [
-              -0.5,
-              0.5,
-              0.5
-            ],
-            [
-              0.5,
-              0.5,
-              0.5
-            ],
-            [
-              -0.5,
-              0.5,
-              -0.5
-            ],
-            [
-              0.5,
-              0.5,
-              -0.5
-            ],
-            [
-              -0.5,
-              -0.5,
-              -0.5
-            ],
-            [
-              0.5,
-              -0.5,
-              -0.5
-            ]
-          ],
           "attributes":[
             {
               "name":"units",
@@ -237,15 +230,11 @@ def off_shape_json() -> Dict:
           ]
         },
         {
-          "type":"dataset",
-          "name":"winding_order",
-          "dataset":{
+          "module":"dataset",
+          "config":{
+            "name":"winding_order",
             "type":"int32",
-            "size":[
-              24
-            ]
-          },
-          "values":[
+            "values":[
             0,
             1,
             3,
@@ -271,6 +260,7 @@ def off_shape_json() -> Dict:
             2,
             4
           ]
+          }
         }
       ],
       "attributes":[
@@ -292,34 +282,25 @@ def cylindrical_shape_json() -> dict:
       "name":"pixel_shape",
       "children":[
         {
-          "type":"dataset",
-          "name":"cylinders",
-          "dataset":{
+          "module":"dataset",
+          "config":{
+            "name":"cylinders",
             "type":"int32",
-            "size":[
-              1,
-              3
-            ]
-          },
-          "values":[
+            "values":[
             [
               0,
               1,
               2
             ]
           ]
+          }
         },
         {
-          "type":"dataset",
-          "name":"vertices",
-          "dataset":{
+          "module":"dataset",
+          "config":{
+            "name":"vertices",
             "type":"double",
-            "size":[
-              3,
-              3
-            ]
-          },
-          "values":[
+            "values":[
             [
               -0.01,
               0,
@@ -335,7 +316,8 @@ def cylindrical_shape_json() -> dict:
               0,
               0
             ]
-          ],
+          ]
+          },
           "attributes":[
             {
               "name":"units",
@@ -360,15 +342,11 @@ def pixel_grid_list() -> list:
     children_list = """
     [
       {
-        "type": "dataset",
-        "name": "detector_number",
-        "dataset": {
+        "module": "dataset",
+        "config": {
+          "name": "detector_number",
           "type": "int32",
-          "size": [
-            100
-          ]
-        },
-        "values": [
+          "values": [
           2100000,
           2100001,
           2100002,
@@ -470,17 +448,14 @@ def pixel_grid_list() -> list:
           2109008,
           2109009
         ]
+        }
       },
       {
-        "type": "dataset",
-        "name": "x_pixel_offset",
-        "dataset": {
+        "module": "dataset",
+        "config": {
+          "name": "x_pixel_offset",
           "type": "double",
-          "size": [
-            100
-          ]
-        },
-        "values": [
+          "values": [
           -0.12,
           -0.09777777777777777,
           -0.07555555555555554,
@@ -581,7 +556,8 @@ def pixel_grid_list() -> list:
           0.07555555555555556,
           0.09777777777777778,
           0.12
-        ],
+        ]
+        },
         "attributes": [
           {
             "name": "units",
@@ -590,15 +566,11 @@ def pixel_grid_list() -> list:
         ]
       },
       {
-        "type": "dataset",
-        "name": "y_pixel_offset",
-        "dataset": {
+        "module": "dataset",
+        "config": {
+          "name": "y_pixel_offset",
           "type": "double",
-          "size": [
-            100
-          ]
-        },
-        "values": [
+          "values": [
           -0.08,
           -0.08,
           -0.08,
@@ -699,7 +671,8 @@ def pixel_grid_list() -> list:
           0.06,
           0.06,
           0.06
-        ],
+        ]
+        },
         "attributes": [
           {
             "name": "units",

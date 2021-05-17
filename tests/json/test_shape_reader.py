@@ -12,8 +12,10 @@ from nexus_constructor.common_attrs import (
     SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
+    NodeType,
 )
 from nexus_constructor.json.json_warnings import JsonWarningsContainer
+from nexus_constructor.json.load_from_json import _get_data_type
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
@@ -205,7 +207,7 @@ def test_GIVEN_type_value_is_not_expected_type_WHEN_checking_type_THEN_issue_mes
         attribute_with_dataset_type_to_change, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    invalid_dataset[CommonKeys.DATASET][CommonKeys.TYPE] = "string"
+    invalid_dataset[NodeType.CONFIG][CommonKeys.DATA_TYPE] = "string"
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -228,13 +230,13 @@ def test_GIVEN_unable_to_find_type_value_WHEN_checking_type_THEN_issue_message_i
         attribute_with_dataset_type_to_delete, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    del invalid_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    del invalid_dataset[NodeType.CONFIG][CommonKeys.TYPE]
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            f"Unable to find type attribute for {attribute_with_dataset_type_to_delete}",
+            f"Type attribute for {attribute_with_dataset_type_to_delete} not found.",
         ],
         off_shape_reader.warnings,
     )
@@ -248,13 +250,13 @@ def test_GIVEN_unable_to_find_dataset_WHEN_checking_type_THEN_issue_message_is_c
         attribute_with_dataset_to_delete, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    del invalid_dataset[CommonKeys.DATASET]
+    del invalid_dataset[NodeType.CONFIG][CommonKeys.TYPE]
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.issue_message,
-            f"Unable to find type attribute for {attribute_with_dataset_to_delete}.",
+            f"Type attribute for {attribute_with_dataset_to_delete} not found.",
         ],
         off_shape_reader.warnings,
     )
@@ -268,7 +270,7 @@ def test_GIVEN_missing_values_attribute_WHEN_finding_values_attribute_THEN_error
         attribute_with_values_to_delete, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    del invalid_dataset[CommonKeys.VALUES]
+    del invalid_dataset[NodeType.CONFIG][CommonKeys.VALUES]
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -288,57 +290,13 @@ def test_GIVEN_values_attribute_is_not_a_list_WHEN_finding_values_attribute_THEN
         attribute_with_values_to_change, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    invalid_dataset[CommonKeys.VALUES] = True
+    invalid_dataset[NodeType.CONFIG][CommonKeys.VALUES] = True
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
         [
             off_shape_reader.error_message,
             f"values attribute in {attribute_with_values_to_change} dataset is not a list.",
-        ],
-        off_shape_reader.warnings,
-    )
-
-
-@pytest.mark.parametrize(
-    "attribute_with_list_size_to_change", EXPECTED_OFF_TYPES.keys()
-)
-def test_GIVEN_inconsistent_list_size_WHEN_validating_attribute_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json, attribute_with_list_size_to_change
-):
-    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
-        attribute_with_list_size_to_change, off_shape_json[CommonKeys.CHILDREN]
-    )
-
-    invalid_dataset[CommonKeys.DATASET]["size"][0] -= 1
-    off_shape_reader.add_shape_to_component()
-
-    assert _any_warning_message_has_substrings(
-        [
-            off_shape_reader.issue_message,
-            f"Mismatch between length of {attribute_with_list_size_to_change} list",
-        ],
-        off_shape_reader.warnings,
-    )
-
-
-@pytest.mark.parametrize(
-    "attribute_with_list_size_to_delete", EXPECTED_OFF_TYPES.keys()
-)
-def test_GIVEN_no_list_size_information_WHEN_validating_attribute_THEN_issue_message_is_created(
-    off_shape_reader, off_shape_json, attribute_with_list_size_to_delete
-):
-    invalid_dataset = off_shape_reader._get_shape_dataset_from_list(
-        attribute_with_list_size_to_delete, off_shape_json[CommonKeys.CHILDREN]
-    )
-
-    del invalid_dataset[CommonKeys.DATASET]["size"]
-    off_shape_reader.add_shape_to_component()
-
-    assert _any_warning_message_has_substrings(
-        [
-            off_shape_reader.issue_message,
-            f"Unable to find size attribute for {attribute_with_list_size_to_delete} dataset.",
         ],
         off_shape_reader.warnings,
     )
@@ -352,7 +310,7 @@ def test_GIVEN_value_has_wrong_type_WHEN_validating_value_THEN_error_message_is_
         attribute_with_value_to_change, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    invalid_dataset[CommonKeys.VALUES][0] = "astring"
+    invalid_dataset[NodeType.CONFIG][CommonKeys.VALUES][0] = "astring"
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -391,10 +349,10 @@ def test_GIVEN_missing_units_WHEN_finding_off_units_THEN_error_message_is_create
         CommonAttrs.VERTICES, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    units = off_shape_reader._get_shape_dataset_from_list(
+    off_shape_reader._get_shape_dataset_from_list(
         CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
     )
-    vertices_dataset[CommonKeys.ATTRIBUTES].remove(units)
+    del vertices_dataset[CommonKeys.ATTRIBUTES][0]
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -414,13 +372,13 @@ def test_GIVEN_invalid_units_WHEN_validating_units_THEN_error_message_is_created
         CommonAttrs.VERTICES, off_shape_json[CommonKeys.CHILDREN]
     )
 
-    off_shape_reader._get_shape_dataset_from_list(
-        CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
-    )[CommonKeys.VALUES] = invalid_units
+    vertices_dataset[CommonKeys.ATTRIBUTES][0][CommonKeys.VALUES] = invalid_units
+
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
-        [off_shape_reader.error_message, invalid_units], off_shape_reader.warnings,
+        [off_shape_reader.error_message, invalid_units],
+        off_shape_reader.warnings,
     )
 
 
@@ -430,7 +388,7 @@ def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertice
     vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
         CommonAttrs.VERTICES, off_shape_json[CommonKeys.CHILDREN]
     )
-    vertices_dataset[CommonKeys.VALUES][3] = [4.0, None, None]
+    vertices_dataset[NodeType.CONFIG][CommonKeys.VALUES][3] = [4.0, None, None]
 
     off_shape_reader.add_shape_to_component()
 
@@ -440,22 +398,6 @@ def test_GIVEN_vertices_cannot_be_converted_to_qvector3D_WHEN_converting_vertice
             "Values in vertices list do not all have type(s)",
             EXPECTED_OFF_TYPES[CommonAttrs.VERTICES],
         ],
-        off_shape_reader.warnings,
-    )
-
-
-def test_GIVEN_vertices_have_wrong_shape_WHEN_converting_vertices_THEN_error_message_is_created(
-    off_shape_reader, off_shape_json
-):
-    vertices_dataset = off_shape_reader._get_shape_dataset_from_list(
-        CommonAttrs.VERTICES, off_shape_json[CommonKeys.CHILDREN]
-    )
-    vertices_dataset[CommonKeys.VALUES][3] = [4.0, 4.0]
-
-    off_shape_reader.add_shape_to_component()
-
-    assert _any_warning_message_has_substrings(
-        [off_shape_reader.error_message, "Incorrect array shape"],
         off_shape_reader.warnings,
     )
 
@@ -470,17 +412,20 @@ def test_GIVEN_off_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expect
         CommonAttrs.VERTICES, children
     )
     vertices = list(
-        map(lambda vertex: QVector3D(*vertex), vertices_dataset[CommonKeys.VALUES])
+        map(
+            lambda vertex: QVector3D(*vertex),
+            vertices_dataset[NodeType.CONFIG][CommonKeys.VALUES],
+        )
     )
     faces = off_shape_reader._get_shape_dataset_from_list("faces", children)[
-        CommonKeys.VALUES
-    ]
+        NodeType.CONFIG
+    ][CommonKeys.VALUES]
     units = _find_attribute_from_list_or_dict(
         CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
     )
     winding_order = off_shape_reader._get_shape_dataset_from_list(
         "winding_order", children
-    )[CommonKeys.VALUES]
+    )[NodeType.CONFIG][CommonKeys.VALUES]
 
     off_shape_reader.add_shape_to_component()
 
@@ -533,10 +478,10 @@ def test_GIVEN_missing_units_WHEN_finding_cylindrical_units_THEN_error_message_i
         CommonAttrs.VERTICES, cylindrical_shape_json[CommonKeys.CHILDREN]
     )
 
-    units = cylindrical_shape_reader._get_shape_dataset_from_list(
+    cylindrical_shape_reader._get_shape_dataset_from_list(
         CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
     )
-    vertices_dataset[CommonKeys.ATTRIBUTES].remove(units)
+    del vertices_dataset[CommonKeys.ATTRIBUTES][0]
     cylindrical_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -558,7 +503,7 @@ def test_GIVEN_missing_values_WHEN_finding_cylindrical_values_THEN_error_message
         attribute_with_values_to_delete, cylindrical_shape_json[CommonKeys.CHILDREN]
     )
 
-    del invalid_dataset[CommonKeys.VALUES]
+    del invalid_dataset[NodeType.CONFIG][CommonKeys.VALUES]
     cylindrical_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(
@@ -577,13 +522,13 @@ def test_GIVEN_cylindrical_shape_json_WHEN_reading_shape_THEN_geometry_object_ha
     vertices_dataset = cylindrical_shape_reader._get_shape_dataset_from_list(
         CommonAttrs.VERTICES, cylindrical_shape_json[CommonKeys.CHILDREN]
     )
-    vertices = vertices_dataset[CommonKeys.VALUES]
+    vertices = vertices_dataset[NodeType.CONFIG][CommonKeys.VALUES]
     units = _find_attribute_from_list_or_dict(
         CommonAttrs.UNITS, vertices_dataset[CommonKeys.ATTRIBUTES]
     )
     cylinders_list = cylindrical_shape_reader._get_shape_dataset_from_list(
         "cylinders", cylindrical_shape_json[CommonKeys.CHILDREN]
-    )[CommonKeys.VALUES]
+    )[NodeType.CONFIG][CommonKeys.VALUES]
 
     cylindrical_shape_reader.add_shape_to_component()
 
@@ -664,7 +609,7 @@ def test_GIVEN_x_y_offset_exists_but_fails_validation_WHEN_reading_pixel_data_TH
     offset_dataset = off_shape_reader._get_shape_dataset_from_list(
         offset_to_corrupt, pixel_grid_list
     )
-    offset_dataset[CommonKeys.VALUES][0] = "not a float"
+    offset_dataset[NodeType.CONFIG][CommonKeys.VALUES][0] = "not a float"
 
     off_shape_reader.shape = mock_off_shape
     off_shape_reader.shape_info[CommonKeys.NAME] = PIXEL_SHAPE_GROUP_NAME
@@ -691,23 +636,29 @@ def test_GIVEN_valid_pixel_grid_WHEN_reading_pixel_data_THEN_set_field_value_is_
     detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
         DETECTOR_NUMBER, pixel_grid_list
     )
-    detector_number = detector_number_dataset[CommonKeys.VALUES]
-    detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    detector_number = detector_number_dataset[NodeType.CONFIG][CommonKeys.VALUES]
+    detector_number_dtype = _get_data_type(detector_number_dataset[NodeType.CONFIG])
 
     x_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
         X_PIXEL_OFFSET, pixel_grid_list
     )
-    x_pixel_offset = np.array(x_offset_dataset[CommonKeys.VALUES])
-    x_pixel_dtype = x_offset_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    x_pixel_offset = np.array(x_offset_dataset[NodeType.CONFIG][CommonKeys.VALUES])
+    x_pixel_dtype = _get_data_type(x_offset_dataset[NodeType.CONFIG])
 
     y_offset_dataset = off_shape_reader._get_shape_dataset_from_list(
         Y_PIXEL_OFFSET, pixel_grid_list
     )
-    y_pixel_offset = np.array(y_offset_dataset[CommonKeys.VALUES])
-    y_pixel_dtype = y_offset_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    y_pixel_offset = np.array(y_offset_dataset[NodeType.CONFIG][CommonKeys.VALUES])
+    y_pixel_dtype = _get_data_type(y_offset_dataset[NodeType.CONFIG])
 
     mock_component.set_field_value.assert_has_calls(
-        [call(DETECTOR_NUMBER, detector_number, detector_number_dtype,)]
+        [
+            call(
+                DETECTOR_NUMBER,
+                detector_number,
+                detector_number_dtype,
+            )
+        ]
     )
 
     assert X_PIXEL_OFFSET == mock_component.set_field_value.call_args_list[1].args[0]
@@ -732,8 +683,8 @@ def test_GIVEN_valid_pixel_mapping_and_cylindrical_shape_WHEN_reading_pixel_data
     detector_number_dataset = off_shape_reader._get_shape_dataset_from_list(
         DETECTOR_NUMBER, pixel_grid_list
     )
-    detector_number = detector_number_dataset[CommonKeys.VALUES]
-    detector_number_dtype = detector_number_dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+    detector_number = detector_number_dataset[NodeType.CONFIG][CommonKeys.VALUES]
+    detector_number_dtype = _get_data_type(detector_number_dataset[NodeType.CONFIG])
 
     mock_component.set_field_value.assert_called_once_with(
         DETECTOR_NUMBER, detector_number, detector_number_dtype

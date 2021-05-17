@@ -24,12 +24,12 @@ def transformation_json():
       "name":"transformations",
       "children":[
         {
-          "type":"dataset",
-          "name":"location",
-          "dataset":{
-            "type":"double"
+          "module":"dataset",
+          "config":{
+            "name":"location",
+            "type":"double",
+            "values":0.0
           },
-          "values":0.0,
           "attributes":[
             {
               "name":"units",
@@ -215,16 +215,14 @@ def test_GIVEN_attribute_value_not_in_list_WHEN_looking_for_transformation_attri
 def test_GIVEN_no_values_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
-    del transformation_json["children"][0]["values"]
+    del transformation_json["children"][0]["config"]["values"]
     transformation_reader._create_transformations(transformation_json["children"])
 
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
-def test_GIVEN_no_dataset_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
-    transformation_reader, transformation_json
-):
-    del transformation_json["children"][0]["dataset"]
+def test_no_transformation_without_config(transformation_reader, transformation_json):
+    del transformation_json["children"][0]["config"]
     transformation_reader._create_transformations(transformation_json["children"])
 
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
@@ -233,8 +231,8 @@ def test_GIVEN_no_dataset_WHEN_attempting_to_create_transformations_THEN_create_
 def test_GIVEN_no_datatype_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
-    transformation_json["children"][0]["dataset"]["a"] = "b"
-    del transformation_json["children"][0]["dataset"]["type"]
+    transformation_json["children"][0]["config"]["a"] = "b"
+    del transformation_json["children"][0]["config"]["type"]
     transformation_reader._create_transformations(transformation_json["children"])
 
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
@@ -272,11 +270,11 @@ def test_GIVEN_no_units_WHEN_attempting_to_create_transformations_THEN_create_tr
 def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THEN_create_transform_is_called(
     transformation_reader, transformation_json
 ):
-    transformation_json["children"][0]["name"] = name = "TranslationName"
+    transformation_json["children"][0]["config"]["name"] = name = "TranslationName"
     transformation_json["children"][0]["attributes"][1][
         "values"
     ] = transformation_type = "translation"
-    transformation_json["children"][0]["values"] = angle_or_magnitude = 300.0
+    transformation_json["children"][0]["config"]["values"] = angle_or_magnitude = 300.0
     transformation_json["children"][0]["attributes"][0]["values"] = units = "mm"
     transformation_json["children"][0]["attributes"][2]["values"] = vector = [
         1.0,
@@ -331,7 +329,7 @@ def test_GIVEN_unrecognised_transformation_type_WHEN_parsing_transformation_type
 def test_GIVEN_invalid_dtype_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
     transformation_reader, transformation_json
 ):
-    transformation_json["children"][0]["dataset"]["type"] = "NotAType"
+    transformation_json["children"][0]["config"]["type"] = "NotAType"
     transformation_reader._create_transformations(transformation_json["children"])
 
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
@@ -352,16 +350,19 @@ def test_GIVEN_transformation_has_depends_on_WHEN_creating_transformations_THEN_
     depends_on_component_name = "test_component"
     depends_on_transform_name = "transformation1"
     depends_on_path = f"entry/instrument/{depends_on_component_name}/transformations/{depends_on_transform_name}"
-    transformation_json["children"][0][
+    transformation_json["children"][0]["config"][
         "name"
     ] = transformation_name = "TransformationName"
     transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 
-    assert transformation_reader._transforms_with_dependencies[
+    transform1 = transformation_reader._transforms_with_dependencies[
         TransformId(PARENT_COMPONENT_NAME, transformation_name)
-    ][1] == TransformId(
-        depends_on_component_name, depends_on_transform_name
+    ][1]
+    transform2 = TransformId(depends_on_component_name, depends_on_transform_name)
+
+    assert (
+        transform1 == transform2
     ), "Expected to find details of dependency stored in dictionary"
 
 
@@ -377,7 +378,8 @@ def test_GIVEN_transformation_has_no_depends_on_WHEN_creating_transformations_TH
     assert (
         transformation_reader._transforms_with_dependencies[
             TransformId(
-                PARENT_COMPONENT_NAME, transformation_json["children"][0]["name"]
+                PARENT_COMPONENT_NAME,
+                transformation_json["children"][0]["config"]["name"],
             )
         ][1]
         is None

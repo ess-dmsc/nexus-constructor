@@ -118,9 +118,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.file_writer_ctrl_window.show()
 
     def show_edit_component_dialog(self):
-        selected_component = self.component_tree_view_tab.component_tree_view.selectedIndexes()[
-            0
-        ].internalPointer()
+        selected_component = (
+            self.component_tree_view_tab.component_tree_view.selectedIndexes()[
+                0
+            ].internalPointer()
+        )
         self.show_add_component_window(selected_component)
 
     def save_to_nexus_file(self):
@@ -172,7 +174,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             )
             if ok_pressed:
                 with open(filename, "wb") as flat_file:
-                    flat_file.write(create_forwarder_config(self.model, provider_type,))
+                    flat_file.write(
+                        create_forwarder_config(
+                            self.model,
+                            provider_type,
+                        )
+                    )
 
     def open_nexus_file(self):
         raise NotImplementedError

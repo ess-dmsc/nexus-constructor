@@ -172,12 +172,11 @@ class Transformation(Dataset):
         # TODO elif array, NXlog, kafka stream, ...
 
         return_dict: Dict = {
-            CommonKeys.NAME: self.name,
-            CommonKeys.TYPE: NodeType.DATASET,
-            CommonKeys.VALUES: value if value is not None else [],
-            CommonKeys.DATASET: {
-                CommonKeys.TYPE: self.type,
-                CommonKeys.SIZE: self.size,
+            CommonKeys.MODULE: "dataset",
+            NodeType.CONFIG: {
+                CommonKeys.NAME: self.name,
+                CommonKeys.DATA_TYPE: self.type,
+                CommonKeys.VALUES: value if value is not None else [],
             },
         }
         if self.attributes:
@@ -191,7 +190,7 @@ class Transformation(Dataset):
                     {
                         CommonKeys.NAME: CommonAttrs.DEPENDS_ON,
                         CommonKeys.VALUES: self.depends_on.absolute_path,
-                        CommonKeys.TYPE: ValueTypes.STRING,
+                        CommonKeys.DATA_TYPE: ValueTypes.STRING,
                     }
                 )
             except AttributeError:

@@ -188,6 +188,7 @@ def mock_component():
     nexus_file = h5py.File("test_file", mode="x", driver="core", backing_store=False)
     test_group = nexus_file.create_group("test_component_group")
     mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
+    mock_component.name = "Mock name"
     yield mock_component
     nexus_file.close()
 
