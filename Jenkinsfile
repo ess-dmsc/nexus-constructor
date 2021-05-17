@@ -47,13 +47,28 @@ builders = pipeline_builder.createBuilders { container ->
             build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
             """
     } // stage
-    
-    pipeline_builder.stage("Check formatting") {
-        container.sh """
-            cd ${project}
-            build_env/bin/python -m black . --check
-        """
-    } // stage
+
+    if (env.CHANGE_ID) {
+        pipeline_builder.stage("Check formatting") {
+            try {
+                container.sh """
+                cd ${project}
+                export LC_ALL=en_US.utf-8
+                export LANG=en_US.utf-8
+                build_env/bin/python -m black .
+                git config user.email 'dm-jenkins-integration@esss.se'
+                git config user.name 'cow-bot'
+                git status -s
+                git add -u
+                git commit -m 'GO FORMAT YOURSELF (black)
+                """
+            } catch (e) {
+                // Okay to fail as there could be no badly formatted files to commit
+            } finally {
+                // Clean up
+            }
+        } // stage
+    }
     
     pipeline_builder.stage("Run Linter") {
         container.sh """
