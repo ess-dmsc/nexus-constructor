@@ -102,6 +102,10 @@ class FieldAttrFrame(QFrame):
 
         self.attr_dtype_combo = QComboBox()
         self.attr_dtype_combo.addItems([*VALUE_TYPE_TO_NP.keys()])
+        for i, item in enumerate(VALUE_TYPE_TO_NP.keys()):
+            if item == ValueTypes.DOUBLE:
+                self.attr_dtype_combo.setCurrentIndex(i)
+                break
         self.attr_dtype_combo.currentTextChanged.connect(self.dtype_changed)
         self.dtype_changed(self.attr_dtype_combo.currentText())
         self.dialog = ArrayDatasetTableWidget(VALUE_TYPE_TO_NP[self.dtype])

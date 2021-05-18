@@ -10,6 +10,7 @@ from PySide2.QtWidgets import (
     QTabWidget,
     QWidget,
 )
+from PySide2.QtGui import QKeySequence
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from ui.treeview_tab import ComponentTreeViewTab
@@ -63,9 +64,11 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.status_bar)
         self.open_nexus_file_action = QAction(MainWindow)
         self.open_json_file_action = QAction(MainWindow)
+        self.open_json_file_action.setShortcut(QKeySequence("Ctrl+O"))
         self.open_idf_file_action = QAction(MainWindow)
         self.export_to_nexus_file_action = QAction(MainWindow)
         self.export_to_filewriter_JSON_action = QAction(MainWindow)
+        self.export_to_filewriter_JSON_action.setShortcut(QKeySequence("Ctrl+S"))
         self.export_to_forwarder_config_action = QAction(MainWindow)
         self.file_menu.addAction(self.open_json_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
