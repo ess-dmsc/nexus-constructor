@@ -156,8 +156,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
 
         if filename:
+            if not (len(filename) > 5 and filename[-5:].lower() == ".json"):
+                filename += ".json"
+            data_dump = json.dumps(self.model.as_dict(), indent=2)
             with open(filename, "w") as file:
-                json.dump(self.model.as_dict(), file, indent=2)
+                file.write(data_dump)
 
     def save_to_forwarder_config(self):
         filename = file_dialog(

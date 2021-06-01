@@ -327,8 +327,8 @@ class StreamFieldsWidget(QDialog):
                 error_type=NotImplemented,
                 shape=[],
             )
-        elif current_schema == WriterModules.TDCTIME:
-            stream = TDCTStream(source, topic)
+        elif current_schema == WriterModules.TDCTIME.value:
+            stream = TDCTStream(source=source, topic=topic)
         group_name = self.parent().parent().field_name_edit.text()
         stream_group = StreamGroup(group_name)
         stream_group[group_name] = stream
