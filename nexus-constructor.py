@@ -26,7 +26,9 @@ if __name__ == "__main__":
     if locale.getlocale()[0] is None:
         used_locale = "en_GB.UTF-8"
         locale.setlocale(locale.LC_ALL, used_locale)
-        print(f"Unable to determine the system locale, using the default ({used_locale}).")
+        print(
+            f"Unable to determine the system locale, using the default ({used_locale})."
+        )
     parser = argparse.ArgumentParser(description="Nexus Constructor")
     if "help" in parser.parse_args():
         exit(0)
