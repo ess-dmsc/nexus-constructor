@@ -41,6 +41,13 @@ class NullableIntValidator(QIntValidator):
             return super().validate(input, pos)
 
 
+def units_are_recognised(unit_string: str) -> bool:
+    try:
+        return units_are_recognised_by_pint(unit_string)
+    except pint.errors.DefinitionSyntaxError:
+        return False
+
+
 class UnitValidator(QValidator):
     """
     Validator to ensure the the text entered is a valid unit of length.
@@ -54,7 +61,7 @@ class UnitValidator(QValidator):
     def validate(self, input: str, pos: int):
 
         if not (
-            units_are_recognised_by_pint(input)
+            units_are_recognised(input)
             and (
                 True
                 if self.expected_dimensionality is None

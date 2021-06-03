@@ -2203,7 +2203,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stre
     assert not streams_widget.type_combo.isVisible()
 
 
-@pytest.mark.parametrize("test_input", ["TdcTime", "senv"])
+@pytest.mark.parametrize("test_input", ["tdct", "senv"])
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_THEN_stream_dialog_shown_with_correct_options(
     qtbot, test_input, add_component_dialog, template
 ):

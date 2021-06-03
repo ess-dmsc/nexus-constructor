@@ -22,7 +22,7 @@ DATASET = "dataset"
 class WriterModules(Enum):
     F142 = "f142"
     EV42 = "ev42"
-    TDCTIME = "TdcTime"
+    TDCTIME = "tdct"
     NS10 = "ns10"
     HS00 = "hs00"
     SENV = "senv"
