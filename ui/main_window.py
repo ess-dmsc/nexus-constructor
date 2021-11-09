@@ -62,17 +62,12 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menu_bar)
         self.status_bar = QStatusBar(MainWindow)
         MainWindow.setStatusBar(self.status_bar)
-        self.open_nexus_file_action = QAction(MainWindow)
         self.open_json_file_action = QAction(MainWindow)
         self.open_json_file_action.setShortcut(QKeySequence("Ctrl+O"))
-        self.open_idf_file_action = QAction(MainWindow)
-        self.export_to_nexus_file_action = QAction(MainWindow)
         self.export_to_filewriter_JSON_action = QAction(MainWindow)
         self.export_to_filewriter_JSON_action.setShortcut(QKeySequence("Ctrl+S"))
-        self.export_to_forwarder_config_action = QAction(MainWindow)
         self.file_menu.addAction(self.open_json_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
-        self.file_menu.addAction(self.export_to_forwarder_config_action)
 
         self.view_menu = QMenu(self.menu_bar)
         self.show_action_labels = QAction(MainWindow)
@@ -91,13 +86,9 @@ class Ui_MainWindow(object):
             self.tab_widget.indexOf(self.component_tree_view_tab), "Components"
         )
         self.file_menu.setTitle("File")
-        self.open_nexus_file_action.setText("Open NeXus file")
         self.open_json_file_action.setText("Open Filewriter JSON file")
-
-        self.open_idf_file_action.setText("Open Mantid IDF file")
-        self.export_to_nexus_file_action.setText("Export to NeXus file")
         self.export_to_filewriter_JSON_action.setText("Export to Filewriter JSON")
-        self.export_to_forwarder_config_action.setText("Export to Forwarder FlatBuffer")
+
         self.view_menu.setTitle("View")
         self.show_action_labels.setText("Show Button Labels")
         self.about_window.setText("About")
