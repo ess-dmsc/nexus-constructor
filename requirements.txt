@@ -8,7 +8,6 @@ pint
 xmltodict
 numpy
 pytest-qt
-confluent-kafka
 ess-streaming-data-types >= 0.9.5
 
 
