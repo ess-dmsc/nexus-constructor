@@ -11,13 +11,13 @@ from nexus_constructor.model.helpers import (
     _set_item,
     get_absolute_path,
 )
-from nexus_constructor.model.link import Link
 
 if TYPE_CHECKING:
     from nexus_constructor.model.stream import (  # noqa: F401
         EV42Stream,
         F142Stream,
         HS00Stream,
+        Link,
         NS10Stream,
         SENVStream,
         TDCTStream,
@@ -46,6 +46,7 @@ class Group:
             "EV42Stream",
             "F142Stream",
             "HS00Stream",
+            "Link",
         ]
     ] = attr.ib(  # noqa: F821
         factory=list, init=False
@@ -59,7 +60,7 @@ class Group:
     def __setitem__(
         self,
         key: str,
-        value: Union["Group", Dataset, Link],
+        value: Union["Group", Dataset, "Link"],
     ):
         try:
             value.parent_node = self

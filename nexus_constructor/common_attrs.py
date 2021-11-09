@@ -29,7 +29,6 @@ class CommonKeys:
 class NodeType:
     CONFIG = "config"
     GROUP = "group"
-    LINK = "link"
 
 
 class TransformationType:

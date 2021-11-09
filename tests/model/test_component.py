@@ -3,8 +3,7 @@ import pytest
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import TRANSFORMS_GROUP_NAME, Component
-from nexus_constructor.model.link import Link
-from nexus_constructor.model.stream import NS10Stream
+from nexus_constructor.model.stream import Link, NS10Stream
 from nexus_constructor.model.value_type import ValueTypes
 
 

@@ -25,7 +25,7 @@ from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.link import Link
+from nexus_constructor.model.stream import Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -313,7 +313,7 @@ class FieldWidget(QFrame):
             self.streams_widget = StreamFieldsWidget(self.edit_dialog)
         elif self.field_type == FieldType.link:
             self.set_visibility(True, False, False, False)
-            self._set_up_value_validator(True)
+            self._set_up_value_validator(False)
         elif self.field_type == FieldType.nx_class:
             self.set_visibility(False, True, False, False)
 
