@@ -312,7 +312,14 @@ class FieldWidget(QFrame):
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
             self.streams_widget = StreamFieldsWidget(self.edit_dialog)
         elif self.field_type == FieldType.link:
-            self.set_visibility(True, False, False, False)
+            self.set_visibility(
+                True,
+                False,
+                False,
+                False,
+                show_unit_line_edit=False,
+                show_attrs_edit=False,
+            )
             self._set_up_value_validator(False)
         elif self.field_type == FieldType.nx_class:
             self.set_visibility(False, True, False, False)
@@ -349,11 +356,15 @@ class FieldWidget(QFrame):
         show_edit_button: bool,
         show_value_type_combo: bool,
         show_name_line_edit: bool = True,
+        show_attrs_edit: bool = True,
+        show_unit_line_edit: bool = True,
     ):
         self.value_line_edit.setVisible(show_value_line_edit)
         self.nx_class_combo.setVisible(show_nx_class_combo)
         self.edit_button.setVisible(show_edit_button)
         self.value_type_combo.setVisible(show_value_type_combo)
+        self.units_line_edit.setVisible(show_unit_line_edit)
+        self.attrs_button.setVisible(show_attrs_edit)
         self.field_name_edit.setVisible(
             show_name_line_edit and not self.hide_name_field
         )

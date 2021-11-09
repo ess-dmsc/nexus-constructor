@@ -111,6 +111,6 @@ def test_component_as_dict_contains_links():
 
     dictionary_output = test_component.as_dict()
 
-    assert dictionary_output["children"][0]["type"] == "link"
-    assert dictionary_output["children"][0]["name"] == name
-    assert dictionary_output["children"][0]["target"] == target
+    assert dictionary_output["children"][0]["config"]["name"] == name
+    assert dictionary_output["children"][0]["config"]["source"] == target
+    assert dictionary_output["children"][0]["module"] == "link"
