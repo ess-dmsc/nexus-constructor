@@ -158,13 +158,13 @@ return {
                     powershell label: 'Archiving build folder', script: "Compress-7Zip -Path .\\dist -ArchiveFileName nexus-constructor_windows_${git_commit_short}.zip -Format Zip"
                     archiveArtifacts 'nexus-constructor*.zip'
                 } // stage
-                stage("Test executable") {
+/*                 stage("Test executable") {
                     timeout(time:15, unit:'SECONDS') {
                         bat """
                         cd dist\\nexus-constructor\\
                         nexus-constructor.exe --help
                         """
-                        }
+                        } */
                 } // stage
             } // if
           } // dir
