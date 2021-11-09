@@ -164,8 +164,8 @@ return {
                         cd dist\\nexus-constructor\\
                         nexus-constructor.exe --help
                         """
-                        } */
-                } // stage
+                        }
+                } */// stage
             } // if
           } // dir
       } //ws
