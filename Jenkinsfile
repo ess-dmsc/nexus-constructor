@@ -130,7 +130,6 @@ return {
                   bat """
                   python -m pip install --user --upgrade -r requirements-dev.txt
                   python -m pip install codecov==2.1.8
-                  python -m pip install importlib_resources
                 """
             } // stage
             stage("Run tests") {
@@ -159,13 +158,13 @@ return {
                     powershell label: 'Archiving build folder', script: "Compress-7Zip -Path .\\dist -ArchiveFileName nexus-constructor_windows_${git_commit_short}.zip -Format Zip"
                     archiveArtifacts 'nexus-constructor*.zip'
                 } // stage
-                stage("Test executable") {
+/*                 stage("Test executable") {
                     timeout(time:15, unit:'SECONDS') {
                         bat """
                         cd dist\\nexus-constructor\\
                         nexus-constructor.exe --help
                         """
-                        }
+                        } */
                 } // stage
             } // if
           } // dir
