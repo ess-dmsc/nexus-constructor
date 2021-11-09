@@ -9,9 +9,8 @@ from pytestqt.qtbot import QtBot  # noqa: F401
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.link import Link
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import EV42Stream, StreamGroup
+from nexus_constructor.model.stream import EV42Stream, Link, StreamGroup
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 
@@ -31,7 +30,12 @@ def create_corresponding_value_dataset(value: Any):
     else:
         size = len(value)
 
-    return Dataset(name=name, type=type, size=[size], values=value,)
+    return Dataset(
+        name=name,
+        type=type,
+        size=[size],
+        values=value,
+    )
 
 
 def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled_correctly(
@@ -116,7 +120,9 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
 def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled_correctly(
     qtbot,
 ):
-    component = Component(name="test",)
+    component = Component(
+        name="test",
+    )
 
     x = 0
     y = 0

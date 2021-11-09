@@ -33,7 +33,6 @@ from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.link import TARGET, Link
 from nexus_constructor.model.stream import (
     ADC_PULSE_DEBUG,
     ARRAY_SIZE,
@@ -45,6 +44,7 @@ from nexus_constructor.model.stream import (
     ERROR_TYPE,
     INDEX_EVERY_KB,
     INDEX_EVERY_MB,
+    LINK,
     SHAPE,
     SOURCE,
     STORE_LATEST_INTO,
@@ -53,6 +53,7 @@ from nexus_constructor.model.stream import (
     EV42Stream,
     F142Stream,
     HS00Stream,
+    Link,
     NS10Stream,
     SENVStream,
     Stream,
@@ -111,7 +112,7 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
 
 
 def _add_field_to_group(item: Dict, group: Group):
-    child: Union[Group, Link]
+    child: Group
     if CommonKeys.TYPE in item:
         if item[CommonKeys.NAME] == TRANSFORMS_GROUP_NAME:
             return
@@ -119,8 +120,6 @@ def _add_field_to_group(item: Dict, group: Group):
         child_name = item[CommonKeys.NAME]
         if field_type == NodeType.GROUP:
             child = _create_group(item, group)
-        elif field_type == NodeType.LINK:
-            child = _create_link(item)
         else:
             raise Exception(
                 f'Found unknown field type ("{field_type}") when loading JSON - {child_name}'
@@ -129,6 +128,7 @@ def _add_field_to_group(item: Dict, group: Group):
     elif CommonKeys.MODULE in item:
         stream: Union[
             Dataset,
+            Link,
             NS10Stream,
             SENVStream,
             TDCTStream,
@@ -137,7 +137,9 @@ def _add_field_to_group(item: Dict, group: Group):
             HS00Stream,
         ]
         writer_module = item[CommonKeys.MODULE]
-        if writer_module == DATASET:
+        if writer_module == LINK:
+            stream = _create_link(item)
+        elif writer_module == DATASET:
             if item[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
                 return
             stream = _create_dataset(item, group)
@@ -492,8 +494,8 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
 
 
 def _create_link(json_object: Dict) -> Link:
-    name = json_object[CommonKeys.NAME]
-    target = json_object[TARGET]
+    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
+    target = json_object[NodeType.CONFIG][SOURCE]
     return Link(name=name, target=target)
 
 
