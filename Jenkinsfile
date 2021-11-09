@@ -130,6 +130,7 @@ return {
                   bat """
                   python -m pip install --user --upgrade -r requirements-dev.txt
                   python -m pip install codecov==2.1.8
+                  python -m pip install importlib_resources
                 """
             } // stage
             stage("Run tests") {
