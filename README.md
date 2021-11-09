@@ -73,11 +73,11 @@ See the [Wiki](https://github.com/ess-dmsc/nexus-constructor/wiki/Developer-Note
 ### The project
 The project is managed on the ESS's JIRA system which is [here](https://jira.esss.lu.se/browse/ECDC).
 
-If you do not have an ESS account but want to raise an issue then please open an issue of the repository. Someone will
+If you do not have an ESS account but want to raise an issue then please open an issue on the repository. Someone will
 triage it and link it from the JIRA system.
 
 ### Pull requests
-Pull requests are very welcome and should be done through GitHub.
+Pull requests are very welcome and should be done through GitHub in the standard way.
 
 ### Code
 
