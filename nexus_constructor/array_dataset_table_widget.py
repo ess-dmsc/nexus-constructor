@@ -144,7 +144,10 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         )
 
     def headerData(
-        self, section: int, orientation: Qt.Orientation, role=...,  # noqa: W504
+        self,
+        section: int,
+        orientation: Qt.Orientation,
+        role=...,  # noqa: W504
     ) -> typing.Any:
         if role == Qt.DisplayRole or role == Qt.EditRole:
             if orientation == Qt.Vertical:

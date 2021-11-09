@@ -10,6 +10,7 @@ from nexus_constructor.common_attrs import (
     SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
+    NodeType,
 )
 from nexus_constructor.json.json_warnings import InvalidShape, JsonWarningsContainer
 from nexus_constructor.json.load_from_json_utils import (
@@ -38,7 +39,9 @@ from nexus_constructor.unit_utils import (
 )
 
 
-def _convert_vertices_to_qvector3d(vertices: List[List[float]],) -> List[QVector3D]:
+def _convert_vertices_to_qvector3d(
+    vertices: List[List[float]],
+) -> List[QVector3D]:
     """
     Converts a list of vertices to QVector3D
     :param vertices: The list of vertices.
@@ -261,9 +264,12 @@ class ShapeReader:
         :param children: The children list where we expect to find the dataset.
         :return: The dataset if it could be found, otherwise None is returned.
         """
-        for dataset in children:
-            if dataset[CommonKeys.NAME] == dataset_name:
-                return dataset
+        try:
+            for dataset in children:
+                if dataset[NodeType.CONFIG][CommonKeys.NAME] == dataset_name:
+                    return dataset
+        except KeyError:
+            pass  # This "pass" ensures that we create a warning message.
         if warning:
             self.warnings.append(
                 InvalidShape(
@@ -283,20 +289,26 @@ class ShapeReader:
         :param parent_name: The name of the parent dataset
         """
         try:
-            if not any(
-                [
-                    expected_type in dataset[CommonKeys.DATASET][CommonKeys.TYPE]
-                    for expected_type in expected_types
-                ]
-            ):
+            found_type = None
+            if CommonKeys.DATA_TYPE in dataset[NodeType.CONFIG]:
+                found_type = dataset[NodeType.CONFIG][CommonKeys.DATA_TYPE]
+            elif CommonKeys.TYPE in dataset[NodeType.CONFIG]:
+                found_type = dataset[NodeType.CONFIG][CommonKeys.TYPE]
+            else:
+                self.warnings.append(
+                    InvalidShape(
+                        f"{self.issue_message} Type attribute for {parent_name} not found."
+                    )
+                )
+            if found_type is not None and found_type not in expected_types:
                 self.warnings.append(
                     InvalidShape(
                         f"{self.issue_message} Type attribute for {parent_name} does not match expected type(s) "
                         f"{expected_types}."
                     )
                 )
-            else:
-                return dataset[CommonKeys.DATASET][CommonKeys.TYPE]
+            elif found_type is not None:
+                return found_type
         except KeyError:
             self.warnings.append(
                 InvalidShape(
@@ -386,57 +398,17 @@ class ShapeReader:
         )
         return False
 
-    def _validate_list_size(
-        self, data_properties: Dict, values: List, parent_name: str
-    ) -> bool:
-        """
-        Checks to see if the length of a list matches the size attribute in the dataset. A warning is recorded if the
-        size attribute cannot be found or if this value doesn't match the length of the list. Failing this check does
-        not stop the geometry creation.
-        :param data_properties: The dictionary where we expect to find the size information.
-        :param values: The list of values.
-        :param parent_name: The name of the parent dataset.
-        :return: True if the sizes matched, the sizes didn't match, or the size information couldn't be found. False
-        if the array does not have a uniform size.
-        """
-        try:
-            array = np.array(values)
-            size = data_properties[CommonKeys.DATASET][CommonKeys.SIZE]
-            for i in range(len(size)):
-                if size[i] != array.shape[i]:
-                    self.warnings.append(
-                        InvalidShape(
-                            f"{self.issue_message} Mismatch between length of {parent_name} list "
-                            f"({array.shape}) and size attribute from dataset ({size})."
-                        )
-                    )
-            return True
-        except KeyError:
-            self.warnings.append(
-                InvalidShape(
-                    f"{self.issue_message} Unable to find size attribute for {parent_name} dataset."
-                )
-            )
-            return True
-        except IndexError:
-            self.warnings.append(
-                InvalidShape(
-                    f"{self.error_message} Incorrect array shape for {parent_name} dataset."
-                )
-            )
-            return False
-
     def _get_values_attribute(
         self, dataset: Dict, parent_name: str
     ) -> Union[List, None]:
         """
-        Attempts to get the values attribute in a dataset. Creates an error message if if cannot be found.
+        Attempts to get the values attribute in a dataset. Creates an error message if it cannot be found.
         :param dataset: The dataset we hope to find the values attribute in.
         :param parent_name: The name of the parent dataset.
         :return: The values attribute if it could be found, otherwise None is returned.
         """
         try:
-            return dataset[CommonKeys.VALUES]
+            return dataset[NodeType.CONFIG][CommonKeys.VALUES]
         except KeyError:
             self.warnings.append(
                 InvalidShape(
@@ -509,9 +481,6 @@ class ShapeReader:
             return None
 
         if not self._attribute_is_a_list(values, attribute_name):
-            return None
-
-        if not self._validate_list_size(dataset, values, attribute_name):
             return None
 
         if not self._all_in_list_have_expected_type(

@@ -88,7 +88,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixel_options: PixelOptions = None
 
     def setupUi(self, parent_dialog, pixel_options: PixelOptions = PixelOptions()):
-        """ Sets up push buttons and validators for the add component window. """
+        """Sets up push buttons and validators for the add component window."""
         super().setupUi(parent_dialog)
 
         # Connect the button calls with functions

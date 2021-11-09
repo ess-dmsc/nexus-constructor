@@ -8,7 +8,7 @@ def test_dataset_as_dict_contains_expected_keys():
         name=input_name, size="[1]", type=ValueTypes.STRING, values="the_value"
     )
     dictionary_output = test_dataset.as_dict()
-    for expected_key in ("name", "type"):
+    for expected_key in ("module", "config"):
         assert expected_key in dictionary_output.keys()
 
-    assert dictionary_output["name"] == input_name
+    assert dictionary_output["config"]["name"] == input_name

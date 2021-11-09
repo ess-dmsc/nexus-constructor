@@ -93,7 +93,7 @@ def json_dict_with_component():
           "attributes":[
             {
               "name":"NX_class",
-              "type":"String",
+              "type":"string",
               "values":"NXentry"
             }
           ],
@@ -104,7 +104,7 @@ def json_dict_with_component():
               "attributes":[
                 {
                   "name":"NX_class",
-                  "type":"String",
+                  "type":"string",
                   "values":"NXinstrument"
                 }
               ],
@@ -115,7 +115,7 @@ def json_dict_with_component():
                   "attributes":[
                     {
                       "name":"NX_class",
-                      "type":"String",
+                      "type":"string",
                       "values":"NXaperture"
                     }
                   ],
@@ -137,7 +137,7 @@ def json_dict_with_component():
               "attributes":[
                 {
                   "name":"NX_class",
-                  "type":"String",
+                  "type":"string",
                   "values":"NXsample"
                 }
               ],
@@ -198,26 +198,25 @@ def json_dict_with_component_and_transform():
                   ],
                   "children":[
                     {
-                      "name":"depends_on",
-                      "type":"dataset",
+                      "module":"dataset",
                       "attributes":[],
-                      "dataset":{
+                      "config":{
+                        "name":"depends_on",
                         "type":"string",
-                        "size":"1"
-                      },
-                      "values": "/entry/instrument/test_component/transformations/location"
+                        "values": "/entry/instrument/test_component/transformations/location"
+                      }
                     },
                     {
                       "type":"group",
                       "name":"transformations",
                       "children":[
                         {
-                          "type":"dataset",
-                          "name":"location",
-                          "dataset":{
-                            "type":"double"
+                          "module":"dataset",
+                          "config":{
+                            "type":"double",
+                            "values":1.0,
+                            "name":"location"
                           },
-                          "values":1.0,
                           "attributes":[
                             {
                               "name":"units",
@@ -440,14 +439,13 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
 ):
     depends_on_dataset_str = """
     {
-      "name":"depends_on",
-      "type":"dataset",
+      "module":"dataset",
       "attributes":[],
-      "dataset":{
+      "config":{
         "type":"string",
-        "size":"1"
-      },
-      "values": "/entry/instrument/test_component/transformations/location"
+        "values": "/entry/instrument/test_component/transformations/location",
+        "name":"depends_on"
+      }
     }
     """
     depends_on_dataset = json.loads(depends_on_dataset_str)
@@ -468,7 +466,7 @@ def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN
     for node in json_dict_with_component_and_transform["children"][0]["children"][0][
         "children"
     ][0]["children"]:
-        if node["name"] == "transformations":
+        if "name" in node and node["name"] == "transformations":
             for attribute in node["children"][0]["attributes"]:
                 if attribute["name"] == "depends_on":
                     attribute["values"] = "/transform/does/not/exist"
@@ -482,7 +480,14 @@ def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN
 
 @pytest.mark.parametrize(
     "test_input",
-    ({}, {"type": "dataset", "values": 0,}, {"attributes": []},),  # noqa E231
+    (
+        {},
+        {
+            "module": "dataset",
+            "config": {"values": 0},
+        },
+        {"attributes": []},
+    ),  # noqa E231
 )
 def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
     test_input,
@@ -535,10 +540,8 @@ def test_GIVEN_dataset_with_string_value_WHEN_adding_dataset_THEN_dataset_object
     values = "a description"
     parent = Group(name="test")
     test_dict = {
-        "name": name,
-        "type": "dataset",
-        "dataset": {"type": ValueTypes.STRING, "size": [1]},
-        "values": values,
+        "module": "dataset",
+        "config": {"type": ValueTypes.STRING, "values": values, "name": name},
     }
 
     ds = _create_dataset(test_dict, parent)
@@ -557,10 +560,8 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
     np_array = np.array(values, dtype=VALUE_TYPE_TO_NP[dtype])
 
     test_dict = {
-        "name": name,
-        "type": "dataset",
-        "dataset": {"type": dtype, "size": np_array.shape},
-        "values": values,
+        "module": "dataset",
+        "config": {"type": dtype, "values": values, "name": name},
     }
     parent = Group(name="test")
     ds = _create_dataset(test_dict, parent)

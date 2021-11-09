@@ -26,7 +26,7 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.link import Link
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import (
@@ -121,6 +121,10 @@ class FieldWidget(QFrame):
 
         self.value_type_combo: QComboBox = QComboBox()
         self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
+        for i, item in enumerate(VALUE_TYPE_TO_NP.keys()):
+            if item == ValueTypes.DOUBLE:
+                self.value_type_combo.setCurrentIndex(i)
+                break
         self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
 
         self.value_line_edit: QLineEdit = QLineEdit()
@@ -231,12 +235,20 @@ class FieldWidget(QFrame):
         return_object: Union[Dataset, StreamGroup, Link]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
-            return_object = Dataset(name=self.name, size=[1], type=dtype, values=val,)
+            return_object = Dataset(
+                name=self.name,
+                size=[1],
+                type=dtype,
+                values=val,
+            )
         elif self.field_type == FieldType.array_dataset:
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
-                name=self.name, size=array.size, type=dtype, values=array,
+                name=self.name,
+                size=array.size,
+                type=dtype,
+                values=array,
             )
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()
@@ -359,7 +371,10 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.kafka_stream:
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
-        self.edit_dialog.show()
+        if self.edit_dialog.isVisible():
+            self.edit_dialog.raise_()
+        else:
+            self.edit_dialog.show()
 
     def show_attrs_dialog(self):
         self.attrs_dialog.show()

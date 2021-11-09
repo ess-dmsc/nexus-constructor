@@ -188,6 +188,7 @@ def mock_component():
     nexus_file = h5py.File("test_file", mode="x", driver="core", backing_store=False)
     test_group = nexus_file.create_group("test_component_group")
     mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
+    mock_component.name = "Mock name"
     yield mock_component
     nexus_file.close()
 
@@ -2202,7 +2203,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stre
     assert not streams_widget.type_combo.isVisible()
 
 
-@pytest.mark.parametrize("test_input", ["TdcTime", "senv"])
+@pytest.mark.parametrize("test_input", ["tdct", "senv"])
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_THEN_stream_dialog_shown_with_correct_options(
     qtbot, test_input, add_component_dialog, template
 ):

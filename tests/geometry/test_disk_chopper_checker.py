@@ -102,7 +102,9 @@ def mock_widget_list(
 
 
 @pytest.fixture(scope="function")
-def mock_fields_list_widget(mock_widget_list,):
+def mock_fields_list_widget(
+    mock_widget_list,
+):
     list_widget = Mock(spec=QListWidget)
     list_widget.count = Mock(return_value=len(mock_widget_list))
 

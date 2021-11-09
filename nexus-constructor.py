@@ -5,7 +5,9 @@ Requires Python 3.6+
 import argparse
 import logging
 import os
+os.environ['QT_MAC_WANTS_LAYER'] = '1'
 import sys
+import locale
 
 from PySide2 import QtCore
 from PySide2.QtGui import QIcon
@@ -22,6 +24,12 @@ else:
     root_dir = os.path.dirname(os.path.realpath(__file__))
 
 if __name__ == "__main__":
+    if locale.getlocale()[0] is None:
+        used_locale = "en_GB.UTF-8"
+        locale.setlocale(locale.LC_ALL, used_locale)
+        print(
+            f"Unable to determine the system locale, using the default ({used_locale})."
+        )
     parser = argparse.ArgumentParser(description="Nexus Constructor")
     if "help" in parser.parse_args():
         exit(0)
