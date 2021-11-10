@@ -29,6 +29,7 @@ COMPONENT_TYPES = {
     "NXguide",
     "NXinsertion_device",
     "NXinstrument",
+    "NXlog",
     "NXmirror",
     "NXmoderator",
     "NXmonochromator",
