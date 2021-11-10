@@ -172,7 +172,7 @@ class Transformation(Dataset):
                 except ValueError:
                     error_collector.append(
                         f"value '{val}' is invalid for transformation '{self.name}' "
-                        f"as expected a {self.type}"
+                        "as expected a numeric value"
                     )
 
         # TODO elif array, NXlog, kafka stream, ...

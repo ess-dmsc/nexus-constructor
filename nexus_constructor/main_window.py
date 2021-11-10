@@ -97,6 +97,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 filename += ".json"
             error_collector = []
             data_dump = json.dumps(self.model.as_dict(error_collector), indent=2)
+            if error_collector:
+                show_errors_message(error_collector)
+                return
             with open(filename, "w") as file:
                 file.write(data_dump)
 
@@ -146,6 +149,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
 
+
+def show_errors_message(errors):
+    msgBox = QMessageBox()
+    msgBox.setIcon(QMessageBox.Critical)
+    msgBox.setText(
+        "Could not save file as structure invalid, see below for details"
+    )
+    msgBox.setStandardButtons(QMessageBox.Ok)
+    msgBox.setDetailedText("\n\n".join([f"- {err}" for err in errors]))
+    msgBox.exec_()
 
 class QDialogCustom(QDialog):
     """
