@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from weakref import WeakKeyDictionary
 
 from PySide2.QtCore import Qt
@@ -95,7 +95,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if filename:
             if not filename.endswith(".json"):
                 filename += ".json"
-            error_collector = []
+            error_collector: List[str] = []
             data_dump = json.dumps(self.model.as_dict(error_collector), indent=2)
             if error_collector:
                 show_errors_message(error_collector)
@@ -150,7 +150,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.add_component_window.show()
 
 
-def show_errors_message(errors):
+def show_errors_message(errors: List[str]):
     msgBox = QMessageBox()
     msgBox.setIcon(QMessageBox.Critical)
     msgBox.setText(
