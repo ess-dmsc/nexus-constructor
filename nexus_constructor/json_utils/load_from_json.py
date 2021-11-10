@@ -12,20 +12,20 @@ from nexus_constructor.common_attrs import (
     NodeType,
 )
 from nexus_constructor.component_type import COMPONENT_TYPES
-from nexus_constructor.json.json_warnings import (
+from nexus_constructor.json_utils.json_warnings import (
     InvalidJson,
     JsonWarningsContainer,
     NameFieldMissing,
     NXClassAttributeMissing,
     TransformDependencyMissing,
 )
-from nexus_constructor.json.load_from_json_utils import (
+from nexus_constructor.json_utils.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
     _find_nx_class,
 )
-from nexus_constructor.json.shape_reader import ShapeReader
-from nexus_constructor.json.transform_id import TransformId
-from nexus_constructor.json.transformation_reader import (
+from nexus_constructor.json_utils.shape_reader import ShapeReader
+from nexus_constructor.json_utils.transform_id import TransformId
+from nexus_constructor.json_utils.transformation_reader import (
     TransformationReader,
     get_component_and_transform_name,
 )
@@ -287,9 +287,7 @@ class JSONReader:
         :return: True if the model was loaded without problems, False otherwise.
         """
         with open(filename, "r") as json_file:
-
             json_data = json_file.read()
-
             try:
                 json_dict = json.loads(json_data)
             except ValueError as exception:
@@ -361,9 +359,11 @@ class JSONReader:
 
     def _add_object_warning(self, missing_info, parent_node):
         if parent_node:
-            name = parent_node[CommonKeys.NAME]
             self.warnings.append(
-                NameFieldMissing(f"Unable to find {missing_info} for child of {name}.")
+                NameFieldMissing(
+                    f"Unable to find {missing_info} "
+                    f"for child of {parent_node.name}."
+                )
             )
         else:
             self.warnings.append(
@@ -386,19 +386,19 @@ class JSONReader:
             except KeyError:
                 self._add_object_warning(CommonKeys.NAME, parent_node)
             nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
-            if not self._validate_nx_class(name, nx_class):
+            if nx_class and not self._validate_nx_class(name, nx_class):
                 raise TypeError(f"Class {nx_class} is not a valid class.")
             nexus_object = Group(name=name)
             nexus_object.parent_node = parent_node
             nexus_object.nx_class = nx_class
             for child in json_object[CommonKeys.CHILDREN]:
                 nexus_object.children.append(
-                    self.__read_json_object(child, nexus_object)
+                    self._read_json_object(child, nexus_object)
                 )
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             nexus_object = Module()
             nexus_object.parent_node = parent_node
-            if json_object[CommonKeys.MODULE] in WriterModules:
+            if json_object[CommonKeys.MODULE] in [x.value for x in WriterModules]:
                 nexus_object.writer_module = json_object[CommonKeys.MODULE]
                 nexus_object.module_configs = json_object[NodeType.CONFIG]
             else:
@@ -412,17 +412,18 @@ class JSONReader:
         if nexus_object:
             attributes = Attributes()
             json_attrs = json_object.get(CommonKeys.ATTRIBUTES)
-            for json_attr in json_attrs:
-                if CommonKeys.DATA_TYPE:
-                    attributes.set_attribute_value(
-                        json_attr[CommonKeys.NAME],
-                        json_attr[CommonKeys.VALUES],
-                        json_attr[CommonKeys.DATA_TYPE],
-                    )
-                else:
-                    attributes.set_attribute_value(
-                        json_attr[CommonKeys.NAME], json_attr[CommonKeys.VALUES]
-                    )
+            if json_attrs:
+                for json_attr in json_attrs:
+                    if CommonKeys.DATA_TYPE:
+                        attributes.set_attribute_value(
+                            json_attr[CommonKeys.NAME],
+                            json_attr[CommonKeys.VALUES],
+                            json_attr[CommonKeys.DATA_TYPE],
+                        )
+                    else:
+                        attributes.set_attribute_value(
+                            json_attr[CommonKeys.NAME], json_attr[CommonKeys.VALUES]
+                        )
 
         return nexus_object
 

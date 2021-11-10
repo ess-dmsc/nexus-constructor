@@ -30,6 +30,7 @@ class WriterModules(Enum):
     SENV = "senv"
     LINK = "link"
     DATASET = "dataset"
+    ADAR = "ADAr"
 
 
 class Module:

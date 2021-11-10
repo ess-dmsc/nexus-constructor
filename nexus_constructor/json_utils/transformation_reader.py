@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple, Union, List
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from PySide2.QtGui import QVector3D
 
@@ -9,17 +9,17 @@ from nexus_constructor.common_attrs import (
     NodeType,
     TransformationType,
 )
-from nexus_constructor.json.json_warnings import (
+from nexus_constructor.json_utils.json_warnings import (
     InvalidTransformation,
     JsonWarningsContainer,
     TransformDependencyMissing,
 )
-from nexus_constructor.json.load_from_json_utils import (
+from nexus_constructor.json_utils.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
     _find_attribute_from_list_or_dict,
     _find_nx_class,
 )
-from nexus_constructor.json.transform_id import TransformId
+from nexus_constructor.json_utils.transform_id import TransformId
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.transformation import Transformation

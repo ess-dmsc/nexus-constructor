@@ -14,12 +14,12 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.json.json_warnings import JsonWarningsContainer
-from nexus_constructor.json.load_from_json import _get_data_type
-from nexus_constructor.json.load_from_json_utils import (
+from nexus_constructor.json_utils.json_warnings import JsonWarningsContainer
+from nexus_constructor.json_utils.load_from_json import _get_data_type
+from nexus_constructor.json_utils.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
 )
-from nexus_constructor.json.shape_reader import (
+from nexus_constructor.json_utils.shape_reader import (
     DETECTOR_NUMBER,
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,

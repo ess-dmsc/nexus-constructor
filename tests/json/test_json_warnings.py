@@ -1,6 +1,9 @@
 import pytest
 
-from nexus_constructor.json.json_warnings import InvalidJson, JsonWarningsContainer
+from nexus_constructor.json_utils.json_warnings import (
+    InvalidJson,
+    JsonWarningsContainer,
+)
 
 JSON_WARN_CONTAINER = JsonWarningsContainer()
 JSON_WARNING = InvalidJson("Invalid JSON warning")

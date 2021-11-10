@@ -6,12 +6,12 @@ import pytest
 from mock import mock_open, patch
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.json.json_warnings import (
+from nexus_constructor.json_utils.json_warnings import (
     JsonWarning,
     JsonWarningsContainer,
     TransformDependencyMissing,
 )
-from nexus_constructor.json.load_from_json import (
+from nexus_constructor.json_utils.load_from_json import (
     JSONReader,
     _add_attributes,
     _create_dataset,
@@ -324,7 +324,7 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
     """
 
     with patch(
-        "nexus_constructor.json.load_from_json.open",
+        "nexus_constructor.json_utils.load_from_json.open",
         mock_open(read_data=json_string),
         create=True,
     ):

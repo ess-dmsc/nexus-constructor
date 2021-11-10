@@ -12,8 +12,11 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.json.json_warnings import InvalidShape, JsonWarningsContainer
-from nexus_constructor.json.load_from_json_utils import (
+from nexus_constructor.json_utils.json_warnings import (
+    InvalidShape,
+    JsonWarningsContainer,
+)
+from nexus_constructor.json_utils.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
     _find_nx_class,
 )

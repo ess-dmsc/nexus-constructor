@@ -1,6 +1,6 @@
 import pytest
 
-from nexus_constructor.json.load_from_json_utils import _find_nx_class
+from nexus_constructor.json_utils.load_from_json_utils import _find_nx_class
 
 
 @pytest.mark.parametrize("class_attribute", [[{"name": "NX_class"}], [{"name": "123"}]])

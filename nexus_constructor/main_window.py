@@ -3,15 +3,10 @@ from typing import Dict, Optional
 from weakref import WeakKeyDictionary
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
-    QApplication,
-    QDialog,
-    QMainWindow,
-    QMessageBox,
-)
+from PySide2.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.json.load_from_json import JSONReader
+from nexus_constructor.json_utils.load_from_json import JSONReader
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
@@ -20,7 +15,7 @@ from ui.main_window import Ui_MainWindow
 from .about_window import AboutWindow
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
-JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
+JSON_FILE_TYPES = {"JSON Files": ["json_utils", "JSON"]}
 FLATBUFFER_FILE_TYPES = {"FlatBuffer Files": ["flat", "FLAT"]}
 
 
@@ -113,7 +108,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     parent=self,
                 )
             if success:
-                self.model.entry = reader.entry
+                self.model.entry = reader.entry  # type: ignore
                 self._update_views()
 
     def _update_transformations_3d_view(self):

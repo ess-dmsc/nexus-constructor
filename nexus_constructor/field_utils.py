@@ -7,6 +7,7 @@ from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.stream import Link, StreamGroup
 from nexus_constructor.validators import FieldType
 
@@ -87,6 +88,7 @@ def get_fields_with_update_functions(
             "F142Stream",
             "HS00Stream",
             "Link",
+            "Group",
         ],
         Callable,
     ]
