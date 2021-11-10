@@ -276,7 +276,6 @@ def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_trans
 
     view.transformation_frame.x_spinbox.setValue(new_x)
     view.save_all_changes()
-    model.signals.transformation_changed.emit.assert_called_once()
     assert transform.vector == QVector3D(new_x, y, z)
 
 
