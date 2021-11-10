@@ -160,6 +160,7 @@ def show_errors_message(errors):
     msgBox.setDetailedText("\n\n".join([f"- {err}" for err in errors]))
     msgBox.exec_()
 
+
 class QDialogCustom(QDialog):
     """
     Custom QDialog class that enables the possibility to properly produce
