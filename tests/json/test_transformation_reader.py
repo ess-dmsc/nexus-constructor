@@ -146,7 +146,7 @@ def test_GIVEN_attribute_is_found_WHEN_looking_for_transformation_attribute_THEN
         "values", transformation_json["children"][0], failure_value=50
     )
 
-    # Check that the json_utils value was returned
+    # Check that the json value was returned
     assert attribute_value == json_value
     # Check that the number of warnings has remained the same
     assert len(transformation_reader.warnings) == n_warnings
@@ -164,7 +164,7 @@ def test_GIVEN_attribute_is_in_list_WHEN_looking_for_transformation_attribute_TH
         "units", "TransformationName", attributes_list, failure_value="yards"
     )
 
-    # Check that the json_utils value was returned
+    # Check that the json value was returned
     assert attribute_value == json_value
     # Check that the number of warnings has remained the same
     assert len(transformation_reader.warnings) == n_warnings

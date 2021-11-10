@@ -109,7 +109,7 @@ def _load_stl_geometry(
     :return: An OFFGeometry instance containing that file's geometry.
     """
     mesh_data = mesh.Mesh.from_file("", fh=file, calculate_normals=False)
-    # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json_utils
+    # numpy-stl loads numbers as python decimals, not floats, which aren't valid in json
     geometry.vertices = [
         QVector3D(
             float(corner[0]) * mult_factor,
