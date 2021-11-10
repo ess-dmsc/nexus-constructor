@@ -259,7 +259,7 @@ def __create_f142_stream(
 
 class JSONReader:
     def __init__(self):
-        self._entry_node = None
+        self.entry_node = None
         self.warnings = JsonWarningsContainer()
 
         # key: TransformId for transform which has a depends on
@@ -279,26 +279,6 @@ class JSONReader:
         self._components_depends_on: Dict[
             str, Tuple[Component, Optional[TransformId]]
         ] = {}
-
-    def load_model_from_json(self, filename: str) -> bool:
-        """
-        Tries to load a model from a JSON file.
-        :param filename: The filename of the JSON file.
-        :return: True if the model was loaded without problems, False otherwise.
-        """
-        with open(filename, "r") as json_file:
-            json_data = json_file.read()
-            try:
-                json_dict = json.loads(json_data)
-            except ValueError as exception:
-                self.warnings.append(
-                    InvalidJson(
-                        f"Provided file not recognised as valid JSON. Exception: {exception}"
-                    )
-                )
-                return False
-
-            return self._load_from_json_dict(json_dict)
 
     def _set_components_depends_on(self):
         """
@@ -351,24 +331,31 @@ class JSONReader:
                     )
                 )
 
+    def load_model_from_json(self, filename: str) -> bool:
+        """
+        Tries to load a model from a JSON file.
+        :param filename: The filename of the JSON file.
+        :return: True if the model was loaded without problems, False otherwise.
+        """
+        with open(filename, "r") as json_file:
+            json_data = json_file.read()
+            try:
+                json_dict = json.loads(json_data)
+            except ValueError as exception:
+                self.warnings.append(
+                    InvalidJson(
+                        f"Provided file not recognised as valid JSON. Exception: {exception}"
+                    )
+                )
+                return False
+
+            return self._load_from_json_dict(json_dict)
+
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
-        self._entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
         # self._set_transforms_depends_on()
         # self._set_components_depends_on()
         return True
-
-    def _add_object_warning(self, missing_info, parent_node):
-        if parent_node:
-            self.warnings.append(
-                NameFieldMissing(
-                    f"Unable to find {missing_info} "
-                    f"for child of {parent_node.name}."
-                )
-            )
-        else:
-            self.warnings.append(
-                NameFieldMissing(f"Unable to find object {missing_info} for NXEntry.")
-            )
 
     def _read_json_object(self, json_object: Dict, parent_node: Group = None):
         """
@@ -392,9 +379,9 @@ class JSONReader:
             nexus_object.parent_node = parent_node
             nexus_object.nx_class = nx_class
             for child in json_object[CommonKeys.CHILDREN]:
-                nexus_object.children.append(
-                    self._read_json_object(child, nexus_object)
-                )
+                node = self._read_json_object(child, nexus_object)
+                if node:
+                    nexus_object.children.append(node)
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             nexus_object = Module()
             nexus_object.parent_node = parent_node
@@ -403,6 +390,7 @@ class JSONReader:
                 nexus_object.module_configs = json_object[NodeType.CONFIG]
             else:
                 self._add_object_warning("valid module type", parent_node)
+                return None
         else:
             self._add_object_warning(
                 f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
@@ -426,6 +414,19 @@ class JSONReader:
                         )
 
         return nexus_object
+
+    def _add_object_warning(self, missing_info, parent_node):
+        if parent_node:
+            self.warnings.append(
+                NameFieldMissing(
+                    f"Unable to find {missing_info} "
+                    f"for child of {parent_node.name}."
+                )
+            )
+        else:
+            self.warnings.append(
+                NameFieldMissing(f"Unable to find object {missing_info} for NXEntry.")
+            )
 
     # TODO: REMOVE THIS ONE.
     @typing.no_type_check

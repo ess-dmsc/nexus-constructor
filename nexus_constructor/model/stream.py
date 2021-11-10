@@ -35,8 +35,8 @@ class WriterModules(Enum):
 
 class Module:
     module_configs = attr.ib(type=dict, default={})
-    writer_module = attr.ib(type=str, default=None, init=False)
-    attributes = attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    writer_module = attr.ib(type=str)
+    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     parent_node = attr.ib(type="Group", default=None)
 
     def as_dict(self):
