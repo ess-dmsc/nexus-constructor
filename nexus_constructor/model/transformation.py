@@ -164,19 +164,19 @@ class Transformation(Dataset):
         self._dependents = []
 
     def as_dict(self) -> Dict[str, Any]:
-        value = None
         return_dict: Dict = {}
         if isinstance(self.values, Dataset):
-            if np.isscalar(self.values.values):
-                val: "ValueType" = self.values.values
-                value = float(val)
-                # TODO elif array, NXlog, kafka stream, ...
+            values = self.values.values
+            if np.isscalar(values):
+                values = float(values)  # type:ignore
+            if isinstance(values, np.ndarray):
+                values = values.tolist()
             return_dict = {
                 CommonKeys.MODULE: "dataset",
                 NodeType.CONFIG: {
                     CommonKeys.NAME: self.name,
                     CommonKeys.DATA_TYPE: self.type,
-                    CommonKeys.VALUES: value if value is not None else [],
+                    CommonKeys.VALUES: values,
                 },
             }
         elif isinstance(self.values, StreamGroup):

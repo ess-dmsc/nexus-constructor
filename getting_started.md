@@ -103,7 +103,7 @@ When the Add component Dialog is shown, select "NXmonitor" as the component type
 Alternatively to cylinder shapes, mesh shapes can be used for components to describe their shape. Currently STL and OFF files are supported for mesh geometry.
 
 To use a mesh file for geometry, select the "Mesh" geometry type. This will show an option to browse for a file. As well as this, units can also be set to change the scale of the geometry.
-To test this, there are OFF and STL files in the `tests/` folder. Let's use the "cube.off" file.   
+To test this, there are OFF and STL files in the `tests/` folder. Let's use the "cube.off" file.
 
 ![](resources/images/AddComponent_011.png)
 
@@ -115,14 +115,3 @@ We now have a very basic example of a beamline instrument visualised in 3D as we
 To save to a JSON file, open the file menu and click "Save to filewriter JSON". This will bring up a file dialog in order to save the file.
 
 To open a JSON file, open the file menu and click "Open from filewriter JSON". The constructor will then load in all components and their fields from a given file.
-
-#### Sending a command to the file-writer
-
-As well as saving the NeXus structure to file, a run start message can be constructed and sent to an instance of the [file-writer](https://github.com/ess-dmsc/kafka-to-nexus)
-To do this, open the file menu and select "Control file writer". This will bring up a dialog that enables a user to input [Kafka topic](https://kafka.apache.org/documentation/#intro_topics) URIs to look at the status of any active file-writers or to send a command to one.
-
-![](resources/images/nexus-constructor.py_013.png)
-
-### Opening and saving to NeXus File
-
-The NeXus Constructor can also directly create a NeXus file. However, note that it will not populate the file with data from Kafka
