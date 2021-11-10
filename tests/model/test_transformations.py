@@ -365,7 +365,7 @@ def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_err
     translation = Transformation(
         name="some_name",
         parent_node=None,
-        values=Dataset(name='', values='', type='double', size=[1]),
+        values=Dataset(name="", values="", type="double", size=[1]),
         type=ValueTypes.DOUBLE,
         parent_component=None,
         size=[1],
