@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from nexus_constructor.transformation_view import EditTransformation
 
 
-class Ui_Transformation(object):
+class Ui_Transformation:
     def setupUi(self, Transformation: "EditTransformation"):
         Transformation.setObjectName("Transformation")
         Transformation.resize(361, 171)
