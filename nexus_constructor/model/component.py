@@ -41,9 +41,9 @@ from nexus_constructor.model.geometry import (
     OFFGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.model.stream import DATASET
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.helpers import _generate_incremental_name
+from nexus_constructor.model.stream import DATASET, StreamGroup
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -253,15 +253,22 @@ class Component(Group):
         units: str,
         vector: QVector3D,
         depends_on: Transformation,
-        values: Dataset,
+        values: Union[Dataset, StreamGroup],
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
+        size = [1]
+        if isinstance(values, Dataset):
+            type = values.type
+            size = values.size  # type: ignore
+        elif isinstance(values, StreamGroup):
+            type = values.children[0].type  # type: ignore
+
         transform = Transformation(
             name=name,
             parent_node=self.get_transforms_group(),
-            type=values.type,
-            size=values.size,
+            type=type,
+            size=size,  # type: ignore
             values=values,
         )
         transform.transform_type = transformation_type
