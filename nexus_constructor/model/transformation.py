@@ -175,12 +175,13 @@ class Transformation(Dataset):
                 CommonKeys.MODULE: "dataset",
                 NodeType.CONFIG: {
                     CommonKeys.NAME: self.name,
-                    CommonKeys.DATA_TYPE: self.type,
+                    CommonKeys.DATA_TYPE: self.values.type,
                     CommonKeys.VALUES: values,
                 },
             }
         elif isinstance(self.values, StreamGroup):
             return_dict = self.values.children[0].as_dict()
+            return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
