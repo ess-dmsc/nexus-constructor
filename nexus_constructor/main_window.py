@@ -1,21 +1,16 @@
 import json
-import uuid
 from typing import Dict, Optional
 from weakref import WeakKeyDictionary
 
-from nexusutils.nexusbuilder import NexusBuilder
-from PySide2.QtCore import QSettings, Qt
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
-    QAction,
     QApplication,
     QDialog,
-    QInputDialog,
     QMainWindow,
     QMessageBox,
 )
 
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.create_forwarder_config import create_forwarder_config
 from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
@@ -39,16 +34,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
-
-        self.export_to_nexus_file_action.triggered.connect(self.save_to_nexus_file)
-        self.open_nexus_file_action.triggered.connect(self.open_nexus_file)
         self.open_json_file_action.triggered.connect(self.open_json_file)
-        self.open_idf_file_action.triggered.connect(self.open_idf_file)
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_filewriter_json
-        )
-        self.export_to_forwarder_config_action.triggered.connect(
-            self.save_to_forwarder_config
         )
         self.show_action_labels.triggered.connect(
             lambda: self.on_show_action_labels(self.show_action_labels.isChecked())
@@ -64,8 +52,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self._update_transformations_3d_view
         )
 
-        self._set_up_file_writer_control_window(main_window)
-        self.file_writer_control_window = None
         self._update_views()
 
     def onOpenAboutWindow(self, instance):
@@ -90,32 +76,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if instance in self._registered_windows:
             del self._registered_windows[instance]
 
-    def _set_up_file_writer_control_window(self, main_window):
-        try:
-            import confluent_kafka  # noqa: F401
-
-            self.control_file_writer_action = QAction(main_window)
-            self.control_file_writer_action.setText("Control file-writer")
-            self.file_menu.addAction(self.control_file_writer_action)
-            self.control_file_writer_action.triggered.connect(
-                self.show_control_file_writer_window
-            )
-        except ImportError:
-            pass
-
     def on_show_action_labels(self, value):
         self.component_tree_view_tab.component_tool_bar.setToolButtonStyle(
             Qt.ToolButtonTextUnderIcon if value else Qt.ToolButtonIconOnly
         )
-
-    def show_control_file_writer_window(self):
-        if self.file_writer_control_window is None:
-            from nexus_constructor.file_writer_ctrl_window import FileWriterCtrl
-
-            self.file_writer_ctrl_window = FileWriterCtrl(
-                QSettings("ess", "nexus-constructor")
-            )
-            self.file_writer_ctrl_window.show()
 
     def show_edit_component_dialog(self):
         selected_component = (
@@ -124,33 +88,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             ].internalPointer()
         )
         self.show_add_component_window(selected_component)
-
-    def save_to_nexus_file(self):
-        filename = file_dialog(True, "Save Nexus File", NEXUS_FILE_TYPES)
-        self.model.signals.save_file(filename)
-
-    def open_idf_file(self):
-        filename = file_dialog(False, "Open IDF file", {"IDF files": ["xml"]})
-        self._load_idf(filename)
-
-    def _load_idf(self, filename):
-        try:
-            builder = NexusBuilder(
-                str(uuid.uuid4()),
-                idf_file=filename,
-                file_in_memory=True,
-                nx_entry_name="entry",
-            )
-            builder.add_instrument_geometry_from_idf()
-            self.model.signals.load_nexus_file(builder.target_file)
-            self._update_views()
-            QMessageBox.warning(
-                self,
-                "Mantid IDF loaded",
-                "Please manually check the instrument for accuracy.",
-            )
-        except Exception:
-            QMessageBox.critical(self, "IDF Error", "Error whilst loading IDF file")
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
@@ -161,31 +98,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             data_dump = json.dumps(self.model.as_dict(), indent=2)
             with open(filename, "w") as file:
                 file.write(data_dump)
-
-    def save_to_forwarder_config(self):
-        filename = file_dialog(
-            True, "Save Forwarder FlatBuffer File", FLATBUFFER_FILE_TYPES
-        )
-        if filename:
-            provider_type, ok_pressed = QInputDialog.getItem(
-                self,
-                "Provider type",
-                "Select provider type for PVs",
-                ["ca", "pva", "fake"],
-                0,
-                False,
-            )
-            if ok_pressed:
-                with open(filename, "wb") as flat_file:
-                    flat_file.write(
-                        create_forwarder_config(
-                            self.model,
-                            provider_type,
-                        )
-                    )
-
-    def open_nexus_file(self):
-        raise NotImplementedError
 
     def open_json_file(self):
         filename = file_dialog(False, "Open File Writer JSON File", JSON_FILE_TYPES)

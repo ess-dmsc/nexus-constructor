@@ -529,7 +529,10 @@ def test_GIVEN_dictionary_containing_attributes_WHEN_adding_attributes_THEN_attr
 def test_GIVEN_link_json_WHEN_adding_link_THEN_link_object_is_created():
     name = "link1"
     target = "/entry/instrument/detector1"
-    test_dict = {"name": name, "target": target}
+    test_dict = {
+        "module": "link",
+        "config": {"name": name, "source": target},
+    }
     link = _create_link(test_dict)
     assert link.name == name
     assert link.target == target

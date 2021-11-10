@@ -14,7 +14,6 @@ def create_transform(
     type="Translation",
     values=Dataset(name="", values=None, type=ValueTypes.DOUBLE, size=[1]),
 ):
-
     translation = Transformation(
         name=name,
         parent_node=None,
@@ -32,7 +31,6 @@ def create_transform(
 
 
 def test_can_get_transform_properties():
-
     test_name = "slartibartfast"
     test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
@@ -80,7 +78,6 @@ def test_ui_value_for_transform_with_array_magnitude_of_strings_returns_zero():
 
 
 def test_can_set_transform_properties():
-
     initial_name = "slartibartfast"
 
     transform = create_transform(initial_name)
@@ -115,7 +112,6 @@ def test_can_set_transform_properties():
 
 
 def test_set_one_dependent():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
 
@@ -128,7 +124,6 @@ def test_set_one_dependent():
 
 
 def test_set_two_dependents():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -144,7 +139,6 @@ def test_set_two_dependents():
 
 
 def test_set_three_dependents():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -163,7 +157,6 @@ def test_set_three_dependents():
 
 
 def test_deregister_dependent():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
 
@@ -176,7 +169,6 @@ def test_deregister_dependent():
 
 
 def test_deregister_unregistered_dependent_alt1():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
 
@@ -186,7 +178,6 @@ def test_deregister_unregistered_dependent_alt1():
 
 
 def test_deregister_unregistered_dependent_alt2():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -199,7 +190,6 @@ def test_deregister_unregistered_dependent_alt2():
 
 
 def test_deregister_unregistered_dependent_alt3():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_2_alt")
@@ -215,7 +205,6 @@ def test_deregister_unregistered_dependent_alt3():
 
 
 def test_reregister_dependent():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -231,7 +220,6 @@ def test_reregister_dependent():
 
 
 def test_set_one_dependent_component():
-
     transform = create_transform("transform_1")
     component = Component("test_component")
     transform.register_dependent(component)
@@ -243,7 +231,6 @@ def test_set_one_dependent_component():
 
 
 def test_set_two_dependent_components():
-
     transform = create_transform("transform_1")
 
     component1 = Component("component1")
@@ -260,7 +247,6 @@ def test_set_two_dependent_components():
 
 
 def test_set_three_dependent_components():
-
     transform = create_transform("transform_1")
 
     component1 = Component("test_component1")
@@ -280,7 +266,6 @@ def test_set_three_dependent_components():
 
 
 def test_deregister_three_dependent_components():
-
     transform = create_transform("transform_1")
 
     component1 = Component("test_component1")
@@ -301,7 +286,6 @@ def test_deregister_three_dependent_components():
 
 
 def test_register_dependent_twice():
-
     transform = create_transform("transform_1")
     component1 = Component("test_component1")
 
@@ -314,7 +298,6 @@ def test_register_dependent_twice():
 
 
 def test_can_get_translation_as_4_by_4_matrix():
-
     test_ui_value = 42.0
     # Note, it should not matter if this is not set to a unit vector
     test_vector = QVector3D(2.0, 0.0, 0.0)
@@ -333,7 +316,6 @@ def test_can_get_translation_as_4_by_4_matrix():
 
 
 def test_can_get_rotation_as_4_by_4_matrix():
-
     test_ui_value = 15.0  # degrees
     test_vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
     test_type = "Rotation"

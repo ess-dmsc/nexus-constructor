@@ -17,6 +17,7 @@ STORE_LATEST_INTO = "store_latest_into"
 SOURCE = "source"
 TOPIC = "topic"
 DATASET = "dataset"
+LINK = "link"
 
 
 class WriterModules(Enum):
@@ -26,6 +27,22 @@ class WriterModules(Enum):
     NS10 = "ns10"
     HS00 = "hs00"
     SENV = "senv"
+
+
+@attr.s
+class Link:
+    name = attr.ib(type=str)
+    target = attr.ib(type=str)
+    writer_module = attr.ib(type=str, default=LINK, init=False)
+    values = None
+    attributes = None
+    parent_node = None
+
+    def as_dict(self):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.target},
+        }
 
 
 @attr.s
