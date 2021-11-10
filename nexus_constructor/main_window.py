@@ -95,7 +95,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if filename:
             if not filename.endswith(".json"):
                 filename += ".json"
-            data_dump = json.dumps(self.model.as_dict(), indent=2)
+            error_collector = []
+            data_dump = json.dumps(self.model.as_dict(error_collector), indent=2)
             with open(filename, "w") as file:
                 file.write(data_dump)
 

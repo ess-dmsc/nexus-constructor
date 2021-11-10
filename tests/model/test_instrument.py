@@ -4,7 +4,7 @@ from nexus_constructor.model.instrument import SAMPLE_NAME, Instrument
 
 def test_instrument_as_dict_does_not_contain_sample():
     test_instrument = Instrument()
-    dictionary_output = test_instrument.as_dict()
+    dictionary_output = test_instrument.as_dict([])
 
     child_names = [child["name"] for child in dictionary_output["children"]]
     assert (
@@ -18,7 +18,7 @@ def test_instrument_as_dict_contains_components():
     first_test_component_name = "Component_B"
     test_instrument.component_list.append(Component(zeroth_test_component_name, []))
     test_instrument.component_list.append(Component(first_test_component_name, []))
-    dictionary_output = test_instrument.as_dict()
+    dictionary_output = test_instrument.as_dict([])
 
     child_names = [child["name"] for child in dictionary_output["children"]]
     assert zeroth_test_component_name in child_names

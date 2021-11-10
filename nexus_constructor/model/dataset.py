@@ -33,7 +33,7 @@ class Dataset:
     def nx_class(self, new_nx_class: str):
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self, error_collector) -> Dict[str, Any]:
         values = self.values
         if isinstance(values, np.ndarray):
             values = values.tolist()
@@ -46,5 +46,5 @@ class Dataset:
             },
         }
         if self.attributes:
-            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(error_collector)
         return return_dict

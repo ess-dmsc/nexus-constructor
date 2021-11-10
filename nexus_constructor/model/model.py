@@ -26,5 +26,5 @@ class Model:
         self.entry = Entry()
         self.entry.instrument = Instrument()
 
-    def as_dict(self) -> Dict[str, Any]:
-        return {CommonKeys.CHILDREN: [self.entry.as_dict()]}
+    def as_dict(self, error_collector) -> Dict[str, Any]:
+        return {CommonKeys.CHILDREN: [self.entry.as_dict(error_collector)]}

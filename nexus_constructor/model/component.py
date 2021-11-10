@@ -434,8 +434,8 @@ class Component(Group):
             )
         ]
 
-    def as_dict(self) -> Dict[str, Any]:
-        dictionary = super(Component, self).as_dict()
+    def as_dict(self, error_collector) -> Dict[str, Any]:
+        dictionary = super(Component, self).as_dict(error_collector)
 
         if self.transforms:
             # Add transformations in a child group
@@ -444,7 +444,7 @@ class Component(Group):
                     CommonKeys.TYPE: NodeType.GROUP,
                     CommonKeys.NAME: TRANSFORMS_GROUP_NAME,
                     CommonKeys.CHILDREN: [
-                        transform.as_dict() for transform in self.transforms
+                        transform.as_dict(error_collector) for transform in self.transforms
                     ],
                     CommonKeys.ATTRIBUTES: [
                         {
