@@ -362,32 +362,24 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
 
 def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_error():
-    translation = Transformation(
-        name="some_name",
-        parent_node=None,
+    transform = create_transform(
         values=Dataset(name="", values="", type="double", size=[1]),
         type=ValueTypes.DOUBLE,
-        parent_component=None,
-        size=[1],
     )
 
     error_collector = []
-    translation.as_dict(error_collector)
+    transform.as_dict(error_collector)
 
     assert error_collector
 
 
 def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
-    translation = Transformation(
-        name="some_name",
-        parent_node=None,
+    transform = create_transform(
         values=Dataset(name="", values="123", type="double", size=[1]),
         type=ValueTypes.DOUBLE,
-        parent_component=None,
-        size=[1],
     )
 
     error_collector = []
-    translation.as_dict(error_collector)
+    transform.as_dict(error_collector)
 
     assert not error_collector
