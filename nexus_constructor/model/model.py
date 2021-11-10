@@ -11,7 +11,6 @@ class Signals(QObject):
     """
     Signals when model is updated, to trigger, for example, updating the 3D view
     """
-
     file_changed = Signal("QVariant")
     file_opened = Signal("QVariant")
     component_added = Signal(str, "QVariant", "QVariant")
