@@ -373,15 +373,19 @@ class JSONReader:
             except KeyError:
                 self._add_object_warning(CommonKeys.NAME, parent_node)
             nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
-            if nx_class and not self._validate_nx_class(name, nx_class):
-                raise TypeError(f"Class {nx_class} is not a valid class.")
+            if not self._validate_nx_class(name, nx_class):
+                self.warnings.append(
+                    NameFieldMissing(f"Class {nx_class} is not a valid class.")
+                )
+                return None
             nexus_object = Group(name=name)
             nexus_object.parent_node = parent_node
             nexus_object.nx_class = nx_class
-            for child in json_object[CommonKeys.CHILDREN]:
-                node = self._read_json_object(child, nexus_object)
-                if node:
-                    nexus_object.children.append(node)
+            if CommonKeys.CHILDREN in json_object:
+                for child in json_object[CommonKeys.CHILDREN]:
+                    node = self._read_json_object(child, nexus_object)
+                    if node:
+                        nexus_object.children.append(node)
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             nexus_object = Module()
             nexus_object.parent_node = parent_node
@@ -402,13 +406,13 @@ class JSONReader:
             json_attrs = json_object.get(CommonKeys.ATTRIBUTES)
             if json_attrs:
                 for json_attr in json_attrs:
-                    if CommonKeys.DATA_TYPE:
+                    if CommonKeys.DATA_TYPE in json_attr:
                         attributes.set_attribute_value(
                             json_attr[CommonKeys.NAME],
                             json_attr[CommonKeys.VALUES],
                             json_attr[CommonKeys.DATA_TYPE],
                         )
-                    else:
+                    elif CommonKeys.NAME in json_attr:
                         attributes.set_attribute_value(
                             json_attr[CommonKeys.NAME], json_attr[CommonKeys.VALUES]
                         )

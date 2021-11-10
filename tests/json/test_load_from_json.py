@@ -48,9 +48,10 @@ def nexus_json_dictionary() -> dict:
             {
               "name":"instrument",
               "type":"group",
-              "attributes":{
-                "NX_class":"NXinstrument"
-              },
+              "attributes":[{
+                "name":"NX_class",
+                "values":"NXinstrument"
+              }],
               "children":[
     
               ]
@@ -292,7 +293,8 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
               "name":"instrument",
               "type":"group",
               "attributes":{
-                "NX_class":"NXinstrument"
+                "name":"NX_class",
+                "values":"NXinstrument"
               },
               "children":[
     
@@ -369,22 +371,19 @@ def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_n
 ):
     sample_name = "NewSampleName"
     nexus_json_dictionary["children"][0]["children"][1]["name"] = sample_name
+    json_reader._load_from_json_dict(nexus_json_dictionary)
 
-    children_list = _retrieve_children_list(nexus_json_dictionary)
-
-    for child in children_list:
-        json_reader._read_json_object(child)
-
-    assert json_reader.entry.instrument.sample.name == sample_name
+    assert json_reader.entry_node[sample_name].name == sample_name
 
 
 def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_object_returns_false(
     nexus_json_dictionary, json_reader
 ):
     nx_instrument = nexus_json_dictionary["children"][0]["children"][0]
-    nx_instrument["attributes"]["NX_class"] = None
+    nx_instrument["attributes"][0]["name"] = None
+    node = json_reader._read_json_object(nx_instrument)
 
-    assert not json_reader._read_json_object(nx_instrument)
+    assert not node
 
 
 def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contains_component_with_json_name(
@@ -394,11 +393,11 @@ def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contain
     json_dict_with_component["children"][0]["children"][0]["children"][0][
         "name"
     ] = component_name
-    json_reader._read_json_object(
+    node = json_reader._read_json_object(
         json_dict_with_component["children"][0]["children"][0]
     )
 
-    assert json_reader.entry.instrument.component_list[1].name == component_name
+    assert node.children[0].name == component_name
 
 
 def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_contains_component_with_nx_class(
@@ -408,13 +407,13 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     json_dict_with_component["children"][0]["children"][0]["children"][0]["attributes"][
         0
     ]["values"] = component_class
-    json_reader._read_json_object(
+    node = json_reader._read_json_object(
         json_dict_with_component["children"][0]["children"][0]
     )
+    assert node.children[0].nx_class == component_class
 
-    assert json_reader.entry.instrument.component_list[1].nx_class == component_class
 
-
+@pytest.mark.skip(reason="groups should not care about components")
 def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_component_in_model_contains_transform(
     json_dict_with_component_and_transform, json_reader
 ):
@@ -459,6 +458,7 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
     assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
 
 
+@pytest.mark.skip(reason="groups should not care about components")
 def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
     json_dict_with_component_and_transform, json_reader
 ):
