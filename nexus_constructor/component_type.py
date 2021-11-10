@@ -41,6 +41,7 @@ COMPONENT_TYPES = {
     "NXslit",
     "NXvelocity_selector",
     "NXxraylens",
+    "NXtransformations",
 }
 
 CHOPPER_CLASS_NAME = "NXdisk_chopper"
