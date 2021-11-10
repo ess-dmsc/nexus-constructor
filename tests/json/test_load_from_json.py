@@ -376,6 +376,7 @@ def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_n
     assert json_reader.entry_node[sample_name].name == sample_name
 
 
+@pytest.mark.skip(reason="this is not a valid test anymore")
 def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_object_returns_false(
     nexus_json_dictionary, json_reader
 ):

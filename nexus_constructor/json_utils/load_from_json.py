@@ -372,12 +372,12 @@ class JSONReader:
                 name = json_object[CommonKeys.NAME]
             except KeyError:
                 self._add_object_warning(CommonKeys.NAME, parent_node)
+                return None
             nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
             if not self._validate_nx_class(name, nx_class):
                 self.warnings.append(
                     NameFieldMissing(f"Class {nx_class} is not a valid class.")
                 )
-                return None
             nexus_object = Group(name=name)
             nexus_object.parent_node = parent_node
             nexus_object.nx_class = nx_class
