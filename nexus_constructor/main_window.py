@@ -15,7 +15,7 @@ from ui.main_window import Ui_MainWindow
 from .about_window import AboutWindow
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
-JSON_FILE_TYPES = {"JSON Files": ["json_utils", "JSON"]}
+JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
 FLATBUFFER_FILE_TYPES = {"FlatBuffer Files": ["flat", "FLAT"]}
 
 
