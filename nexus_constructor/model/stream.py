@@ -4,6 +4,7 @@ from typing import List, Union
 import attr
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
+from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.group import Group
 
 ARRAY_SIZE = "array_size"
@@ -17,6 +18,7 @@ STORE_LATEST_INTO = "store_latest_into"
 SOURCE = "source"
 TOPIC = "topic"
 DATASET = "dataset"
+LINK = "link"
 
 
 class WriterModules(Enum):
@@ -26,6 +28,37 @@ class WriterModules(Enum):
     NS10 = "ns10"
     HS00 = "hs00"
     SENV = "senv"
+    LINK = "link"
+    DATASET = "dataset"
+
+
+class Module:
+    module_configs = attr.ib(type=dict, default={})
+    writer_module = attr.ib(type=str, default=None, init=False)
+    attributes = attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    parent_node = attr.ib(type="Group", default=None)
+
+    def as_dict(self):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: self.module_configs,
+        }
+
+
+@attr.s
+class Link:
+    name = attr.ib(type=str)
+    target = attr.ib(type=str)
+    writer_module = attr.ib(type=str, default=LINK, init=False)
+    values = None
+    attributes = None
+    parent_node = None
+
+    def as_dict(self):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.target},
+        }
 
 
 @attr.s

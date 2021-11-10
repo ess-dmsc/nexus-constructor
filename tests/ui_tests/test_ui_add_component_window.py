@@ -28,9 +28,8 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNoNexus,
 )
 from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.link import Link
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import F142Stream, StreamGroup
+from nexus_constructor.model.stream import F142Stream, Link, StreamGroup
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
@@ -1566,7 +1565,8 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch(
-        COMPONENT_CLASS_PATH, return_value=mock_component,
+        COMPONENT_CLASS_PATH,
+        return_value=mock_component,
     ):
         add_component_dialog.on_ok()
         mock_component.record_pixel_grid.assert_called_once_with(pixel_grid)
@@ -1601,7 +1601,8 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch(
-        COMPONENT_CLASS_PATH, return_value=mock_component,
+        COMPONENT_CLASS_PATH,
+        return_value=mock_component,
     ):
         add_component_dialog.on_ok()
         mock_component.record_pixel_mapping.assert_called_once_with(pixel_mapping)
@@ -1634,7 +1635,8 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 
     # Call the on_ok method as if the user had pressed Add Component
     with patch(
-        COMPONENT_CLASS_PATH, return_value=mock_component,
+        COMPONENT_CLASS_PATH,
+        return_value=mock_component,
     ):
         add_component_dialog.on_ok()
         mock_component.record_pixel_mapping.assert_not_called()
@@ -1642,7 +1644,8 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
 
 
 def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_correct_values_are_loaded_into_UI(
-    qtbot, model,
+    qtbot,
+    model,
 ):
     component_model = ComponentTreeModel(model)
 
@@ -1707,7 +1710,8 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
 
 
 def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cylinder_shape_radio_is_checked(
-    qtbot, model,
+    qtbot,
+    model,
 ):
     component_model = ComponentTreeModel(model)
 
@@ -1822,7 +1826,6 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     )
 
     entry = Entry()
-
     link_name = "link1"
     link = Link(name=link_name, target=entry.name)
 
@@ -1931,7 +1934,8 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
-    qtbot, model,
+    qtbot,
+    model,
 ):
     component_model = ComponentTreeModel(model)
 
@@ -1971,7 +1975,8 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data_is_in_line_edits(
-    qtbot, model,
+    qtbot,
+    model,
 ):
     component_model = ComponentTreeModel(model)
 

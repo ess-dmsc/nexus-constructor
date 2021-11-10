@@ -25,8 +25,8 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
-from nexus_constructor.model.link import Link
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.stream import Link
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,

@@ -29,7 +29,6 @@ class CommonKeys:
 class NodeType:
     CONFIG = "config"
     GROUP = "group"
-    LINK = "link"
 
 
 class TransformationType:
@@ -38,6 +37,7 @@ class TransformationType:
 
 
 INSTRUMENT_NAME = "instrument"
+SAMPLE_NAME = "sample"
 ARRAY = "Array"
 SCALAR = "Scalar"
 SHAPE_GROUP_NAME = "shape"

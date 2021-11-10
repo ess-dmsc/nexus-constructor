@@ -1,4 +1,5 @@
 import json
+import typing
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -28,12 +29,10 @@ from nexus_constructor.json.transformation_reader import (
     TransformationReader,
     get_component_and_transform_name,
 )
+from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
-from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.link import TARGET, Link
 from nexus_constructor.model.stream import (
     ADC_PULSE_DEBUG,
     ARRAY_SIZE,
@@ -45,6 +44,7 @@ from nexus_constructor.model.stream import (
     ERROR_TYPE,
     INDEX_EVERY_KB,
     INDEX_EVERY_MB,
+    LINK,
     SHAPE,
     SOURCE,
     STORE_LATEST_INTO,
@@ -53,6 +53,8 @@ from nexus_constructor.model.stream import (
     EV42Stream,
     F142Stream,
     HS00Stream,
+    Link,
+    Module,
     NS10Stream,
     SENVStream,
     Stream,
@@ -111,7 +113,7 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
 
 
 def _add_field_to_group(item: Dict, group: Group):
-    child: Union[Group, Link]
+    child: Group
     if CommonKeys.TYPE in item:
         if item[CommonKeys.NAME] == TRANSFORMS_GROUP_NAME:
             return
@@ -119,8 +121,6 @@ def _add_field_to_group(item: Dict, group: Group):
         child_name = item[CommonKeys.NAME]
         if field_type == NodeType.GROUP:
             child = _create_group(item, group)
-        elif field_type == NodeType.LINK:
-            child = _create_link(item)
         else:
             raise Exception(
                 f'Found unknown field type ("{field_type}") when loading JSON - {child_name}'
@@ -129,6 +129,7 @@ def _add_field_to_group(item: Dict, group: Group):
     elif CommonKeys.MODULE in item:
         stream: Union[
             Dataset,
+            Link,
             NS10Stream,
             SENVStream,
             TDCTStream,
@@ -137,7 +138,9 @@ def _add_field_to_group(item: Dict, group: Group):
             HS00Stream,
         ]
         writer_module = item[CommonKeys.MODULE]
-        if writer_module == DATASET:
+        if writer_module == LINK:
+            stream = _create_link(item)
+        elif writer_module == DATASET:
             if item[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
                 return
             stream = _create_dataset(item, group)
@@ -256,8 +259,7 @@ def __create_f142_stream(
 
 class JSONReader:
     def __init__(self):
-        self.entry = Entry()
-        self.entry.instrument = Instrument()
+        self._entry_node = None
         self.warnings = JsonWarningsContainer()
 
         # key: TransformId for transform which has a depends on
@@ -299,19 +301,6 @@ class JSONReader:
                 return False
 
             return self._load_from_json_dict(json_dict)
-
-    def _load_from_json_dict(self, json_dict: Dict) -> bool:
-        children_list = _retrieve_children_list(json_dict)
-
-        for child in children_list:
-            self._read_json_object(
-                child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
-            )
-
-        self._set_transforms_depends_on()
-        self._set_components_depends_on()
-
-        return True
 
     def _set_components_depends_on(self):
         """
@@ -364,7 +353,82 @@ class JSONReader:
                     )
                 )
 
-    def _read_json_object(self, json_object: Dict, parent_name: str = None):
+    def _load_from_json_dict(self, json_dict: Dict) -> bool:
+        self._entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        # self._set_transforms_depends_on()
+        # self._set_components_depends_on()
+        return True
+
+    def _add_object_warning(self, missing_info, parent_node):
+        if parent_node:
+            name = parent_node[CommonKeys.NAME]
+            self.warnings.append(
+                NameFieldMissing(f"Unable to find {missing_info} for child of {name}.")
+            )
+        else:
+            self.warnings.append(
+                NameFieldMissing(f"Unable to find object {missing_info} for NXEntry.")
+            )
+
+    def _read_json_object(self, json_object: Dict, parent_node: Group = None):
+        """
+        Tries to create a component based on the contents of the JSON file.
+        :param json_object: A component from the JSON dictionary.
+        :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
+        """
+        nexus_object: Union[Group, Module] = None
+        if (
+            CommonKeys.TYPE in json_object
+            and json_object[CommonKeys.TYPE] == NodeType.GROUP
+        ):
+            try:
+                name = json_object[CommonKeys.NAME]
+            except KeyError:
+                self._add_object_warning(CommonKeys.NAME, parent_node)
+            nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
+            if not self._validate_nx_class(name, nx_class):
+                raise TypeError(f"Class {nx_class} is not a valid class.")
+            nexus_object = Group(name=name)
+            nexus_object.parent_node = parent_node
+            nexus_object.nx_class = nx_class
+            for child in json_object[CommonKeys.CHILDREN]:
+                nexus_object.children.append(
+                    self.__read_json_object(child, nexus_object)
+                )
+        elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
+            nexus_object = Module()
+            nexus_object.parent_node = parent_node
+            if json_object[CommonKeys.MODULE] in WriterModules:
+                nexus_object.writer_module = json_object[CommonKeys.MODULE]
+                nexus_object.module_configs = json_object[NodeType.CONFIG]
+            else:
+                self._add_object_warning("valid module type", parent_node)
+        else:
+            self._add_object_warning(
+                f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
+            )
+
+        # Add attributes to nexus_object.
+        if nexus_object:
+            attributes = Attributes()
+            json_attrs = json_object.get(CommonKeys.ATTRIBUTES)
+            for json_attr in json_attrs:
+                if CommonKeys.DATA_TYPE:
+                    attributes.set_attribute_value(
+                        json_attr[CommonKeys.NAME],
+                        json_attr[CommonKeys.VALUES],
+                        json_attr[CommonKeys.DATA_TYPE],
+                    )
+                else:
+                    attributes.set_attribute_value(
+                        json_attr[CommonKeys.NAME], json_attr[CommonKeys.VALUES]
+                    )
+
+        return nexus_object
+
+    # TODO: REMOVE THIS ONE.
+    @typing.no_type_check
+    def __read_json_object(self, json_object: Dict, parent_name: str = None):
         """
         Tries to create a component based on the contents of the JSON file.
         :param json_object: A component from the JSON dictionary.
@@ -492,8 +556,8 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
 
 
 def _create_link(json_object: Dict) -> Link:
-    name = json_object[CommonKeys.NAME]
-    target = json_object[TARGET]
+    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
+    target = json_object[NodeType.CONFIG][SOURCE]
     return Link(name=name, target=target)
 
 
