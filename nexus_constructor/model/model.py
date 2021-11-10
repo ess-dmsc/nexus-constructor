@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from PySide2.QtCore import QObject, Signal
 
@@ -26,5 +26,5 @@ class Model:
         self.entry = Entry()
         self.entry.instrument = Instrument()
 
-    def as_dict(self, error_collector) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return {CommonKeys.CHILDREN: [self.entry.as_dict(error_collector)]}

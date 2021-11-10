@@ -434,7 +434,7 @@ class Component(Group):
             )
         ]
 
-    def as_dict(self, error_collector) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict(error_collector)
 
         if self.transforms:

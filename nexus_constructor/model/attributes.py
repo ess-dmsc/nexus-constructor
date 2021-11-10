@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import attr
 import numpy as np
@@ -33,7 +33,7 @@ class Attributes(list):
         result = _get_item(self, attribute_name)
         return True if result is not None else False
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         return [attribute.as_dict(error_collector) for attribute in self]
 
 
@@ -57,7 +57,7 @@ class FieldAttribute:
             return self.values == other_attribute.values
         return np.array_equal(self.values, other_attribute.values)
 
-    def as_dict(self, error_collector) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         values = self.values
         if isinstance(values, np.ndarray):
             values = values.tolist()

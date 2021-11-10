@@ -38,7 +38,7 @@ class Link:
     attributes = None
     parent_node = None
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.target},
@@ -51,7 +51,7 @@ class NS10Stream:
     source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
@@ -64,7 +64,7 @@ class SENVStream:
     source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
@@ -77,7 +77,7 @@ class TDCTStream:
     source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
@@ -95,7 +95,7 @@ class EV42Stream:
     nexus_chunk_chunk_mb = attr.ib(type=int, default=None)
     nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         config_dict: dict = {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
@@ -129,7 +129,7 @@ class F142Stream:
     nexus_indices_index_every_kb = attr.ib(type=str, default=None)
     store_latest_into = attr.ib(type=int, default=None)
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         config_dict: dict = {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {
@@ -175,7 +175,7 @@ class HS00Stream:
     shape = attr.ib()
     writer_module = attr.ib(type=str, default=WriterModules.HS00.value, init=False)
 
-    def as_dict(self, error_collector):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {

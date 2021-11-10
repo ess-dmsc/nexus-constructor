@@ -162,7 +162,7 @@ class Transformation(Dataset):
 
         self._dependents = []
 
-    def as_dict(self, error_collector) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         value = None
         if isinstance(self.values, Dataset):
             if np.isscalar(self.values.values):

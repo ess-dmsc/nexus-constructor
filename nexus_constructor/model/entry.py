@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.group import Group
@@ -19,7 +19,7 @@ class Entry(Group):
         self[INSTRUMENT_NAME] = instrument
         instrument.parent_node = self
 
-    def as_dict(self, error_collector) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Entry, self).as_dict(error_collector)
         # sample lives in instrument component list for purposes of GUI
         # but in the NeXus structure must live in the entry

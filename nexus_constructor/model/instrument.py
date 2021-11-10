@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.component import Component
@@ -16,7 +16,7 @@ class Instrument(Group):
         self.sample.nx_class = "NXsample"
         self.component_list = [self.sample]
 
-    def as_dict(self, error_collector) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Instrument, self).as_dict(error_collector)
         # Put components (other than sample) in children
         dictionary[CommonKeys.CHILDREN].extend(

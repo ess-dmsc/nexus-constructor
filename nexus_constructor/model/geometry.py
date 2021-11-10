@@ -439,5 +439,5 @@ class NoShapeGeometry:
     def off_geometry(self) -> OFFGeometry:
         return OFFCube
 
-    def as_dict(self, error_collector) -> None:
+    def as_dict(self, error_collector: List[str]) -> None:
         return None
