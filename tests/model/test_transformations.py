@@ -375,3 +375,19 @@ def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_err
     translation.as_dict(error_collector)
 
     assert error_collector
+
+
+def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
+    translation = Transformation(
+        name="some_name",
+        parent_node=None,
+        values=Dataset(name="", values="123", type="double", size=[1]),
+        type=ValueTypes.DOUBLE,
+        parent_component=None,
+        size=[1],
+    )
+
+    error_collector = []
+    translation.as_dict(error_collector)
+
+    assert not error_collector
