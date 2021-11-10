@@ -66,8 +66,14 @@ class EditTransformation(QGroupBox):
         ]:
             ui_element.setEnabled(True)
 
-    def saveChanges(self):
+    def save_value(self):
+        self.check_field_type()
+        self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
+        self.transformation.values = self.transformation_frame.magnitude_widget.value
+        self.transformation.units = self.transformation_frame.magnitude_widget.units
+        self.model.signals.transformation_changed.emit()
 
+    def check_field_type(self):
         if self.transformation_frame.magnitude_widget.field_type_is_scalar():
             try:
                 value_3d_view: "ValueType" = (
@@ -76,11 +82,6 @@ class EditTransformation(QGroupBox):
                 self.transformation_frame.value_spinbox.setValue(float(value_3d_view))
             except ValueError:
                 pass
-
-        self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
-        self.transformation.values = self.transformation_frame.magnitude_widget.value
-        self.transformation.units = self.transformation_frame.magnitude_widget.units
-        self.model.signals.transformation_changed.emit()
 
     def save_transformation_vector(self):
         self.transformation.vector = QVector3D(
@@ -92,6 +93,11 @@ class EditTransformation(QGroupBox):
         if self.transformation_frame.name_line_edit.text() != self.transformation.name:
             self.transformation.name = self.transformation_frame.name_line_edit.text()
             self.model.signals.transformation_changed.emit()
+
+    def save_all_changes(self):
+        self.save_transformation_name()
+        self.save_transformation_vector()
+        self.save_value()
 
 
 class EditTranslation(EditTransformation):
@@ -111,6 +117,10 @@ class EditTranslation(EditTransformation):
         for box in self.transformation_frame.spinboxes[:-1]:
             box.textChanged.connect(self.save_transformation_vector)
 
+        self.transformation_frame.magnitude_widget.value_line_edit.textChanged.connect(
+            self.save_value
+        )
+
 
 class EditRotation(EditTransformation):
     def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
@@ -128,6 +138,10 @@ class EditRotation(EditTransformation):
 
         for box in self.transformation_frame.spinboxes[:-1]:
             box.textChanged.connect(self.save_transformation_vector)
+
+        self.transformation_frame.magnitude_widget.value_line_edit.textChanged.connect(
+            self.save_value
+        )
 
 
 def links_back_to_component(reference: Component, comparison: Component):
@@ -197,5 +211,5 @@ class EditTransformationLink(QFrame):
     def enable(self):
         self.populate_combo_box()
 
-    def saveChanges(self):
+    def save_all_changes(self):
         self.signals.transformation_changed.emit()

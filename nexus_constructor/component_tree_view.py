@@ -93,7 +93,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def setModelData(
         self, editorWidget: QWidget, model: QAbstractItemModel, index: QModelIndex
     ):
-        editorWidget.transformation_frame.saveChanges()
+        editorWidget.transformation_frame.save_all_changes()
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()
