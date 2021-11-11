@@ -26,8 +26,8 @@ from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.stream import (
     SOURCE,
+    FileWriterModule,
     Link,
-    Module,
     WriterModules,
     create_fw_module_object,
 )
@@ -203,7 +203,7 @@ class JSONReader:
         :param json_object: A component from the JSON dictionary.
         :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
-        nexus_object: Union[Group, Module] = None
+        nexus_object: Union[Group, FileWriterModule] = None
         if (
             CommonKeys.TYPE in json_object
             and json_object[CommonKeys.TYPE] == NodeType.GROUP
@@ -231,8 +231,6 @@ class JSONReader:
                     module_type, json_object[NodeType.CONFIG]
                 )
                 nexus_object.parent_node = parent_node
-                # nexus_object.writer_module = json_object[CommonKeys.MODULE]
-                # nexus_object.module_configs = json_object[NodeType.CONFIG]
             else:
                 self._add_object_warning("valid module type", parent_node)
                 return None

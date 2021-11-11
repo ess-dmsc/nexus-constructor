@@ -213,25 +213,6 @@ class HS00Stream:
 Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
 
 
-class Module:
-    module_configs = attr.ib(type=dict, default={})
-    writer_module = attr.ib(type=str)
-    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
-    parent_node = attr.ib(type="Group", default=None)
-
-    def __init__(self, writer_module):
-        self.writer_module = writer_module
-
-    def _module_factory(self):
-        pass
-
-    def as_dict(self):
-        return {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: self.module_configs,
-        }
-
-
 @attr.s
 class StreamGroup(Group):
     # As the inheritance is broken for this class, type check with mypy must be ignored.
