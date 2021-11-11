@@ -92,11 +92,7 @@ class Group:
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def set_field_value(self, name: str, value: Any, dtype: str):
-        try:
-            size = value.shape
-        except AttributeError:
-            size = [1]
-        self[name] = Dataset(name=name, size=size, type=dtype, values=value)
+        self[name] = Dataset(name=name, type=dtype, values=value)
 
     def get_field_value(self, name: str):
         return self[name].values

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple, Union, List
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from PySide2.QtGui import QVector3D
 
@@ -55,7 +55,6 @@ def _create_transformation_dataset(
     """
     return Dataset(
         name,
-        size=[1],
         type=dtype,
         values=angle_or_magnitude,
     )
