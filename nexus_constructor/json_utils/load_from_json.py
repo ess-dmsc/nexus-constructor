@@ -375,9 +375,7 @@ class JSONReader:
                 return None
             nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
             if not self._validate_nx_class(name, nx_class):
-                self.warnings.append(
-                    NameFieldMissing(f"Class {nx_class} is not a valid class.")
-                )
+                self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
             nexus_object = Group(name=name)
             nexus_object.parent_node = parent_node
             nexus_object.nx_class = nx_class
@@ -387,9 +385,10 @@ class JSONReader:
                     if node:
                         nexus_object.children.append(node)
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
-            nexus_object = Module()
-            nexus_object.parent_node = parent_node
-            if json_object[CommonKeys.MODULE] in [x.value for x in WriterModules]:
+            module_type = json_object[CommonKeys.MODULE]
+            if module_type in [x.value for x in WriterModules]:
+                nexus_object = Module()
+                nexus_object.parent_node = parent_node
                 nexus_object.writer_module = json_object[CommonKeys.MODULE]
                 nexus_object.module_configs = json_object[NodeType.CONFIG]
             else:
