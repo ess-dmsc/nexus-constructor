@@ -207,7 +207,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def _create_new_transformation(
         parent_component, transformation_list, transformation_type
     ):
-        values = Dataset(name="", type=ValueTypes.DOUBLE, size=[1], values="")
+        values = Dataset(name="", type=ValueTypes.DOUBLE, values="")
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
                 name=generate_unique_name(
