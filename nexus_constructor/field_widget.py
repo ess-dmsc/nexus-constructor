@@ -237,7 +237,6 @@ class FieldWidget(QFrame):
             val = self.value_line_edit.text()
             return_object = Dataset(
                 name=self.name,
-                size=[1],
                 type=dtype,
                 values=val,
             )
@@ -246,7 +245,6 @@ class FieldWidget(QFrame):
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
                 name=self.name,
-                size=array.size,
                 type=dtype,
                 values=array,
             )

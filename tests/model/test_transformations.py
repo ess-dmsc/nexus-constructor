@@ -12,7 +12,7 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="Translation",
-    values=Dataset(name="", values=None, type=ValueTypes.DOUBLE, size=[1]),
+    values=Dataset(name="", values=None, type=ValueTypes.DOUBLE),
 ):
     translation = Transformation(
         name=name,
@@ -20,7 +20,6 @@ def create_transform(
         values=values,
         type=ValueTypes.STRING,
         parent_component=None,
-        size=[1],
     )
 
     translation.vector = vector

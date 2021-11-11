@@ -9,7 +9,6 @@ from nexus_constructor.model.value_type import ValueTypes
 values = Dataset(
     name="scalar_value",
     type=ValueTypes.DOUBLE,
-    size=[1],
     values=90.0,
     parent_node=None,
 )
