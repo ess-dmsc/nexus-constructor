@@ -97,6 +97,11 @@ class EditTransformation(QGroupBox):
             self.transformation.name = self.transformation_frame.name_line_edit.text()
             self.model.signals.transformation_changed.emit()
 
+    def save_all_changes(self):
+        self.save_transformation_name()
+        self.save_transformation_vector()
+        self.save_magnitude()
+
 
 class EditTranslation(EditTransformation):
     def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
@@ -209,5 +214,5 @@ class EditTransformationLink(QFrame):
     def enable(self):
         self.populate_combo_box()
 
-    def saveChanges(self):
+    def save_all_changes(self):
         self.signals.transformation_changed.emit()
