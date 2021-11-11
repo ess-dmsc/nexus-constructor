@@ -169,7 +169,6 @@ def create_fw_module_object(mod_type, configuration, parent_node):
         WriterModules.NS10.value,
         WriterModules.SENV.value,
         WriterModules.TDCTIME.value,
-        WriterModules.F142.value,
         WriterModules.EV42.value,
         WriterModules.ADAR.value,
     ]:
@@ -177,6 +176,25 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             topic=configuration[TOPIC],
             source=configuration[SOURCE],
             parent_node=parent_node,
+        )
+    elif mod_type == WriterModules.F142.value:
+        array_size = None
+        f142_type = None
+        value_units = None
+
+        if ARRAY_SIZE in configuration:
+            array_size = configuration[ADC_PULSE_DEBUG]
+        if CommonKeys.TYPE in configuration:
+            f142_type = configuration[CommonKeys.TYPE]
+        if VALUE_UNITS in configuration:
+            value_units = configuration[VALUE_UNITS]
+        fw_mod_obj = fw_mod_class(
+            topic=configuration[TOPIC],
+            source=configuration[SOURCE],
+            parent_node=parent_node,
+            type=f142_type,
+            array_size=array_size,
+            value_units=value_units,
         )
     elif mod_type == WriterModules.LINK.value:
         fw_mod_obj = fw_mod_class(
