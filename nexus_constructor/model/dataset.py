@@ -6,7 +6,7 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.helpers import get_absolute_path
-from nexus_constructor.model.value_type import ValueType
+from nexus_constructor.model.value_type import ValueType, ValueTypes
 
 if TYPE_CHECKING:
     from nexus_constructor.model.group import Group  # noqa: F401
@@ -16,8 +16,7 @@ if TYPE_CHECKING:
 class Dataset:
     name = attr.ib(type=str)
     values = attr.ib(type=Union[List[ValueType], ValueType])
-    type = attr.ib(type=str)
-    size = attr.ib(factory=tuple)
+    type = attr.ib(type=str, default=ValueTypes.DOUBLE)
     parent_node = attr.ib(type="Group", default=None)
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
 

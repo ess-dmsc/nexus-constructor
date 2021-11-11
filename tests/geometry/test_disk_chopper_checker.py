@@ -31,8 +31,8 @@ from tests.geometry.chopper_test_helpers import (  # noqa: F401
 
 def create_dataset(name: str, dtype: str, val: Any):
     if np.isscalar(val):
-        return Dataset(name=name, size=[1], type=dtype, values=str(val))
-    return Dataset(name=name, size=val.size, type=dtype, values=val)
+        return Dataset(name=name, type=dtype, values=str(val))
+    return Dataset(name=name, type=dtype, values=val)
 
 
 @pytest.fixture(scope="function")

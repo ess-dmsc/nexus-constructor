@@ -41,9 +41,9 @@ from nexus_constructor.model.geometry import (
     OFFGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.model.stream import DATASET
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.helpers import _generate_incremental_name
+from nexus_constructor.model.stream import DATASET
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -199,7 +199,7 @@ class Component(Group):
         vector: QVector3D,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
+        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -225,7 +225,7 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
+        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -261,7 +261,6 @@ class Component(Group):
             name=name,
             parent_node=self.get_transforms_group(),
             type=values.type,
-            size=values.size,
             values=values,
         )
         transform.transform_type = transformation_type
