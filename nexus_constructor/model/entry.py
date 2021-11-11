@@ -8,8 +8,9 @@ from nexus_constructor.model.value_type import ValueTypes
 
 
 NICOS_PLACEHOLDERS = {
-    "experiment_identifier": Dataset("experiment_identifier", values="$EXP_ID$",
-                                     type=ValueTypes.STRING, size=[1])
+    "experiment_identifier": Dataset(
+        "experiment_identifier", values="$EXP_ID$", type=ValueTypes.STRING
+    )
 }
 
 
@@ -32,16 +33,22 @@ class Entry(Group):
         # sample lives in instrument component list for purposes of GUI
         # but in the NeXus structure must live in the entry
         try:
-            dictionary[CommonKeys.CHILDREN].append(self.instrument.sample.as_dict(error_collector))
+            dictionary[CommonKeys.CHILDREN].append(
+                self.instrument.sample.as_dict(error_collector)
+            )
         except AttributeError:
             # If instrument is not set then don't try to add sample to dictionary
             pass
-        self._insert_nicos_placeholders(dictionary)
+        self._insert_nicos_placeholders(dictionary, error_collector)
         return dictionary
 
-    def _insert_nicos_placeholders(self, dictionary: Dict[str, Any]):
+    def _insert_nicos_placeholders(
+        self, dictionary: Dict[str, Any], error_collector: List[str]
+    ):
         children = [ds.name for ds in self.children if isinstance(ds, Dataset)]
 
         for name, place_holder in NICOS_PLACEHOLDERS.items():
             if name not in children:
-                dictionary[CommonKeys.CHILDREN].append(place_holder.as_dict())
+                dictionary[CommonKeys.CHILDREN].append(
+                    place_holder.as_dict(error_collector)
+                )
