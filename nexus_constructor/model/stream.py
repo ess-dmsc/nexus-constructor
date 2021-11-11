@@ -11,6 +11,8 @@ ARRAY_SIZE = "array_size"
 VALUE_UNITS = "value_units"
 CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
 CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
+CHUNK_SIZE = "chunk_size"
+CUE_INTERVAL = "cue_interval"
 INDEX_EVERY_KB = "nexus.indices.index_every_kb"
 INDEX_EVERY_MB = "nexus.indices.index_every_mb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
@@ -33,143 +35,145 @@ class WriterModules(Enum):
     ADAR = "ADAr"
 
 
-class Module:
-    module_configs = attr.ib(type=dict, default={})
-    writer_module = attr.ib(type=str)
+class FileWriterModule:
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    name = attr.ib(type=str, default=None)
     parent_node = attr.ib(type="Group", default=None)
-
-    def as_dict(self):
-        return {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: self.module_configs,
-        }
-
-
-@attr.s
-class Link:
-    name = attr.ib(type=str)
-    target = attr.ib(type=str)
-    writer_module = attr.ib(type=str, default=LINK, init=False)
-    values = None
-    attributes = None
-    parent_node = None
-
-    def as_dict(self):
-        return {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.target},
-        }
-
-
-@attr.s
-class NS10Stream:
-    topic = attr.ib(type=str)
     source = attr.ib(type=str)
+    topic = attr.ib(type=str, default=None)
+    writer_module = attr.ib(type=str, init=False)
+
+    def as_dict(self):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
+        }
+
+
+@attr.s
+class NS10Stream(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
 
-    def as_dict(self):
-        return {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
-        }
-
 
 @attr.s
-class SENVStream:
-    topic = attr.ib(type=str)
-    source = attr.ib(type=str)
+class SENVStream(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
-    def as_dict(self):
-        return {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
-        }
+
+@attr.s
+class TDCTStream(FileWriterModule):
+    writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
 
 @attr.s
-class TDCTStream:
-    topic = attr.ib(type=str)
-    source = attr.ib(type=str)
-    writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
-
-    def as_dict(self):
-        return {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
-        }
-
-
-@attr.s
-class EV42Stream:
-    topic = attr.ib(type=str)
-    source = attr.ib(type=str)
+class EV42Stream(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
-    adc_pulse_debug = attr.ib(type=bool, default=None)
-    nexus_indices_index_every_mb = attr.ib(type=str, default=None)
-    nexus_indices_index_every_kb = attr.ib(type=str, default=None)
-    nexus_chunk_chunk_mb = attr.ib(type=int, default=None)
-    nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
+    adc_pulse_debug = attr.ib(type=bool, default=None, init=False)
+    cue_interval = attr.ib(type=int, default=None, init=False)
+    chunk_size = attr.ib(type=int, default=None, init=False)
 
     def as_dict(self):
-        config_dict: dict = {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
-        }
-        if self.adc_pulse_debug is not None:
-            config_dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
-        if self.nexus_indices_index_every_mb is not None:
-            config_dict[NodeType.CONFIG][
-                INDEX_EVERY_MB
-            ] = self.nexus_indices_index_every_mb
-        if self.nexus_indices_index_every_kb is not None:
-            config_dict[NodeType.CONFIG][
-                INDEX_EVERY_KB
-            ] = self.nexus_indices_index_every_kb
-        if self.nexus_chunk_chunk_mb is not None:
-            config_dict[NodeType.CONFIG][CHUNK_CHUNK_MB] = self.nexus_chunk_chunk_mb
-        if self.nexus_chunk_chunk_kb is not None:
-            config_dict[NodeType.CONFIG][CHUNK_CHUNK_KB] = self.nexus_chunk_chunk_kb
-        return config_dict
+        module_dict = FileWriterModule.as_dict(self)
+        if self.adc_pulse_debug:
+            module_dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
+        if self.chunk_size:
+            module_dict[NodeType.CONFIG][CHUNK_SIZE] = self.chunk_size
+        if self.cue_interval:
+            module_dict[NodeType.CONFIG][CUE_INTERVAL] = self.cue_interval
+        return module_dict
 
 
 @attr.s
-class F142Stream:
-    topic = attr.ib(type=str)
-    source = attr.ib(type=str)
-    type = attr.ib(type=str)
-    value_units = attr.ib(type=str, default=None)
-    array_size = attr.ib(type=float, default=None)
-    writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
-    nexus_indices_index_every_mb = attr.ib(type=str, default=None)
-    nexus_indices_index_every_kb = attr.ib(type=str, default=None)
-    store_latest_into = attr.ib(type=int, default=None)
+class F142Stream(EV42Stream):
+    writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
+
+
+@attr.s
+class Link(FileWriterModule):
+    writer_module = attr.ib(type=str, default=WriterModules.LINK.value, init=False)
+    values = None
 
     def as_dict(self):
-        config_dict: dict = {
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.source},
+        }
+
+
+@attr.s
+class Dataset(FileWriterModule):
+    writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
+    values = None
+
+    def as_dict(self):
+        return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {
-                SOURCE: self.source,
-                TOPIC: self.topic,
-                CommonKeys.DATA_TYPE: self.type,
+                CommonKeys.NAME: self.name,
+                CommonKeys.VALUES: self.values,
             },
         }
-        if self.value_units is not None:
-            config_dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units
-        if self.array_size is not None:
-            config_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
-        if self.nexus_indices_index_every_mb is not None:
-            config_dict[NodeType.CONFIG][
-                INDEX_EVERY_MB
-            ] = self.nexus_indices_index_every_mb
-        if self.nexus_indices_index_every_kb is not None:
-            config_dict[NodeType.CONFIG][
-                INDEX_EVERY_KB
-            ] = self.nexus_indices_index_every_kb
-        if self.store_latest_into is not None:
-            config_dict[NodeType.CONFIG][STORE_LATEST_INTO] = self.store_latest_into
-        return config_dict
+
+
+@attr.s
+class ADARStream(FileWriterModule):
+    writer_module = attr.ib(type=str, default=WriterModules.ADAR.value, init=False)
+    array_size = attr.ib(type=list, default=None, init=False)
+
+    def as_dict(self):
+        module_dict = FileWriterModule.as_dict(self)
+        if self.array_size:
+            module_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
+        return module_dict
+
+
+class WriterModuleClasses(Enum):
+    F142 = F142Stream
+    EV42 = EV42Stream
+    TDCTIME = TDCTStream
+    NS10 = NS10Stream
+    HS00 = FileWriterModule
+    SENV = SENVStream
+    LINK = Link
+    DATASET = Dataset
+    ADAR = ADARStream
+
+
+module_class_dict = dict(
+    zip([x.value for x in WriterModules], [x.value for x in WriterModuleClasses])
+)
+
+
+def create_fw_module_object(mod_type, configuration):
+    fw_mod_obj = module_class_dict[mod_type]()
+    if mod_type in [
+        WriterModules.NS10.value,
+        WriterModules.SENV.value,
+        WriterModules.TDCTIME.value,
+        WriterModules.F142.value,
+        WriterModules.EV42.value,
+        WriterModules.ADAR.value,
+    ]:
+        fw_mod_obj.topic = configuration[TOPIC]
+        fw_mod_obj.source = configuration[SOURCE]
+    elif mod_type == WriterModules.LINK.value:
+        fw_mod_obj.name = configuration[CommonKeys.NAME]
+        fw_mod_obj.source = configuration[SOURCE]
+    elif mod_type == WriterModules.DATASET.value:
+        fw_mod_obj.name = configuration[CommonKeys.NAME]
+        fw_mod_obj.values = configuration[CommonKeys.VALUES]
+
+    if mod_type in [WriterModules.F142.value, WriterModules.EV42.value]:
+        if ADC_PULSE_DEBUG in configuration:
+            fw_mod_obj.adc_pulse_debug = configuration[ADC_PULSE_DEBUG]
+        if CUE_INTERVAL in configuration:
+            fw_mod_obj.cue_interval = configuration[CUE_INTERVAL]
+        if CHUNK_SIZE in configuration:
+            fw_mod_obj.chunk_size = configuration[CHUNK_SIZE]
+
+    if mod_type == WriterModules.ADAR.value:
+        fw_mod_obj.array_size = configuration[ARRAY_SIZE]
+    return fw_mod_obj
 
 
 HS00TYPES = ["uint32", "uint64", "float", "double"]
@@ -207,6 +211,25 @@ class HS00Stream:
 
 
 Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
+
+
+class Module:
+    module_configs = attr.ib(type=dict, default={})
+    writer_module = attr.ib(type=str)
+    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    parent_node = attr.ib(type="Group", default=None)
+
+    def __init__(self, writer_module):
+        self.writer_module = writer_module
+
+    def _module_factory(self):
+        pass
+
+    def as_dict(self):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: self.module_configs,
+        }
 
 
 @attr.s

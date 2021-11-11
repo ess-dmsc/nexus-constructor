@@ -536,7 +536,7 @@ def test_GIVEN_link_json_WHEN_adding_link_THEN_link_object_is_created():
     }
     link = _create_link(test_dict)
     assert link.name == name
-    assert link.target == target
+    assert link.source == target
 
 
 def test_GIVEN_dataset_with_string_value_WHEN_adding_dataset_THEN_dataset_object_is_created_with_correct_dtype():
