@@ -1,8 +1,16 @@
 from typing import Any, Dict, List
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
+from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.value_type import ValueTypes
+
+
+NICOS_PLACEHOLDERS = {
+    "experiment_identifier": Dataset("experiment_identifier", values="$EXP_ID$",
+                                     type=ValueTypes.STRING, size=[1])
+}
 
 
 class Entry(Group):
@@ -28,4 +36,12 @@ class Entry(Group):
         except AttributeError:
             # If instrument is not set then don't try to add sample to dictionary
             pass
+        self._insert_nicos_placeholders(dictionary)
         return dictionary
+
+    def _insert_nicos_placeholders(self, dictionary: Dict[str, Any]):
+        children = [ds.name for ds in self.children if isinstance(ds, Dataset)]
+
+        for name, place_holder in NICOS_PLACEHOLDERS.items():
+            if name not in children:
+                dictionary[CommonKeys.CHILDREN].append(place_holder.as_dict())

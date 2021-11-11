@@ -101,6 +101,10 @@ class JSONReader:
         children_list = _retrieve_children_list(json_dict)
 
         for child in children_list:
+            if child.get('module', '') == 'dataset':
+                _add_field_to_group(child, self.entry)
+                continue
+
             self._read_json_object(
                 child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
             )
