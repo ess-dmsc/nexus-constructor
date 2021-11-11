@@ -1,11 +1,16 @@
+from abc import ABC
 from enum import Enum
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Union
 
 import attr
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
-from nexus_constructor.model.group import Group
+
+if TYPE_CHECKING:
+    from nexus_constructor.model.group import Group  # noqa: F401
+
+from nexus_constructor.model.value_type import ValueType
 
 ARRAY_SIZE = "array_size"
 VALUE_UNITS = "value_units"
@@ -35,13 +40,20 @@ class WriterModules(Enum):
     ADAR = "ADAr"
 
 
-class FileWriterModule:
+@attr.s
+class FileWriterModule(ABC):
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
-    name = attr.ib(type=str, default=None)
-    parent_node = attr.ib(type="Group", default=None)
-    source = attr.ib(type=str)
-    topic = attr.ib(type=str, default=None)
     writer_module = attr.ib(type=str, init=False)
+    parent_node = attr.ib(type="Group")
+
+    def as_dict(self):
+        raise NotImplementedError
+
+
+@attr.s
+class StreamModule(FileWriterModule):
+    source = attr.ib(type=str)
+    topic = attr.ib(type=str)
 
     def as_dict(self):
         return {
@@ -51,29 +63,29 @@ class FileWriterModule:
 
 
 @attr.s
-class NS10Stream(FileWriterModule):
+class NS10Stream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
 
 
 @attr.s
-class SENVStream(FileWriterModule):
+class SENVStream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
 
 @attr.s
-class TDCTStream(FileWriterModule):
+class TDCTStream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
 
 @attr.s
-class EV42Stream(FileWriterModule):
+class EV42Stream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
     adc_pulse_debug = attr.ib(type=bool, default=None, init=False)
     cue_interval = attr.ib(type=int, default=None, init=False)
     chunk_size = attr.ib(type=int, default=None, init=False)
 
     def as_dict(self):
-        module_dict = FileWriterModule.as_dict(self)
+        module_dict = StreamModule.as_dict(self)
         if self.adc_pulse_debug:
             module_dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
         if self.chunk_size:
@@ -85,11 +97,16 @@ class EV42Stream(FileWriterModule):
 
 @attr.s
 class F142Stream(EV42Stream):
+    array_size = attr.ib(type=list)
+    type = attr.ib(type=str)
+    value_units = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
 
 
 @attr.s
 class Link(FileWriterModule):
+    name = attr.ib(type=str)
+    source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.LINK.value, init=False)
     values = None
 
@@ -102,8 +119,10 @@ class Link(FileWriterModule):
 
 @attr.s
 class Dataset(FileWriterModule):
+    name = attr.ib(type=str)
+    values = attr.ib(type=Union[List[ValueType], ValueType])
+    type = attr.ib(type=str, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
-    values = None
 
     def as_dict(self):
         return {
@@ -116,12 +135,12 @@ class Dataset(FileWriterModule):
 
 
 @attr.s
-class ADARStream(FileWriterModule):
+class ADARStream(StreamModule):
+    array_size = attr.ib(type=list, init=False)
     writer_module = attr.ib(type=str, default=WriterModules.ADAR.value, init=False)
-    array_size = attr.ib(type=list, default=None, init=False)
 
     def as_dict(self):
-        module_dict = FileWriterModule.as_dict(self)
+        module_dict = StreamModule.as_dict(self)
         if self.array_size:
             module_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
         return module_dict
@@ -144,8 +163,8 @@ module_class_dict = dict(
 )
 
 
-def create_fw_module_object(mod_type, configuration):
-    fw_mod_obj = module_class_dict[mod_type]()
+def create_fw_module_object(mod_type, configuration, parent_node):
+    fw_mod_class = module_class_dict[mod_type]
     if mod_type in [
         WriterModules.NS10.value,
         WriterModules.SENV.value,
@@ -154,14 +173,23 @@ def create_fw_module_object(mod_type, configuration):
         WriterModules.EV42.value,
         WriterModules.ADAR.value,
     ]:
-        fw_mod_obj.topic = configuration[TOPIC]
-        fw_mod_obj.source = configuration[SOURCE]
+        fw_mod_obj = fw_mod_class(
+            topic=configuration[TOPIC],
+            source=configuration[SOURCE],
+            parent_node=parent_node,
+        )
     elif mod_type == WriterModules.LINK.value:
-        fw_mod_obj.name = configuration[CommonKeys.NAME]
-        fw_mod_obj.source = configuration[SOURCE]
+        fw_mod_obj = fw_mod_class(
+            name=configuration[CommonKeys.NAME],
+            source=configuration[SOURCE],
+            parent_node=parent_node,
+        )
     elif mod_type == WriterModules.DATASET.value:
-        fw_mod_obj.name = configuration[CommonKeys.NAME]
-        fw_mod_obj.values = configuration[CommonKeys.VALUES]
+        fw_mod_obj = fw_mod_class(
+            name=configuration[CommonKeys.NAME],
+            values=configuration[CommonKeys.VALUES],
+            parent_node=parent_node,
+        )
 
     if mod_type in [WriterModules.F142.value, WriterModules.EV42.value]:
         if ADC_PULSE_DEBUG in configuration:
@@ -211,21 +239,3 @@ class HS00Stream:
 
 
 Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
-
-
-@attr.s
-class StreamGroup(Group):
-    # As the inheritance is broken for this class, type check with mypy must be ignored.
-    # Parent class Group has a different type hint for the list in the children attribute.
-    children: List[Stream] = attr.ib(factory=list, init=False)  # type: ignore
-
-    def __setitem__(  # type: ignore
-        self,
-        key: str,
-        value: Stream,
-    ):
-        self.children.append(value)
-
-    def __getitem__(self, item):
-        """This is not simple as they do not have a name - we could do this by using a private member"""
-        raise NotImplementedError

@@ -8,7 +8,7 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import Link, StreamGroup
+from nexus_constructor.model.stream import Link
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ def update_existing_link_field(field: Link, new_ui_field: "QFrame"):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.link
-    new_ui_field.value = field.target
+    new_ui_field.value = field.source
 
 
 def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
@@ -62,9 +62,7 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     __update_existing_dataset_field(field, new_ui_field)
 
 
-def update_existing_stream_field(
-    field: StreamGroup, new_ui_field: "StreamFieldsWidget"
-):
+def update_existing_stream_field(field: Group, new_ui_field: "StreamFieldsWidget"):
     """
     Fill in a UI stream field for an existing stream field in the component group
     :param field: The dataset to copy into the value line edit
@@ -111,7 +109,7 @@ def find_field_type(item: "ValueType") -> Callable:
             return update_existing_scalar_field
         else:
             return update_existing_array_field
-    elif isinstance(item, StreamGroup):
+    elif isinstance(item, Group):
         return update_existing_stream_field
     elif isinstance(item, Link):
         return update_existing_link_field

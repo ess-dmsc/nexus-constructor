@@ -1,7 +1,7 @@
 import logging
 import uuid
 from functools import partial
-from typing import TYPE_CHECKING, Any, List, Union
+from typing import Any, List, Union
 
 import numpy as np
 from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
@@ -35,9 +35,6 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
-
-if TYPE_CHECKING:
-    from nexus_constructor.model.stream import StreamGroup
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -232,7 +229,7 @@ class FieldWidget(QFrame):
     @property
     def value(self) -> Union[Dataset, Group, Link, None]:
         dtype = self.value_type_combo.currentText()
-        return_object: Union[Dataset, StreamGroup, Link]
+        return_object: Union[Dataset, Group, Link]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
             return_object = Dataset(
@@ -253,7 +250,9 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
-            return_object = Link(name=self.name, target=self.value_line_edit.text())
+            return_object = Link(
+                parent_node=None, name=self.name, source=self.value_line_edit.text()
+            )
         else:
             logging.error(f"unknown field type: {self.name}")
             return None

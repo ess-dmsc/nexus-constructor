@@ -228,7 +228,7 @@ class JSONReader:
             module_type = json_object[CommonKeys.MODULE]
             if module_type in [x.value for x in WriterModules]:
                 nexus_object = create_fw_module_object(
-                    module_type, json_object[NodeType.CONFIG]
+                    module_type, json_object[NodeType.CONFIG], parent_node
                 )
                 nexus_object.parent_node = parent_node
             else:
@@ -317,13 +317,10 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
     return ds
 
 
-def _create_link(json_object: Dict) -> Link:
+def _create_link(json_object: Dict, parent_node: Optional[Group] = None) -> Link:
     name = json_object[NodeType.CONFIG][CommonKeys.NAME]
     target = json_object[NodeType.CONFIG][SOURCE]
-    link = Link()
-    link.name = name
-    link.source = target
-    return link
+    return Link(parent_node=parent_node, name=name, source=target)
 
 
 def _add_attributes(json_object: Dict, model_object: Union[Group, Dataset]):

@@ -18,6 +18,7 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.common_attrs import ARRAY, SCALAR
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.stream import (
     ADC_PULSE_DEBUG,
     CHUNK_CHUNK_KB,
@@ -30,10 +31,12 @@ from nexus_constructor.model.stream import (
     HS00Stream,
     NS10Stream,
     SENVStream,
-    StreamGroup,
     TDCTStream,
     WriterModules,
 )
+
+# TODO: CHECKS NEED TO BE IMPLEMENTED FOR NEW FIELDS IN STREAM ACCORDING TO
+# TODO: FILE WRITER DOCUMENTATION.
 
 F142_TYPES = [
     "byte",
@@ -287,7 +290,7 @@ class StreamFieldsWidget(QDialog):
         else:
             self.source_line_edit.setPlaceholderText("")
 
-    def get_stream_group(self) -> StreamGroup:
+    def get_stream_group(self) -> Group:
         """
         Create the stream group
         :return: The created StreamGroup
@@ -302,22 +305,27 @@ class StreamFieldsWidget(QDialog):
         current_schema = self.schema_combo.currentText()
         if current_schema == WriterModules.F142.value:
             value_units = self.value_units_edit.text()
-            stream = F142Stream(
-                source=source, topic=topic, type=type, value_units=value_units
-            )
             array_size = self.array_size_spinbox.value()
+            stream = F142Stream(
+                parent_node=None,
+                source=source,
+                topic=topic,
+                type=type,
+                value_units=value_units,
+                array_size=array_size,
+            )
             if array_size:
                 stream.array_size = array_size
             if self.advanced_options_enabled:
                 self._record_advanced_f142_values(stream)
         elif current_schema == WriterModules.EV42.value:
-            stream = EV42Stream(source=source, topic=topic)
+            stream = EV42Stream(parent_node=None, source=source, topic=topic)
             if self.advanced_options_enabled:
                 self._record_advanced_ev42_values(stream)
         elif current_schema == WriterModules.NS10.value:
-            stream = NS10Stream(source=source, topic=topic)
+            stream = NS10Stream(parent_node=None, source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
-            stream = SENVStream(source=source, topic=topic)
+            stream = SENVStream(parent_node=None, source=source, topic=topic)
         elif current_schema == WriterModules.HS00.value:
             stream = HS00Stream(
                 source=source,
@@ -328,9 +336,9 @@ class StreamFieldsWidget(QDialog):
                 shape=[],
             )
         elif current_schema == WriterModules.TDCTIME.value:
-            stream = TDCTStream(source=source, topic=topic)
+            stream = TDCTStream(parent_node=None, source=source, topic=topic)
         group_name = self.parent().parent().field_name_edit.text()
-        stream_group = StreamGroup(group_name)
+        stream_group = Group(group_name)
         stream_group[group_name] = stream
 
         return stream_group
@@ -340,9 +348,7 @@ class StreamFieldsWidget(QDialog):
         Save the advanced f142 properties to the stream data object.
         :param stream: The stream data object to be modified.
         """
-        stream.nexus_indices_index_every_mb = self.f142_index_every_mb_spinner.value()
-        stream.nexus_indices_index_every_kb = self.f142_index_every_kb_spinner.value()
-        stream.store_latest_into = self.f142_store_latest_into_spinner.value()
+        raise NotImplementedError
 
     def _record_advanced_ev42_values(self, stream: EV42Stream):
         """
@@ -350,10 +356,6 @@ class StreamFieldsWidget(QDialog):
         :param stream: The stream data object to be modified.
         """
         stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
-        stream.nexus_indices_index_every_mb = self.ev42_index_every_mb_spinner.value()
-        stream.nexus_indices_index_every_kb = self.ev42_index_every_kb_spinner.value()
-        stream.nexus_chunk_chunk_mb = self.ev42_chunk_mb_spinner.value()
-        stream.nexus_chunk_chunk_kb = self.ev42_chunk_kb_spinner.value()
 
     def fill_in_existing_ev42_fields(self, field: EV42Stream):
         """
@@ -363,10 +365,6 @@ class StreamFieldsWidget(QDialog):
         if check_if_advanced_options_should_be_enabled(
             [
                 field.adc_pulse_debug,
-                field.nexus_indices_index_every_mb,
-                field.nexus_indices_index_every_kb,
-                field.nexus_chunk_chunk_mb,
-                field.nexus_chunk_chunk_kb,
             ]
         ):
             self._show_advanced_options(True)
@@ -378,10 +376,6 @@ class StreamFieldsWidget(QDialog):
         :param field: The ev42 stream data object.
         """
         self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
-        self.ev42_index_every_mb_spinner.setValue(field.nexus_indices_index_every_mb)
-        self.ev42_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
-        self.ev42_chunk_mb_spinner.setValue(field.nexus_chunk_chunk_mb)
-        self.ev42_chunk_kb_spinner.setValue(field.nexus_chunk_chunk_kb)
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
@@ -399,13 +393,7 @@ class StreamFieldsWidget(QDialog):
         if field.value_units is not None:
             self.value_units_edit.setText(field.value_units)
 
-        if check_if_advanced_options_should_be_enabled(
-            [
-                field.nexus_indices_index_every_mb,
-                field.nexus_indices_index_every_kb,
-                field.store_latest_into,
-            ]
-        ):
+        if check_if_advanced_options_should_be_enabled([]):
             self._show_advanced_options(True)
             self._fill_existing_advanced_f142_fields(field)
 
@@ -414,9 +402,7 @@ class StreamFieldsWidget(QDialog):
         Fill the advanced fields in the interface with the existing f142 stream data.
         :param field: The f412 stream data object.
         """
-        self.f142_index_every_mb_spinner.setValue(field.nexus_indices_index_every_mb)
-        self.f142_index_every_kb_spinner.setValue(field.nexus_indices_index_every_kb)
-        self.f142_store_latest_into_spinner.setValue(field.store_latest_into)
+        raise NotImplementedError
 
     def update_existing_stream_info(self, field):
         """

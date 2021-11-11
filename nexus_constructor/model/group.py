@@ -1,16 +1,16 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import attr
 
 from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.helpers import (
     _get_item,
     _remove_item,
     _set_item,
     get_absolute_path,
 )
+from nexus_constructor.model.stream import Dataset
 
 if TYPE_CHECKING:
     from nexus_constructor.model.stream import FileWriterModule  # noqa: F401
@@ -41,7 +41,7 @@ class Group:
     def __setitem__(
         self,
         key: str,
-        value: Union["Group", Dataset, "FileWriterModule"],
+        value: Union["Group", "FileWriterModule"],
     ):
         try:
             value.parent_node = self
@@ -72,12 +72,12 @@ class Group:
     def nx_class(self, new_nx_class: str):
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def set_field_value(self, name: str, value: Any, dtype: str):
-        try:
-            size = value.shape
-        except AttributeError:
-            size = [1]
-        self[name] = Dataset(name=name, size=size, type=dtype, values=value)
+    def set_field_value(
+        self, name: str, value: Any, dtype: str, parent_node: Optional["Group"] = None
+    ):
+        self[name] = Dataset(
+            parent_node=parent_node, name=name, type=dtype, values=value
+        )
 
     def get_field_value(self, name: str):
         return self[name].values
