@@ -10,6 +10,7 @@ from nexus_constructor.json.transformation_reader import (
     TRANSFORMATION_MAP,
     TransformationReader,
     _create_transformation_dataset,
+    _create_transformation_datastream_group,
     _is_transformation_group,
 )
 from nexus_constructor.model.component import Component
@@ -63,6 +64,55 @@ def transformation_json():
       ]
     }
     """
+    return json.loads(json_string)
+
+
+@pytest.fixture(scope="function")
+def transformation_with_stream_json():
+    json_string = """
+    {
+      "type": "group",
+      "name": "transformations",
+      "children": [
+          {
+            "module": "f142",
+            "config": {
+            "source": ":: SOURCE ::",
+            "topic": ":: TOPIC ::",
+            "dtype": "double",
+            "value_units": "m",
+            "name": "location"
+            },
+          "attributes": [
+              {
+                "name": "transformation_type",
+                "dtype": "string",
+                "values": "Translation"
+              },
+              {
+                "name": "units",
+                "dtype": "string",
+                "values": "m"
+              },
+              {
+                "name": "vector",
+                "dtype": "string",
+                "values": [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              }
+            ]
+          }
+        ],
+        "attributes": [
+          {
+            "name": "NX_class",
+            "values": "NXtransformations"
+          }
+      ]
+    }"""
     return json.loads(json_string)
 
 
@@ -386,4 +436,57 @@ def test_GIVEN_transformation_has_no_depends_on_WHEN_creating_transformations_TH
     ), (
         "Expected transformation to be added to dictionary but there to be no details"
         "for a transformation dependency"
+    )
+
+
+def test_GIVEN_no_modules_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
+    transformation_reader, transformation_with_stream_json
+):
+    del transformation_with_stream_json["children"][0]["module"]
+    transformation_reader._create_transformations(
+        transformation_with_stream_json["children"]
+    )
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_incorrect_module_WHEN_attempting_to_create_transformations_THEN_create_transform_is_not_called(
+    transformation_reader, transformation_with_stream_json
+):
+    transformation_with_stream_json["children"][0][
+        "module"
+    ] = ":: SOME UNKNOWN MODULE ::"
+    transformation_reader._create_transformations(
+        transformation_with_stream_json["children"]
+    )
+
+    transformation_reader.parent_component._create_and_add_transform.assert_not_called()
+
+
+def test_GIVEN_all_information_present_in_json_with_stream_WHEN_attempting_to_create_translation_THEN_create_transform_is_called(
+    transformation_reader, transformation_with_stream_json
+):
+    transform_json = transformation_with_stream_json["children"][0]
+    transform_json["config"]["name"] = name = "TranslationName"
+    transform_json["attributes"][0]["values"] = transformation_type = "translation"
+    transform_json["attributes"][1]["values"] = units = "mm"
+    transform_json["attributes"][2]["values"] = vector = [
+        1.0,
+        2.0,
+        3.0,
+    ]
+    depends_on = None
+    values = _create_transformation_datastream_group(transform_json, name)
+    transformation_reader._create_transformations(
+        transformation_with_stream_json["children"]
+    )
+
+    transformation_reader.parent_component._create_and_add_transform.assert_called_once_with(
+        name=name,
+        transformation_type=TRANSFORMATION_MAP[transformation_type],
+        angle_or_magnitude=0.0,
+        units=units,
+        vector=QVector3D(*vector),
+        depends_on=depends_on,
+        values=values,
     )

@@ -257,10 +257,15 @@ class Component(Group):
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
+
+        type = ValueTypes.DOUBLE
         if isinstance(values, Dataset):
             type = values.type
         elif isinstance(values, StreamGroup):
-            type = values.children[0].type  # type: ignore
+            try:
+                type = values.children[0].type  # type: ignore
+            except AttributeError:
+                pass
 
         transform = Transformation(
             name=name,

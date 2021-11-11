@@ -23,6 +23,7 @@ from nexus_constructor.json.load_from_json_utils import (
 from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.stream import DATASET, StreamGroup, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
@@ -63,9 +64,9 @@ def _create_transformation_dataset(
 
 
 def _create_transformation_datastream_group(
-    data: Dict, name: str, parent_node: Optional[str] = None
+    data: Dict, name: str, parent_node: Optional[Group] = None
 ) -> StreamGroup:
-    group = StreamGroup(name=name, parent_node=None)
+    group = StreamGroup(name=name, parent_node=parent_node)
     group.children.append(_create_stream(data))
     return group
 
@@ -228,8 +229,13 @@ class TransformationReader:
             if not config:
                 continue
 
-            name = self._get_transformation_attribute(CommonKeys.NAME, config)
+            module = self._get_transformation_attribute(
+                CommonKeys.MODULE, json_transformation
+            )
+            if not module:
+                continue
 
+            name = self._get_transformation_attribute(CommonKeys.NAME, config)
             dtype = self._get_transformation_attribute(
                 [CommonKeys.DATA_TYPE, CommonKeys.TYPE],
                 config,
@@ -271,9 +277,6 @@ class TransformationReader:
             # depends on origin (end of dependency chain)
             depends_on = _find_attribute_from_list_or_dict(
                 CommonAttrs.DEPENDS_ON, attributes
-            )
-            module = self._get_transformation_attribute(
-                CommonKeys.MODULE, json_transformation
             )
             if module == DATASET:
                 values = self._get_transformation_attribute(

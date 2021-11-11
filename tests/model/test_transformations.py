@@ -1,8 +1,10 @@
 import numpy as np
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.stream import F142Stream, StreamGroup, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 
@@ -358,3 +360,29 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
     assert transform.ui_value != str_value
     assert transform.ui_value == 0
+
+
+def test_as_dict_method_of_transformation_when_values_is_a_dataset():
+    name = ":: SOME NAME ::"
+    dataset = Dataset(name="", values=None, type=ValueTypes.DOUBLE)
+    transform = create_transform(name=name, values=dataset)
+    assert transform.values == dataset
+    return_dict = transform.as_dict()
+    assert return_dict[CommonKeys.MODULE] == "dataset"
+    assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
+
+
+def test_as_dict_method_of_transformation_when_values_is_a_f142_streamgroup():
+    name = ":: SOME NAME ::"
+    source = ":: SOME SOURCE ::"
+    topic = (":: SOME TOPIC ::",)
+    stream_group = StreamGroup(name="")
+    stream_group.children = [F142Stream(source=source, topic=topic, type="double")]
+    transform = create_transform(name=name, values=stream_group)
+    assert transform.values == stream_group
+
+    return_dict = transform.as_dict()
+    assert return_dict[CommonKeys.MODULE] == WriterModules.F142.value
+    assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
+    assert return_dict[NodeType.CONFIG]["source"] == source
+    assert return_dict[NodeType.CONFIG]["topic"] == topic
