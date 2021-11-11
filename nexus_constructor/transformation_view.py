@@ -80,10 +80,13 @@ class EditTransformation(QGroupBox):
 
         self.transformation.ui_value = self.transformation_frame.value_spinbox.value()
         self.transformation.values = self.transformation_frame.magnitude_widget.value
+        self.transformation.units = self.transformation_frame.magnitude_widget.units
+        self.model.signals.transformation_changed.emit()
+
+    def save_transformation_vector(self):
         self.transformation.vector = QVector3D(
             *[spinbox.value() for spinbox in self.transformation_frame.spinboxes[:-1]]
         )
-        self.transformation.units = self.transformation_frame.magnitude_widget.units
         self.model.signals.transformation_changed.emit()
 
     def save_transformation_name(self):
@@ -106,6 +109,9 @@ class EditTranslation(EditTransformation):
             self.save_transformation_name
         )
 
+        for box in self.transformation_frame.spinboxes[:-1]:
+            box.textChanged.connect(self.save_transformation_vector)
+
 
 class EditRotation(EditTransformation):
     def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
@@ -120,6 +126,9 @@ class EditRotation(EditTransformation):
         self.transformation_frame.name_line_edit.textChanged.connect(
             self.save_transformation_name
         )
+
+        for box in self.transformation_frame.spinboxes[:-1]:
+            box.textChanged.connect(self.save_transformation_vector)
 
 
 def links_back_to_component(reference: Component, comparison: Component):
