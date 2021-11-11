@@ -39,7 +39,7 @@ def test_GIVEN_existing_field_with_attr_WHEN_editing_component_THEN_both_field_a
     qtbot, attr_val, field_attributes_dialog
 ):
     attr_key = "testattr"
-    ds = Dataset(name="test", size="1", type=ValueTypes.STRING, values="")
+    ds = Dataset(name="test", type=ValueTypes.STRING, values="")
     ds.attributes.set_attribute_value(attr_key, attr_val)
 
     field_attributes_dialog.fill_existing_attrs(ds)
@@ -54,7 +54,7 @@ def test_GIVEN_existing_field_with_attr_which_is_in_excludelist_WHEN_editing_com
     attr_key = "units"
     attr_val = "m"
 
-    ds = Dataset(name="test", size="1", type=ValueTypes.STRING, values="")
+    ds = Dataset(name="test", type=ValueTypes.STRING, values="")
     ds.attributes.set_attribute_value(attr_key, attr_val)
 
     field_attributes_dialog.fill_existing_attrs(ds)

@@ -199,7 +199,7 @@ class Component(Group):
         vector: QVector3D,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
+        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -225,7 +225,7 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
+        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -257,10 +257,8 @@ class Component(Group):
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
-        size = [1]
         if isinstance(values, Dataset):
             type = values.type
-            size = values.size  # type: ignore
         elif isinstance(values, StreamGroup):
             type = values.children[0].type  # type: ignore
 
@@ -268,7 +266,6 @@ class Component(Group):
             name=name,
             parent_node=self.get_transforms_group(),
             type=type,
-            size=size,  # type: ignore
             values=values,
         )
         transform.transform_type = transformation_type

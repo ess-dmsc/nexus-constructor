@@ -57,7 +57,6 @@ def _create_transformation_dataset(
     """
     return Dataset(
         name,
-        size=[1],
         type=dtype,
         values=angle_or_magnitude,
     )

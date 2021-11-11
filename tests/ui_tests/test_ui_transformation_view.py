@@ -25,15 +25,11 @@ def create_corresponding_value_dataset(value: Any):
     type = _get_human_readable_type(value)
 
     if np.isscalar(value):
-        size = 1
         value = str(value)
-    else:
-        size = len(value)
 
     return Dataset(
         name=name,
         type=type,
-        size=[size],
         values=value,
     )
 
