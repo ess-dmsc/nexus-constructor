@@ -13,15 +13,7 @@ from nexus_constructor.model.helpers import (
 )
 
 if TYPE_CHECKING:
-    from nexus_constructor.model.stream import (  # noqa: F401
-        EV42Stream,
-        F142Stream,
-        HS00Stream,
-        Link,
-        NS10Stream,
-        SENVStream,
-        TDCTStream,
-    )
+    from nexus_constructor.model.stream import FileWriterModule  # noqa: F401
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -37,19 +29,7 @@ class Group:
 
     name = attr.ib(type=str)
     parent_node = attr.ib(type="Group", default=None)
-    children: List[
-        Union[
-            Dataset,
-            "NS10Stream",
-            "SENVStream",
-            "TDCTStream",
-            "EV42Stream",
-            "F142Stream",
-            "HS00Stream",
-            "Link",
-            "Group",
-        ]
-    ] = attr.ib(  # noqa: F821
+    children: List[Union["FileWriterModule", "Group"]] = attr.ib(  # noqa: F821
         factory=list, init=False
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
@@ -61,7 +41,7 @@ class Group:
     def __setitem__(
         self,
         key: str,
-        value: Union["Group", Dataset, "Link"],
+        value: Union["Group", Dataset, "FileWriterModule"],
     ):
         try:
             value.parent_node = self
