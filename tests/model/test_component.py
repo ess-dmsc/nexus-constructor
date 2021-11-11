@@ -76,7 +76,7 @@ def test_component_as_dict_contains_transformations():
         depends_on=first_transform,
     )
     test_component.depends_on = zeroth_transform
-    dictionary_output = test_component.as_dict()
+    dictionary_output = test_component.as_dict([])
 
     assert dictionary_output["children"][0]["name"] == TRANSFORMS_GROUP_NAME
     child_names = [
@@ -94,7 +94,7 @@ def test_component_as_dict_contains_stream_field():
     test_component = Component(name="test")
     test_component[name] = NS10Stream(source=source, topic=topic)
 
-    dictionary_output = test_component.as_dict()
+    dictionary_output = test_component.as_dict([])
 
     assert dictionary_output["children"][0]["module"] == "ns10"
     assert dictionary_output["children"][0]["config"]["topic"] == topic
@@ -107,7 +107,7 @@ def test_component_as_dict_contains_links():
     test_component = Component(name="test")
     test_component[name] = Link(name=name, target=target)
 
-    dictionary_output = test_component.as_dict()
+    dictionary_output = test_component.as_dict([])
 
     assert dictionary_output["children"][0]["config"]["name"] == name
     assert dictionary_output["children"][0]["config"]["source"] == target

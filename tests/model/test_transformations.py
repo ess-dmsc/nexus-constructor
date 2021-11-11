@@ -358,3 +358,27 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
     assert transform.ui_value != str_value
     assert transform.ui_value == 0
+
+
+def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_error():
+    transform = create_transform(
+        values=Dataset(name="", values="not a number", type="double"),
+        type=ValueTypes.DOUBLE,
+    )
+
+    error_collector = []
+    transform.as_dict(error_collector)
+
+    assert error_collector
+
+
+def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
+    transform = create_transform(
+        values=Dataset(name="", values="123", type="double"),
+        type=ValueTypes.DOUBLE,
+    )
+
+    error_collector = []
+    transform.as_dict(error_collector)
+
+    assert not error_collector

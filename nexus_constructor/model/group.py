@@ -97,16 +97,16 @@ class Group:
     def get_field_value(self, name: str):
         return self[name].values
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return_dict: Dict = {
             CommonKeys.NAME: self.name,
             CommonKeys.TYPE: NodeType.GROUP,
         }
         if self.attributes:
-            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict()
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(error_collector)
         return_dict[CommonKeys.CHILDREN] = (
             [
-                child.as_dict()
+                child.as_dict(error_collector)
                 for child in self.children
                 if name_not_in_excludelist(child)
             ]

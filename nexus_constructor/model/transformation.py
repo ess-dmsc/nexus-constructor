@@ -162,12 +162,18 @@ class Transformation(Dataset):
 
         self._dependents = []
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         value = None
         if isinstance(self.values, Dataset):
             if np.isscalar(self.values.values):
                 val: "ValueType" = self.values.values
-                value = float(val)
+                try:
+                    value = float(val)
+                except ValueError:
+                    error_collector.append(
+                        f"value '{val}' is invalid for transformation '{self.name}' "
+                        "as expected a numeric value"
+                    )
 
         # TODO elif array, NXlog, kafka stream, ...
 
@@ -181,7 +187,7 @@ class Transformation(Dataset):
         }
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
-                attribute.as_dict()
+                attribute.as_dict(error_collector)
                 for attribute in self.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
             ]
