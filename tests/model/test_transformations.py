@@ -362,7 +362,7 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
 def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_error():
     transform = create_transform(
-        values=Dataset(name="", values="not a number", type="double", size=[1]),
+        values=Dataset(name="", values="not a number", type="double"),
         type=ValueTypes.DOUBLE,
     )
 
@@ -374,7 +374,7 @@ def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_err
 
 def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
     transform = create_transform(
-        values=Dataset(name="", values="123", type="double", size=[1]),
+        values=Dataset(name="", values="123", type="double"),
         type=ValueTypes.DOUBLE,
     )
 
