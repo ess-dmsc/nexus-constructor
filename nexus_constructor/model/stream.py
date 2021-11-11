@@ -46,10 +46,10 @@ class Link:
 
 
 @attr.s
-class DataSetStream:
+class NS10Stream:
     topic = attr.ib(type=str)
     source = attr.ib(type=str)
-    writer_module = attr.ib(type=str, default="", init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
 
     def as_dict(self):
         return {
@@ -59,22 +59,35 @@ class DataSetStream:
 
 
 @attr.s
-class NS10Stream(DataSetStream):
-    writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
-
-
-@attr.s
-class SENVStream(DataSetStream):
+class SENVStream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
+    def as_dict(self):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
+        }
+
 
 @attr.s
-class TDCTStream(DataSetStream):
+class TDCTStream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
 
+    def as_dict(self):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
+        }
+
 
 @attr.s
-class EV42Stream(DataSetStream):
+class EV42Stream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
     adc_pulse_debug = attr.ib(type=bool, default=None)
     nexus_indices_index_every_mb = attr.ib(type=str, default=None)
@@ -83,7 +96,10 @@ class EV42Stream(DataSetStream):
     nexus_chunk_chunk_kb = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        config_dict: dict = super().as_dict()
+        config_dict: dict = {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
+        }
         if self.adc_pulse_debug is not None:
             config_dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
         if self.nexus_indices_index_every_mb is not None:
@@ -102,9 +118,10 @@ class EV42Stream(DataSetStream):
 
 
 @attr.s
-class F142Stream(DataSetStream):
+class F142Stream:
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     type = attr.ib(type=str)
-    size = attr.ib(type=str, default=None)
     value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=float, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
@@ -113,8 +130,14 @@ class F142Stream(DataSetStream):
     store_latest_into = attr.ib(type=int, default=None)
 
     def as_dict(self):
-        config_dict: dict = super().as_dict()
-        config_dict[NodeType.CONFIG][CommonKeys.DATA_TYPE] = self.type
+        config_dict: dict = {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
+                SOURCE: self.source,
+                TOPIC: self.topic,
+                CommonKeys.DATA_TYPE: self.type,
+            },
+        }
         if self.value_units is not None:
             config_dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units
         if self.array_size is not None:
@@ -141,9 +164,11 @@ SHAPE = "shape"
 
 
 @attr.s
-class HS00Stream(DataSetStream):
+class HS00Stream:
     """Not currently supported yet"""
 
+    topic = attr.ib(type=str)
+    source = attr.ib(type=str)
     data_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     error_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
     edge_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
@@ -151,12 +176,17 @@ class HS00Stream(DataSetStream):
     writer_module = attr.ib(type=str, default=WriterModules.HS00.value, init=False)
 
     def as_dict(self):
-        config_dict: dict = super().as_dict()
-        config_dict[NodeType.CONFIG][CommonKeys.DATA_TYPE] = self.data_type
-        config_dict[NodeType.CONFIG][ERROR_TYPE] = self.error_type
-        config_dict[NodeType.CONFIG][EDGE_TYPE] = self.edge_type
-        config_dict[NodeType.CONFIG][SHAPE] = self.shape
-        return config_dict
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {
+                SOURCE: self.source,
+                TOPIC: self.topic,
+                DATA_TYPE: self.data_type,
+                ERROR_TYPE: self.error_type,
+                EDGE_TYPE: self.edge_type,
+                SHAPE: self.shape,
+            },
+        }
 
 
 Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
