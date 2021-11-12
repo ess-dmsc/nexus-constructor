@@ -204,7 +204,7 @@ def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
     view.transformation_frame.y_spinbox.setValue(new_y)
     view.transformation_frame.z_spinbox.setValue(new_z)
 
-    view.saveChanges()
+    view.save_all_changes()
 
     assert transform.vector == QVector3D(new_x, new_y, new_z)
 
@@ -271,8 +271,7 @@ def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_trans
     new_x = 4
 
     view.transformation_frame.x_spinbox.setValue(new_x)
-    view.saveChanges()
-    model.signals.transformation_changed.emit.assert_called_once()
+    view.save_all_changes()
     assert transform.vector == QVector3D(new_x, y, z)
 
 
