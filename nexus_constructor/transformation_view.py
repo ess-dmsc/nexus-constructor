@@ -123,6 +123,9 @@ class EditTranslation(EditTransformation):
         self.transformation_frame.magnitude_widget.value_line_edit.textChanged.connect(
             self.save_magnitude
         )
+        self.transformation_frame.magnitude_widget.units_line_edit.textChanged.connect(
+            self.save_magnitude
+        )
 
 
 class EditRotation(EditTransformation):
@@ -143,6 +146,9 @@ class EditRotation(EditTransformation):
             box.textChanged.connect(self.save_transformation_vector)
 
         self.transformation_frame.magnitude_widget.value_line_edit.textChanged.connect(
+            self.save_magnitude
+        )
+        self.transformation_frame.magnitude_widget.units_line_edit.textChanged.connect(
             self.save_magnitude
         )
 
