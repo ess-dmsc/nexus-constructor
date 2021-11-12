@@ -74,7 +74,7 @@ class SENVStream(StreamModule):
 
 @attr.s
 class TDCTStream(StreamModule):
-    writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
 
 
 @attr.s
@@ -100,7 +100,7 @@ class F142Stream(EV42Stream):
     array_size = attr.ib(type=list)
     type = attr.ib(type=str)
     value_units = attr.ib(type=str)
-    writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
+    writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
 
 
 @attr.s
