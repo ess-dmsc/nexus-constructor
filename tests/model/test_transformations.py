@@ -11,7 +11,7 @@ def create_transform(
     name="test translation",
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
-    type="Translation",
+    type="translation",
     values=Dataset(name="", values=None, type=ValueTypes.DOUBLE),
 ):
     translation = Transformation(
@@ -33,7 +33,7 @@ def test_can_get_transform_properties():
     test_name = "slartibartfast"
     test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
-    test_type = "Translation"
+    test_type = "translation"
     test_values = Dataset("test_dataset", None, [1])
 
     transform = create_transform(
@@ -84,7 +84,7 @@ def test_can_set_transform_properties():
     test_name = "beeblebrox"
     test_ui_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
-    test_type = "Rotation"
+    test_type = "rotation"
     test_values = Dataset("valuedataset", None, [1, 2])
 
     transform.name = test_name
@@ -300,7 +300,7 @@ def test_can_get_translation_as_4_by_4_matrix():
     test_ui_value = 42.0
     # Note, it should not matter if this is not set to a unit vector
     test_vector = QVector3D(2.0, 0.0, 0.0)
-    test_type = "Translation"
+    test_type = "translation"
 
     transformation = create_transform(
         ui_value=test_ui_value, vector=test_vector, type=test_type
@@ -317,7 +317,7 @@ def test_can_get_translation_as_4_by_4_matrix():
 def test_can_get_rotation_as_4_by_4_matrix():
     test_ui_value = 15.0  # degrees
     test_vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
-    test_type = "Rotation"
+    test_type = "rotation"
 
     transformation = create_transform(
         ui_value=test_ui_value, vector=test_vector, type=test_type

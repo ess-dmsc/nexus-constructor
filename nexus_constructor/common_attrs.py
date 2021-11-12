@@ -32,8 +32,8 @@ class NodeType:
 
 
 class TransformationType:
-    TRANSLATION = "Translation"
-    ROTATION = "Rotation"
+    TRANSLATION = "translation"
+    ROTATION = "rotation"
 
 
 INSTRUMENT_NAME = "instrument"
