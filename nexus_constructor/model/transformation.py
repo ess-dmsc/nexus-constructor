@@ -163,12 +163,18 @@ class Transformation(Dataset):
 
         self._dependents = []
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return_dict: Dict = {}
         if isinstance(self.values, Dataset):
             values = self.values.values
             if np.isscalar(values):
-                values = float(values)  # type:ignore
+                try:
+                    values = float(values)  # type:ignore
+                except ValueError:
+                    error_collector.append(
+                        f"value '{values}' is invalid for transformation '{self.name}' "
+                        "as expected a numeric value"
+                    )
             if isinstance(values, np.ndarray):
                 values = values.tolist()
             return_dict = {
@@ -180,12 +186,12 @@ class Transformation(Dataset):
                 },
             }
         elif isinstance(self.values, StreamGroup):
-            return_dict = self.values.children[0].as_dict()
+            return_dict = self.values.children[0].as_dict(error_collector)
             return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
-                attribute.as_dict()
+                attribute.as_dict(error_collector)
                 for attribute in self.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
             ]
