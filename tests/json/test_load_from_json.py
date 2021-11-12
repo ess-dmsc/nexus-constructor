@@ -468,3 +468,51 @@ def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN
     assert contains_warning_of_type(
         json_reader.warnings, TransformDependencyMissing
     ), "Expected a warning due to depends_on pointing to a non-existent transform"
+
+
+def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
+    json_string = """
+   {
+     "children": [
+        {
+           "name": "entry",
+           "type": "group",
+           "attributes": [
+             {
+                "name": "NX_class",
+                "dtype": "string",
+                "values": "NXentry"
+             }
+           ],
+           "children": [
+             {
+                "module": "dataset",
+                "config": {
+                   "name": "experiment_identifier",
+                   "dtype": "string",
+                   "values": "ID_123456"
+                }
+             }
+           ]
+        }
+     ]
+   }
+    """
+
+    with patch(
+        "nexus_constructor.json.load_from_json.open",
+        mock_open(read_data=json_string),
+        create=True,
+    ):
+        json_reader.load_model_from_json("filename")
+        model = json_reader.entry
+
+    success = False
+    for child in model.children:
+        try:
+            if child.name == "experiment_identifier" and child.values == "ID_123456":
+                success = True
+                break
+        except:
+            pass
+    assert success
