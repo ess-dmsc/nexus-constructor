@@ -82,11 +82,13 @@ class FieldWidget(QFrame):
         possible_field_names=None,
         parent: QListWidget = None,
         hide_name_field: bool = False,
+        show_only_f142_stream: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
 
         if possible_field_names is None:
             possible_field_names = []
+        self._show_only_f142_stream = show_only_f142_stream
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
@@ -234,7 +236,6 @@ class FieldWidget(QFrame):
             val = self.value_line_edit.text()
             return_object = Dataset(
                 name=self.name,
-                size=[1],
                 type=dtype,
                 values=val,
             )
@@ -243,7 +244,6 @@ class FieldWidget(QFrame):
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
                 name=self.name,
-                size=array.size,
                 type=dtype,
                 values=array,
             )
@@ -309,7 +309,9 @@ class FieldWidget(QFrame):
             self.table_view = ArrayDatasetTableWidget()
         elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
-            self.streams_widget = StreamFieldsWidget(self.edit_dialog)
+            self.streams_widget = StreamFieldsWidget(
+                self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
+            )
         elif self.field_type == FieldType.link:
             self.set_visibility(
                 True,

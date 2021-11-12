@@ -388,7 +388,7 @@ def test_add_rotation():
     test_component_tree_model.add_rotation(component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 1
     transform_index = test_component_tree_model.index(0, 0, transformation_list_index)
-    assert transform_index.internalPointer().transform_type == "Rotation"
+    assert transform_index.internalPointer().transform_type == "rotation"
 
 
 def test_add_translation():
@@ -401,7 +401,7 @@ def test_add_translation():
     test_component_tree_model.add_translation(component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 1
     transform_index = test_component_tree_model.index(0, 0, transformation_list_index)
-    assert transform_index.internalPointer().transform_type == "Translation"
+    assert transform_index.internalPointer().transform_type == "translation"
 
 
 def test_add_transformation_alt_1():

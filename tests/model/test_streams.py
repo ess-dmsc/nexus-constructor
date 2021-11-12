@@ -23,7 +23,7 @@ name = "stream1"
     ],
 )
 def test_streams_with_name_source_and_topic(stream):
-    stream_dict = stream.as_dict()["config"]
+    stream_dict = stream.as_dict([])["config"]
     assert stream_dict["topic"] == topic
     assert stream_dict["source"] == source
 
@@ -45,7 +45,7 @@ def test_f142_stream_optional_settings():
         nexus_indices_index_every_mb=nexus_indices_index_every_mb,
         store_latest_into=store_latest_into,
     )
-    stream_dict = stream.as_dict()["config"]
+    stream_dict = stream.as_dict([])["config"]
     assert stream_dict["topic"] == topic
     assert stream_dict["source"] == source
     assert stream_dict["dtype"] == type
@@ -71,7 +71,7 @@ def test_ev42_stream_optional_settings():
         nexus_indices_index_every_kb=nexus_indices_index_every_kb,
         nexus_indices_index_every_mb=nexus_indices_index_every_mb,
     )
-    stream_dict = stream.as_dict()["config"]
+    stream_dict = stream.as_dict([])["config"]
     assert stream_dict["topic"] == topic
     assert stream_dict["source"] == source
     assert stream_dict["adc_pulse_debug"] == adc_pulse_debug

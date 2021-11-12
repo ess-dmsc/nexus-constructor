@@ -46,7 +46,7 @@ class FileWriterModule(ABC):
     writer_module = attr.ib(type=str, init=False)
     parent_node = attr.ib(type="Group")
 
-    def as_dict(self):
+    def as_dict(self, error_collector: List[str]):
         raise NotImplementedError
 
 
@@ -55,7 +55,7 @@ class StreamModule(FileWriterModule):
     source = attr.ib(type=str)
     topic = attr.ib(type=str)
 
-    def as_dict(self):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
@@ -84,8 +84,8 @@ class EV42Stream(StreamModule):
     cue_interval = attr.ib(type=int, default=None, init=False)
     chunk_size = attr.ib(type=int, default=None, init=False)
 
-    def as_dict(self):
-        module_dict = StreamModule.as_dict(self)
+    def as_dict(self, error_collector: List[str]):
+        module_dict = StreamModule.as_dict(self, error_collector)
         if self.adc_pulse_debug:
             module_dict[NodeType.CONFIG][ADC_PULSE_DEBUG] = self.adc_pulse_debug
         if self.chunk_size:
@@ -110,7 +110,7 @@ class Link(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.LINK.value, init=False)
     values = None
 
-    def as_dict(self):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.source},
@@ -124,7 +124,7 @@ class Dataset(FileWriterModule):
     type = attr.ib(type=str, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
 
-    def as_dict(self):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {
@@ -139,8 +139,8 @@ class ADARStream(StreamModule):
     array_size = attr.ib(type=list, init=False)
     writer_module = attr.ib(type=str, default=WriterModules.ADAR.value, init=False)
 
-    def as_dict(self):
-        module_dict = StreamModule.as_dict(self)
+    def as_dict(self, error_collector: List[str]):
+        module_dict = StreamModule.as_dict(self, error_collector)
         if self.array_size:
             module_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
         return module_dict
@@ -242,7 +242,7 @@ class HS00Stream:
     shape = attr.ib()
     writer_module = attr.ib(type=str, default=WriterModules.HS00.value, init=False)
 
-    def as_dict(self):
+    def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {
@@ -257,3 +257,7 @@ class HS00Stream:
 
 
 Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
+
+
+class StreamGroup:
+    pass

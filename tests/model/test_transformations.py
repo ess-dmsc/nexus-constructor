@@ -1,8 +1,10 @@
 import numpy as np
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.stream import F142Stream, StreamGroup, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 
@@ -11,17 +13,15 @@ def create_transform(
     name="test translation",
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
-    type="Translation",
-    values=Dataset(name="", values=None, type=ValueTypes.DOUBLE, size=[1]),
+    type="translation",
+    values=Dataset(name="", values=None, type=ValueTypes.DOUBLE),
 ):
-
     translation = Transformation(
         name=name,
         parent_node=None,
         values=values,
         type=ValueTypes.STRING,
         parent_component=None,
-        size=[1],
     )
 
     translation.vector = vector
@@ -32,11 +32,10 @@ def create_transform(
 
 
 def test_can_get_transform_properties():
-
     test_name = "slartibartfast"
     test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
-    test_type = "Translation"
+    test_type = "translation"
     test_values = Dataset("test_dataset", None, [1])
 
     transform = create_transform(
@@ -80,7 +79,6 @@ def test_ui_value_for_transform_with_array_magnitude_of_strings_returns_zero():
 
 
 def test_can_set_transform_properties():
-
     initial_name = "slartibartfast"
 
     transform = create_transform(initial_name)
@@ -88,7 +86,7 @@ def test_can_set_transform_properties():
     test_name = "beeblebrox"
     test_ui_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
-    test_type = "Rotation"
+    test_type = "rotation"
     test_values = Dataset("valuedataset", None, [1, 2])
 
     transform.name = test_name
@@ -115,7 +113,6 @@ def test_can_set_transform_properties():
 
 
 def test_set_one_dependent():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
 
@@ -128,7 +125,6 @@ def test_set_one_dependent():
 
 
 def test_set_two_dependents():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -144,7 +140,6 @@ def test_set_two_dependents():
 
 
 def test_set_three_dependents():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -163,7 +158,6 @@ def test_set_three_dependents():
 
 
 def test_deregister_dependent():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
 
@@ -176,7 +170,6 @@ def test_deregister_dependent():
 
 
 def test_deregister_unregistered_dependent_alt1():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
 
@@ -186,7 +179,6 @@ def test_deregister_unregistered_dependent_alt1():
 
 
 def test_deregister_unregistered_dependent_alt2():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -199,7 +191,6 @@ def test_deregister_unregistered_dependent_alt2():
 
 
 def test_deregister_unregistered_dependent_alt3():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_2_alt")
@@ -215,7 +206,6 @@ def test_deregister_unregistered_dependent_alt3():
 
 
 def test_reregister_dependent():
-
     transform1 = create_transform("transform_1")
     transform2 = create_transform("transform_2")
     transform3 = create_transform("transform_3")
@@ -231,7 +221,6 @@ def test_reregister_dependent():
 
 
 def test_set_one_dependent_component():
-
     transform = create_transform("transform_1")
     component = Component("test_component")
     transform.register_dependent(component)
@@ -243,7 +232,6 @@ def test_set_one_dependent_component():
 
 
 def test_set_two_dependent_components():
-
     transform = create_transform("transform_1")
 
     component1 = Component("component1")
@@ -260,7 +248,6 @@ def test_set_two_dependent_components():
 
 
 def test_set_three_dependent_components():
-
     transform = create_transform("transform_1")
 
     component1 = Component("test_component1")
@@ -280,7 +267,6 @@ def test_set_three_dependent_components():
 
 
 def test_deregister_three_dependent_components():
-
     transform = create_transform("transform_1")
 
     component1 = Component("test_component1")
@@ -301,7 +287,6 @@ def test_deregister_three_dependent_components():
 
 
 def test_register_dependent_twice():
-
     transform = create_transform("transform_1")
     component1 = Component("test_component1")
 
@@ -314,11 +299,10 @@ def test_register_dependent_twice():
 
 
 def test_can_get_translation_as_4_by_4_matrix():
-
     test_ui_value = 42.0
     # Note, it should not matter if this is not set to a unit vector
     test_vector = QVector3D(2.0, 0.0, 0.0)
-    test_type = "Translation"
+    test_type = "translation"
 
     transformation = create_transform(
         ui_value=test_ui_value, vector=test_vector, type=test_type
@@ -333,10 +317,9 @@ def test_can_get_translation_as_4_by_4_matrix():
 
 
 def test_can_get_rotation_as_4_by_4_matrix():
-
     test_ui_value = 15.0  # degrees
     test_vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
-    test_type = "Rotation"
+    test_type = "rotation"
 
     transformation = create_transform(
         ui_value=test_ui_value, vector=test_vector, type=test_type
@@ -377,3 +360,53 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
     assert transform.ui_value != str_value
     assert transform.ui_value == 0
+
+
+def test_as_dict_method_of_transformation_when_values_is_a_dataset():
+    name = ":: SOME NAME ::"
+    dataset = Dataset(name="", values=None, type=ValueTypes.DOUBLE)
+    transform = create_transform(name=name, values=dataset)
+    assert transform.values == dataset
+    return_dict = transform.as_dict([])
+    assert return_dict[CommonKeys.MODULE] == "dataset"
+    assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
+
+
+def test_as_dict_method_of_transformation_when_values_is_a_f142_streamgroup():
+    name = ":: SOME NAME ::"
+    source = ":: SOME SOURCE ::"
+    topic = (":: SOME TOPIC ::",)
+    stream_group = StreamGroup(name="")
+    stream_group.children = [F142Stream(source=source, topic=topic, type="double")]
+    transform = create_transform(name=name, values=stream_group)
+    assert transform.values == stream_group
+
+    return_dict = transform.as_dict([])
+    assert return_dict[CommonKeys.MODULE] == WriterModules.F142.value
+    assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
+    assert return_dict[NodeType.CONFIG]["source"] == source
+    assert return_dict[NodeType.CONFIG]["topic"] == topic
+
+
+def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_error():
+    transform = create_transform(
+        values=Dataset(name="", values="not a number", type="double"),
+        type=ValueTypes.DOUBLE,
+    )
+
+    error_collector = []
+    transform.as_dict(error_collector)
+
+    assert error_collector
+
+
+def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
+    transform = create_transform(
+        values=Dataset(name="", values="123", type="double"),
+        type=ValueTypes.DOUBLE,
+    )
+
+    error_collector = []
+    transform.as_dict(error_collector)
+
+    assert not error_collector

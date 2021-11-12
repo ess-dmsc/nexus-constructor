@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.group import Group
@@ -19,12 +19,12 @@ class Entry(Group):
         self[INSTRUMENT_NAME] = instrument
         instrument.parent_node = self
 
-    def as_dict(self) -> Dict[str, Any]:
-        dictionary = super(Entry, self).as_dict()
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
+        dictionary = super(Entry, self).as_dict(error_collector)
         # sample lives in instrument component list for purposes of GUI
         # but in the NeXus structure must live in the entry
         try:
-            dictionary[CommonKeys.CHILDREN].append(self.instrument.sample.as_dict())
+            dictionary[CommonKeys.CHILDREN].append(self.instrument.sample.as_dict(error_collector))
         except AttributeError:
             # If instrument is not set then don't try to add sample to dictionary
             pass
