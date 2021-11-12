@@ -1,4 +1,5 @@
-from typing import Any, Dict, List
+from copy import copy
+from typing import Any, Dict, List, Tuple
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.dataset import Dataset
@@ -28,6 +29,26 @@ class Entry(Group):
         self[INSTRUMENT_NAME] = instrument
         instrument.parent_node = self
 
+    @property
+    def proposal_id(self) -> Tuple[str, bool]:
+        prop_ds = self["experiment_identifier"]
+        if prop_ds:
+            return (
+                prop_ds.values,
+                True
+                if prop_ds.values == NICOS_PLACEHOLDERS["experiment_identifier"].values
+                else False,
+            )
+        return "", False
+
+    @proposal_id.setter
+    def proposal_id(self, values: Tuple[str, bool]):
+        self["experiment_identifier"] = copy(
+            NICOS_PLACEHOLDERS["experiment_identifier"]
+        )
+        if not values[1]:
+            self["experiment_identifier"].values = values[0]
+
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Entry, self).as_dict(error_collector)
         # sample lives in instrument component list for purposes of GUI
@@ -39,16 +60,4 @@ class Entry(Group):
         except AttributeError:
             # If instrument is not set then don't try to add sample to dictionary
             pass
-        self._insert_nicos_placeholders(dictionary, error_collector)
         return dictionary
-
-    def _insert_nicos_placeholders(
-        self, dictionary: Dict[str, Any], error_collector: List[str]
-    ):
-        children = [ds.name for ds in self.children if isinstance(ds, Dataset)]
-
-        for name, place_holder in NICOS_PLACEHOLDERS.items():
-            if name not in children:
-                dictionary[CommonKeys.CHILDREN].append(
-                    place_holder.as_dict(error_collector)
-                )

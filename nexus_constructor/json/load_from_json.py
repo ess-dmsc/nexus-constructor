@@ -22,6 +22,7 @@ from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
     _find_shape_information,
     _retrieve_children_list,
+    _create_dataset,
 )
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transform_id import TransformId
@@ -101,8 +102,9 @@ class JSONReader:
         children_list = _retrieve_children_list(json_dict)
 
         for child in children_list:
-            if child.get('module', '') == 'dataset':
-                _add_field_to_group(child, self.entry)
+            if child.get("module", "") == "dataset":
+                ds = _create_dataset(child, self.entry)
+                self.entry[ds.name] = ds
                 continue
 
             self._read_json_object(
@@ -121,10 +123,7 @@ class JSONReader:
         """
         for (
             component_name,
-            (
-                component,
-                depends_on_id,
-            ),
+            (component, depends_on_id,),
         ) in self._components_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
@@ -146,10 +145,7 @@ class JSONReader:
         """
         for (
             transform_id,
-            (
-                transform,
-                depends_on_id,
-            ),
+            (transform, depends_on_id,),
         ) in self._transforms_depends_on.items():
             try:
                 # If it has a dependency then find the corresponding Transformation and assign it to
