@@ -63,12 +63,14 @@ class StreamFieldsWidget(QDialog):
     A stream widget containing schema-specific properties.
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, show_only_f142_stream: bool = False):
         super().__init__()
         self.setParent(parent)
         self.setLayout(QGridLayout())
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
+
+        self._show_only_f142_stream = show_only_f142_stream
         self.minimum_spinbox_value = 0
         self.maximum_spinbox_value = 100_000_000
         self.advanced_options_enabled = False
@@ -118,7 +120,10 @@ class StreamFieldsWidget(QDialog):
         self.array_radio.clicked.connect(partial(self._show_array_size, True))
 
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
-        self.schema_combo.addItems([e.value for e in WriterModules])
+        if self._show_only_f142_stream:
+            self.schema_combo.addItems([WriterModules.F142.value])
+        else:
+            self.schema_combo.addItems([e.value for e in WriterModules])
 
         self.ok_button = QPushButton("OK")
         self.ok_button.clicked.connect(self.parent().close)

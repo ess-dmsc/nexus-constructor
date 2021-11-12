@@ -10,7 +10,7 @@ from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import EV42Stream, Link, StreamGroup
+from nexus_constructor.model.stream import F142Stream, Link, StreamGroup
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 
@@ -130,7 +130,8 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 
     topic = "test_topic"
     source = "source1"
-    stream = EV42Stream(topic=topic, source=source)
+    type = "double"
+    stream = F142Stream(topic=topic, source=source, type=type)
 
     stream_group["stream"] = stream
 
@@ -147,9 +148,10 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
         view.transformation_frame.magnitude_widget.field_type == FieldType.kafka_stream
     )
     assert view.transformation_frame.magnitude_widget.value.children[0].topic == topic
+    assert view.transformation_frame.magnitude_widget.value.children[0].type == type
     assert (
         view.transformation_frame.magnitude_widget.value.children[0].writer_module
-        == "ev42"
+        == "f142"
     )
     assert view.transformation_frame.magnitude_widget.value.children[0].source == source
 

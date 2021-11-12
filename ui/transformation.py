@@ -52,7 +52,9 @@ class Ui_Transformation(object):
         self._make_text_bold(self.value_label)
         self.main_layout.addWidget(self.value_label)
 
-        self.magnitude_widget = FieldWidget(hide_name_field=True)
+        self.magnitude_widget = FieldWidget(
+            hide_name_field=True, show_only_f142_stream=True
+        )
         self.magnitude_widget.setFrameShape(QFrame.NoFrame)
         self.magnitude_widget.setMinimumHeight(40)
         self.main_layout.addWidget(self.magnitude_widget)
