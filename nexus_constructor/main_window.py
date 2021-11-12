@@ -6,7 +6,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.json_utils.load_from_json import JSONReader
+from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog

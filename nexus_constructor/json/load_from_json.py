@@ -11,15 +11,15 @@ from nexus_constructor.common_attrs import (
     NodeType,
 )
 from nexus_constructor.component_type import COMPONENT_TYPES
-from nexus_constructor.json_utils.json_warnings import (
+from nexus_constructor.json.json_warnings import (
     InvalidJson,
     JsonWarningsContainer,
     NameFieldMissing,
     NXClassAttributeMissing,
     TransformDependencyMissing,
 )
-from nexus_constructor.json_utils.load_from_json_utils import _find_nx_class
-from nexus_constructor.json_utils.transform_id import TransformId
+from nexus_constructor.json.load_from_json_utils import _find_nx_class
+from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
