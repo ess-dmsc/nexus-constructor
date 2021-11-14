@@ -125,4 +125,4 @@ def test_GIVEN_link_json_WHEN_adding_link_THEN_link_object_is_created():
     }
     link = _create_link(test_dict)
     assert link.name == name
-    assert link.target == target
+    assert link.source == target

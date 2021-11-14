@@ -24,7 +24,7 @@ from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import DATASET, StreamGroup, WriterModules
+from nexus_constructor.model.stream import DATASET, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
@@ -65,8 +65,8 @@ def _create_transformation_dataset(
 
 def _create_transformation_datastream_group(
     data: Dict, name: str, parent_node: Optional[Group] = None
-) -> StreamGroup:
-    group = StreamGroup(name=name, parent_node=parent_node)
+) -> Group:
+    group = Group(name=name, parent_node=parent_node)
     group.children.append(_create_stream(data))
     return group
 

@@ -12,10 +12,7 @@ from nexus_constructor.common_attrs import (
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.stream import (
-    ADC_PULSE_DEBUG,
     ARRAY_SIZE,
-    CHUNK_CHUNK_KB,
-    CHUNK_CHUNK_MB,
     DATA_TYPE,
     DATASET,
     EDGE_TYPE,
@@ -25,7 +22,6 @@ from nexus_constructor.model.stream import (
     LINK,
     SHAPE,
     SOURCE,
-    STORE_LATEST_INTO,
     TOPIC,
     VALUE_UNITS,
     EV42Stream,
@@ -35,7 +31,6 @@ from nexus_constructor.model.stream import (
     NS10Stream,
     SENVStream,
     Stream,
-    StreamGroup,
     TDCTStream,
     WriterModules,
 )
@@ -224,21 +219,10 @@ def _create_stream(json_object: Dict) -> Stream:
 def __create_ev42_stream(
     index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
 ):
-    adc = stream_object[ADC_PULSE_DEBUG] if ADC_PULSE_DEBUG in stream_object else None
-    chunk_mb = (
-        stream_object[CHUNK_CHUNK_MB] if CHUNK_CHUNK_MB in stream_object else None
-    )
-    chunk_kb = (
-        stream_object[CHUNK_CHUNK_KB] if CHUNK_CHUNK_KB in stream_object else None
-    )
     return EV42Stream(
+        parent_node=None,
         source=source,
         topic=topic,
-        adc_pulse_debug=adc,
-        nexus_indices_index_every_kb=index_kb,
-        nexus_indices_index_every_mb=index_mb,
-        nexus_chunk_chunk_mb=chunk_mb,
-        nexus_chunk_chunk_kb=chunk_kb,
     )
 
 
@@ -248,18 +232,13 @@ def __create_f142_stream(
     value_type = stream_object[CommonKeys.DATA_TYPE]
     value_units = stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
     array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
-    store_latest_into = (
-        stream_object[STORE_LATEST_INTO] if STORE_LATEST_INTO in stream_object else None
-    )
     return F142Stream(
+        parent_node=None,
         source=source,
         topic=topic,
         type=value_type,
         value_units=value_units,
         array_size=array_size,
-        nexus_indices_index_every_mb=index_mb,
-        nexus_indices_index_every_kb=index_kb,
-        store_latest_into=store_latest_into,
     )
 
 
@@ -269,7 +248,7 @@ def _create_group(json_object: Dict, parent: Group) -> Group:
     group = Group(name=name, parent_node=parent)
     for item in children:
         if CommonKeys.MODULE in item:
-            group = StreamGroup(name=name, parent_node=parent)
+            group = Group(name=name, parent_node=parent)
             break
 
     for item in children:

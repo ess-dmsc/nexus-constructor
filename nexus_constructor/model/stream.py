@@ -97,10 +97,20 @@ class EV42Stream(StreamModule):
 
 @attr.s
 class F142Stream(EV42Stream):
-    array_size = attr.ib(type=list)
     type = attr.ib(type=str)
-    value_units = attr.ib(type=str)
+    value_units = attr.ib(type=str, default=None)
+    array_size = attr.ib(type=list, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
+
+    def as_dict(self, error_collector: List[str]):
+        module_dict = EV42Stream.as_dict(self, error_collector)
+        if self.type:
+            module_dict[NodeType.CONFIG][CommonKeys.DATA_TYPE] = self.type
+        if self.value_units:
+            module_dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units
+        if self.array_size:
+            module_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
+        return module_dict
 
 
 @attr.s
@@ -178,24 +188,19 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             parent_node=parent_node,
         )
     elif mod_type == WriterModules.F142.value:
-        array_size = None
         f142_type = None
-        value_units = None
-
-        if ARRAY_SIZE in configuration:
-            array_size = configuration[ADC_PULSE_DEBUG]
         if CommonKeys.TYPE in configuration:
             f142_type = configuration[CommonKeys.TYPE]
-        if VALUE_UNITS in configuration:
-            value_units = configuration[VALUE_UNITS]
         fw_mod_obj = fw_mod_class(
             topic=configuration[TOPIC],
             source=configuration[SOURCE],
             parent_node=parent_node,
             type=f142_type,
-            array_size=array_size,
-            value_units=value_units,
         )
+        if ARRAY_SIZE in configuration:
+            fw_mod_obj.array_size = configuration[ADC_PULSE_DEBUG]
+        if VALUE_UNITS in configuration:
+            fw_mod_obj.value_units = configuration[VALUE_UNITS]
     elif mod_type == WriterModules.LINK.value:
         fw_mod_obj = fw_mod_class(
             name=configuration[CommonKeys.NAME],
@@ -257,7 +262,3 @@ class HS00Stream:
 
 
 Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
-
-
-class StreamGroup:
-    pass
