@@ -261,4 +261,4 @@ class HS00Stream:
         }
 
 
-Stream = Union[NS10Stream, SENVStream, TDCTStream, EV42Stream, F142Stream, HS00Stream]
+Stream = StreamModule

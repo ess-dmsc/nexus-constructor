@@ -9,7 +9,6 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.stream import (
     ARRAY_SIZE,
@@ -24,8 +23,10 @@ from nexus_constructor.model.stream import (
     SOURCE,
     TOPIC,
     VALUE_UNITS,
+    Dataset,
     EV42Stream,
     F142Stream,
+    FileWriterModule,
     HS00Stream,
     Link,
     NS10Stream,
@@ -85,16 +86,7 @@ def _add_field_to_group(item: Dict, group: Group):
             )
         group[child_name] = child
     elif CommonKeys.MODULE in item:
-        stream: Union[
-            Dataset,
-            Link,
-            NS10Stream,
-            SENVStream,
-            TDCTStream,
-            EV42Stream,
-            F142Stream,
-            HS00Stream,
-        ]
+        stream: Union[FileWriterModule, Group]
         writer_module = item[CommonKeys.MODULE]
         if writer_module == LINK:
             stream = _create_link(item)
@@ -198,7 +190,7 @@ def _create_stream(json_object: Dict) -> Stream:
         error_type = stream_object[ERROR_TYPE]
         edge_type = stream_object[EDGE_TYPE]
         shape = stream_object[SHAPE]
-        return HS00Stream(
+        return HS00Stream(  # type: ignore
             source=source,
             topic=topic,
             data_type=data_type,

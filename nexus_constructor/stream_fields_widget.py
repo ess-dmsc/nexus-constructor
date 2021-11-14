@@ -31,6 +31,7 @@ from nexus_constructor.model.stream import (
     HS00Stream,
     NS10Stream,
     SENVStream,
+    StreamModule,
     TDCTStream,
     WriterModules,
 )
@@ -303,9 +304,7 @@ class StreamFieldsWidget(QDialog):
 
         source = self.source_line_edit.text()
         topic = self.topic_line_edit.text()
-        stream: Union[
-            F142Stream, EV42Stream, NS10Stream, SENVStream, HS00Stream, TDCTStream
-        ] = None
+        stream: Union[StreamModule] = None
         type = self.type_combo.currentText()
         current_schema = self.schema_combo.currentText()
         if current_schema == WriterModules.F142.value:
@@ -332,7 +331,7 @@ class StreamFieldsWidget(QDialog):
         elif current_schema == WriterModules.SENV.value:
             stream = SENVStream(parent_node=None, source=source, topic=topic)
         elif current_schema == WriterModules.HS00.value:
-            stream = HS00Stream(
+            stream = HS00Stream(  # type: ignore
                 source=source,
                 topic=topic,
                 data_type=NotImplemented,
