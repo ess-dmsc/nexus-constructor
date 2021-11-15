@@ -124,20 +124,17 @@ class Transformation(Dataset):
 
     @units.setter
     def units(self, new_units):
+        self._calculate_scaling_factor(new_units)
+        self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
+
+    def _calculate_scaling_factor(self, units):
         try:
             if self.transform_type == TransformationType.TRANSLATION:
-                self._ui_scale_factor = calculate_unit_conversion_factor(
-                    new_units, METRES
-                )
+                self._ui_scale_factor = calculate_unit_conversion_factor(units, METRES)
             elif self.transform_type == TransformationType.ROTATION:
-                self._ui_scale_factor = calculate_unit_conversion_factor(
-                    new_units, RADIANS
-                )
-        except Exception as e:
-            print(e)
+                self._ui_scale_factor = calculate_unit_conversion_factor(units, RADIANS)
+        except Exception:
             pass
-        print("Conversion factor ", self._ui_scale_factor)
-        self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
 
     @property
     def depends_on(self) -> "Transformation":
