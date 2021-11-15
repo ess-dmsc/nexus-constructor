@@ -3,6 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, List, Union
 
 import attr
+import numpy as np
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
@@ -135,6 +136,8 @@ class Dataset(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
+        if isinstance(self.values, np.ndarray):
+            self.values = self.values.tolist()
         return {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {
