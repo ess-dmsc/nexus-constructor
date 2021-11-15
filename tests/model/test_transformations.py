@@ -8,6 +8,11 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.stream import F142Stream, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.unit_utils import (
+    DEGREES,
+    RADIANS,
+    calculate_unit_conversion_factor,
+)
 
 
 def create_transform(
@@ -16,6 +21,7 @@ def create_transform(
     vector=QVector3D(1.0, 0.0, 0.0),
     type="translation",
     values=Dataset(name="", values=None, type=ValueTypes.DOUBLE),
+    units="m",
 ):
     translation = Transformation(
         name=name,
@@ -28,6 +34,7 @@ def create_transform(
     translation.vector = vector
     translation.transform_type = type
     translation.ui_value = ui_value
+    translation.units = units
 
     return translation
 
@@ -322,12 +329,13 @@ def test_can_get_rotation_as_4_by_4_matrix():
     test_type = "rotation"
 
     transformation = create_transform(
-        ui_value=test_ui_value, vector=test_vector, type=test_type
+        ui_value=test_ui_value, vector=test_vector, type=test_type, units="deg"
     )
 
     test_matrix = transformation.qmatrix
     # for a rotation around the y-axis:
     test_value_radians = np.deg2rad(test_ui_value)
+
     expected_matrix = np.array(
         (
             np.cos(-test_value_radians),
@@ -413,3 +421,101 @@ def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
     transform.as_dict(error_collector)
 
     assert not error_collector
+
+
+def test_if_VALID_unit_is_entered_in_TRANSLATION_then_ui_scale_factor_is_evaluated_correctly():
+    test_type = "translation"
+
+    transformation = create_transform(type=test_type, units="cm")
+    assert transformation._ui_scale_factor == 1 / 100
+
+    transformation.units = "m"
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = "mm"
+    assert transformation._ui_scale_factor == 1 / 1000
+
+
+def test_if_INVALID_unit_is_entered_in_TRANSLATION_then_the_last_valid_scale_factor_is_used():
+    test_type = "translation"
+
+    transformation = create_transform(type=test_type, units="m")
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = ":: NOT A VALID UNIT ::"
+    assert transformation._ui_scale_factor == 1
+
+
+def test_if_VALID_unit_is_entered_in_ROTATION_then_ui_scale_factor_is_evaluated_correctly():
+    test_type = "rotation"
+
+    transformation = create_transform(type=test_type, units="deg")
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = "radian"
+    assert transformation._ui_scale_factor == calculate_unit_conversion_factor(
+        RADIANS, DEGREES
+    )
+
+
+def test_if_INVALID_unit_is_entered_in_ROTATION_then_the_last_valid_scale_factor_is_used():
+    test_type = "rotation"
+
+    transformation = create_transform(type=test_type, units="deg")
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = ":: NOT A VALID UNIT ::"
+    assert transformation._ui_scale_factor == 1
+
+
+def test_can_get_translation_as_4_by_4_matrix_with_correct_unit_scaling():
+    ui_value = 12.0
+    vector = QVector3D(1.0, 0.0, 0.0)
+    type = "translation"
+
+    transformation = create_transform(
+        ui_value=ui_value, vector=vector, type=type, units="cm"
+    )
+    scale_factor = 1 / 100  # cm to metres
+
+    test_matrix = transformation.qmatrix
+    expected_matrix = np.array(
+        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ui_value * scale_factor, 0, 0, 1)
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()))
+
+
+def test_can_get_rotation_as_4_by_4_matrix_with_correct_unit_scaling():
+    ui_value = 12.0  # degrees
+    vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
+    type = "rotation"
+
+    transformation = create_transform(
+        ui_value=ui_value, vector=vector, type=type, units="cdeg"
+    )
+    scale_factor = 1 / 100  # cdeg to deg
+    test_matrix = transformation.qmatrix
+    # for a rotation around the y-axis:
+    test_value_radians = np.deg2rad(ui_value * scale_factor)
+
+    expected_matrix = np.array(
+        (
+            np.cos(-test_value_radians),
+            0,
+            np.sin(-test_value_radians),
+            0,
+            0,
+            1,
+            0,
+            0,
+            np.sin(test_value_radians),
+            0,
+            np.cos(-test_value_radians),
+            0,
+            0,
+            0,
+            0,
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()), atol=1.0e-7)
