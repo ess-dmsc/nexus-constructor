@@ -15,8 +15,8 @@ from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.stream import StreamGroup
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
+    DEGREES,
     METRES,
-    RADIANS,
     calculate_unit_conversion_factor,
 )
 
@@ -102,15 +102,13 @@ class Transformation(Dataset):
         transform = Qt3DCore.QTransform()
         transform.matrix()
         if self.transform_type == TransformationType.ROTATION:
-            # Changing sign of angle so that it describes a passive transformation
             quaternion = transform.fromAxisAndAngle(
-                self.vector, -1 * self.ui_value * self._ui_scale_factor
+                self.vector, self.ui_value * self._ui_scale_factor
             )
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
-            # Changing sign of distance so that it describes a passive transformation
             transform.setTranslation(
-                self.vector.normalized() * -1 * self.ui_value * self._ui_scale_factor
+                self.vector.normalized() * self.ui_value * self._ui_scale_factor
             )
         else:
             raise (
@@ -132,7 +130,7 @@ class Transformation(Dataset):
             if self.transform_type == TransformationType.TRANSLATION:
                 self._ui_scale_factor = calculate_unit_conversion_factor(units, METRES)
             elif self.transform_type == TransformationType.ROTATION:
-                self._ui_scale_factor = calculate_unit_conversion_factor(units, RADIANS)
+                self._ui_scale_factor = calculate_unit_conversion_factor(units, DEGREES)
         except Exception:
             pass
 
