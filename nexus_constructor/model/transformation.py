@@ -14,6 +14,11 @@ from nexus_constructor.common_attrs import (
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.stream import StreamGroup
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.unit_utils import (
+    DEGREES,
+    METRES,
+    calculate_unit_conversion_factor,
+)
 
 if TYPE_CHECKING:
     from nexus_constructor.model.component import Component  # noqa: F401
@@ -30,6 +35,7 @@ class Transformation(Dataset):
     parent_component = attr.ib(type="Component", default=None)
     _dependents = attr.ib(type=list, init=False)
     _ui_value = attr.ib(type=float, default=None)
+    _ui_scale_factor = attr.ib(type=float, default=1.0, init=False)
 
     @_dependents.default
     def _initialise_dependents(self):
@@ -96,10 +102,14 @@ class Transformation(Dataset):
         transform = Qt3DCore.QTransform()
         transform.matrix()
         if self.transform_type == TransformationType.ROTATION:
-            quaternion = transform.fromAxisAndAngle(self.vector, self.ui_value)
+            quaternion = transform.fromAxisAndAngle(
+                self.vector, self.ui_value * self._ui_scale_factor
+            )
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
-            transform.setTranslation(self.vector.normalized() * self.ui_value)
+            transform.setTranslation(
+                self.vector.normalized() * self.ui_value * self._ui_scale_factor
+            )
         else:
             raise (
                 RuntimeError(f'Unknown transformation of type "{self.transform_type}".')
@@ -112,7 +122,17 @@ class Transformation(Dataset):
 
     @units.setter
     def units(self, new_units):
+        self._evaluate_ui_scale_factor(new_units)
         self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
+
+    def _evaluate_ui_scale_factor(self, units):
+        try:
+            if self.transform_type == TransformationType.TRANSLATION:
+                self._ui_scale_factor = calculate_unit_conversion_factor(units, METRES)
+            elif self.transform_type == TransformationType.ROTATION:
+                self._ui_scale_factor = calculate_unit_conversion_factor(units, DEGREES)
+        except Exception:
+            pass
 
     @property
     def depends_on(self) -> "Transformation":
