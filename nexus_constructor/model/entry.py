@@ -52,13 +52,23 @@ class Entry(Group):
 
     @property
     def title(self) -> Tuple[str, bool]:
-        prop_ds = self["title"]
-        # if prop_ds:
-        #     return (
-        #         prop_ds.values,
-        #         True if prop_ds.values == EXP_ID_PLACEHOLDER.values else False,
-        #     )
+        title_ds = self["title"]
+        if title_ds:
+            return title_ds.values, True if title_ds.values == "$TITLE$" else False
         return "", False
+
+    @title.setter
+    def title(self, values: Tuple[str, bool]):
+        value, use_default = values
+        if not use_default and value.strip() == "":
+            del self["title"]
+            return
+
+        if use_default:
+            self["title"] = Dataset("title", values="$TITLE$", type=ValueTypes.STRING)
+            return
+
+        self["title"] = Dataset("title", values=value, type=ValueTypes.STRING)
 
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:

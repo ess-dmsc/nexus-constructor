@@ -79,3 +79,48 @@ def test_title_is_initially_empty():
     test_entry = Entry()
 
     assert test_entry.title == ("", False)
+
+
+def test_title_is_set_to_use_placeholder():
+    test_entry = Entry()
+
+    test_entry.title = ("will be ignored", True)
+
+    assert test_entry.title == ("$TITLE$", True)
+
+
+def test_title_is_set_to_custom_value():
+    test_entry = Entry()
+
+    test_entry.title = ("MY_TITLE", False)
+
+    assert test_entry.title == ("MY_TITLE", False)
+
+
+def test_blank_title_is_not_in_dictionary():
+    test_entry = Entry()
+
+    dictionary = test_entry.as_dict([])
+
+    assert find_in_dict(dictionary, "title") is None
+
+
+def test_blank_title_is_not_in_dictionary_after_clearing():
+    test_entry = Entry()
+    test_entry.title = ("MY_TITLE", False)
+    test_entry.title = ("", False)
+
+    dictionary = test_entry.as_dict([])
+
+    assert find_in_dict(dictionary, "title") is None
+
+
+def test_defined_title_is_in_dictionary():
+    test_entry = Entry()
+    test_entry.title = ("MY_TITLE", False)
+
+    dictionary = test_entry.as_dict([])
+
+    result = find_in_dict(dictionary, "title")
+    assert result is not None
+    assert result["config"]["values"] == "MY_TITLE"
