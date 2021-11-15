@@ -3,6 +3,8 @@ from nexus_constructor.model.entry import (
     Entry,
     EXP_ID_PLACEHOLDER_VALUE,
     NEXUS_EXP_ID_NAME,
+    TITLE_PLACEHOLDER_VALUE,
+    NEXUS_TITLE_NAME,
 )
 from nexus_constructor.model.instrument import SAMPLE_NAME, Instrument
 
@@ -86,7 +88,7 @@ def test_title_is_set_to_use_placeholder():
 
     test_entry.title = ("will be ignored", True)
 
-    assert test_entry.title == ("$TITLE$", True)
+    assert test_entry.title == (TITLE_PLACEHOLDER_VALUE, True)
 
 
 def test_title_is_set_to_custom_value():
@@ -102,7 +104,7 @@ def test_blank_title_is_not_in_dictionary():
 
     dictionary = test_entry.as_dict([])
 
-    assert find_in_dict(dictionary, "title") is None
+    assert find_in_dict(dictionary, NEXUS_TITLE_NAME) is None
 
 
 def test_blank_title_is_not_in_dictionary_after_clearing():
@@ -112,7 +114,7 @@ def test_blank_title_is_not_in_dictionary_after_clearing():
 
     dictionary = test_entry.as_dict([])
 
-    assert find_in_dict(dictionary, "title") is None
+    assert find_in_dict(dictionary, NEXUS_TITLE_NAME) is None
 
 
 def test_defined_title_is_in_dictionary():
@@ -121,6 +123,6 @@ def test_defined_title_is_in_dictionary():
 
     dictionary = test_entry.as_dict([])
 
-    result = find_in_dict(dictionary, "title")
+    result = find_in_dict(dictionary, NEXUS_TITLE_NAME)
     assert result is not None
     assert result["config"]["values"] == "MY_TITLE"

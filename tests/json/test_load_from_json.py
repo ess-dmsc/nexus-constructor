@@ -516,3 +516,51 @@ def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
         except RuntimeError:
             pass
     assert success
+
+
+def test_when_title_in_json_then_it_is_added_to_entry(json_reader):
+    json_string = """
+   {
+     "children": [
+        {
+           "name": "entry",
+           "type": "group",
+           "attributes": [
+             {
+                "name": "NX_class",
+                "dtype": "string",
+                "values": "NXentry"
+             }
+           ],
+           "children": [
+             {
+                "module": "dataset",
+                "config": {
+                   "name": "title",
+                   "dtype": "string",
+                   "values": "my title"
+                }
+             }
+           ]
+        }
+     ]
+   }
+    """
+
+    with patch(
+        "nexus_constructor.json.load_from_json.open",
+        mock_open(read_data=json_string),
+        create=True,
+    ):
+        json_reader.load_model_from_json("filename")
+        model = json_reader.entry
+
+    success = False
+    for child in model.children:
+        try:
+            if child.name == "title" and child.values == "my title":
+                success = True
+                break
+        except RuntimeError:
+            pass
+    assert success
