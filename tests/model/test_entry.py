@@ -1,7 +1,7 @@
 from nexus_constructor.common_attrs import INSTRUMENT_NAME
 from nexus_constructor.model.entry import (
     Entry,
-    EXP_ID_PLACEHOLDER_NAME,
+    EXP_ID_PLACEHOLDER_VALUE,
     NEXUS_EXP_ID_NAME,
 )
 from nexus_constructor.model.instrument import SAMPLE_NAME, Instrument
@@ -35,7 +35,7 @@ def test_proposal_id_is_set_to_use_placeholder():
 
     test_entry.proposal_id = ("will be ignored", True)
 
-    assert test_entry.proposal_id == (EXP_ID_PLACEHOLDER_NAME, True)
+    assert test_entry.proposal_id == (EXP_ID_PLACEHOLDER_VALUE, True)
 
 
 def test_proposal_id_is_set_to_custom_value():
