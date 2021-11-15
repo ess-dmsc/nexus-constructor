@@ -1,7 +1,17 @@
 from nexus_constructor.common_attrs import INSTRUMENT_NAME
-from nexus_constructor.model.entry import Entry, EXP_ID_PLACEHOLDER_NAME, \
-    NEXUS_EXP_ID_NAME
+from nexus_constructor.model.entry import (
+    Entry,
+    EXP_ID_PLACEHOLDER_NAME,
+    NEXUS_EXP_ID_NAME,
+)
 from nexus_constructor.model.instrument import SAMPLE_NAME, Instrument
+
+
+def find_in_dict(dictionary, name):
+    for child in dictionary["children"]:
+        if "config" in child and child["config"]["name"] == name:
+            return child
+    return None
 
 
 def test_entry_as_dict_contains_sample_and_instrument():
@@ -25,7 +35,6 @@ def test_proposal_id_is_set_to_use_placeholder():
 
     test_entry.proposal_id = ("will be ignored", True)
 
-
     assert test_entry.proposal_id == (EXP_ID_PLACEHOLDER_NAME, True)
 
 
@@ -35,13 +44,6 @@ def test_proposal_id_is_set_to_custom_value():
     test_entry.proposal_id = ("MY_PROP_ID", False)
 
     assert test_entry.proposal_id == ("MY_PROP_ID", False)
-
-
-def find_in_dict(dictionary, name):
-    for child in dictionary["children"]:
-        if 'config' in child and child["config"]["name"] == name:
-            return child
-    return None
 
 
 def test_blank_proposal_id_is_not_in_dictionary():
