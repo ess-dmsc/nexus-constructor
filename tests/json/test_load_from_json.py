@@ -513,6 +513,6 @@ def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
             if child.name == "experiment_identifier" and child.values == "ID_123456":
                 success = True
                 break
-        except:
+        except: # pylint: disable=broad-except
             pass
     assert success
