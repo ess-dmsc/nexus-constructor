@@ -8,11 +8,11 @@ from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.value_type import ValueTypes
 
 
-NICOS_PLACEHOLDERS = {
-    "experiment_identifier": Dataset(
-        "experiment_identifier", values="$EXP_ID$", type=ValueTypes.STRING
-    )
-}
+NEXUS_EXP_ID_NAME = "experiment_identifier"
+EXP_ID_PLACEHOLDER_NAME = "$EXP_ID$"
+EXP_ID_PLACEHOLDER = Dataset(
+    NEXUS_EXP_ID_NAME, values=EXP_ID_PLACEHOLDER_NAME, type=ValueTypes.STRING
+)
 
 
 class Entry(Group):
@@ -31,23 +31,24 @@ class Entry(Group):
 
     @property
     def proposal_id(self) -> Tuple[str, bool]:
-        prop_ds = self["experiment_identifier"]
+        prop_ds = self[NEXUS_EXP_ID_NAME]
         if prop_ds:
             return (
                 prop_ds.values,
-                True
-                if prop_ds.values == NICOS_PLACEHOLDERS["experiment_identifier"].values
-                else False,
+                True if prop_ds.values == EXP_ID_PLACEHOLDER.values else False,
             )
         return "", False
 
     @proposal_id.setter
     def proposal_id(self, values: Tuple[str, bool]):
-        self["experiment_identifier"] = copy(
-            NICOS_PLACEHOLDERS["experiment_identifier"]
-        )
-        if not values[1]:
-            self["experiment_identifier"].values = values[0]
+        value, use_default = values
+        if not use_default and value.strip() == "":
+            del self[NEXUS_EXP_ID_NAME]
+            return
+
+        self[NEXUS_EXP_ID_NAME] = copy(EXP_ID_PLACEHOLDER)
+        if not use_default:
+            self[NEXUS_EXP_ID_NAME].values = value.strip()
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Entry, self).as_dict(error_collector)
