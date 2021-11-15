@@ -280,7 +280,7 @@ class Component(Group):
         transform.depends_on = depends_on
         transform.parent_component = self
 
-        self.get_transforms_group()[name] = transform
+        self.get_transforms_group()[name] = transform  # type: ignore
 
         return transform
 
