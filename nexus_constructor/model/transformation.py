@@ -124,10 +124,10 @@ class Transformation(Dataset):
 
     @units.setter
     def units(self, new_units):
-        self._calculate_scaling_factor(new_units)
+        self._evaluate_ui_scale_factor(new_units)
         self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
 
-    def _calculate_scaling_factor(self, units):
+    def _evaluate_ui_scale_factor(self, units):
         try:
             if self.transform_type == TransformationType.TRANSLATION:
                 self._ui_scale_factor = calculate_unit_conversion_factor(units, METRES)
