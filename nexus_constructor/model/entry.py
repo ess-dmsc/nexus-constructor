@@ -50,6 +50,17 @@ class Entry(Group):
         if not use_default:
             self[NEXUS_EXP_ID_NAME].values = value.strip()
 
+    @property
+    def title(self) -> Tuple[str, bool]:
+        prop_ds = self["title"]
+        # if prop_ds:
+        #     return (
+        #         prop_ds.values,
+        #         True if prop_ds.values == EXP_ID_PLACEHOLDER.values else False,
+        #     )
+        return "", False
+
+
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Entry, self).as_dict(error_collector)
         # sample lives in instrument component list for purposes of GUI

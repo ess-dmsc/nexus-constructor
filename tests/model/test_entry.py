@@ -73,3 +73,9 @@ def test_defined_proposal_id_is_in_dictionary():
     result = find_in_dict(dictionary, NEXUS_EXP_ID_NAME)
     assert result is not None
     assert result["config"]["values"] == "MY_PROP_ID"
+
+
+def test_title_is_initially_empty():
+    test_entry = Entry()
+
+    assert test_entry.title == ("", False)
