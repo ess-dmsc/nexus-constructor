@@ -102,9 +102,6 @@
     <field name="sampled_fraction" type="NX_FLOAT" units="NX_DIMENSIONLESS">
         <doc>Proportion of incident beam sampled by the monitor (0&lt;x&lt;1)</doc>
     </field>
-    <group type="NXgeometry">
-        <doc>Geometry of the monitor</doc>
-    </group>
     <field name="count_time" type="NX_FLOAT" units="NX_TIME">
         <doc>
             Elapsed actual counting time, can be an array of size ``np``
@@ -126,4 +123,16 @@
             for a summary of the discussion.
         </doc>
     </attribute>
+    <field name="depends_on" type="NX_CHAR">
+      <doc>
+        Points to the path to a field defining the last transformation in a chain of transformations
+        which defines the position and orientation of this component or the string "." if located
+        in the origin.
+      </doc>
+    </field>
+    <group type="NXtransformations">
+      <doc>
+        Transformations used by this component to define its position and orientation.
+      </doc>
+    </group>
 </definition>
