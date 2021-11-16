@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Union
 
 import numpy as np
 from PySide2.QtCore import Qt
@@ -304,14 +303,16 @@ class StreamFieldsWidget(QDialog):
 
         source = self.source_line_edit.text()
         topic = self.topic_line_edit.text()
-        stream: Union[StreamModule] = None
+        stream: StreamModule = None
         type = self.type_combo.currentText()
         current_schema = self.schema_combo.currentText()
+        group_name = self.parent().parent().field_name_edit.text()
+        stream_group = Group(group_name)
         if current_schema == WriterModules.F142.value:
             value_units = self.value_units_edit.text()
             array_size = self.array_size_spinbox.value()
             stream = F142Stream(
-                parent_node=None,
+                parent_node=stream_group,
                 source=source,
                 topic=topic,
                 type=type,
@@ -323,13 +324,13 @@ class StreamFieldsWidget(QDialog):
             if self.advanced_options_enabled:
                 self._record_advanced_f142_values(stream)
         elif current_schema == WriterModules.EV42.value:
-            stream = EV42Stream(parent_node=None, source=source, topic=topic)
+            stream = EV42Stream(parent_node=stream_group, source=source, topic=topic)
             if self.advanced_options_enabled:
                 self._record_advanced_ev42_values(stream)
         elif current_schema == WriterModules.NS10.value:
-            stream = NS10Stream(parent_node=None, source=source, topic=topic)
+            stream = NS10Stream(parent_node=stream_group, source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
-            stream = SENVStream(parent_node=None, source=source, topic=topic)
+            stream = SENVStream(parent_node=stream_group, source=source, topic=topic)
         elif current_schema == WriterModules.HS00.value:
             stream = HS00Stream(  # type: ignore
                 source=source,
@@ -340,9 +341,7 @@ class StreamFieldsWidget(QDialog):
                 shape=[],
             )
         elif current_schema == WriterModules.TDCTIME.value:
-            stream = TDCTStream(parent_node=None, source=source, topic=topic)
-        group_name = self.parent().parent().field_name_edit.text()
-        stream_group = Group(group_name)
+            stream = TDCTStream(parent_node=stream_group, source=source, topic=topic)
         stream_group[group_name] = stream
 
         return stream_group
@@ -418,10 +417,8 @@ class StreamFieldsWidget(QDialog):
         ]  # only the first stream in the stream group can be edited currently
         schema = field.writer_module
         self.schema_combo.setCurrentText(schema)
-        if schema not in [WriterModules.LINK.value, WriterModules.DATASET.value]:
-            self.topic_line_edit.setText(field.topic)
-        if schema != WriterModules.DATASET.value:
-            self.source_line_edit.setText(field.source)
+        self.topic_line_edit.setText(field.topic)
+        self.source_line_edit.setText(field.source)
         if schema == WriterModules.F142.value:
             self.fill_in_existing_f142_fields(field)
         elif schema == WriterModules.EV42.value:

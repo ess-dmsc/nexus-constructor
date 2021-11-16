@@ -193,6 +193,7 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        # TODO: Fix this in a follow-up ticket.
         # self._set_transforms_depends_on()
         # self._set_components_depends_on()
         return True
@@ -216,8 +217,7 @@ class JSONReader:
             nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
             if not self._validate_nx_class(name, nx_class):
                 self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
-            nexus_object = Group(name=name)
-            nexus_object.parent_node = parent_node
+            nexus_object = Group(name=name, parent_node=parent_node)
             nexus_object.nx_class = nx_class
             if CommonKeys.CHILDREN in json_object:
                 for child in json_object[CommonKeys.CHILDREN]:

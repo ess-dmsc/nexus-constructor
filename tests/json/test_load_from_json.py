@@ -13,7 +13,7 @@ from nexus_constructor.json.json_warnings import (
 from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.json.load_from_json_utils import _retrieve_children_list
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.stream import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 
@@ -333,7 +333,9 @@ def component_with_transformation() -> Component:
         angle=90,
         axis=QVector3D(1, 0, 0),
         depends_on=None,
-        values=Dataset(name="test", values=123, type=ValueTypes.DOUBLE),
+        values=Dataset(
+            parent_node=False, name="test", values=123, type=ValueTypes.DOUBLE
+        ),
     )
     comp.depends_on = transformation
     return comp
@@ -406,17 +408,18 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     assert node.children[0].nx_class == component_class
 
 
-@pytest.mark.skip(reason="groups should not care about components")
 def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_component_in_model_contains_transform(
     json_dict_with_component_and_transform, json_reader
 ):
     json_reader._load_from_json_dict(json_dict_with_component_and_transform)
     component_found = False
-    for component in json_reader.entry.instrument.component_list:
+    for component in json_reader.entry_node["instrument"].children:
         if component.name == "test_component":
-            component_found = True
-            assert len(component.transforms) == 1
-            assert component.transforms[0].name == "location"
+            for item in component.children:
+                if item.name == "transformations":
+                    component_found = True
+                    assert len([item["location"].values]) == 1
+                    assert item["location"]
     assert component_found
 
 
@@ -470,3 +473,51 @@ def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN
     assert contains_warning_of_type(
         json_reader.warnings, TransformDependencyMissing
     ), "Expected a warning due to depends_on pointing to a non-existent transform"
+
+
+def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
+    json_string = """
+   {
+     "children": [
+        {
+           "name": "entry",
+           "type": "group",
+           "attributes": [
+             {
+                "name": "NX_class",
+                "dtype": "string",
+                "values": "NXentry"
+             }
+           ],
+           "children": [
+             {
+                "module": "dataset",
+                "config": {
+                   "name": "experiment_identifier",
+                   "dtype": "string",
+                   "values": "ID_123456"
+                }
+             }
+           ]
+        }
+     ]
+   }
+    """
+
+    with patch(
+        "nexus_constructor.json.load_from_json.open",
+        mock_open(read_data=json_string),
+        create=True,
+    ):
+        json_reader.load_model_from_json("filename")
+        model = json_reader.entry_node
+
+    success = False
+    for child in model.children:
+        try:
+            if child.name == "experiment_identifier" and child.values == "ID_123456":
+                success = True
+                break
+        except RuntimeError:
+            pass
+    assert success
