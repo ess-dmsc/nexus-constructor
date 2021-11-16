@@ -40,6 +40,7 @@ COMPONENT_TYPES = {
     "NXsample_component",
     "NXsensor",
     "NXslit",
+    "NXuser",
     "NXvelocity_selector",
     "NXxraylens",
     "NXtransformations",
