@@ -20,11 +20,11 @@ class TableModel(QAbstractTableModel):
         self._headings = ["name", "email", "facility_user_id", "affiliation"]
         self._data: List[Dict[str, str]] = copy.deepcopy(data)
 
-    def data(self, index, role):
+    def data(self, index, role=None):
         if role == Qt.DisplayRole or role == Qt.EditRole:
             return self._data[index.row()][self._headings[index.column()]]
 
-    def setData(self, index, value, role):
+    def setData(self, index, value, role=None):
         if role != Qt.EditRole:
             return False
 
@@ -32,16 +32,16 @@ class TableModel(QAbstractTableModel):
         self._data[row][column_key] = value
         return True
 
-    def columnCount(self, index):
+    def columnCount(self, parent=None, *args, **kwargs):
         return len(self._headings)
 
-    def rowCount(self, index):
+    def rowCount(self, parent=None, *args, **kwargs):
         return len(self._data)
 
     def flags(self, index):
         return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=None):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self._headings[section]
 
