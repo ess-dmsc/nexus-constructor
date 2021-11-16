@@ -7,7 +7,6 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.value_type import ValueTypes
 
-
 NEXUS_EXP_ID_NAME = "experiment_identifier"
 EXP_ID_PLACEHOLDER_NAME = "$EXP_ID$"
 EXP_ID_PLACEHOLDER = Dataset(
@@ -46,7 +45,7 @@ class Entry(Group):
             del self[NEXUS_EXP_ID_NAME]
             return
 
-        self[NEXUS_EXP_ID_NAME] = copy(EXP_ID_PLACEHOLDER)
+        self[NEXUS_EXP_ID_NAME] = copy(EXP_ID_PLACEHOLDER)  # type: ignore
         if not use_default:
             self[NEXUS_EXP_ID_NAME].values = value.strip()
 

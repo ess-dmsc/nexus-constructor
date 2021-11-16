@@ -43,7 +43,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.helpers import _generate_incremental_name
-from nexus_constructor.model.stream import DATASET, StreamGroup
+from nexus_constructor.model.stream import DATASET
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -253,7 +253,7 @@ class Component(Group):
         units: str,
         vector: QVector3D,
         depends_on: Transformation,
-        values: Union[Dataset, StreamGroup],
+        values: Union[Dataset, Group],
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
@@ -261,7 +261,7 @@ class Component(Group):
         type = ValueTypes.DOUBLE
         if isinstance(values, Dataset):
             type = values.type
-        elif isinstance(values, StreamGroup):
+        elif isinstance(values, Group):
             try:
                 type = values.children[0].type  # type: ignore
             except AttributeError:
@@ -280,7 +280,7 @@ class Component(Group):
         transform.depends_on = depends_on
         transform.parent_component = self
 
-        self.get_transforms_group()[name] = transform
+        self.get_transforms_group()[name] = transform  # type: ignore
 
         return transform
 

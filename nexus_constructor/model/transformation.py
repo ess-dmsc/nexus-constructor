@@ -12,7 +12,7 @@ from nexus_constructor.common_attrs import (
     TransformationType,
 )
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.stream import StreamGroup
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
     DEGREES,
@@ -203,7 +203,7 @@ class Transformation(Dataset):
                     CommonKeys.VALUES: values,
                 },
             }
-        elif isinstance(self.values, StreamGroup):
+        elif isinstance(self.values, Group):
             return_dict = self.values.children[0].as_dict(error_collector)
             return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 

@@ -4,7 +4,8 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.stream import F142Stream, StreamGroup, WriterModules
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.stream import F142Stream, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
@@ -383,12 +384,15 @@ def test_as_dict_method_of_transformation_when_values_is_a_f142_streamgroup():
     name = ":: SOME NAME ::"
     source = ":: SOME SOURCE ::"
     topic = (":: SOME TOPIC ::",)
-    stream_group = StreamGroup(name="")
-    stream_group.children = [F142Stream(source=source, topic=topic, type="double")]
+    stream_group = Group(name="")
+    stream_group.children = [
+        F142Stream(parent_node=stream_group, source=source, topic=topic, type="double")
+    ]
     transform = create_transform(name=name, values=stream_group)
     assert transform.values == stream_group
 
     return_dict = transform.as_dict([])
+    print(return_dict)
     assert return_dict[CommonKeys.MODULE] == WriterModules.F142.value
     assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
     assert return_dict[NodeType.CONFIG]["source"] == source
