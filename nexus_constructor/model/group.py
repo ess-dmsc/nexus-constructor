@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 import attr
 
@@ -72,12 +72,8 @@ class Group:
     def nx_class(self, new_nx_class: str):
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def set_field_value(
-        self, name: str, value: Any, dtype: str, parent_node: Optional["Group"] = None
-    ):
-        self[name] = Dataset(
-            parent_node=parent_node, name=name, type=dtype, values=value
-        )
+    def set_field_value(self, name: str, value: Any, dtype: str):
+        self[name] = Dataset(parent_node=self, name=name, type=dtype, values=value)
 
     def get_field_value(self, name: str):
         return self[name].values
