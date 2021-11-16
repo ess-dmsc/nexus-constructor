@@ -193,6 +193,7 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        # TODO: Fix this in a follow-up ticket.
         # self._set_transforms_depends_on()
         # self._set_components_depends_on()
         return True
