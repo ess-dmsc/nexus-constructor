@@ -417,10 +417,8 @@ class StreamFieldsWidget(QDialog):
         ]  # only the first stream in the stream group can be edited currently
         schema = field.writer_module
         self.schema_combo.setCurrentText(schema)
-        if schema not in [WriterModules.LINK.value, WriterModules.DATASET.value]:
-            self.topic_line_edit.setText(field.topic)
-        if schema != WriterModules.DATASET.value:
-            self.source_line_edit.setText(field.source)
+        self.topic_line_edit.setText(field.topic)
+        self.source_line_edit.setText(field.source)
         if schema == WriterModules.F142.value:
             self.fill_in_existing_f142_fields(field)
         elif schema == WriterModules.EV42.value:
