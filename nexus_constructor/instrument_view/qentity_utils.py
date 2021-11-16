@@ -49,3 +49,46 @@ def create_qentity(
     for component in components:
         entity.addComponent(component)
     return entity
+
+
+from PySide2.QtGui import QColor, QMatrix4x4, QVector3D
+
+
+def get_nx_source(gnomon_root_entity, neutron_animation_length=6):
+    cylinder_mesh = Qt3DExtras.QCylinderMesh(gnomon_root_entity)
+    cylinder_transform = Qt3DCore.QTransform(gnomon_root_entity)
+    set_cylinder_mesh_dimensions(cylinder_mesh, 1.5, neutron_animation_length, 2)
+    set_beam_transform(cylinder_transform, neutron_animation_length)
+    beam_material = create_material(
+        QColor("blue"), QColor("lightblue"), gnomon_root_entity, alpha=0.5
+    )
+    return create_qentity(
+        [cylinder_mesh, beam_material, cylinder_transform], gnomon_root_entity
+    )
+
+
+def set_cylinder_mesh_dimensions(cylinder_mesh, radius, length, rings):
+    """
+    Sets the dimensions of a cylinder mesh.
+    :param cylinder_mesh: The cylinder mesh to modify.
+    :param radius: The desired radius.
+    :param length: The desired length.
+    :param rings: The desired number of rings.
+    """
+    cylinder_mesh.setRadius(radius)
+    cylinder_mesh.setLength(length)
+    cylinder_mesh.setRings(rings)
+
+
+def set_beam_transform(cylinder_transform, neutron_animation_distance):
+    """
+    Configures the transform for the beam cylinder by giving it a matrix. The matrix will turn the cylinder sideways
+    and then move it "backwards" in the z-direction by 20 units so that it ends at the location of the sample.
+    :param cylinder_transform: A QTransform object.
+    :param neutron_animation_distance: The distance that the neutron travels during its animation.
+    """
+    cylinder_matrix = QMatrix4x4()
+    cylinder_matrix.rotate(90, QVector3D(1, 0, 0))
+    cylinder_matrix.translate(QVector3D(0, neutron_animation_distance * 0.5, 0))
+
+    cylinder_transform.setMatrix(cylinder_matrix)

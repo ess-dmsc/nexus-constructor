@@ -14,7 +14,7 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
-from nexus_constructor.instrument_view.qentity_utils import (
+from nexus_constructor.instrument_view.qentity_utils import (  # get_nx_source,
     create_material,
     create_qentity,
 )
@@ -218,7 +218,7 @@ class InstrumentView(QWidget):
             self.component_root_entity,
             alpha=0.5 if name == SAMPLE_NAME else None,
         )
-
+        # self.component_entities[name] = get_nx_source(self.component_root_entity)
         self.component_entities[name] = create_qentity(
             [mesh, material], self.component_root_entity
         )
