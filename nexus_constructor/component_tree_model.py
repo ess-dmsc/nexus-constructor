@@ -8,8 +8,10 @@ from PySide2.QtWidgets import QMessageBox
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -26,7 +28,6 @@ class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.components = self.model.entry.instrument.component_list
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -279,66 +280,33 @@ class ComponentTreeModel(QAbstractItemModel):
             return QModelIndex()
 
         if not parent.isValid():
-            return self.createIndex(row, 0, self.components[row])
+            return self.createIndex(0, 0, self.model.entry)
 
         parent_item = parent.internalPointer()
 
-        if isinstance(parent_item, Component):
-            if row == 0:
-                if parent_item.component_info is None:
-                    parent_item.component_info = ComponentInfo(parent_item)
-                return self.createIndex(0, 0, parent_item.component_info)
-            elif row == 1:
-                if parent_item.stored_transforms is None:
-                    parent_item.stored_transforms = parent_item.transforms
-                return self.createIndex(1, 0, parent_item.stored_transforms)
-            else:
-                return QModelIndex()
-        elif isinstance(parent_item, TransformationsList):
-            if parent_item.has_link and row == len(parent_item):
-                return self.createIndex(row, 0, parent_item.link)
-            return self.createIndex(row, 0, parent_item[row])
+        if isinstance(parent_item, Group):
+            return self.createIndex(row, 0, parent_item.children[row])
         raise RuntimeError("Unable to find element.")
 
     def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():
             return QModelIndex()
         parent_item = index.internalPointer()
-        if isinstance(parent_item, Component):
+        if isinstance(parent_item, Entry):
             return QModelIndex()
-        elif isinstance(parent_item, TransformationsList):
-            try:
-                return self.createIndex(
-                    self.components.index(parent_item.parent_component),
-                    0,
-                    parent_item.parent_component,
-                )
-            except ValueError as e:
-                logging.error(e)
-        elif isinstance(parent_item, ComponentInfo):
-            return self.createIndex(
-                self.components.index(parent_item.parent), 0, parent_item.parent
-            )
-        elif isinstance(parent_item, Transformation):
-            return self.createIndex(
-                1, 0, parent_item.parent_component.stored_transforms
-            )
-        elif isinstance(parent_item, LinkTransformation):
-            return self.createIndex(1, 0, parent_item.parent)
+        elif isinstance(parent_item, Group):
+            return self.createIndex(parent_item.parent_node.children.index(parent_item), 0, parent_item.parent_node)
+
         raise RuntimeError("Unknown element type.")
 
     def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
-            return len(self.components)
+            return 1
 
         parent_item = parent.internalPointer()
 
-        if isinstance(parent_item, Component):
-            return 2
-        elif isinstance(parent_item, TransformationsList):
-            if parent_item.has_link:
-                return len(parent_item) + 1
-            return len(parent_item)
+        if isinstance(parent_item, Group):
+            return len(parent_item.children)
         elif isinstance(
             parent_item, (Transformation, ComponentInfo, LinkTransformation)
         ):

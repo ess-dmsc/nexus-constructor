@@ -14,6 +14,7 @@ from PySide2.QtWidgets import (
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.treeview_utils import (
@@ -23,6 +24,7 @@ from nexus_constructor.treeview_utils import (
     get_link_transformation_frame,
     get_transformation_frame,
     get_transformations_list_frame,
+    get_group_frame
 )
 
 
@@ -36,6 +38,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def get_frame(
         self,
         value: Union[
+            Group,
             Component,
             ComponentInfo,
             Transformation,
@@ -52,7 +55,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.setLayout(QVBoxLayout())
         frame.layout().setContentsMargins(0, 0, 0, 0)
 
-        if isinstance(value, Component):
+        if isinstance(value, Group):
+            get_group_frame(frame, value.name)
+        elif isinstance(value, Component):
             get_component_frame(frame, value)
         elif isinstance(value, TransformationsList):
             get_transformations_list_frame(frame)
@@ -85,7 +90,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
         frame = self.get_frame(value)
-        frame.transformation_frame.enable()
+        # frame.transformation_frame.enable()
         frame.setParent(parent)
         self.frameSize = frame.sizeHint()
         return frame
@@ -93,7 +98,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def setModelData(
         self, editorWidget: QWidget, model: QAbstractItemModel, index: QModelIndex
     ):
-        editorWidget.transformation_frame.save_all_changes()
+        # editorWidget.transformation_frame.save_all_changes()
+        pass
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()

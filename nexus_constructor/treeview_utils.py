@@ -253,6 +253,11 @@ def get_transformations_list_frame(frame):
     frame.layout().addWidget(frame.label)
 
 
+def get_group_frame(frame, name):
+    frame.label = QLabel(name, frame)
+    frame.layout().addWidget(frame.label)
+
+
 def get_component_frame(frame, value):
     frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
     frame.layout().addWidget(frame.label)

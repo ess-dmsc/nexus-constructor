@@ -5,6 +5,7 @@ from PySide2.QtCore import QObject, Signal
 from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.component import Component
 
 
 class Signals(QObject):
@@ -23,7 +24,10 @@ class Model:
     def __init__(self):
         self.signals = Signals()
         self.entry = Entry()
-        self.entry.instrument = Instrument()
+        instrument = Instrument(self.entry)
+        sample = Component("sample", instrument)
+        instrument.children.append(sample)
+        self.entry.children.append(instrument)
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return {CommonKeys.CHILDREN: [self.entry.as_dict(error_collector)]}
