@@ -258,6 +258,11 @@ def get_group_frame(frame, name):
     frame.layout().addWidget(frame.label)
 
 
+def get_writer_module_frame(frame, name):
+    frame.label = QLabel(name, frame)
+    frame.layout().addWidget(frame.label)
+
+
 def get_component_frame(frame, value):
     frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
     frame.layout().addWidget(frame.label)

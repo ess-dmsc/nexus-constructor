@@ -12,6 +12,7 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.stream import FileWriterModule
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -292,11 +293,10 @@ class ComponentTreeModel(QAbstractItemModel):
         if not index.isValid():
             return QModelIndex()
         parent_item = index.internalPointer()
-        if isinstance(parent_item, Entry):
+        if parent_item.parent_node is None:
             return QModelIndex()
-        elif isinstance(parent_item, Group):
+        elif isinstance(parent_item, (Group, FileWriterModule)):
             return self.createIndex(parent_item.parent_node.children.index(parent_item), 0, parent_item.parent_node)
-
         raise RuntimeError("Unknown element type.")
 
     def rowCount(self, parent: QModelIndex) -> int:
@@ -308,7 +308,7 @@ class ComponentTreeModel(QAbstractItemModel):
         if isinstance(parent_item, Group):
             return len(parent_item.children)
         elif isinstance(
-            parent_item, (Transformation, ComponentInfo, LinkTransformation)
+            parent_item, (Transformation, ComponentInfo, LinkTransformation, FileWriterModule)
         ):
             return 0
         raise RuntimeError("Unknown element type.")

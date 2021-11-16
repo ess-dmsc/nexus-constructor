@@ -112,7 +112,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     parent=self,
                 )
             if success:
-                self.model.entry = reader.entry  # type: ignore
+                self.model.entry = reader.entry_node  # type: ignore
                 self._update_views()
 
     def _update_transformations_3d_view(self):
@@ -127,10 +127,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.model.entry.instrument.component_list:
-            shape, positions = component.shape
-            self.sceneWidget.add_component(component.name, shape, positions)
-            self.sceneWidget.add_transformation(component.name, component.qtransform)
+        pass
+        # for component in self.model.entry.instrument.component_list:
+        #     shape, positions = component.shape
+        #     self.sceneWidget.add_component(component.name, shape, positions)
+        #     self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def show_add_component_window(self, component: Optional[Component] = None):
         self.add_component_window = QDialogCustom()
