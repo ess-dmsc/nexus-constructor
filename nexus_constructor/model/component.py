@@ -253,14 +253,24 @@ class Component(Group):
         units: str,
         vector: QVector3D,
         depends_on: Transformation,
-        values: Dataset,
+        values: Union[Dataset, Group],
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
+
+        type = ValueTypes.DOUBLE
+        if isinstance(values, Dataset):
+            type = values.type
+        elif isinstance(values, Group):
+            try:
+                type = values.children[0].type  # type: ignore
+            except AttributeError:
+                pass
+
         transform = Transformation(
             name=name,
             parent_node=self.get_transforms_group(),
-            type=values.type,
+            type=type,
             values=values,
         )
         transform.transform_type = transformation_type
@@ -270,7 +280,7 @@ class Component(Group):
         transform.depends_on = depends_on
         transform.parent_component = self
 
-        self.get_transforms_group()[name] = transform
+        self.get_transforms_group()[name] = transform  # type: ignore
 
         return transform
 
@@ -443,7 +453,8 @@ class Component(Group):
                     CommonKeys.TYPE: NodeType.GROUP,
                     CommonKeys.NAME: TRANSFORMS_GROUP_NAME,
                     CommonKeys.CHILDREN: [
-                        transform.as_dict(error_collector) for transform in self.transforms
+                        transform.as_dict(error_collector)
+                        for transform in self.transforms
                     ],
                     CommonKeys.ATTRIBUTES: [
                         {

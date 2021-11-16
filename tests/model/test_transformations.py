@@ -1,18 +1,27 @@
 import numpy as np
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.stream import F142Stream, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.unit_utils import (
+    DEGREES,
+    RADIANS,
+    calculate_unit_conversion_factor,
+)
 
 
 def create_transform(
     name="test translation",
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
-    type="Translation",
+    type="translation",
     values=Dataset(name="", values=None, type=ValueTypes.DOUBLE),
+    units="m",
 ):
     translation = Transformation(
         name=name,
@@ -25,6 +34,7 @@ def create_transform(
     translation.vector = vector
     translation.transform_type = type
     translation.ui_value = ui_value
+    translation.units = units
 
     return translation
 
@@ -33,7 +43,7 @@ def test_can_get_transform_properties():
     test_name = "slartibartfast"
     test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
-    test_type = "Translation"
+    test_type = "translation"
     test_values = Dataset("test_dataset", None, [1])
 
     transform = create_transform(
@@ -84,7 +94,7 @@ def test_can_set_transform_properties():
     test_name = "beeblebrox"
     test_ui_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
-    test_type = "Rotation"
+    test_type = "rotation"
     test_values = Dataset("valuedataset", None, [1, 2])
 
     transform.name = test_name
@@ -300,16 +310,15 @@ def test_can_get_translation_as_4_by_4_matrix():
     test_ui_value = 42.0
     # Note, it should not matter if this is not set to a unit vector
     test_vector = QVector3D(2.0, 0.0, 0.0)
-    test_type = "Translation"
+    test_type = "translation"
 
     transformation = create_transform(
         ui_value=test_ui_value, vector=test_vector, type=test_type
     )
 
     test_matrix = transformation.qmatrix
-    # NB, -1 * distance because the transformation in the UI is a passive transformation
     expected_matrix = np.array(
-        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -1 * test_ui_value, 0, 0, 1)
+        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, test_ui_value, 0, 0, 1)
     )
     assert np.allclose(expected_matrix, np.array(test_matrix.data()))
 
@@ -317,28 +326,29 @@ def test_can_get_translation_as_4_by_4_matrix():
 def test_can_get_rotation_as_4_by_4_matrix():
     test_ui_value = 15.0  # degrees
     test_vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
-    test_type = "Rotation"
+    test_type = "rotation"
 
     transformation = create_transform(
-        ui_value=test_ui_value, vector=test_vector, type=test_type
+        ui_value=test_ui_value, vector=test_vector, type=test_type, units="deg"
     )
 
     test_matrix = transformation.qmatrix
     # for a rotation around the y-axis:
     test_value_radians = np.deg2rad(test_ui_value)
+
     expected_matrix = np.array(
         (
-            np.cos(test_value_radians),
+            np.cos(-test_value_radians),
             0,
-            np.sin(test_value_radians),
+            np.sin(-test_value_radians),
             0,
             0,
             1,
             0,
             0,
-            -np.sin(test_value_radians),
+            np.sin(test_value_radians),
             0,
-            np.cos(test_value_radians),
+            np.cos(-test_value_radians),
             0,
             0,
             0,
@@ -358,6 +368,35 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
     assert transform.ui_value != str_value
     assert transform.ui_value == 0
+
+
+def test_as_dict_method_of_transformation_when_values_is_a_dataset():
+    name = ":: SOME NAME ::"
+    dataset = Dataset(name="", values=None, type=ValueTypes.DOUBLE)
+    transform = create_transform(name=name, values=dataset)
+    assert transform.values == dataset
+    return_dict = transform.as_dict([])
+    assert return_dict[CommonKeys.MODULE] == "dataset"
+    assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
+
+
+def test_as_dict_method_of_transformation_when_values_is_a_f142_streamgroup():
+    name = ":: SOME NAME ::"
+    source = ":: SOME SOURCE ::"
+    topic = (":: SOME TOPIC ::",)
+    stream_group = Group(name="")
+    stream_group.children = [
+        F142Stream(parent_node=stream_group, source=source, topic=topic, type="double")
+    ]
+    transform = create_transform(name=name, values=stream_group)
+    assert transform.values == stream_group
+
+    return_dict = transform.as_dict([])
+    print(return_dict)
+    assert return_dict[CommonKeys.MODULE] == WriterModules.F142.value
+    assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
+    assert return_dict[NodeType.CONFIG]["source"] == source
+    assert return_dict[NodeType.CONFIG]["topic"] == topic
 
 
 def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_error():
@@ -382,3 +421,101 @@ def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
     transform.as_dict(error_collector)
 
     assert not error_collector
+
+
+def test_if_VALID_unit_is_entered_in_TRANSLATION_then_ui_scale_factor_is_evaluated_correctly():
+    test_type = "translation"
+
+    transformation = create_transform(type=test_type, units="cm")
+    assert transformation._ui_scale_factor == 1 / 100
+
+    transformation.units = "m"
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = "mm"
+    assert transformation._ui_scale_factor == 1 / 1000
+
+
+def test_if_INVALID_unit_is_entered_in_TRANSLATION_then_the_last_valid_scale_factor_is_used():
+    test_type = "translation"
+
+    transformation = create_transform(type=test_type, units="m")
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = ":: NOT A VALID UNIT ::"
+    assert transformation._ui_scale_factor == 1
+
+
+def test_if_VALID_unit_is_entered_in_ROTATION_then_ui_scale_factor_is_evaluated_correctly():
+    test_type = "rotation"
+
+    transformation = create_transform(type=test_type, units="deg")
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = "radian"
+    assert transformation._ui_scale_factor == calculate_unit_conversion_factor(
+        RADIANS, DEGREES
+    )
+
+
+def test_if_INVALID_unit_is_entered_in_ROTATION_then_the_last_valid_scale_factor_is_used():
+    test_type = "rotation"
+
+    transformation = create_transform(type=test_type, units="deg")
+    assert transformation._ui_scale_factor == 1
+
+    transformation.units = ":: NOT A VALID UNIT ::"
+    assert transformation._ui_scale_factor == 1
+
+
+def test_can_get_translation_as_4_by_4_matrix_with_correct_unit_scaling():
+    ui_value = 12.0
+    vector = QVector3D(1.0, 0.0, 0.0)
+    type = "translation"
+
+    transformation = create_transform(
+        ui_value=ui_value, vector=vector, type=type, units="cm"
+    )
+    scale_factor = 1 / 100  # cm to metres
+
+    test_matrix = transformation.qmatrix
+    expected_matrix = np.array(
+        (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ui_value * scale_factor, 0, 0, 1)
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()))
+
+
+def test_can_get_rotation_as_4_by_4_matrix_with_correct_unit_scaling():
+    ui_value = 12.0  # degrees
+    vector = QVector3D(0.0, 1.0, 0.0)  # around y-axis
+    type = "rotation"
+
+    transformation = create_transform(
+        ui_value=ui_value, vector=vector, type=type, units="cdeg"
+    )
+    scale_factor = 1 / 100  # cdeg to deg
+    test_matrix = transformation.qmatrix
+    # for a rotation around the y-axis:
+    test_value_radians = np.deg2rad(ui_value * scale_factor)
+
+    expected_matrix = np.array(
+        (
+            np.cos(-test_value_radians),
+            0,
+            np.sin(-test_value_radians),
+            0,
+            0,
+            1,
+            0,
+            0,
+            np.sin(test_value_radians),
+            0,
+            np.cos(-test_value_radians),
+            0,
+            0,
+            0,
+            0,
+            1,
+        )
+    )
+    assert np.allclose(expected_matrix, np.array(test_matrix.data()), atol=1.0e-7)

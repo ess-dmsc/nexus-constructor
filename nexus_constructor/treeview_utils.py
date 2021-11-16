@@ -1,6 +1,6 @@
 import os
 import sys
-from collections import Callable
+from collections.abc import Callable
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QColor, QIcon

@@ -12,7 +12,13 @@ from nexus_constructor.common_attrs import (
     TransformationType,
 )
 from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.unit_utils import (
+    DEGREES,
+    METRES,
+    calculate_unit_conversion_factor,
+)
 
 if TYPE_CHECKING:
     from nexus_constructor.model.component import Component  # noqa: F401
@@ -29,6 +35,7 @@ class Transformation(Dataset):
     parent_component = attr.ib(type="Component", default=None)
     _dependents = attr.ib(type=list, init=False)
     _ui_value = attr.ib(type=float, default=None)
+    _ui_scale_factor = attr.ib(type=float, default=1.0, init=False)
 
     @_dependents.default
     def _initialise_dependents(self):
@@ -95,12 +102,14 @@ class Transformation(Dataset):
         transform = Qt3DCore.QTransform()
         transform.matrix()
         if self.transform_type == TransformationType.ROTATION:
-            # Changing sign of angle so that it describes a passive transformation
-            quaternion = transform.fromAxisAndAngle(self.vector, -1 * self.ui_value)
+            quaternion = transform.fromAxisAndAngle(
+                self.vector, self.ui_value * self._ui_scale_factor
+            )
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
-            # Changing sign of distance so that it describes a passive transformation
-            transform.setTranslation(self.vector.normalized() * -1 * self.ui_value)
+            transform.setTranslation(
+                self.vector.normalized() * self.ui_value * self._ui_scale_factor
+            )
         else:
             raise (
                 RuntimeError(f'Unknown transformation of type "{self.transform_type}".')
@@ -113,7 +122,17 @@ class Transformation(Dataset):
 
     @units.setter
     def units(self, new_units):
+        self._evaluate_ui_scale_factor(new_units)
         self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
+
+    def _evaluate_ui_scale_factor(self, units):
+        try:
+            if self.transform_type == TransformationType.TRANSLATION:
+                self._ui_scale_factor = calculate_unit_conversion_factor(units, METRES)
+            elif self.transform_type == TransformationType.ROTATION:
+                self._ui_scale_factor = calculate_unit_conversion_factor(units, DEGREES)
+        except Exception:
+            pass
 
     @property
     def depends_on(self) -> "Transformation":
@@ -163,28 +182,31 @@ class Transformation(Dataset):
         self._dependents = []
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
-        value = None
+        return_dict: Dict = {}
         if isinstance(self.values, Dataset):
-            if np.isscalar(self.values.values):
-                val: "ValueType" = self.values.values
+            values = self.values.values
+            if np.isscalar(values):
                 try:
-                    value = float(val)
+                    values = float(values)  # type:ignore
                 except ValueError:
                     error_collector.append(
-                        f"value '{val}' is invalid for transformation '{self.name}' "
+                        f"value '{values}' is invalid for transformation '{self.name}' "
                         "as expected a numeric value"
                     )
+            if isinstance(values, np.ndarray):
+                values = values.tolist()
+            return_dict = {
+                CommonKeys.MODULE: "dataset",
+                NodeType.CONFIG: {
+                    CommonKeys.NAME: self.name,
+                    CommonKeys.DATA_TYPE: self.values.type,
+                    CommonKeys.VALUES: values,
+                },
+            }
+        elif isinstance(self.values, Group):
+            return_dict = self.values.children[0].as_dict(error_collector)
+            return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 
-        # TODO elif array, NXlog, kafka stream, ...
-
-        return_dict: Dict = {
-            CommonKeys.MODULE: "dataset",
-            NodeType.CONFIG: {
-                CommonKeys.NAME: self.name,
-                CommonKeys.DATA_TYPE: self.type,
-                CommonKeys.VALUES: value if value is not None else [],
-            },
-        }
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
                 attribute.as_dict(error_collector)

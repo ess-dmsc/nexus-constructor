@@ -32,11 +32,12 @@ class NodeType:
 
 
 class TransformationType:
-    TRANSLATION = "Translation"
-    ROTATION = "Rotation"
+    TRANSLATION = "translation"
+    ROTATION = "rotation"
 
 
 INSTRUMENT_NAME = "instrument"
+SAMPLE_NAME = "sample"
 ARRAY = "Array"
 SCALAR = "Scalar"
 SHAPE_GROUP_NAME = "shape"

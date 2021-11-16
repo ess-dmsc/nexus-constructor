@@ -338,7 +338,7 @@ def test_GIVEN_floating_point_value_WHEN_using_numpy_validator_with_integer_as_d
 
 
 def test_GIVEN_alphabetical_chars_WHEN_using_numpy_validator_with_float_as_dtype_THEN_false_signal_is_emitted():
-    validator = NumpyDTypeValidator(np.float)
+    validator = NumpyDTypeValidator(np.float64)
     validator.is_valid = Mock()
 
     assert validator.validate("test", 0) == QValidator.Intermediate

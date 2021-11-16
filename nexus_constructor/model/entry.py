@@ -7,6 +7,7 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.value_type import ValueTypes
 
+
 NEXUS_TITLE_NAME = "title"
 TITLE_PLACEHOLDER_VALUE = "$TITLE$"
 TITLE_PLACEHOLDER = Dataset(
@@ -66,8 +67,9 @@ class Entry(Group):
         if not use_default and value.strip() == "":
             del self[name]
             return
-
+          
         self[name] = copy(placeholder)
+
         if not use_default:
             self[name].values = value.strip()
 

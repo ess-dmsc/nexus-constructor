@@ -21,7 +21,13 @@ from nexus_constructor.json.load_from_json_utils import (
 )
 from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.stream import (
+    DATASET,
+    Dataset,
+    WriterModules,
+    create_fw_module_object,
+)
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
@@ -54,10 +60,21 @@ def _create_transformation_dataset(
     :return: A dataset containing the above information.
     """
     return Dataset(
-        name,
+        parent_node=None,
+        name=name,
         type=dtype,
         values=angle_or_magnitude,
     )
+
+
+def _create_transformation_datastream_group(
+    data: Dict, name: str, parent_node: Optional[Group] = None
+) -> Group:
+    group = Group(name=name, parent_node=parent_node)
+    group.children.append(
+        create_fw_module_object(data[CommonKeys.MODULE], data[NodeType.CONFIG], group)
+    )
+    return group
 
 
 def get_component_and_transform_name(depends_on_string: str):
@@ -212,18 +229,19 @@ class TransformationReader:
         :param json_transformations: A list of JSON transformation entries.
         """
         for json_transformation in json_transformations:
-
             config = self._get_transformation_attribute(
                 NodeType.CONFIG, json_transformation
             )
             if not config:
                 continue
 
-            name = self._get_transformation_attribute(CommonKeys.NAME, config)
-
-            values = self._get_transformation_attribute(CommonKeys.VALUES, config, name)
-            if values is None:
+            module = self._get_transformation_attribute(
+                CommonKeys.MODULE, json_transformation
+            )
+            if not module:
                 continue
+
+            name = self._get_transformation_attribute(CommonKeys.NAME, config)
             dtype = self._get_transformation_attribute(
                 [CommonKeys.DATA_TYPE, CommonKeys.TYPE],
                 config,
@@ -261,19 +279,27 @@ class TransformationReader:
             vector = self._find_attribute_in_list(
                 CommonAttrs.VECTOR, name, attributes, [0.0, 0.0, 0.0]
             )
-
             # This attribute is allowed to be missing, missing is equivalent to the value "." which means
             # depends on origin (end of dependency chain)
             depends_on = _find_attribute_from_list_or_dict(
                 CommonAttrs.DEPENDS_ON, attributes
             )
-
-            # TODO handle cases that "values" is an NXlog, KafkaStream etc
-            #  ticket #835
-
+            if module == DATASET:
+                values = self._get_transformation_attribute(
+                    CommonKeys.VALUES, config, name
+                )
+                if values is None:
+                    continue
+                angle_or_magnitude = values
+                values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
+            elif module in [writer_mod.value for writer_mod in WriterModules]:
+                values = _create_transformation_datastream_group(
+                    json_transformation, name
+                )
+                angle_or_magnitude = 0.0
+            else:
+                continue
             temp_depends_on = None
-            angle_or_magnitude = values
-            values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
 
             transform = self.parent_component._create_and_add_transform(
                 name=name,

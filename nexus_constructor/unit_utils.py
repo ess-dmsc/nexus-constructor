@@ -4,6 +4,8 @@ import pint
 
 RADIANS = "radians"
 METRES = "metres"
+DEGREES = "deg"
+
 
 ureg = pint.UnitRegistry()
 
