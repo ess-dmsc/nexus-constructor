@@ -558,7 +558,7 @@ def test_when_title_in_json_then_it_is_added_to_entry(json_reader):
         create=True,
     ):
         json_reader.load_model_from_json("filename")
-        model = json_reader.entry
+        model = json_reader.entry_node
 
     success = False
     for child in model.children:
