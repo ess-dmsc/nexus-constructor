@@ -112,7 +112,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     parent=self,
                 )
             if success:
-                self.model.entry = reader.entry  # type: ignore
+                self.model.entry = reader.entry_node  # type: ignore
+                print(self.model.entry)  # TODO: Remove once tree view works.
                 self._update_views()
 
     def _update_transformations_3d_view(self):
