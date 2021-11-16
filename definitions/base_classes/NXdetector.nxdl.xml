@@ -3,7 +3,7 @@
 <!--
 # NeXus - Neutron and X-ray Common Data Format
 #
-# Copyright (C) 2008-2020 NeXus International Advisory Committee (NIAC)
+# Copyright (C) 2008-2021 NeXus International Advisory Committee (NIAC)
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -33,9 +33,9 @@
   <symbols>
     <doc>These symbols will be used below to coordinate datasets with the same shape.</doc>
     <symbol name="np"><doc>number of scan points (only present in scanning measurements)</doc></symbol>
-    <symbol name="i"><doc>number of detector pixels in the first (X, slowest) direction</doc></symbol>
-    <symbol name="j"><doc>number of detector pixels in the second (Y, faster) direction</doc></symbol>
-    <symbol name="k"><doc>number of detector pixels in the third (Z, if necessary, fastest) direction</doc></symbol>
+    <symbol name="i"><doc>number of detector pixels in the first (slowest) direction</doc></symbol>
+    <symbol name="j"><doc>number of detector pixels in the second (faster) direction</doc></symbol>
+    <symbol name="k"><doc>number of detector pixels in the third (if necessary, fastest) direction</doc></symbol>
     <symbol name="tof"><doc>number of bins in the time-of-flight histogram</doc></symbol>
   </symbols>
 
@@ -108,11 +108,11 @@
 
   </field>
 
-  <field name="data_error" type="NX_NUMBER" units="NX_ANY">
+  <field name="data_errors" type="NX_NUMBER" units="NX_ANY">
     <doc>
       The best estimate of the uncertainty in the data value. Where
       possible, this should be the standard deviation, which has the same units
-      as the data.
+      as the data. The form data_error is deprecated.
     </doc>
 
     <dimensions rank="4">
@@ -122,6 +122,7 @@
       <dim index="4" value="tof" />
     </dimensions>
   </field>
+
 
   <field name="x_pixel_offset" type="NX_FLOAT" units="NX_LENGTH">
     <doc>
@@ -423,6 +424,25 @@
         <dim index="3" value="k" />
       </dimensions>
     </field>
+  </group>
+
+  <field name="real_time" type="NX_NUMBER" units="NX_TIME">
+    <doc>
+      Real-time of the exposure (use this if exposure time varies for
+      each array element, otherwise use ``count_time`` field).
+	    
+      Most often there is a single real time value that is constant across
+      an entire image frame.  In such cases, only a 1-D array is needed.
+      But there are detectors in which the real time
+      changes per pixel. In that case, more than one dimension is needed. Therefore
+      the rank of this field should be less than or equal to (detector rank + 1).
+    </doc>
+    <dimensions rank="3">
+      <dim index="1" value="np" />
+      <dim index="2" value="i" />
+      <dim index="3" value="j" />
+    </dimensions>
+  </field>
 
   <field name="start_time" type="NX_FLOAT" units="NX_TIME">
     <doc>start time for each frame, with the ``start`` attribute as absolute reference</doc>
@@ -438,20 +458,6 @@
     </dimensions>
     <attribute name="start" type="NX_DATE_TIME" />
   </field>
-
-    <field name="real_time" type="NX_NUMBER" units="NX_TIME">
-      <doc>
-        real-time of the exposure (use this if exposure time varies for
-        each array element, otherwise use ``count_time`` field)
-      </doc>
-
-      <dimensions rank="3">
-        <dim index="1" value="i" />
-        <dim index="2" value="j" />
-        <dim index="3" value="k" />
-      </dimensions>
-    </field>
-  </group>
 
   <field name="calibration_date" type="NX_DATE_TIME">
     <doc>
@@ -572,8 +578,11 @@
       <dim index="2" value="j"/>
     </dimensions>
   </field>
-  <field name="flatfield_error" type="NX_FLOAT" >
-    <doc>Errors of the flat field correction data.</doc>
+  <field name="flatfield_errors" type="NX_FLOAT" >
+    <doc>
+        Errors of the flat field correction data.
+        The form flatfield_error is deprecated.
+    </doc>
     <dimensions rank="2">
       <dim index="1" value="i"/>
       <dim index="2" value="j"/>
@@ -637,7 +646,7 @@
       <dim index="2" value="j"/>
     </dimensions>
   </field>
-  <field name="countrate_correction__applied" type="NX_BOOLEAN" >
+  <field name="countrate_correction_applied" type="NX_BOOLEAN" >
     <doc>
       True when a count-rate correction has already been applied in the
       electronics, false otherwise.
@@ -795,4 +804,17 @@
       </doc>
     </group>
   </choice>
+  <attribute name="default">
+      <doc>
+          .. index:: plotting
+          
+          Declares which child group contains a path leading 
+          to a :ref:`NXdata` group.
+          
+          It is recommended (as of NIAC2014) to use this attribute
+          to help define the path to the default dataset to be plotted.
+          See https://www.nexusformat.org/2014_How_to_find_default_data.html
+          for a summary of the discussion.
+      </doc>
+  </attribute>
 </definition>

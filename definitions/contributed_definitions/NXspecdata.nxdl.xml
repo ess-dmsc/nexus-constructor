@@ -3,7 +3,7 @@
 <!--
 # NeXus - Neutron and X-ray Common Data Format
 # 
-# Copyright (C) 2012-2020 NeXus International Advisory Committee (NIAC)
+# Copyright (C) 2012-2021 NeXus International Advisory Committee (NIAC)
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -29,8 +29,10 @@
 	    xsi:schemaLocation="http://definition.nexusformat.org/nxdl/3.1 ../nxdl.xsd"
 	    >
   <doc>
+      DEPRECATED: This definition will be removed by 2022.  Not for new use.
+
       Data collected by SPEC control and data acquisition software
-      
+
       SPEC [#]_ is software for instrument control
       and data acquisition in X-ray diffraction experiments.
       
@@ -93,7 +95,7 @@
     </doc>
   </attribute>
 
-  <group type="NXentry">
+  <group type="NXentry" deprecated="This definition will be removed by 2022.">
     <doc>
       one scan from a SPEC data file, starts with a **#S** line
     </doc>
@@ -259,7 +261,7 @@
           
           Such as for 2-D data plotted against *energy* and *th*::
           
-              @axes = energy:th
+              @axes = ["energy", "th"]
           
           This(these) field(s) must exist (or be linked) in this :ref:`NXdata` group.
         </doc>

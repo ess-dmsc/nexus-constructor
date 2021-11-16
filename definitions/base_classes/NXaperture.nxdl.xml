@@ -3,7 +3,7 @@
 <!--
 # NeXus - Neutron and X-ray Common Data Format
 # 
-# Copyright (C) 2008-2020 NeXus International Advisory Committee (NIAC)
+# Copyright (C) 2008-2021 NeXus International Advisory Committee (NIAC)
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@
                 * Such as where is the gap written?
         </doc>
     </group>
-    <group type="NXgeometry">
+    <group name="BLADE_GEOMETRY" type="NXgeometry">
         <doc>location and shape of each blade</doc>
     </group>
     <field name="material"><!-- TODO Uniformity problem, "type" is used elsewhere for same context -->
@@ -53,4 +53,17 @@
         <doc>Description of aperture</doc>
     </field>
     <group type="NXnote"><doc>describe any additional information in a note*</doc></group>
+    <attribute name="default">
+        <doc>
+            .. index:: plotting
+            
+            Declares which child group contains a path leading 
+            to a :ref:`NXdata` group.
+            
+            It is recommended (as of NIAC2014) to use this attribute
+            to help define the path to the default dataset to be plotted.
+            See https://www.nexusformat.org/2014_How_to_find_default_data.html
+            for a summary of the discussion.
+        </doc>
+    </attribute>
 </definition>
