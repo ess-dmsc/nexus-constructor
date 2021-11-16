@@ -21,10 +21,10 @@ from nexus_constructor.json.load_from_json_utils import (
 )
 from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.stream import (
     DATASET,
+    Dataset,
     WriterModules,
     create_fw_module_object,
 )
@@ -60,7 +60,8 @@ def _create_transformation_dataset(
     :return: A dataset containing the above information.
     """
     return Dataset(
-        name,
+        parent_node=None,
+        name=name,
         type=dtype,
         values=angle_or_magnitude,
     )
