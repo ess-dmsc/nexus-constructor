@@ -43,7 +43,11 @@ from nexus_constructor.model.module import (
     create_fw_module_object,
 )
 from nexus_constructor.model.transformation import Transformation
+<<<<<<< HEAD
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
+=======
+from nexus_constructor.model.user import User
+>>>>>>> aecb63e0 (Added new gui code)
 
 """
 The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of
@@ -53,6 +57,7 @@ valid NeXus files, but are safe if the JSON was created by the NeXus Constructor
 """
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
+NX_USER = "NXuser"
 CHILD_EXCLUDELIST = [
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
