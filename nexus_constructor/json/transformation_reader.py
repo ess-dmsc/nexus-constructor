@@ -16,7 +16,6 @@ from nexus_constructor.json.json_warnings import (
 )
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
-    _create_stream,
     _find_attribute_from_list_or_dict,
     _find_nx_class,
 )
@@ -24,7 +23,11 @@ from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import DATASET, WriterModules
+from nexus_constructor.model.stream import (
+    DATASET,
+    WriterModules,
+    create_fw_module_object,
+)
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
@@ -67,7 +70,9 @@ def _create_transformation_datastream_group(
     data: Dict, name: str, parent_node: Optional[Group] = None
 ) -> Group:
     group = Group(name=name, parent_node=parent_node)
-    group.children.append(_create_stream(data))
+    group.children.append(
+        create_fw_module_object(data[CommonKeys.MODULE], data[NodeType.CONFIG], group)
+    )
     return group
 
 

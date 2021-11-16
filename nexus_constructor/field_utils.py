@@ -71,7 +71,7 @@ def update_existing_stream_field(field: Group, new_ui_field: "StreamFieldsWidget
 
 def get_fields_with_update_functions(
     component: Component,
-) -> List[Tuple[Union[Dataset, "HS00Stream", "FileWriterModule", "Group"], Callable]]:
+) -> List[Tuple[Union["FileWriterModule", "Group"], Callable]]:
     """
     Return a list of fields in a given component group.
     :param component: The component to check for fields
@@ -81,7 +81,7 @@ def get_fields_with_update_functions(
     for item in component.children:
         update_function = find_field_type(item)
         items_with_update_functions.append((item, update_function))
-    return items_with_update_functions  # type: ignore
+    return items_with_update_functions
 
 
 def find_field_type(item: "ValueType") -> Callable:
