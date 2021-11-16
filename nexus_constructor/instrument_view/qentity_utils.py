@@ -3,7 +3,12 @@ from typing import List
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtGui import QColor
+from PySide2.QtCore import QPropertyAnimation
+from PySide2.QtGui import QColor, QMatrix4x4, QVector3D
+
+from nexus_constructor.instrument_view.neutron_animation_controller import (
+    NeutronAnimationController,
+)
 
 
 def create_material(
@@ -51,10 +56,8 @@ def create_qentity(
     return entity
 
 
-from PySide2.QtGui import QColor, QMatrix4x4, QVector3D
-
-
-def get_nx_source(gnomon_root_entity, neutron_animation_length=6):
+def get_nx_source(gnomon_root_entity, neutron_animation_length=4):
+    setup_neutrons(gnomon_root_entity, neutron_animation_length)
     cylinder_mesh = Qt3DExtras.QCylinderMesh(gnomon_root_entity)
     cylinder_transform = Qt3DCore.QTransform(gnomon_root_entity)
     set_cylinder_mesh_dimensions(cylinder_mesh, 1.5, neutron_animation_length, 2)
@@ -62,9 +65,10 @@ def get_nx_source(gnomon_root_entity, neutron_animation_length=6):
     beam_material = create_material(
         QColor("blue"), QColor("lightblue"), gnomon_root_entity, alpha=0.5
     )
-    return create_qentity(
+    create_qentity(
         [cylinder_mesh, beam_material, cylinder_transform], gnomon_root_entity
     )
+    return gnomon_root_entity
 
 
 def set_cylinder_mesh_dimensions(cylinder_mesh, radius, length, rings):
@@ -92,3 +96,73 @@ def set_beam_transform(cylinder_transform, neutron_animation_distance):
     cylinder_matrix.translate(QVector3D(0, neutron_animation_distance * 0.5, 0))
 
     cylinder_transform.setMatrix(cylinder_matrix)
+
+
+def set_neutron_animation_properties(
+    neutron_animation,
+    neutron_animation_controller,
+    animation_distance,
+    time_span_offset,
+):
+    """
+    Prepares a QPropertyAnimation for a neutron by giving it a target, a distance, and loop settings.
+    :param neutron_animation: The QPropertyAnimation to be configured.
+    :param neutron_animation_controller: The related animation controller object.
+    :param animation_distance: The starting distance of the neutron.
+    :param time_span_offset: The offset that allows the neutron to move at a different time from other neutrons.
+    """
+    neutron_animation.setTargetObject(neutron_animation_controller)
+    neutron_animation.setPropertyName(b"distance")
+    neutron_animation.setStartValue(0)
+    neutron_animation.setEndValue(animation_distance)
+    neutron_animation.setDuration(500 + time_span_offset)
+    neutron_animation.setLoopCount(-1)
+    neutron_animation.start()
+
+
+def setup_neutrons(gnomon_root_entity, neutron_animation_distance):
+    """
+    Sets up the neutrons and their animations by preparing their meshes and then giving offset and
+    distance parameters to an animation controller.
+    """
+
+    # Create lists of x, y, and time offsets for the neutron animations
+    x_offsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
+    y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
+    time_span_offsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
+
+    neutron_radius = 1.5
+
+    for i in range(9):
+        mesh = Qt3DExtras.QSphereMesh(gnomon_root_entity)
+        set_sphere_mesh_radius(mesh, neutron_radius)
+
+        transform = Qt3DCore.QTransform(gnomon_root_entity)
+        neutron_animation_controller = NeutronAnimationController(
+            x_offsets[i] * 0.5, y_offsets[i] * 0.5, transform
+        )
+        neutron_animation_controller.set_target(transform)
+
+        neutron_animation = QPropertyAnimation(transform)
+        set_neutron_animation_properties(
+            neutron_animation,
+            neutron_animation_controller,
+            neutron_animation_distance,
+            time_span_offsets[i],
+        )
+
+        neutron_material = create_material(
+            QColor("black"), QColor("grey"), gnomon_root_entity
+        )
+
+        create_qentity([mesh, neutron_material, transform], gnomon_root_entity)
+    return gnomon_root_entity
+
+
+def set_sphere_mesh_radius(sphere_mesh, radius):
+    """
+    Sets the radius of a sphere mesh.
+    :param sphere_mesh: The sphere mesh to modify.
+    :param radius: The desired radius.
+    """
+    sphere_mesh.setRadius(radius)

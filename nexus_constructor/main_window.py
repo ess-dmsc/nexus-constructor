@@ -3,12 +3,7 @@ from typing import Dict, List, Optional
 from weakref import WeakKeyDictionary
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
-    QApplication,
-    QDialog,
-    QMainWindow,
-    QMessageBox,
-)
+from PySide2.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
@@ -134,7 +129,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _update_3d_view_with_component_shapes(self):
         for component in self.model.entry.instrument.component_list:
             shape, positions = component.shape
-            self.sceneWidget.add_component(component.name, shape, positions)
+            self.sceneWidget.add_component(
+                component.name, component.nx_class, shape, positions
+            )
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def show_add_component_window(self, component: Optional[Component] = None):
@@ -153,9 +150,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 def show_errors_message(errors: List[str]):
     msgBox = QMessageBox()
     msgBox.setIcon(QMessageBox.Critical)
-    msgBox.setText(
-        "Could not save file as structure invalid, see below for details"
-    )
+    msgBox.setText("Could not save file as structure invalid, see below for details")
     msgBox.setStandardButtons(QMessageBox.Ok)
     msgBox.setDetailedText("\n\n".join([f"- {err}" for err in errors]))
     msgBox.exec_()
@@ -193,7 +188,11 @@ class QDialogCustom(QDialog):
             return
         quit_msg = "Do you want to close the component editor?"
         reply = QMessageBox.question(
-            self, "Really quit?", quit_msg, QMessageBox.Close | QMessageBox.Ignore, QMessageBox.Close
+            self,
+            "Really quit?",
+            quit_msg,
+            QMessageBox.Close | QMessageBox.Ignore,
+            QMessageBox.Close,
         )
         if reply == QMessageBox.Close:
             event.accept()

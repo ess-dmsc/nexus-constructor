@@ -8,22 +8,23 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QColor, QVector3D
 from PySide2.QtWidgets import QVBoxLayout, QWidget
 
+from nexus_constructor.component_type import SAMPLE_CLASS_NAME, SOURCE_CLASS_NAME
 from nexus_constructor.instrument_view.gnomon import Gnomon
 from nexus_constructor.instrument_view.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
-from nexus_constructor.instrument_view.qentity_utils import (  # get_nx_source,
+from nexus_constructor.instrument_view.qentity_utils import (
     create_material,
     create_qentity,
+    get_nx_source,
 )
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.model.instrument import SAMPLE_NAME
 
 
 class InstrumentView(QWidget):
@@ -199,6 +200,7 @@ class InstrumentView(QWidget):
     def add_component(
         self,
         name: str,
+        nx_class,
         geometry: Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
         positions: List[QVector3D] = None,
     ):
@@ -208,20 +210,24 @@ class InstrumentView(QWidget):
         :param geometry: The geometry information of the component that is used to create a mesh.
         :param positions: Mesh is repeated at each of these positions
         """
+        print(name, nx_class)
         if geometry is None:
             return
 
-        mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
-        material = create_material(
-            QColor("black") if name != SAMPLE_NAME else QColor("red"),
-            QColor("grey"),
-            self.component_root_entity,
-            alpha=0.5 if name == SAMPLE_NAME else None,
-        )
-        # self.component_entities[name] = get_nx_source(self.component_root_entity)
-        self.component_entities[name] = create_qentity(
-            [mesh, material], self.component_root_entity
-        )
+        if nx_class == SOURCE_CLASS_NAME:
+            entity = get_nx_source(self.component_root_entity)
+            self.component_entities[name] = entity
+        else:
+            mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
+            material = create_material(
+                QColor("black") if nx_class != SAMPLE_CLASS_NAME else QColor("red"),
+                QColor("grey"),
+                self.component_root_entity,
+                alpha=0.5 if nx_class == SAMPLE_CLASS_NAME else None,
+            )
+            self.component_entities[name] = create_qentity(
+                [mesh, material], self.component_root_entity
+            )
 
     def get_entity(self, component_name: str) -> Qt3DCore.QEntity:
         """
