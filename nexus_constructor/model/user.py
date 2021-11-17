@@ -4,6 +4,8 @@ from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.value_type import ValueTypes
 
+NX_USER = "NXuser"
+
 
 class User(Group):
     def __init__(self, nexus_name=None, parent_node=None, **user_data):
@@ -13,7 +15,7 @@ class User(Group):
             else nexus_name
         )
         super().__init__(name=name, parent_node=parent_node)
-        self.nx_class = "NXuser"
+        self.nx_class = NX_USER
         for name, value in user_data.items():
             self.children.append(Dataset(name=name, type=ValueTypes.STRING, values=value))  # type: ignore
 

@@ -91,6 +91,6 @@ class ParametersView(QWidget):
         self.model.entry.title = (text, self.title_placeholder.isChecked())
 
     def _edit_users(self):
-        dialog = ConfigureUsersDialog(self.model.entry.users_for_display())
+        dialog = ConfigureUsersDialog(self.model.entry.users)
         if dialog.exec_():
-            self.model.entry.set_users(dialog.get_users())
+            self.model.entry.users = dialog.get_users()
