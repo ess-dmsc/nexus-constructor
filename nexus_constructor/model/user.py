@@ -14,8 +14,8 @@ class User(Group):
         )
         super().__init__(name=name, parent_node=parent_node)
         self.nx_class = "NXuser"
-        for n, v in user_data.items():
-            self.children.append(Dataset(name=n, type=ValueTypes.STRING, values=v))
+        for name, value in user_data.items():
+            self.children.append(Dataset(name=name, type=ValueTypes.STRING, values=value))  # type: ignore
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return super().as_dict(error_collector)
