@@ -248,8 +248,8 @@ def test_GIVEN_r_and_theta_WHEN_creating_and_adding_mirrored_points_THEN_expecte
     r = 20
     theta = 0
 
-    expected_front_point = Point(r, 0, EXPECTED_Z)
-    expected_back_point = Point(r, 0, -EXPECTED_Z)
+    expected_front_point = Point(0, r, EXPECTED_Z)
+    expected_back_point = Point(0, r, -EXPECTED_Z)
 
     (
         actual_front_point,
