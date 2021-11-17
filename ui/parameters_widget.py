@@ -20,33 +20,63 @@ class ParametersView(QWidget):
         self.proposal_layout = QHBoxLayout()
         self.proposal_label = QLabel()
         self.proposal_label.setText("Proposal ID:")
-        self.prop_text = QLineEdit()
-        self.prop_text.textEdited.connect(self._prop_text_changed)
-        self.prop_placeholder = QCheckBox()
-        self.prop_placeholder.toggled.connect(self._prop_id_checked_changed)
-        self.prop_placeholder.setText("Use placeholder")
-
+        self.proposal_text = QLineEdit()
+        self.proposal_text.textEdited.connect(self._proposal_text_changed)
+        self.proposal_placeholder = QCheckBox()
+        self.proposal_placeholder.toggled.connect(self._proposal_id_checked_changed)
+        self.proposal_placeholder.setText("Use placeholder")
         self.proposal_layout.addWidget(self.proposal_label)
-        self.proposal_layout.addWidget(self.prop_text)
-        self.proposal_layout.addWidget(self.prop_placeholder)
+        self.proposal_layout.addWidget(self.proposal_text)
+        self.proposal_layout.addWidget(self.proposal_placeholder)
         self.layout().addLayout(self.proposal_layout)
+
+        self.title_layout = QHBoxLayout()
+        self.title_label = QLabel()
+        self.title_label.setText("Title:")
+        self.title_text = QLineEdit()
+        self.title_text.textEdited.connect(self._title_text_changed)
+        self.title_placeholder = QCheckBox()
+        self.title_placeholder.toggled.connect(self._title_checked_changed)
+        self.title_placeholder.setText("Use placeholder")
+        self.title_layout.addWidget(self.title_label)
+        self.title_layout.addWidget(self.title_text)
+        self.title_layout.addWidget(self.title_placeholder)
+        self.layout().addLayout(self.title_layout)
 
     def set_up_model(self, model: Model):
         self.model = model
         proposal_id, is_placeholder = model.entry.proposal_id
         if is_placeholder:
-            self.prop_placeholder.setChecked(True)
-            self.prop_text.setText("")
+            self.proposal_placeholder.setChecked(True)
+            self.proposal_text.setText("")
         else:
-            self.prop_placeholder.setChecked(False)
-            self.prop_text.setText(proposal_id)
+            self.proposal_placeholder.setChecked(False)
+            self.proposal_text.setText(proposal_id)
 
-    def _prop_id_checked_changed(self):
-        if self.prop_placeholder.isChecked():
+        title, is_placeholder = model.entry.title
+        if is_placeholder:
+            self.title_placeholder.setChecked(True)
+            self.title_text.setText("")
+        else:
+            self.title_placeholder.setChecked(False)
+            self.title_text.setText(title)
+
+    def _proposal_id_checked_changed(self):
+        if self.proposal_placeholder.isChecked():
             self.model.entry.proposal_id = ("", True)
         else:
-            self.model.entry.proposal_id = (self.prop_text.text(), False)
-        self.prop_text.setEnabled(not self.prop_placeholder.isChecked())
+            self.model.entry.proposal_id = (self.proposal_text.text(), False)
+        self.proposal_text.setEnabled(not self.proposal_placeholder.isChecked())
 
-    def _prop_text_changed(self, text):
-        self.model.entry.proposal_id = (text, self.prop_placeholder.isChecked())
+    def _proposal_text_changed(self, text):
+        self.model.entry.proposal_id = (text, self.proposal_placeholder.isChecked())
+
+    def _title_checked_changed(self):
+        if self.title_placeholder.isChecked():
+            self.model.entry.title = ("", True)
+        else:
+            self.model.entry.title = (self.title_text.text(), False)
+        self.title_text.setEnabled(not self.title_placeholder.isChecked())
+
+    def _title_text_changed(self, text):
+        self.model.entry.title = (text, self.title_placeholder.isChecked())
