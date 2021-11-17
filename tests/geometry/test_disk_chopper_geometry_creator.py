@@ -464,8 +464,8 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
 
     # The expected intermediate points should have a distance from the centres of r, an angle of 90 degrees and be
     # separated by 2 * z
-    expected_intermediate_front = Point(0, r, geometry_creator.z)
-    expected_intermediate_back = Point(0, r, -geometry_creator.z)
+    expected_intermediate_front = Point(r, 0, geometry_creator.z)
+    expected_intermediate_back = Point(r, 0, -geometry_creator.z)
 
     # Check that the last two points that were created in the geometry creator match what was expected
     actual_intermediate_front = geometry_creator.points[-2]
