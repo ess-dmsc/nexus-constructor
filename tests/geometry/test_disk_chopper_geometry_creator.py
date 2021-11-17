@@ -415,8 +415,8 @@ def test_GIVEN_angle_distance_to_centre_and_two_points_WHEN_creating_wedge_shape
         theta, prev_back, prev_front, r
     )
 
-    assert current_front == Point(-r, 0, geometry_creator.z)
-    assert current_back == Point(-r, 0, -geometry_creator.z)
+    assert current_front == Point(0, -r, geometry_creator.z)
+    assert current_back == Point(0, -r, -geometry_creator.z)
 
     assert geometry_creator.faces[-3] == create_list_of_ids(
         prev_front, prev_back, current_back, current_front
