@@ -4,9 +4,8 @@ from typing import Any, Dict, List, Tuple
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
-
 from nexus_constructor.model.module import Dataset
-from nexus_constructor.model.user import User
+from nexus_constructor.model.user import User, NX_USER
 from nexus_constructor.model.value_type import ValueTypes
 
 NEXUS_TITLE_NAME = "title"
@@ -32,7 +31,6 @@ class Entry(Group):
     def __init__(self):
         super().__init__(name="entry", parent_node=None)
         self.nx_class = "NXentry"
-        self._users = []
 
     @property
     def instrument(self) -> Instrument:
@@ -68,13 +66,19 @@ class Entry(Group):
             )
         return "", False
 
-    def users_for_display(self) -> List[Dict[str, str]]:
-        return [user.values_dict() for user in self._users]
+    @property
+    def users(self) -> List[Dict[str, str]]:
+        users = []
+        for child in self.children:
+            if child.nx_class == NX_USER:
+                users.append(child.values_dict())
+        return users
 
-    def set_users(self, users: List[Dict[str, str]]):
-        self._users = []
+    @users.setter
+    def users(self, users: List[Dict[str, str]]):
         for user in users:
-            self._users.append(User(None, **user))
+            u = User(**user)
+            self[u.name] = u
 
     def _set_dataset_property(
         self, name: str, placeholder: Dataset, values: Tuple[str, bool]
@@ -101,6 +105,4 @@ class Entry(Group):
             # If instrument is not set then don't try to add sample to dictionary
             pass
 
-        for user in self._users:
-            dictionary[CommonKeys.CHILDREN].append(user.as_dict(error_collector))
         return dictionary

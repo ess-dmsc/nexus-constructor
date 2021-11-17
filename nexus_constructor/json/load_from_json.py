@@ -53,7 +53,6 @@ valid NeXus files, but are safe if the JSON was created by the NeXus Constructor
 """
 NX_INSTRUMENT = "NXinstrument"
 NX_SAMPLE = "NXsample"
-NX_USER = "NXuser"
 CHILD_EXCLUDELIST = [
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
