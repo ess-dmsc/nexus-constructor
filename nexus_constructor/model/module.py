@@ -142,16 +142,21 @@ class Dataset(FileWriterModule):
 
     def as_dict(self, error_collector: List[str]):
         values = self.values
-        if isinstance(values, np.ndarray):
+        if np.isscalar(values):
+            try:
+                values = float(values)  # type: ignore
+            except ValueError:
+                pass
+        elif isinstance(values, np.ndarray):
             values = values.tolist()
 
         return_dict = {
             CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {
-                CommonKeys.NAME: self.name,
-                CommonKeys.VALUES: values,
-            },
+            NodeType.CONFIG: {CommonKeys.NAME: self.name, CommonKeys.VALUES: values},
         }
+
+        if self.type:
+            return_dict[NodeType.CONFIG][CommonKeys.TYPE] = self.type  # type: ignore
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
                 error_collector
