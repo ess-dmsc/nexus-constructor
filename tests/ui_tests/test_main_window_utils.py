@@ -8,8 +8,8 @@ from PySide2.QtWidgets import QFrame, QToolBar, QTreeView, QVBoxLayout, QWidget
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -588,7 +588,9 @@ def create_transformation(trans_type: TransformationType):
     )
     t.transform_type = trans_type
     t.vector = QVector3D(1, 0, 0)
-    t.values = Dataset(name="", values=0, type=ValueTypes.DOUBLE)
+    t.values = Dataset(
+        parent_node=Transformation, name="", values=0, type=ValueTypes.DOUBLE
+    )
     t.units = "m"
     return t
 

@@ -13,7 +13,7 @@ from nexus_constructor.common_attrs import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.helpers import get_absolute_path
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
     DEGREES,

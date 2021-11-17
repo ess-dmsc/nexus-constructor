@@ -4,7 +4,7 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import Dataset, F142Stream, WriterModules
+from nexus_constructor.model.module import Dataset, F142Stream, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
