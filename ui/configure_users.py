@@ -11,6 +11,7 @@ from PySide2.QtWidgets import (
     QPushButton,
     QSpacerItem,
     QSizePolicy,
+    QLabel,
 )
 
 
@@ -59,6 +60,15 @@ class TableModel(QAbstractTableModel):
         # Ignore users with no name set.
         return [copy.copy(user) for user in self._data if user["name"].strip() != ""]
 
+    def are_users_unique(self):
+        users = set()
+        for user in self._data:
+            name = user["name"].strip()
+            if name in users:
+                return False
+            users.add(name)
+        return True
+
 
 class ConfigureUsersDialog(QDialog):
     def __init__(self, users):
@@ -92,15 +102,27 @@ class ConfigureUsersDialog(QDialog):
 
         self.layout.addLayout(self.table_layout)
 
+        self.error_text = QLabel()
+        self.error_text.setStyleSheet("color: red;")
+        self.layout.addWidget(self.error_text)
+
         self.button_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         )
-        self.button_box.accepted.connect(self.accept)
+        self.button_box.accepted.connect(self._on_accepted_clicked)
         self.button_box.rejected.connect(self.reject)
         self.layout.addWidget(self.button_box)
         self.setLayout(self.layout)
 
         self.resize(600, 400)
+
+    def _on_accepted_clicked(self):
+        if not self.model.are_users_unique():
+            self.error_text.setText("Name must be unique for each user")
+            return
+
+        self.error_text.setText("")
+        self.accept()
 
     def _add_user_clicked(self):
         self.model.add_new_user()
