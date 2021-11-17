@@ -258,7 +258,7 @@ class DiskChopperGeometryCreator:
         :param theta: The vector angle.
         :return: x, y
         """
-        return r * np.cos(theta), r * np.sin(theta)
+        return r * np.sin(theta), r * np.cos(theta)
 
     def _create_mirrored_points(self, r: float, theta: float) -> Tuple[Point, Point]:
         """
