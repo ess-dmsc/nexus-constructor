@@ -77,7 +77,7 @@ def test_component_as_dict_contains_transformations():
     )
     test_component.depends_on = zeroth_transform
     dictionary_output = test_component.as_dict([])
-
+    print(dictionary_output["children"])
     assert dictionary_output["children"][0]["name"] == TRANSFORMS_GROUP_NAME
     child_names = [
         child["config"]["name"]

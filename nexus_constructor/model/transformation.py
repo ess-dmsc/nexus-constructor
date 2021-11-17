@@ -193,7 +193,8 @@ class Transformation(Dataset):
         elif isinstance(self.values, Group):
             return_dict = self.values.children[0].as_dict(error_collector)
 
-        return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
+        if NodeType.CONFIG in return_dict:
+            return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 
         if self.attributes:
             return_dict[CommonKeys.ATTRIBUTES] = [
