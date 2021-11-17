@@ -570,3 +570,145 @@ def test_when_title_in_json_then_it_is_added_to_entry(json_reader):
         except RuntimeError:
             pass
     assert success
+
+
+def test_when_users_are_in_json_then_they_are_added_to_entry(json_reader):
+    user_john = {
+        "name": "John Smith",
+        "email": "js@ess.eu",
+        "facility_user_id": "js90",
+        "affiliation": "ESS",
+    }
+
+    user_betty = {
+        "name": "Betty Boo",
+        "email": "bb@doing.the.do",
+        "facility_user_id": "bb70",
+        "affiliation": "She Rockers",
+    }
+
+    json_string = """
+        {
+        "children": [
+            {
+                "name": "entry",
+                "type": "group",
+                "attributes": [
+                    {"name": "NX_class", "dtype": "string", "values": "NXentry"}
+                ],
+                "children": [
+                    {
+                        "name": "user_JohnSmith",
+                        "type": "group",
+                        "attributes": [
+                            {"name": "NX_class", "dtype": "string", "values": "NXuser"}
+                        ],
+                        "children": [
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "name",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "email",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "facility_user_id",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "affiliation",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "user_BettyBoo",
+                        "type": "group",
+                        "attributes": [
+                            {"name": "NX_class", "dtype": "string", "values": "NXuser"}
+                        ],
+                        "children": [
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "name",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "email",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "facility_user_id",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "affiliation",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+    """ % (
+        user_john["name"],
+        user_john["email"],
+        user_john["facility_user_id"],
+        user_john["affiliation"],
+        user_betty["name"],
+        user_betty["email"],
+        user_betty["facility_user_id"],
+        user_betty["affiliation"],
+    )
+
+    with patch(
+        "nexus_constructor.json.load_from_json.open",
+        mock_open(read_data=json_string),
+        create=True,
+    ):
+        json_reader.load_model_from_json("filename")
+        model = json_reader.entry_node
+
+    results = []
+    for child in model.children:
+        try:
+            if child.attributes[0].values == "NXuser":
+                results.append({ds.name: ds.values for ds in child.children})
+        except RuntimeError:
+            pass
+
+    assert user_john in results
+    assert user_betty in results
