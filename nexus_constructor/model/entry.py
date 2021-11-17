@@ -67,8 +67,8 @@ class Entry(Group):
         if not use_default and value.strip() == "":
             del self[name]
             return
-          
-        self[name] = copy(placeholder)
+
+        self[name] = copy(placeholder)  # type: ignore
 
         if not use_default:
             self[name].values = value.strip()
