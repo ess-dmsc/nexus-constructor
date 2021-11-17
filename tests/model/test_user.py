@@ -8,7 +8,7 @@ def test_can_get_values_dict():
         "facility_user_id": "js90",
         "affiliation": "ESS",
     }
-    test_user = User(None, None, **user_data)
+    test_user = User(**user_data)
 
     result = test_user.values_dict()
 
@@ -22,7 +22,7 @@ def test_if_nexus_name_not_specified_then_is_generated():
         "facility_user_id": "js90",
         "affiliation": "ESS",
     }
-    test_user = User(None, None, **user_data)
+    test_user = User(**user_data)
 
     assert test_user.name == "user_JohnSmith"
 
@@ -34,7 +34,7 @@ def test_nexus_name_is_specified():
         "facility_user_id": "js90",
         "affiliation": "ESS",
     }
-    test_user = User("user_123", None, **user_data)
+    test_user = User("user_123", **user_data)
 
     assert test_user.name == "user_123"
 
@@ -54,7 +54,7 @@ def test_as_dict_contains_all_data():
         "facility_user_id": "js90",
         "affiliation": "ESS",
     }
-    test_user = User(None, None, **user_data)
+    test_user = User(**user_data)
 
     result = test_user.as_dict([])
 
