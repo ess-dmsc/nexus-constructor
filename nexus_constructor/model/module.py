@@ -57,10 +57,15 @@ class StreamModule(FileWriterModule):
     topic = attr.ib(type=str)
 
     def as_dict(self, error_collector: List[str]):
-        return {
+        return_dict = {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
         }
+        if self.attributes:
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
+                error_collector
+            )
+        return return_dict
 
 
 @attr.s
@@ -136,15 +141,27 @@ class Dataset(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
-        if isinstance(self.values, np.ndarray):
-            self.values = self.values.tolist()
-        return {
+        values = self.values
+        if np.isscalar(values):
+            try:
+                values = float(values)  # type: ignore
+            except ValueError:
+                pass
+        elif isinstance(values, np.ndarray):
+            values = values.tolist()
+
+        return_dict = {
             CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {
-                CommonKeys.NAME: self.name,
-                CommonKeys.VALUES: self.values,
-            },
+            NodeType.CONFIG: {CommonKeys.NAME: self.name, CommonKeys.VALUES: values},
         }
+
+        if self.type:
+            return_dict[NodeType.CONFIG][CommonKeys.TYPE] = self.type  # type: ignore
+        if self.attributes:
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
+                error_collector
+            )
+        return return_dict
 
 
 @attr.s

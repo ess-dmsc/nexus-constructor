@@ -2,15 +2,27 @@ from copy import copy
 from typing import Any, Dict, List, Tuple
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
+NEXUS_TITLE_NAME = "title"
+TITLE_PLACEHOLDER_VALUE = "$TITLE$"
+TITLE_PLACEHOLDER = Dataset(
+    parent_node=None,
+    name=NEXUS_TITLE_NAME,
+    values=TITLE_PLACEHOLDER_VALUE,
+    type=ValueTypes.STRING,
+)
+
 NEXUS_EXP_ID_NAME = "experiment_identifier"
-EXP_ID_PLACEHOLDER_NAME = "$EXP_ID$"
+EXP_ID_PLACEHOLDER_VALUE = "$EXP_ID$"
 EXP_ID_PLACEHOLDER = Dataset(
-    NEXUS_EXP_ID_NAME, values=EXP_ID_PLACEHOLDER_NAME, type=ValueTypes.STRING
+    parent_node=None,
+    name=NEXUS_EXP_ID_NAME,
+    values=EXP_ID_PLACEHOLDER_VALUE,
+    type=ValueTypes.STRING,
 )
 
 
@@ -30,24 +42,41 @@ class Entry(Group):
 
     @property
     def proposal_id(self) -> Tuple[str, bool]:
-        prop_ds = self[NEXUS_EXP_ID_NAME]
-        if prop_ds:
-            return (
-                prop_ds.values,
-                True if prop_ds.values == EXP_ID_PLACEHOLDER.values else False,
-            )
-        return "", False
+        return self._read_dataset_property(NEXUS_EXP_ID_NAME, EXP_ID_PLACEHOLDER_VALUE)
 
     @proposal_id.setter
     def proposal_id(self, values: Tuple[str, bool]):
+        self._set_dataset_property(NEXUS_EXP_ID_NAME, EXP_ID_PLACEHOLDER, values)
+
+    @property
+    def title(self) -> Tuple[str, bool]:
+        return self._read_dataset_property(NEXUS_TITLE_NAME, TITLE_PLACEHOLDER_VALUE)
+
+    @title.setter
+    def title(self, values: Tuple[str, bool]):
+        self._set_dataset_property(NEXUS_TITLE_NAME, TITLE_PLACEHOLDER, values)
+
+    def _read_dataset_property(self, name: str, value: str) -> Tuple[str, bool]:
+        dataset = self[name]
+        if dataset:
+            return (
+                dataset.values,
+                True if dataset.values == value else False,
+            )
+        return "", False
+
+    def _set_dataset_property(
+        self, name: str, placeholder: Dataset, values: Tuple[str, bool]
+    ):
         value, use_default = values
         if not use_default and value.strip() == "":
-            del self[NEXUS_EXP_ID_NAME]
+            del self[name]
             return
 
-        self[NEXUS_EXP_ID_NAME] = copy(EXP_ID_PLACEHOLDER)  # type: ignore
+        self[name] = copy(placeholder)  # type: ignore
+
         if not use_default:
-            self[NEXUS_EXP_ID_NAME].values = value.strip()
+            self[name].values = value.strip()
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Entry, self).as_dict(error_collector)

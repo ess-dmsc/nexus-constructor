@@ -30,7 +30,7 @@ from nexus_constructor.model.geometry import (
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import F142Stream, Link
+from nexus_constructor.model.module import F142Stream, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator

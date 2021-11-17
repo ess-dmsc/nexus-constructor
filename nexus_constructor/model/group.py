@@ -10,10 +10,10 @@ from nexus_constructor.model.helpers import (
     _set_item,
     get_absolute_path,
 )
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 
 if TYPE_CHECKING:
-    from nexus_constructor.model.stream import FileWriterModule  # noqa: F401
+    from nexus_constructor.model.module import FileWriterModule  # noqa: F401
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
