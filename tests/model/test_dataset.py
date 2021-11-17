@@ -1,4 +1,4 @@
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 

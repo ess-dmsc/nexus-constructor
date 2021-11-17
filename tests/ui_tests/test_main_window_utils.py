@@ -9,7 +9,7 @@ from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformation_view import EditRotation, EditTranslation

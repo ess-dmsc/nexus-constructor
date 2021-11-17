@@ -9,7 +9,7 @@ from nexus_constructor.json.load_from_json_utils import (
 )
 from nexus_constructor.model.attributes import FieldAttribute
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 
 

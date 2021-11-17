@@ -42,7 +42,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.helpers import _generate_incremental_name
-from nexus_constructor.model.stream import DATASET, Dataset
+from nexus_constructor.model.module import DATASET, Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList

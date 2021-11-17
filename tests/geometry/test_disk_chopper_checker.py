@@ -18,7 +18,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _incorrect_data_type_message,
     _units_are_valid,
 )
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 from tests.geometry.chopper_test_helpers import (  # noqa: F401
     DEGREES_EDGES_ARR,

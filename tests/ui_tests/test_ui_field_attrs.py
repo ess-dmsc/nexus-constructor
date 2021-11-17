@@ -6,7 +6,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.field_attrs import FieldAttrFrame, FieldAttrsDialog
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 from tests.ui_tests.ui_test_utils import show_and_close_window
 

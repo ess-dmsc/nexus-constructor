@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Tuple
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 NEXUS_TITLE_NAME = "title"
