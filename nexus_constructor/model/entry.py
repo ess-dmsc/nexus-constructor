@@ -2,22 +2,27 @@ from copy import copy
 from typing import Any, Dict, List, Tuple
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.stream import Dataset
 from nexus_constructor.model.value_type import ValueTypes
-
 
 NEXUS_TITLE_NAME = "title"
 TITLE_PLACEHOLDER_VALUE = "$TITLE$"
 TITLE_PLACEHOLDER = Dataset(
-    NEXUS_TITLE_NAME, values=TITLE_PLACEHOLDER_VALUE, type=ValueTypes.STRING
+    parent_node=None,
+    name=NEXUS_TITLE_NAME,
+    values=TITLE_PLACEHOLDER_VALUE,
+    type=ValueTypes.STRING,
 )
 
 NEXUS_EXP_ID_NAME = "experiment_identifier"
 EXP_ID_PLACEHOLDER_VALUE = "$EXP_ID$"
 EXP_ID_PLACEHOLDER = Dataset(
-    NEXUS_EXP_ID_NAME, values=EXP_ID_PLACEHOLDER_VALUE, type=ValueTypes.STRING
+    parent_node=None,
+    name=NEXUS_EXP_ID_NAME,
+    values=EXP_ID_PLACEHOLDER_VALUE,
+    type=ValueTypes.STRING,
 )
 
 

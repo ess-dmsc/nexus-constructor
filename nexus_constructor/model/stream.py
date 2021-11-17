@@ -57,10 +57,15 @@ class StreamModule(FileWriterModule):
     topic = attr.ib(type=str)
 
     def as_dict(self, error_collector: List[str]):
-        return {
+        return_dict = {
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
         }
+        if self.attributes:
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
+                error_collector
+            )
+        return return_dict
 
 
 @attr.s
@@ -93,6 +98,10 @@ class EV42Stream(StreamModule):
             module_dict[NodeType.CONFIG][CHUNK_SIZE] = self.chunk_size
         if self.cue_interval:
             module_dict[NodeType.CONFIG][CUE_INTERVAL] = self.cue_interval
+        if self.attributes:
+            module_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
+                error_collector
+            )
         return module_dict
 
 
@@ -163,6 +172,10 @@ class ADARStream(StreamModule):
         module_dict = StreamModule.as_dict(self, error_collector)
         if self.array_size:
             module_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
+        if self.attributes:
+            module_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
+                error_collector
+            )
         return module_dict
 
 
