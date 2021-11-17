@@ -45,10 +45,10 @@ def expected_slit_boundary_face_points(center_to_slit_start: float, radius: floa
     :return: Four points that should be roughly equal to the points for slit boundary face.
     """
 
-    expected_upper_front = Point(radius, 0, EXPECTED_Z)
-    expected_lower_front = Point(center_to_slit_start, 0, EXPECTED_Z)
-    expected_upper_back = Point(radius, 0, -EXPECTED_Z)
-    expected_lower_back = Point(center_to_slit_start, 0, -EXPECTED_Z)
+    expected_upper_front = Point(0, radius, EXPECTED_Z)
+    expected_lower_front = Point(0, center_to_slit_start, EXPECTED_Z)
+    expected_upper_back = Point(0, radius, -EXPECTED_Z)
+    expected_lower_back = Point(0, center_to_slit_start, -EXPECTED_Z)
 
     return (
         expected_lower_back,
