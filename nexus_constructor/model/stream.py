@@ -143,6 +143,7 @@ class Dataset(FileWriterModule):
             NodeType.CONFIG: {
                 CommonKeys.NAME: self.name,
                 CommonKeys.VALUES: self.values,
+                CommonKeys.TYPE: self.type,
             },
         }
 
