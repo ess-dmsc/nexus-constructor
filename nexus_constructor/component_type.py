@@ -46,6 +46,7 @@ COMPONENT_TYPES = {
 }
 
 CHOPPER_CLASS_NAME = "NXdisk_chopper"
+SLIT_CLASS_NAME = "NXslit"
 
 
 def __list_base_class_files(file_list):
