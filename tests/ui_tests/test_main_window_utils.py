@@ -583,7 +583,9 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
 
 
 def create_transformation(trans_type: TransformationType):
-    t = Transformation(name="transformation", type=ValueTypes.DOUBLE, values=8)
+    t = Transformation(
+        parent_node=None, name="transformation", type=ValueTypes.DOUBLE, values=8
+    )
     t.transform_type = trans_type
     t.vector = QVector3D(1, 0, 0)
     t.values = Dataset(name="", values=0, type=ValueTypes.DOUBLE)
