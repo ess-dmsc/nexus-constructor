@@ -111,7 +111,7 @@ def _find_depends_on_path(items: List[Dict], name: str) -> Optional[str]:
 class JSONReader:
     def __init__(self):
         self.entry_node: Group = None
-        self.model: Optional[Model] = None
+        self.model = Model()
         self.sample_name: str = ""
         self.warnings = JsonWarningsContainer()
 
@@ -278,6 +278,12 @@ class JSONReader:
                         attributes.set_attribute_value(
                             json_attr[CommonKeys.NAME], json_attr[CommonKeys.VALUES]
                         )
+            if (
+                parent_node
+                and isinstance(nexus_object, Dataset)
+                and parent_node.nx_class == "NXentry"
+            ):
+                self.model.entry[nexus_object.name] = nexus_object
 
         return nexus_object
 
@@ -316,7 +322,6 @@ class JSONReader:
         """
         Create model used in tree-view according to old implementation.
         """
-        self.model = Model()
         instrument_group = self.entry_node[INSTRUMENT_NAME]
         if instrument_group:
             instrument_component = Instrument(parent_node=self.model.entry)
