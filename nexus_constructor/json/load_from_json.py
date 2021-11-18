@@ -23,7 +23,7 @@ from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
-from nexus_constructor.model.stream import (
+from nexus_constructor.model.module import (
     SOURCE,
     Dataset,
     FileWriterModule,
