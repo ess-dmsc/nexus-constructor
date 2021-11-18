@@ -119,12 +119,20 @@ class ConfigureUsersDialog(QDialog):
         self.resize(600, 400)
 
     def _on_accepted_clicked(self):
+        self._complete_table()
         if not self.model.are_users_unique():
             self.error_text.setText("Name must be unique for each user")
             return
 
         self.error_text.setText("")
         self.accept()
+
+    def _complete_table(self):
+        # The currently selected cell only updates the model when 'return' is
+        # pressed or another cell is selected. If the user is updating a value
+        # then clicks 'OK' without pressing 'return' then the change is lost.
+        # This is a Qt thing - the workaround is to take focus from the table.
+        self.button_box.button(self.button_box.Ok).setFocus()
 
     def _add_user_clicked(self):
         self.model.add_new_user()
