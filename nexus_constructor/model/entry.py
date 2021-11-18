@@ -70,8 +70,8 @@ class Entry(Group):
     def users(self) -> List[Dict[str, str]]:
         users = []
         for child in self.children:
-            if child.nx_class == NX_USER:
-                users.append(child.values_dict())
+            if isinstance(child, Group) and child.nx_class == NX_USER:
+                users.append(child.values_dict())  # type: ignore
         return users
 
     @users.setter
@@ -85,7 +85,7 @@ class Entry(Group):
     def _clear_all_users(self):
         old_users = []
         for child in self.children:
-            if child.nx_class == NX_USER:
+            if isinstance(child, Group) and child.nx_class == NX_USER:
                 old_users.append(child)
         for user in old_users:
             self.children.remove(user)
