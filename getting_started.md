@@ -109,6 +109,21 @@ To test this, there are OFF and STL files in the `tests/` folder. Let's use the 
 
 Again, this would need to be moved away from the sample if reflecting a real scenario. It may also need to be rotated. To add multiple transformations, select "Add rotation" or "Add translation" in the order you want them to be added.
 
+### Usage of Streams in components fields and transformations.
+
+While adding fields or transformation to a component, until now we only used either `Scalar dataset` or `Array dataset`.
+These are examples of static datasets. Nexus-constructor also allows you to provide configuration for the datastreams (`kafka streams`) for the component's fileds or transformations.
+
+In the figure below, you find an example where `rotation_speed` field of a disk chopper is configured as `kafka stream`
+instead of `Scalar or Array dataset`. Choosing `kafka stream` option from the dropdown opens another dialog window where there are options to pick the schema for the `kafka stream` (in this example an [f142](https://github.com/ess-dmsc/kafka-to-nexus/blob/main/documentation/writer_module_f142_log_data.md)). In the example below, `topic` input is the kafka topic where data for chopper `rotation_speed` will be available. There are certain mandatory inputs for eg `topic` and `source` which are common across all the [file-writer](https://github.com/ess-dmsc/kafka-to-nexus) supported [schemas](https://github.com/ess-dmsc/kafka-to-nexus/tree/main/documentation).
+
+![](resources/images/disk_chopper_stream.png)
+
+There are often cases where the components (for eg. a detector bank, chopper etc) are installed on platforms that can be translated or rotated with the help of motors during the course of experiment. In such cases datastreams (`kafka stream`) should be used when adding translation/rotation for the component. In this particular case a chopper translation along the `z` direction is assumed to be controlled by a motor (`some_motor_name`) and the information about its datastreams is provided by editing the configurations in `kafka stream` dialog window.
+
+![](resources/images/disk_chopper_transformation_stream.png)
+
+
 ### Opening and saving file-writer commands
 
 We now have a very basic example of a beamline instrument visualised in 3D as well as the resulting NeXus file. The constructor can output to a [file-writer command](https://github.com/ess-dmsc/kafka-to-nexus/blob/master/documentation/commands.md) in JSON format, and can also load from these files.
