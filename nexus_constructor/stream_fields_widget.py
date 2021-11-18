@@ -18,7 +18,7 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.common_attrs import ARRAY, SCALAR
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import (
+from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
     CHUNK_CHUNK_KB,
     CHUNK_CHUNK_MB,

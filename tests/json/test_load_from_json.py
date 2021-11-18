@@ -13,7 +13,7 @@ from nexus_constructor.json.json_warnings import (
 from nexus_constructor.json.load_from_json import JSONReader
 from nexus_constructor.json.load_from_json_utils import _retrieve_children_list
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 

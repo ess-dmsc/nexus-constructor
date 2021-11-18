@@ -7,13 +7,13 @@ from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import Dataset, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
     from PySide2.QtWidgets import QFrame  # noqa: F401
 
-    from nexus_constructor.model.stream import HS00Stream  # noqa: F401
+    from nexus_constructor.model.module import HS00Stream  # noqa: F401
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
     from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
 
