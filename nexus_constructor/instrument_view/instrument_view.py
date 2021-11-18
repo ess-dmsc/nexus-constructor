@@ -17,8 +17,8 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.instrument_view.qentity_utils import (
     create_material,
+    create_neutron_source,
     create_qentity,
-    get_nx_source,
 )
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
@@ -215,7 +215,7 @@ class InstrumentView(QWidget):
             return
 
         if nx_class == SOURCE_CLASS_NAME:
-            entity = get_nx_source(self.component_root_entity)
+            entity = create_neutron_source(self.component_root_entity)
             self.component_entities[name] = entity
         else:
             mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)

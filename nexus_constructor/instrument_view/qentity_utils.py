@@ -3,12 +3,7 @@ from typing import List
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtCore import QPropertyAnimation
 from PySide2.QtGui import QColor, QMatrix4x4, QVector3D
-
-from nexus_constructor.instrument_view.neutron_animation_controller import (
-    NeutronAnimationController,
-)
 
 
 def create_material(
@@ -56,113 +51,28 @@ def create_qentity(
     return entity
 
 
-def get_nx_source(gnomon_root_entity, neutron_animation_length=4):
-    setup_neutrons(gnomon_root_entity, neutron_animation_length)
-    cylinder_mesh = Qt3DExtras.QCylinderMesh(gnomon_root_entity)
-    cylinder_transform = Qt3DCore.QTransform(gnomon_root_entity)
-    set_cylinder_mesh_dimensions(cylinder_mesh, 1.5, neutron_animation_length, 2)
-    set_beam_transform(cylinder_transform, neutron_animation_length)
-    beam_material = create_material(
-        QColor("blue"), QColor("lightblue"), gnomon_root_entity, alpha=0.5
+def create_neutron_source(gnomon_root_entity, neutron_animation_length=4):
+    cone_mesh = Qt3DExtras.QConeMesh(gnomon_root_entity)
+    cone_transform = Qt3DCore.QTransform(gnomon_root_entity)
+    set_cone_dimension(cone_mesh, 0.5, 1.0, neutron_animation_length, 50, 20)
+    set_cone_transform(cone_transform, neutron_animation_length)
+    material = create_material(
+        QColor("#928327"), QColor("#928327"), gnomon_root_entity, alpha=0.5
     )
-    create_qentity(
-        [cylinder_mesh, beam_material, cylinder_transform], gnomon_root_entity
-    )
-    return gnomon_root_entity
+    return create_qentity([cone_mesh, material, cone_transform], gnomon_root_entity)
 
 
-def set_cylinder_mesh_dimensions(cylinder_mesh, radius, length, rings):
-    """
-    Sets the dimensions of a cylinder mesh.
-    :param cylinder_mesh: The cylinder mesh to modify.
-    :param radius: The desired radius.
-    :param length: The desired length.
-    :param rings: The desired number of rings.
-    """
-    cylinder_mesh.setRadius(radius)
-    cylinder_mesh.setLength(length)
-    cylinder_mesh.setRings(rings)
+def set_cone_dimension(cone_mesh, top_radius, bottom_radius, length, rings, slices):
+    cone_mesh.setTopRadius(top_radius)
+    cone_mesh.setBottomRadius(bottom_radius)
+    cone_mesh.setLength(length)
+    cone_mesh.setRings(rings)
+    cone_mesh.setSlices(slices)
 
 
-def set_beam_transform(cylinder_transform, neutron_animation_distance):
-    """
-    Configures the transform for the beam cylinder by giving it a matrix. The matrix will turn the cylinder sideways
-    and then move it "backwards" in the z-direction by 20 units so that it ends at the location of the sample.
-    :param cylinder_transform: A QTransform object.
-    :param neutron_animation_distance: The distance that the neutron travels during its animation.
-    """
-    cylinder_matrix = QMatrix4x4()
-    cylinder_matrix.rotate(90, QVector3D(1, 0, 0))
-    cylinder_matrix.translate(QVector3D(0, neutron_animation_distance * 0.5, 0))
+def set_cone_transform(cone_transform, neutron_animation_distance):
+    matrix = QMatrix4x4()
+    matrix.rotate(90, QVector3D(1, 0, 0))
+    matrix.translate(QVector3D(0, neutron_animation_distance * 0.5, 0))
 
-    cylinder_transform.setMatrix(cylinder_matrix)
-
-
-def set_neutron_animation_properties(
-    neutron_animation,
-    neutron_animation_controller,
-    animation_distance,
-    time_span_offset,
-):
-    """
-    Prepares a QPropertyAnimation for a neutron by giving it a target, a distance, and loop settings.
-    :param neutron_animation: The QPropertyAnimation to be configured.
-    :param neutron_animation_controller: The related animation controller object.
-    :param animation_distance: The starting distance of the neutron.
-    :param time_span_offset: The offset that allows the neutron to move at a different time from other neutrons.
-    """
-    neutron_animation.setTargetObject(neutron_animation_controller)
-    neutron_animation.setPropertyName(b"distance")
-    neutron_animation.setStartValue(0)
-    neutron_animation.setEndValue(animation_distance)
-    neutron_animation.setDuration(500 + time_span_offset)
-    neutron_animation.setLoopCount(-1)
-    neutron_animation.start()
-
-
-def setup_neutrons(gnomon_root_entity, neutron_animation_distance):
-    """
-    Sets up the neutrons and their animations by preparing their meshes and then giving offset and
-    distance parameters to an animation controller.
-    """
-
-    # Create lists of x, y, and time offsets for the neutron animations
-    x_offsets = [0, 0, 0, 2, -2, 1.4, 1.4, -1.4, -1.4]
-    y_offsets = [0, 2, -2, 0, 0, 1.4, -1.4, 1.4, -1.4]
-    time_span_offsets = [0, -5, -7, 5, 7, 19, -19, 23, -23]
-
-    neutron_radius = 1.5
-
-    for i in range(9):
-        mesh = Qt3DExtras.QSphereMesh(gnomon_root_entity)
-        set_sphere_mesh_radius(mesh, neutron_radius)
-
-        transform = Qt3DCore.QTransform(gnomon_root_entity)
-        neutron_animation_controller = NeutronAnimationController(
-            x_offsets[i] * 0.5, y_offsets[i] * 0.5, transform
-        )
-        neutron_animation_controller.set_target(transform)
-
-        neutron_animation = QPropertyAnimation(transform)
-        set_neutron_animation_properties(
-            neutron_animation,
-            neutron_animation_controller,
-            neutron_animation_distance,
-            time_span_offsets[i],
-        )
-
-        neutron_material = create_material(
-            QColor("black"), QColor("grey"), gnomon_root_entity
-        )
-
-        create_qentity([mesh, neutron_material, transform], gnomon_root_entity)
-    return gnomon_root_entity
-
-
-def set_sphere_mesh_radius(sphere_mesh, radius):
-    """
-    Sets the radius of a sphere mesh.
-    :param sphere_mesh: The sphere mesh to modify.
-    :param radius: The desired radius.
-    """
-    sphere_mesh.setRadius(radius)
+    cone_transform.setMatrix(matrix)
