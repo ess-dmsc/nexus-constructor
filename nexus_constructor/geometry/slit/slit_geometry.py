@@ -17,16 +17,31 @@ class SlitGeometry:
     def _create_vertices(self):
         half_side_length = 0.05
         self.vertices = [
-            QVector3D(-2 * half_side_length, -half_side_length, half_side_length),
-            QVector3D(half_side_length, -half_side_length, half_side_length),
-            QVector3D(-2 * half_side_length, half_side_length, half_side_length),
-            QVector3D(half_side_length, half_side_length, half_side_length),
-            QVector3D(-2 * half_side_length, half_side_length, -half_side_length),
-            QVector3D(half_side_length, half_side_length, -half_side_length),
-            QVector3D(-half_side_length, -half_side_length, -half_side_length),
-            QVector3D(half_side_length, -half_side_length, -half_side_length),
+            QVector3D(
+                -0.5 * half_side_length, -half_side_length, 0.0 * half_side_length
+            ),  # left-bottom
+            QVector3D(
+                0.5 * half_side_length, -half_side_length, 0.0 * half_side_length
+            ),  # right-bottom
+            QVector3D(
+                -0.5 * half_side_length, half_side_length, 0.0 * half_side_length
+            ),  # left-top
+            QVector3D(
+                0.5 * half_side_length, half_side_length, 0.0 * half_side_length
+            ),  # right-top
+            QVector3D(
+                -0.5 * half_side_length, half_side_length, -0.0 * half_side_length
+            ),
+            QVector3D(
+                0.5 * half_side_length, half_side_length, -0.0 * half_side_length
+            ),
+            QVector3D(
+                -0.5 * half_side_length, -half_side_length, -0.0 * half_side_length
+            ),
+            QVector3D(
+                0.5 * half_side_length, -half_side_length, -0.0 * half_side_length
+            ),
         ]
-        print("vertices created")
 
     def _create_faces(self):
         self.faces = [
@@ -37,8 +52,6 @@ class SlitGeometry:
             [1, 7, 5, 3],
             [6, 0, 2, 4],
         ]
-        print("faces created")
 
     def create_slit_geometry(self) -> OFFGeometryNoNexus:
-        print("returning geometry")
         return OFFGeometryNoNexus(self.vertices, self.faces, SHAPE_GROUP_NAME)
