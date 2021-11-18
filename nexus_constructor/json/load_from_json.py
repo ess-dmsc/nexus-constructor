@@ -306,21 +306,23 @@ class JSONReader:
         """
         self.model = Model()
         instrument_group = self.entry_node[INSTRUMENT_NAME]
-        instrument_component = Instrument(parent_node=self.model.entry)
-        instrument_component.children = instrument_group.children
-        for child in instrument_component.children:
-            child.parent_node = instrument_component
-        self.model.entry.instrument = instrument_component
-        self._add_components_to_instrument()
+        if instrument_group:
+            instrument_component = Instrument(parent_node=self.model.entry)
+            instrument_component.children = instrument_group.children
+            for child in instrument_component.children:
+                child.parent_node = instrument_component
+            self.model.entry.instrument = instrument_component
+            self._add_components_to_instrument()
 
         # Create sample according to old implementation.
-        sample = Component(name=SAMPLE_NAME)
-        sample.children = self.entry_node[SAMPLE_NAME].children
-        for child in sample.children:
-            child.parent_node = sample
-        self.model.entry.instrument.sample = self._add_transform_and_shape_to_component(
-            sample
-        )
+        if self.entry_node[SAMPLE_NAME]:
+            sample = Component(name=SAMPLE_NAME)
+            sample.children = self.entry_node[SAMPLE_NAME].children
+            for child in sample.children:
+                child.parent_node = sample
+            self.model.entry.instrument.sample = (
+                self._add_transform_and_shape_to_component(sample)
+            )
 
     def _add_components_to_instrument(self):
         for child in self.model.entry.instrument.children:
