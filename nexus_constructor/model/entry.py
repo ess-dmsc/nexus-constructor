@@ -71,9 +71,19 @@ class Entry(Group):
 
     @users.setter
     def users(self, users: List[Dict[str, str]]):
+        self._clear_all_users()
+
         for user in users:
             u = User(**user)
             self[u.name] = u
+
+    def _clear_all_users(self):
+        old_users = []
+        for child in self.children:
+            if child.nx_class == NX_USER:
+                old_users.append(child)
+        for user in old_users:
+            self.children.remove(user)
 
     def _set_dataset_property(
         self, name: str, placeholder: Dataset, values: Tuple[str, bool]

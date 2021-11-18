@@ -64,6 +64,8 @@ class TableModel(QAbstractTableModel):
         users = set()
         for user in self._data:
             name = user["name"].strip()
+            if not name:
+                continue
             if name in users:
                 return False
             users.add(name)
