@@ -4,7 +4,9 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 
 from nexus_constructor.common_attrs import (
+    INSTRUMENT_NAME,
     PIXEL_SHAPE_GROUP_NAME,
+    SAMPLE_NAME,
     SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
@@ -23,6 +25,8 @@ from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
+from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     SOURCE,
     Dataset,
@@ -99,7 +103,8 @@ def _find_depends_on_path(items: List[Dict], name: str) -> Optional[str]:
 
 class JSONReader:
     def __init__(self):
-        self.entry_node = None
+        self.entry_node: Group = None
+        self.model: Optional[Model] = None
         self.warnings = JsonWarningsContainer()
 
         # key: TransformId for transform which has a depends on
@@ -193,6 +198,7 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        self._fit_into_model()
         # TODO: Fix this in a follow-up ticket.
         # self._set_transforms_depends_on()
         # self._set_components_depends_on()
@@ -241,9 +247,9 @@ class JSONReader:
 
         # Add attributes to nexus_object.
         if nexus_object:
-            attributes = Attributes()
             json_attrs = json_object.get(CommonKeys.ATTRIBUTES)
             if json_attrs:
+                attributes = Attributes()
                 for json_attr in json_attrs:
                     if not json_attr[CommonKeys.VALUES]:
                         self._add_object_warning(
@@ -290,11 +296,47 @@ class JSONReader:
                 )
             )
             return False
-
         if nx_class not in COMPONENT_TYPES:
             return False
-
         return True
+
+    def _fit_into_model(self):
+        """
+        Create model used in tree-view according to old implementation.
+        """
+        self.model = Model()
+        instrument_group = self.entry_node[INSTRUMENT_NAME]
+        instrument_component = Instrument(parent_node=self.model.entry)
+        instrument_component.children = instrument_group.children
+        for child in instrument_component.children:
+            child.parent_node = instrument_component
+        self.model.entry.instrument = instrument_component
+        self._add_components_to_instrument()
+
+        # Create sample according to old implementation.
+        sample = Component(name=SAMPLE_NAME)
+        sample.children = self.entry_node[SAMPLE_NAME].children
+        for child in sample.children:
+            child.parent_node = sample
+        self.model.entry.instrument.sample = self._add_transform_and_shape_to_component(
+            sample
+        )
+
+    def _add_components_to_instrument(self):
+        for child in self.model.entry.instrument.children:
+            if isinstance(child, Group):
+                component = Component(
+                    name=child.name, parent_node=self.model.entry.instrument
+                )
+                component.attributes = child.attributes
+                for child_child in child.children:
+                    child_child.parent_node = component
+                    component.children.append(child_child)
+                res = self._add_transform_and_shape_to_component(component)
+                self.model.entry.instrument.component_list.append(res)
+
+    def _add_transform_and_shape_to_component(self, component):
+        return component
 
 
 def _get_data_type(json_object: Dict):
