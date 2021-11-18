@@ -20,8 +20,16 @@ from nexus_constructor.json.json_warnings import (
     NXClassAttributeMissing,
     TransformDependencyMissing,
 )
-from nexus_constructor.json.load_from_json_utils import _find_nx_class
+from nexus_constructor.json.load_from_json_utils import (
+    DEPENDS_ON_IGNORE,
+    _find_nx_class,
+)
+from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transform_id import TransformId
+from nexus_constructor.json.transformation_reader import (
+    TransformationReader,
+    get_component_and_transform_name,
+)
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
@@ -198,10 +206,10 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        # TODO: Remove the three function calls below once new UI is in place.
         self._fit_into_model()
-        # TODO: Fix this in a follow-up ticket.
-        # self._set_transforms_depends_on()
-        # self._set_components_depends_on()
+        self._set_transforms_depends_on()
+        self._set_components_depends_on()
         return True
 
     def _read_json_object(self, json_object: Dict, parent_node: Group = None):
@@ -224,6 +232,8 @@ class JSONReader:
             if not self._validate_nx_class(name, nx_class):
                 self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
             nexus_object = Group(name=name, parent_node=parent_node)
+            if CommonKeys.CHILDREN in json_object:
+                nexus_object.child_dict = json_object[CommonKeys.CHILDREN]
             nexus_object.nx_class = nx_class
             if CommonKeys.CHILDREN in json_object:
                 for child in json_object[CommonKeys.CHILDREN]:
@@ -321,7 +331,9 @@ class JSONReader:
             for child in sample.children:
                 child.parent_node = sample
             self.model.entry.instrument.sample = (
-                self._add_transform_and_shape_to_component(sample)
+                self._add_transform_and_shape_to_component(
+                    sample, sample.as_dict([])[CommonKeys.CHILDREN]
+                )
             )
 
     def _add_components_to_instrument(self):
@@ -334,10 +346,39 @@ class JSONReader:
                 for child_child in child.children:
                     child_child.parent_node = component
                     component.children.append(child_child)
-                res = self._add_transform_and_shape_to_component(component)
+                res = self._add_transform_and_shape_to_component(
+                    component, child.child_dict
+                )
                 self.model.entry.instrument.component_list.append(res)
 
-    def _add_transform_and_shape_to_component(self, component):
+    def _add_transform_and_shape_to_component(self, component, children_dict):
+        # Add transformations if they exist.
+        transformation_reader = TransformationReader(
+            component, children_dict, self._transforms_depends_on
+        )
+        transformation_reader.add_transformations_to_component()
+        self.warnings += transformation_reader.warnings
+        depends_on_path = _find_depends_on_path(children_dict, component.name)
+        if depends_on_path not in DEPENDS_ON_IGNORE:
+            depends_on_id = TransformId(
+                *get_component_and_transform_name(depends_on_path)
+            )
+            self._components_depends_on[component.name] = (component, depends_on_id)
+        else:
+            self._components_depends_on[component.name] = (component, None)
+
+        # Add shape if there is a shape.
+        shape_info = _find_shape_information(children_dict)
+        if shape_info:
+            shape_reader = ShapeReader(component, shape_info)
+            shape_reader.add_shape_to_component()
+            try:
+                shape_reader.add_pixel_data_to_component(children_dict)
+            except TypeError:
+                # Will fail if not a detector shape
+                pass
+            self.warnings += shape_reader.warnings
+
         return component
 
 
