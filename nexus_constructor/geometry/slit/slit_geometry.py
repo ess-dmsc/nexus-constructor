@@ -8,7 +8,7 @@ from nexus_constructor.model.geometry import OFFGeometryNoNexus
 
 class SlitGeometry:
     def __init__(self):
-        self.vertices: List[QVector3D]
+        self.vertices: List[QVector3D] = []
         self.faces: List[List[int]]
 
         self._create_vertices()
@@ -16,32 +16,26 @@ class SlitGeometry:
 
     def _create_vertices(self):
         half_side_length = 0.05
-        self.vertices = [
-            QVector3D(
-                -0.5 * half_side_length, -half_side_length, 0.0 * half_side_length
-            ),  # left-bottom
-            QVector3D(
-                0.5 * half_side_length, -half_side_length, 0.0 * half_side_length
-            ),  # right-bottom
-            QVector3D(
-                -0.5 * half_side_length, half_side_length, 0.0 * half_side_length
-            ),  # left-top
-            QVector3D(
-                0.5 * half_side_length, half_side_length, 0.0 * half_side_length
-            ),  # right-top
-            QVector3D(
-                -0.5 * half_side_length, half_side_length, -0.0 * half_side_length
-            ),
-            QVector3D(
-                0.5 * half_side_length, half_side_length, -0.0 * half_side_length
-            ),
-            QVector3D(
-                -0.5 * half_side_length, -half_side_length, -0.0 * half_side_length
-            ),
-            QVector3D(
-                0.5 * half_side_length, -half_side_length, -0.0 * half_side_length
-            ),
+
+        coefficient_matrix = [
+            [-0.5, -1, 0.0],
+            [0.5, -1, 0.0],
+            [-0.5, 1, 0.0],
+            [0.5, 1, 0.0],
+            [-0.5, 1, 0.0],
+            [0.5, 1, 0.0],
+            [-0.5, -1, 0.0],
+            [0.5, -1, 0.0],
         ]
+
+        for row, column in enumerate(coefficient_matrix):
+            self.vertices.append(
+                QVector3D(
+                    column[0] * half_side_length,
+                    column[1] * half_side_length,
+                    column[2] * half_side_length,
+                )
+            )
 
     def _create_faces(self):
         self.faces = [
