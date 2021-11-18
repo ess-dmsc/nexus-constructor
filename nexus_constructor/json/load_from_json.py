@@ -6,7 +6,6 @@ import numpy as np
 from nexus_constructor.common_attrs import (
     INSTRUMENT_NAME,
     PIXEL_SHAPE_GROUP_NAME,
-    SAMPLE_NAME,
     SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
@@ -113,6 +112,7 @@ class JSONReader:
     def __init__(self):
         self.entry_node: Group = None
         self.model: Optional[Model] = None
+        self.sample_name: str = ""
         self.warnings = JsonWarningsContainer()
 
         # key: TransformId for transform which has a depends on
@@ -229,6 +229,8 @@ class JSONReader:
                 self._add_object_warning(CommonKeys.NAME, parent_node)
                 return None
             nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
+            if nx_class == NX_SAMPLE:
+                self.sample_name = name
             if not self._validate_nx_class(name, nx_class):
                 self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
             nexus_object = Group(name=name, parent_node=parent_node)
@@ -325,14 +327,15 @@ class JSONReader:
             self._add_components_to_instrument()
 
         # Create sample according to old implementation.
-        if self.entry_node[SAMPLE_NAME]:
-            sample = Component(name=SAMPLE_NAME)
-            sample.children = self.entry_node[SAMPLE_NAME].children
+        if self.sample_name:
+            sample = self.model.entry.instrument.sample
+            sample.name = self.sample_name
+            sample.children = self.entry_node[self.sample_name].children
             for child in sample.children:
                 child.parent_node = sample
             self.model.entry.instrument.sample = (
                 self._add_transform_and_shape_to_component(
-                    sample, sample.as_dict([])[CommonKeys.CHILDREN]
+                    sample, self.entry_node[self.sample_name].child_dict
                 )
             )
 
