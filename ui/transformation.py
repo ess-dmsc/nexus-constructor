@@ -57,9 +57,9 @@ class UiTransformation:
             "Value to use in 3D view:", self.value_spinbox
         )
 
-        self.setup_ui(Transformation)
+        self.setupUI(Transformation)
 
-    def setup_ui(self, transformation):
+    def setupUI(self, transformation):
         self.setup_name_layout()
         self.setup_vector_layout(transformation)
         self.setup_value_and_magnitude()
