@@ -9,7 +9,11 @@ from PySide2.QtWidgets import QListWidget, QListWidgetItem
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
 from nexus_constructor.component_tree_model import ComponentTreeModel
-from nexus_constructor.component_type import CHOPPER_CLASS_NAME, PIXEL_COMPONENT_TYPES
+from nexus_constructor.component_type import (
+    CHOPPER_CLASS_NAME,
+    PIXEL_COMPONENT_TYPES,
+    SLIT_CLASS_NAME,
+)
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import ChopperChecker
@@ -18,6 +22,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
 )
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
+from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
 from nexus_constructor.model.component import Component, add_fields_to_component
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
@@ -58,6 +63,11 @@ def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget)
         component[SHAPE_GROUP_NAME] = chopper_creator.create_disk_chopper_geometry()
     else:
         logging.warning("Validation failed. Unable to create disk chopper mesh.")
+
+
+def _set_slit_geometry(component: Component):
+    slit_geometry = SlitGeometry()
+    component[SHAPE_GROUP_NAME] = slit_geometry.create_slit_geometry()
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
@@ -405,6 +415,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             and component.nx_class == CHOPPER_CLASS_NAME
         ):
             _set_chopper_geometry(component, self.fieldsListWidget)
+        elif (
+            self.noShapeRadioButton.isChecked()
+            and component.nx_class == SLIT_CLASS_NAME
+        ):
+            _set_slit_geometry(component)
 
     def get_pixel_visibility_condition(self) -> bool:
         """
