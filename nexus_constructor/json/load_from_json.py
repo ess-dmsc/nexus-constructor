@@ -11,7 +11,7 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.component_type import COMPONENT_TYPES
+from nexus_constructor.component_type import COMPONENT_TYPES, VALID_NX_CLASSES
 from nexus_constructor.json.json_warnings import (
     InvalidJson,
     JsonWarningsContainer,
@@ -314,7 +314,7 @@ class JSONReader:
                 )
             )
             return False
-        if nx_class not in COMPONENT_TYPES:
+        if nx_class not in VALID_NX_CLASSES:
             return False
         return True
 
@@ -346,7 +346,7 @@ class JSONReader:
 
     def _add_components_to_instrument(self):
         for child in self.model.entry.instrument.children:
-            if isinstance(child, Group):
+            if isinstance(child, Group) and child.nx_class in COMPONENT_TYPES:
                 component = Component(
                     name=child.name, parent_node=self.model.entry.instrument
                 )
