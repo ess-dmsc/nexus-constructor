@@ -8,9 +8,9 @@ from pytestqt.qtbot import QtBot  # noqa: F401
 
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import EV42Stream, Link, StreamGroup
+from nexus_constructor.model.module import Dataset, F142Stream, Link
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 
@@ -25,15 +25,12 @@ def create_corresponding_value_dataset(value: Any):
     type = _get_human_readable_type(value)
 
     if np.isscalar(value):
-        size = 1
         value = str(value)
-    else:
-        size = len(value)
 
     return Dataset(
+        parent_node=None,
         name=name,
         type=type,
-        size=[size],
         values=value,
     )
 
@@ -130,11 +127,12 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
 
-    stream_group = StreamGroup("stream_group")
+    stream_group = Group("stream_group")
 
     topic = "test_topic"
     source = "source1"
-    stream = EV42Stream(topic=topic, source=source)
+    type = "double"
+    stream = F142Stream(parent_node=stream_group, topic=topic, source=source, type=type)
 
     stream_group["stream"] = stream
 
@@ -151,9 +149,10 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
         view.transformation_frame.magnitude_widget.field_type == FieldType.kafka_stream
     )
     assert view.transformation_frame.magnitude_widget.value.children[0].topic == topic
+    assert view.transformation_frame.magnitude_widget.value.children[0].type == type
     assert (
         view.transformation_frame.magnitude_widget.value.children[0].writer_module
-        == "ev42"
+        == "f142"
     )
     assert view.transformation_frame.magnitude_widget.value.children[0].source == source
 
@@ -171,7 +170,7 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     path = "/entry"
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
-    link = Link(name="test", target=path)
+    link = Link(parent_node=None, name="test", source=path)
 
     transform.values = link
 
@@ -183,7 +182,7 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     assert view.transformation_frame.z_spinbox.value() == z
     assert view.transformation_frame.value_spinbox.value() == 0.0
     assert view.transformation_frame.magnitude_widget.field_type == FieldType.link
-    assert view.transformation_frame.magnitude_widget.value.target == path
+    assert view.transformation_frame.magnitude_widget.value.source == path
 
 
 def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
@@ -208,7 +207,7 @@ def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
     view.transformation_frame.y_spinbox.setValue(new_y)
     view.transformation_frame.z_spinbox.setValue(new_z)
 
-    view.saveChanges()
+    view.save_all_changes()
 
     assert transform.vector == QVector3D(new_x, new_y, new_z)
 
@@ -275,8 +274,7 @@ def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_trans
     new_x = 4
 
     view.transformation_frame.x_spinbox.setValue(new_x)
-    view.saveChanges()
-    model.signals.transformation_changed.emit.assert_called_once()
+    view.save_all_changes()
     assert transform.vector == QVector3D(new_x, y, z)
 
 

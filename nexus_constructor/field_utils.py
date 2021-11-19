@@ -6,21 +6,14 @@ import numpy as np
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.stream import Link, StreamGroup
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
     from PySide2.QtWidgets import QFrame  # noqa: F401
 
-    from nexus_constructor.model.stream import (  # noqa: F401
-        EV42Stream,
-        F142Stream,
-        HS00Stream,
-        NS10Stream,
-        SENVStream,
-        TDCTStream,
-    )
+    from nexus_constructor.model.module import HS00Stream  # noqa: F401
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
     from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
 
@@ -32,7 +25,7 @@ def update_existing_link_field(field: Link, new_ui_field: "QFrame"):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.link
-    new_ui_field.value = field.target
+    new_ui_field.value = field.source
 
 
 def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
@@ -61,9 +54,7 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     __update_existing_dataset_field(field, new_ui_field)
 
 
-def update_existing_stream_field(
-    field: StreamGroup, new_ui_field: "StreamFieldsWidget"
-):
+def update_existing_stream_field(field: Group, new_ui_field: "StreamFieldsWidget"):
     """
     Fill in a UI stream field for an existing stream field in the component group
     :param field: The dataset to copy into the value line edit
@@ -76,21 +67,7 @@ def update_existing_stream_field(
 
 def get_fields_with_update_functions(
     component: Component,
-) -> List[
-    Tuple[
-        Union[
-            Dataset,
-            "NS10Stream",
-            "SENVStream",
-            "TDCTStream",
-            "EV42Stream",
-            "F142Stream",
-            "HS00Stream",
-            "Link",
-        ],
-        Callable,
-    ]
-]:
+) -> List[Tuple[Union["FileWriterModule", "Group"], Callable]]:
     """
     Return a list of fields in a given component group.
     :param component: The component to check for fields
@@ -109,12 +86,21 @@ def find_field_type(item: "ValueType") -> Callable:
             return update_existing_scalar_field
         else:
             return update_existing_array_field
-    elif isinstance(item, StreamGroup):
-        return update_existing_stream_field
+    elif isinstance(item, Group):
+        if item.children:
+            if isinstance(item.children[0], StreamModule):
+                return update_existing_stream_field
+            elif isinstance(item, Link):
+                return update_existing_link_field
+            elif isinstance(item, FileWriterModule):
+                if np.isscalar(item.values):
+                    return update_existing_scalar_field
+                else:
+                    return update_existing_array_field
     elif isinstance(item, Link):
         return update_existing_link_field
     else:
         logging.debug(
             f"Object {item} not handled as field - could be used for other parts of UI instead"
         )
-        return None
+    return None

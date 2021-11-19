@@ -1,13 +1,17 @@
 import json
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
 
 from nexus_constructor.common_attrs import (
+    INSTRUMENT_NAME,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
+    NodeType,
 )
-from nexus_constructor.component_type import COMPONENT_TYPES
+from nexus_constructor.component_type import COMPONENT_TYPES, NX_CLASSES
 from nexus_constructor.json.json_warnings import (
     InvalidJson,
     JsonWarningsContainer,
@@ -17,11 +21,7 @@ from nexus_constructor.json.json_warnings import (
 )
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
-    _add_field_to_group,
-    _find_depends_on_path,
     _find_nx_class,
-    _find_shape_information,
-    _retrieve_children_list,
 )
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transform_id import TransformId
@@ -29,11 +29,21 @@ from nexus_constructor.json.transformation_reader import (
     TransformationReader,
     get_component_and_transform_name,
 )
+from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.entry import Entry
-from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME
+from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
+from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import (
+    SOURCE,
+    Dataset,
+    FileWriterModule,
+    Link,
+    WriterModules,
+    create_fw_module_object,
+)
 from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 """
 The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of
@@ -51,10 +61,58 @@ CHILD_EXCLUDELIST = [
 ]
 
 
+def _retrieve_children_list(json_dict: Dict) -> List:
+    """
+    Attempts to retrieve the children from the JSON dictionary.
+    :param json_dict: The JSON dictionary loaded by the user.
+    :return: The children value is returned if it was found, otherwise an empty list is returned.
+    """
+    value = []
+    try:
+        entry = json_dict[CommonKeys.CHILDREN][0]
+        value = entry[CommonKeys.CHILDREN]
+    except (KeyError, IndexError, TypeError):
+        pass
+    return value
+
+
+def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
+    """
+    Tries to get the shape information from a component.
+    :param children: The list of dictionaries.
+    :return: The shape attribute if it could be found, otherwise None.
+    """
+    value = None
+    try:
+        for item in children:
+            if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
+                value = item
+    except KeyError:
+        pass
+    return value
+
+
+def _find_depends_on_path(items: List[Dict], name: str) -> Optional[str]:
+    if not isinstance(items, list):
+        raise RuntimeError(
+            f'List of children in node with the name "{name}" is not a list.'
+        )
+    for item in items:
+        try:
+            config = item[NodeType.CONFIG]
+            if config[CommonKeys.NAME] != CommonAttrs.DEPENDS_ON:
+                continue
+            return config[CommonKeys.VALUES]
+        except KeyError:
+            pass  # Not all items has a config node, ignore those that do not.
+    return None
+
+
 class JSONReader:
     def __init__(self):
-        self.entry = Entry()
-        self.entry.instrument = Instrument()
+        self.entry_node: Group = None
+        self.model = Model()
+        self.sample_name: str = ""
         self.warnings = JsonWarningsContainer()
 
         # key: TransformId for transform which has a depends on
@@ -74,41 +132,6 @@ class JSONReader:
         self._components_depends_on: Dict[
             str, Tuple[Component, Optional[TransformId]]
         ] = {}
-
-    def load_model_from_json(self, filename: str) -> bool:
-        """
-        Tries to load a model from a JSON file.
-        :param filename: The filename of the JSON file.
-        :return: True if the model was loaded without problems, False otherwise.
-        """
-        with open(filename, "r") as json_file:
-
-            json_data = json_file.read()
-
-            try:
-                json_dict = json.loads(json_data)
-            except ValueError as exception:
-                self.warnings.append(
-                    InvalidJson(
-                        f"Provided file not recognised as valid JSON. Exception: {exception}"
-                    )
-                )
-                return False
-
-            return self._load_from_json_dict(json_dict)
-
-    def _load_from_json_dict(self, json_dict: Dict) -> bool:
-        children_list = _retrieve_children_list(json_dict)
-
-        for child in children_list:
-            self._read_json_object(
-                child, json_dict[CommonKeys.CHILDREN][0].get(CommonKeys.NAME)
-            )
-
-        self._set_transforms_depends_on()
-        self._set_components_depends_on()
-
-        return True
 
     def _set_components_depends_on(self):
         """
@@ -161,75 +184,121 @@ class JSONReader:
                     )
                 )
 
-    def _read_json_object(self, json_object: Dict, parent_name: str = None):
+    def load_model_from_json(self, filename: str) -> bool:
+        """
+        Tries to load a model from a JSON file.
+        :param filename: The filename of the JSON file.
+        :return: True if the model was loaded without problems, False otherwise.
+        """
+        with open(filename, "r") as json_file:
+            json_data = json_file.read()
+            try:
+                json_dict = json.loads(json_data)
+            except ValueError as exception:
+                self.warnings.append(
+                    InvalidJson(
+                        f"Provided file not recognised as valid JSON. Exception: {exception}"
+                    )
+                )
+                return False
+
+            return self._load_from_json_dict(json_dict)
+
+    def _load_from_json_dict(self, json_dict: Dict) -> bool:
+        self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        # TODO: Remove the three function calls below once new UI is in place.
+        self._fit_into_model()
+        self._set_transforms_depends_on()
+        self._set_components_depends_on()
+        return True
+
+    def _read_json_object(self, json_object: Dict, parent_node: Group = None):
         """
         Tries to create a component based on the contents of the JSON file.
         :param json_object: A component from the JSON dictionary.
         :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
-        try:
-            name = json_object[CommonKeys.NAME]
-        except KeyError:
+        nexus_object: Union[Group, FileWriterModule] = None
+        if (
+            CommonKeys.TYPE in json_object
+            and json_object[CommonKeys.TYPE] == NodeType.GROUP
+        ):
+            try:
+                name = json_object[CommonKeys.NAME]
+            except KeyError:
+                self._add_object_warning(CommonKeys.NAME, parent_node)
+                return None
+            nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
+            if nx_class == NX_SAMPLE:
+                self.sample_name = name
+            if not self._validate_nx_class(name, nx_class):
+                self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
+            nexus_object = Group(name=name, parent_node=parent_node)
+            if CommonKeys.CHILDREN in json_object:
+                nexus_object.child_dict = json_object[CommonKeys.CHILDREN]
+            nexus_object.nx_class = nx_class
+            if CommonKeys.CHILDREN in json_object:
+                for child in json_object[CommonKeys.CHILDREN]:
+                    node = self._read_json_object(child, nexus_object)
+                    if node:
+                        nexus_object.children.append(node)
+        elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
+            module_type = json_object[CommonKeys.MODULE]
+            if module_type in [x.value for x in WriterModules]:
+                nexus_object = create_fw_module_object(
+                    module_type, json_object[NodeType.CONFIG], parent_node
+                )
+                nexus_object.parent_node = parent_node
+            else:
+                self._add_object_warning("valid module type", parent_node)
+                return None
+        else:
+            self._add_object_warning(
+                f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
+            )
+
+        # Add attributes to nexus_object.
+        if nexus_object:
+            json_attrs = json_object.get(CommonKeys.ATTRIBUTES)
+            if json_attrs:
+                attributes = Attributes()
+                for json_attr in json_attrs:
+                    if not json_attr[CommonKeys.VALUES]:
+                        self._add_object_warning(
+                            f"values in attribute {json_attr[CommonKeys.NAME]}",
+                            parent_node,
+                        )
+                    elif CommonKeys.DATA_TYPE in json_attr:
+                        attributes.set_attribute_value(
+                            json_attr[CommonKeys.NAME],
+                            json_attr[CommonKeys.VALUES],
+                            json_attr[CommonKeys.DATA_TYPE],
+                        )
+                    elif CommonKeys.NAME in json_attr:
+                        attributes.set_attribute_value(
+                            json_attr[CommonKeys.NAME], json_attr[CommonKeys.VALUES]
+                        )
+            if (
+                parent_node
+                and isinstance(nexus_object, Dataset)
+                and parent_node.nx_class == "NXentry"
+            ):
+                self.model.entry[nexus_object.name] = nexus_object
+
+        return nexus_object
+
+    def _add_object_warning(self, missing_info, parent_node):
+        if parent_node:
             self.warnings.append(
                 NameFieldMissing(
-                    f"Unable to find object name for child of {parent_name}."
+                    f"Unable to find {missing_info} "
+                    f"for child of {parent_node.name}."
                 )
             )
-            return
-
-        nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
-
-        try:
-            children = json_object[CommonKeys.CHILDREN]
-        except KeyError:
-            return
-
-        if nx_class == NX_INSTRUMENT:
-            for child in children:
-                self._read_json_object(child, name)
-
-        if not self._validate_nx_class(name, nx_class):
-            return
-
-        if nx_class == NX_SAMPLE:
-            component = self.entry.instrument.sample
-            component.name = name
         else:
-            component = Component(name, parent_node=self.entry.instrument)
-            component.nx_class = nx_class
-            self.entry.instrument.component_list.append(component)
-
-        for item in children:
-            _add_field_to_group(item, component)
-
-        transformation_reader = TransformationReader(
-            component, children, self._transforms_depends_on
-        )
-        transformation_reader.add_transformations_to_component()
-        self.warnings += transformation_reader.warnings
-
-        depends_on_path = _find_depends_on_path(children, name)
-
-        if depends_on_path not in DEPENDS_ON_IGNORE:
-            depends_on_id = TransformId(
-                *get_component_and_transform_name(depends_on_path)
+            self.warnings.append(
+                NameFieldMissing(f"Unable to find object {missing_info} for NXEntry.")
             )
-            self._components_depends_on[name] = (component, depends_on_id)
-        else:
-            self._components_depends_on[name] = (component, None)
-
-        shape_info = _find_shape_information(children)
-        if shape_info:
-            shape_reader = ShapeReader(component, shape_info)
-            shape_reader.add_shape_to_component()
-            try:
-                shape_reader.add_pixel_data_to_component(
-                    json_object[CommonKeys.CHILDREN]
-                )
-            except TypeError:
-                # Will fail if not a detector shape
-                pass
-            self.warnings += shape_reader.warnings
 
     def _validate_nx_class(self, name: str, nx_class: str) -> bool:
         """
@@ -245,8 +314,116 @@ class JSONReader:
                 )
             )
             return False
-
-        if nx_class not in COMPONENT_TYPES:
+        if nx_class not in NX_CLASSES:
             return False
-
         return True
+
+    def _fit_into_model(self):
+        """
+        Create model used in tree-view according to old implementation.
+        """
+        instrument_group = self.entry_node[INSTRUMENT_NAME]
+        if instrument_group:
+            instrument_component = Instrument(parent_node=self.model.entry)
+            instrument_component.children = instrument_group.children
+            for child in instrument_component.children:
+                child.parent_node = instrument_component
+            self.model.entry.instrument = instrument_component
+            self._add_components_to_instrument()
+
+        # Create sample according to old implementation.
+        if self.sample_name:
+            sample = self.model.entry.instrument.sample
+            sample.name = self.sample_name
+            sample.children = self.entry_node[self.sample_name].children
+            for child in sample.children:
+                child.parent_node = sample
+            self.model.entry.instrument.sample = (
+                self._add_transform_and_shape_to_component(
+                    sample, self.entry_node[self.sample_name].child_dict
+                )
+            )
+
+    def _add_components_to_instrument(self):
+        for child in self.model.entry.instrument.children:
+            if isinstance(child, Group) and child.nx_class in COMPONENT_TYPES:
+                component = Component(
+                    name=child.name, parent_node=self.model.entry.instrument
+                )
+                component.attributes = child.attributes
+                for child_child in child.children:
+                    child_child.parent_node = component
+                    component.children.append(child_child)
+                res = self._add_transform_and_shape_to_component(
+                    component, child.child_dict
+                )
+                self.model.entry.instrument.component_list.append(res)
+
+    def _add_transform_and_shape_to_component(self, component, children_dict):
+        # Add transformations if they exist.
+        transformation_reader = TransformationReader(
+            component, children_dict, self._transforms_depends_on
+        )
+        transformation_reader.add_transformations_to_component()
+        self.warnings += transformation_reader.warnings
+        depends_on_path = _find_depends_on_path(children_dict, component.name)
+        if depends_on_path not in DEPENDS_ON_IGNORE:
+            depends_on_id = TransformId(
+                *get_component_and_transform_name(depends_on_path)
+            )
+            self._components_depends_on[component.name] = (component, depends_on_id)
+        else:
+            self._components_depends_on[component.name] = (component, None)
+
+        # Add shape if there is a shape.
+        shape_info = _find_shape_information(children_dict)
+        if shape_info:
+            shape_reader = ShapeReader(component, shape_info)
+            shape_reader.add_shape_to_component()
+            try:
+                shape_reader.add_pixel_data_to_component(children_dict)
+            except TypeError:
+                # Will fail if not a detector shape
+                pass
+            self.warnings += shape_reader.warnings
+
+        return component
+
+
+def _get_data_type(json_object: Dict):
+    if CommonKeys.DATA_TYPE in json_object:
+        return json_object[CommonKeys.DATA_TYPE]
+    elif CommonKeys.TYPE in json_object:
+        return json_object[CommonKeys.TYPE]
+    raise KeyError
+
+
+def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
+    value_type = _get_data_type(json_object[NodeType.CONFIG])
+    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
+    values = json_object[NodeType.CONFIG][CommonKeys.VALUES]
+    if isinstance(values, list):
+        # convert to a numpy array using specified type
+        values = np.array(values, dtype=VALUE_TYPE_TO_NP[value_type])
+    ds = Dataset(name=name, values=values, type=value_type, parent_node=parent)
+    _add_attributes(json_object, ds)
+    return ds
+
+
+def _create_link(json_object: Dict, parent_node: Optional[Group] = None) -> Link:
+    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
+    target = json_object[NodeType.CONFIG][SOURCE]
+    return Link(parent_node=parent_node, name=name, source=target)
+
+
+def _add_attributes(json_object: Dict, model_object: Union[Group, Dataset]):
+    try:
+        attrs_list = json_object[CommonKeys.ATTRIBUTES]
+        for attribute in attrs_list:
+            attr_name = attribute[CommonKeys.NAME]
+            attr_values = attribute[CommonKeys.VALUES]
+            model_object.attributes.set_attribute_value(
+                attribute_name=attr_name, attribute_value=attr_values
+            )
+    except (KeyError, AttributeError):
+        pass

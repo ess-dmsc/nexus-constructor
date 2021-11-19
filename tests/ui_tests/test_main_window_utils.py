@@ -8,8 +8,8 @@ from PySide2.QtWidgets import QFrame, QToolBar, QTreeView, QVBoxLayout, QWidget
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -554,7 +554,7 @@ def test_GIVEN_translation_is_added_WHEN_adding_transformation_THEN_translation_
     sample_component = sample_component_index.internalPointer()
 
     assert len(sample_component.transforms) == 1
-    assert sample_component.transforms[0].transform_type == "Translation"
+    assert sample_component.transforms[0].transform_type == "translation"
 
 
 def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_added_to_component(
@@ -568,7 +568,7 @@ def test_GIVEN_rotation_is_added_WHEN_adding_transformation_THEN_rotation_is_add
     sample_component = sample_component_index.internalPointer()
 
     assert len(sample_component.transforms) == 1
-    assert sample_component.transforms[0].transform_type == "Rotation"
+    assert sample_component.transforms[0].transform_type == "rotation"
 
 
 def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raises_value_error(
@@ -584,11 +584,13 @@ def test_GIVEN_unknown_transformation_type_WHEN_adding_transformation_THEN_raise
 
 def create_transformation(trans_type: TransformationType):
     t = Transformation(
-        name="transformation", type=ValueTypes.DOUBLE, size=[1], values=8
+        parent_node=None, name="transformation", type=ValueTypes.DOUBLE, values=8
     )
     t.transform_type = trans_type
     t.vector = QVector3D(1, 0, 0)
-    t.values = Dataset(name="", values=0, type=ValueTypes.DOUBLE)
+    t.values = Dataset(
+        parent_node=Transformation, name="", values=0, type=ValueTypes.DOUBLE
+    )
     t.units = "m"
     return t
 

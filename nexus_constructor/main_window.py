@@ -1,14 +1,9 @@
 import json
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from weakref import WeakKeyDictionary
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
-    QApplication,
-    QDialog,
-    QMainWindow,
-    QMessageBox,
-)
+from PySide2.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
@@ -95,7 +90,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if filename:
             if not filename.endswith(".json"):
                 filename += ".json"
-            data_dump = json.dumps(self.model.as_dict(), indent=2)
+            error_collector: List[str] = []
+            data_dump = json.dumps(self.model.as_dict(error_collector), indent=2)
+            if error_collector:
+                show_errors_message(error_collector)
+                return
             with open(filename, "w") as file:
                 file.write(data_dump)
 
@@ -113,7 +112,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     parent=self,
                 )
             if success:
-                self.model.entry = reader.entry
+                self.model.entry = reader.model.entry
                 self._update_views()
 
     def _update_transformations_3d_view(self):
@@ -144,6 +143,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
         self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
+
+
+def show_errors_message(errors: List[str]):
+    msgBox = QMessageBox()
+    msgBox.setIcon(QMessageBox.Critical)
+    msgBox.setText("Could not save file as structure invalid, see below for details")
+    msgBox.setStandardButtons(QMessageBox.Ok)
+    msgBox.setDetailedText("\n\n".join([f"- {err}" for err in errors]))
+    msgBox.exec_()
 
 
 class QDialogCustom(QDialog):
@@ -178,7 +186,11 @@ class QDialogCustom(QDialog):
             return
         quit_msg = "Do you want to close the component editor?"
         reply = QMessageBox.question(
-            self, "Really quit?", quit_msg, QMessageBox.Close | QMessageBox.Ignore, QMessageBox.Close
+            self,
+            "Really quit?",
+            quit_msg,
+            QMessageBox.Close | QMessageBox.Ignore,
+            QMessageBox.Close,
         )
         if reply == QMessageBox.Close:
             event.accept()

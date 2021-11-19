@@ -3,7 +3,7 @@ import pytest
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import TRANSFORMS_GROUP_NAME, Component
-from nexus_constructor.model.stream import Link, NS10Stream
+from nexus_constructor.model.module import Link, NS10Stream
 from nexus_constructor.model.value_type import ValueTypes
 
 
@@ -44,7 +44,6 @@ def test_component_set_field_with_numpy_array_correctly_sets_field_value():
     field_dataset = comp["field1"]
     assert field_dataset.name == field_name
     assert np.array_equal(field_dataset.values, field_value)
-    assert field_dataset.size == (2, 1)
     assert field_dataset.type == dtype
 
 
@@ -60,7 +59,6 @@ def test_component_set_field_with_scalar_value_correctly_sets_field_value():
 
     assert field_dataset.name == field_name
     assert field_dataset.values == data
-    assert field_dataset.size == [1]
     assert field_dataset.type == dtype
 
 
@@ -78,7 +76,7 @@ def test_component_as_dict_contains_transformations():
         depends_on=first_transform,
     )
     test_component.depends_on = zeroth_transform
-    dictionary_output = test_component.as_dict()
+    dictionary_output = test_component.as_dict([])
 
     assert dictionary_output["children"][0]["name"] == TRANSFORMS_GROUP_NAME
     child_names = [
@@ -94,9 +92,9 @@ def test_component_as_dict_contains_stream_field():
     topic = "topic1"
     name = "stream1"
     test_component = Component(name="test")
-    test_component[name] = NS10Stream(source=source, topic=topic)
+    test_component[name] = NS10Stream(parent_node=None, source=source, topic=topic)
 
-    dictionary_output = test_component.as_dict()
+    dictionary_output = test_component.as_dict([])
 
     assert dictionary_output["children"][0]["module"] == "ns10"
     assert dictionary_output["children"][0]["config"]["topic"] == topic
@@ -107,9 +105,9 @@ def test_component_as_dict_contains_links():
     name = "link1"
     target = "/entry/instrument/something"
     test_component = Component(name="test")
-    test_component[name] = Link(name=name, target=target)
+    test_component[name] = Link(parent_node=None, name=name, source=target)
 
-    dictionary_output = test_component.as_dict()
+    dictionary_output = test_component.as_dict([])
 
     assert dictionary_output["children"][0]["config"]["name"] == name
     assert dictionary_output["children"][0]["config"]["source"] == target

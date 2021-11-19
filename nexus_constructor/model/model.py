@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from PySide2.QtCore import QObject, Signal
 
@@ -11,7 +11,6 @@ class Signals(QObject):
     """
     Signals when model is updated, to trigger, for example, updating the 3D view
     """
-
     file_changed = Signal("QVariant")
     file_opened = Signal("QVariant")
     component_added = Signal(str, "QVariant", "QVariant")
@@ -26,5 +25,5 @@ class Model:
         self.entry = Entry()
         self.entry.instrument = Instrument()
 
-    def as_dict(self) -> Dict[str, Any]:
-        return {CommonKeys.CHILDREN: [self.entry.as_dict()]}
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
+        return {CommonKeys.CHILDREN: [self.entry.as_dict(error_collector)]}

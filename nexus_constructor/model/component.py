@@ -29,7 +29,6 @@ from nexus_constructor.geometry.pixel_data_utils import (
     get_z_offsets_from_pixel_grid,
 )
 from nexus_constructor.geometry.utils import validate_nonzero_qvector
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.geometry import (
     CYLINDERS,
     DETECTOR_NUMBER,
@@ -41,9 +40,9 @@ from nexus_constructor.model.geometry import (
     OFFGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.model.stream import DATASET
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.helpers import _generate_incremental_name
+from nexus_constructor.model.module import DATASET, Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -199,7 +198,9 @@ class Component(Group):
         vector: QVector3D,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
+        values: Dataset = Dataset(
+            parent_node=None, name="", values=0, type=ValueTypes.DOUBLE
+        ),
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -208,6 +209,7 @@ class Component(Group):
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         :param values: The translation distance information.
         """
+        values.parent_node = self
         unit_vector, _ = _normalise(vector)
         return self._create_and_add_transform(
             name,
@@ -225,7 +227,9 @@ class Component(Group):
         angle: float,
         name: str = None,
         depends_on: Transformation = None,
-        values: Dataset = Dataset(name="", values=0, type=ValueTypes.DOUBLE, size="1"),
+        values: Dataset = Dataset(
+            parent_node=None, name="", values=0, type=ValueTypes.DOUBLE
+        ),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -235,6 +239,7 @@ class Component(Group):
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         :param values: The translation distance information.
         """
+        values.parent_node = self
         return self._create_and_add_transform(
             name,
             TransformationType.ROTATION,
@@ -253,15 +258,24 @@ class Component(Group):
         units: str,
         vector: QVector3D,
         depends_on: Transformation,
-        values: Dataset,
+        values: Union[Dataset, Group],
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
+
+        type = ValueTypes.DOUBLE
+        if isinstance(values, Dataset):
+            type = values.type
+        elif isinstance(values, Group):
+            try:
+                type = values.children[0].type  # type: ignore
+            except AttributeError:
+                pass
+
         transform = Transformation(
             name=name,
             parent_node=self.get_transforms_group(),
-            type=values.type,
-            size=values.size,
+            type=type,
             values=values,
         )
         transform.transform_type = transformation_type
@@ -271,7 +285,7 @@ class Component(Group):
         transform.depends_on = depends_on
         transform.parent_component = self
 
-        self.get_transforms_group()[name] = transform
+        self.get_transforms_group()[name] = transform  # type: ignore
 
         return transform
 
@@ -434,8 +448,8 @@ class Component(Group):
             )
         ]
 
-    def as_dict(self) -> Dict[str, Any]:
-        dictionary = super(Component, self).as_dict()
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
+        dictionary = super(Component, self).as_dict(error_collector)
 
         if self.transforms:
             # Add transformations in a child group
@@ -444,7 +458,8 @@ class Component(Group):
                     CommonKeys.TYPE: NodeType.GROUP,
                     CommonKeys.NAME: TRANSFORMS_GROUP_NAME,
                     CommonKeys.CHILDREN: [
-                        transform.as_dict() for transform in self.transforms
+                        transform.as_dict(error_collector)
+                        for transform in self.transforms
                     ],
                     CommonKeys.ATTRIBUTES: [
                         {

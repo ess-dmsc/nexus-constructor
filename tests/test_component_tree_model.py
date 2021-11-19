@@ -10,9 +10,9 @@ from nexus_constructor.component_tree_model import (
     LinkTransformation,
 )
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 
@@ -23,7 +23,11 @@ def _add_component_to_file(
     component.set_field_value(
         field_name,
         Dataset(
-            name=field_name, type=ValueTypes.DOUBLE, size="[1]", values=field_value
+            parent_node=None,
+            name=field_name,
+            type=ValueTypes.DOUBLE,
+            size="[1]",
+            values=field_value,
         ),
         dtype=ValueTypes.DOUBLE,
     )
@@ -388,7 +392,7 @@ def test_add_rotation():
     test_component_tree_model.add_rotation(component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 1
     transform_index = test_component_tree_model.index(0, 0, transformation_list_index)
-    assert transform_index.internalPointer().transform_type == "Rotation"
+    assert transform_index.internalPointer().transform_type == "rotation"
 
 
 def test_add_translation():
@@ -401,7 +405,7 @@ def test_add_translation():
     test_component_tree_model.add_translation(component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 1
     transform_index = test_component_tree_model.index(0, 0, transformation_list_index)
-    assert transform_index.internalPointer().transform_type == "Translation"
+    assert transform_index.internalPointer().transform_type == "translation"
 
 
 def test_add_transformation_alt_1():
