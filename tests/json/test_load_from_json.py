@@ -408,6 +408,7 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     assert node.children[0].nx_class == component_class
 
 
+@pytest.mark.skip(reason="not a valid test anymore due to reimplementation")
 def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_component_in_model_contains_transform(
     json_dict_with_component_and_transform, json_reader
 ):
