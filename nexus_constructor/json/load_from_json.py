@@ -11,7 +11,7 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.component_type import COMPONENT_TYPES, VALID_NX_CLASSES
+from nexus_constructor.component_type import COMPONENT_TYPES, NX_CLASSES
 from nexus_constructor.json.json_warnings import (
     InvalidJson,
     JsonWarningsContainer,
@@ -314,7 +314,7 @@ class JSONReader:
                 )
             )
             return False
-        if nx_class not in VALID_NX_CLASSES:
+        if nx_class not in NX_CLASSES:
             return False
         return True
 

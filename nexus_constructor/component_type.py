@@ -40,7 +40,7 @@ COMPONENT_TYPES = {
     "NXxraylens",
 }
 
-VALID_NX_CLASSES = {
+NX_CLASSES = {
     "NXaperture",
     "NXattenuator",
     "NXbeam",
