@@ -67,7 +67,7 @@ class UiTransformation:
 
         self.frame_layout.addLayout(self.main_layout)
 
-        self.retranslate_ui(transformation)
+        self.retranslateUi(transformation)
         QMetaObject.connectSlotsByName(transformation)
 
     def setup_value_and_magnitude(self):
@@ -130,7 +130,7 @@ class UiTransformation:
         label.setFont(font)
 
     @staticmethod
-    def retranslate_ui(transformation):
+    def retranslateUi(transformation):
         transformation.setWindowTitle(
             QApplication.translate("Transformation", "GroupBox", None, -1)
         )
