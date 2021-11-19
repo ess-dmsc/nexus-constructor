@@ -5,7 +5,6 @@ from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.module import Dataset
-from nexus_constructor.model.user import User, NX_USER
 from nexus_constructor.model.value_type import ValueTypes
 
 NEXUS_TITLE_NAME = "title"
@@ -70,22 +69,38 @@ class Entry(Group):
     def users(self) -> List[Dict[str, str]]:
         users = []
         for child in self.children:
-            if isinstance(child, Group) and child.nx_class == NX_USER:
-                users.append(child.values_dict())  # type: ignore
+            if isinstance(child, Group) and child.nx_class == "NXuser":
+                users.append(self._extract_user_info(child))
         return users
 
     @users.setter
     def users(self, users: List[Dict[str, str]]):
         self._clear_all_users()
-
         for user in users:
-            u = User(**user)
-            self[u.name] = u
+            group = Group(name="temporary name", parent_node=self)
+            group = self._create_user(group, user)
+            self[group.name] = group
+
+    def _extract_user_info(self, group: Group) -> Dict[str, str]:
+        return {
+            ds.name: str(ds.values) for ds in group.children if isinstance(ds, Dataset)
+        }
+
+    def _create_user(self, group: Group, user_data: Dict[str, str]) -> Group:
+        group.name = f"user_{user_data['name'].replace(' ', '')}"
+        group.nx_class = "NXuser"
+        for name, value in user_data.items():
+            group.children.append(
+                Dataset(
+                    name=name, parent_node=group, type=ValueTypes.STRING, values=value
+                )
+            )
+        return group
 
     def _clear_all_users(self):
         old_users = []
         for child in self.children:
-            if isinstance(child, Group) and child.nx_class == NX_USER:
+            if isinstance(child, Group) and child.nx_class == "NXuser":
                 old_users.append(child)
         for user in old_users:
             self.children.remove(user)

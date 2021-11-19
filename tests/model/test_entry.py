@@ -7,7 +7,6 @@ from nexus_constructor.model.entry import (
     NEXUS_TITLE_NAME,
 )
 from nexus_constructor.model.instrument import SAMPLE_NAME, Instrument
-from nexus_constructor.model.user import NX_USER
 
 
 def find_child_dataset_by_name(dictionary, name):
@@ -157,7 +156,7 @@ def test_users_is_initially_empty():
     assert len(test_entry.users) == 0
 
 
-def test_users_can_be_set():
+def test_users_can_be_edited_using_simple_dict_representation():
     user_john = {
         "name": "John Smith",
         "email": "js@ess.eu",
@@ -190,7 +189,7 @@ def test_users_are_in_dictionary():
     test_entry.users = [user_john, user_betty]
 
     dictionary = test_entry.as_dict([])
-    result = extract_based_on_nx_class(dictionary, NX_USER)
+    result = extract_based_on_nx_class(dictionary, "NXuser")
 
     assert_matching_datasets_exist(result[0], user_john)
     assert_matching_datasets_exist(result[1], user_betty)
