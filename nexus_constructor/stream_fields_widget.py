@@ -20,11 +20,8 @@ from nexus_constructor.common_attrs import ARRAY, SCALAR
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
-    CHUNK_CHUNK_KB,
-    CHUNK_CHUNK_MB,
-    INDEX_EVERY_KB,
-    INDEX_EVERY_MB,
-    STORE_LATEST_INTO,
+    CHUNK_SIZE,
+    CUE_INTERVAL,
     EV42Stream,
     F142Stream,
     HS00Stream,
@@ -186,19 +183,13 @@ class StreamFieldsWidget(QDialog):
 
         self.ev42_index_every_mb_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
-                INDEX_EVERY_MB, self.ev42_advanced_group_box
+                CHUNK_SIZE, self.ev42_advanced_group_box
             )
         )
         self.ev42_index_every_kb_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
-                INDEX_EVERY_KB, self.ev42_advanced_group_box
+                CUE_INTERVAL, self.ev42_advanced_group_box
             )
-        )
-        self.ev42_chunk_mb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            CHUNK_CHUNK_MB, self.ev42_advanced_group_box
-        )
-        self.ev42_chunk_kb_spinner = self.create_label_and_spinbox_for_advanced_option(
-            CHUNK_CHUNK_KB, self.ev42_advanced_group_box
         )
 
     def create_label_and_spinbox_for_advanced_option(
@@ -228,17 +219,12 @@ class StreamFieldsWidget(QDialog):
 
         self.f142_index_every_mb_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
-                INDEX_EVERY_MB, self.f142_advanced_group_box
+                CHUNK_SIZE, self.f142_advanced_group_box
             )
         )
         self.f142_index_every_kb_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
-                INDEX_EVERY_KB, self.f142_advanced_group_box
-            )
-        )
-        self.f142_store_latest_into_spinner = (
-            self.create_label_and_spinbox_for_advanced_option(
-                STORE_LATEST_INTO, self.f142_advanced_group_box
+                CUE_INTERVAL, self.f142_advanced_group_box
             )
         )
 
