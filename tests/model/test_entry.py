@@ -5,6 +5,7 @@ from nexus_constructor.model.entry import (
     NEXUS_EXP_ID_NAME,
     TITLE_PLACEHOLDER_VALUE,
     NEXUS_TITLE_NAME,
+    USERS_PLACEHOLDER,
 )
 from nexus_constructor.model.instrument import SAMPLE_NAME, Instrument
 
@@ -193,3 +194,21 @@ def test_users_are_in_dictionary():
 
     assert_matching_datasets_exist(result[0], user_john)
     assert_matching_datasets_exist(result[1], user_betty)
+
+
+def test_if_placeholder_used_then_users_replaced_by_placeholder():
+    user_john = {
+        "name": "John Smith",
+        "email": "js@ess.eu",
+        "facility_user_id": "js90",
+        "affiliation": "ESS",
+    }
+
+    test_entry = Entry()
+    test_entry.users = [user_john]
+
+    test_entry.users_placeholder = True
+    dictionary = test_entry.as_dict([])
+
+    assert len(extract_based_on_nx_class(dictionary, "NXuser")) == 0
+    assert USERS_PLACEHOLDER in dictionary["children"]
