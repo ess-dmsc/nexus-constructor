@@ -56,6 +56,46 @@ class Entry(Group):
     def title(self, values: Tuple[str, bool]):
         self._set_dataset_property(NEXUS_TITLE_NAME, TITLE_PLACEHOLDER, values)
 
+    @property
+    def users(self) -> List[Dict[str, str]]:
+        users = []
+        for child in self.children:
+            if isinstance(child, Group) and child.nx_class == "NXuser":
+                users.append(self._extract_user_info(child))
+        return users
+
+    @users.setter
+    def users(self, users: List[Dict[str, str]]):
+        self._clear_all_users()
+        for user in users:
+            group = Group(name="temporary name", parent_node=self)
+            group = self._create_user(group, user)
+            self[group.name] = group
+
+    def _extract_user_info(self, group: Group) -> Dict[str, str]:
+        return {
+            ds.name: str(ds.values) for ds in group.children if isinstance(ds, Dataset)
+        }
+
+    def _create_user(self, group: Group, user_data: Dict[str, str]) -> Group:
+        group.name = f"user_{user_data['name'].replace(' ', '')}"
+        group.nx_class = "NXuser"
+        for name, value in user_data.items():
+            group.children.append(
+                Dataset(
+                    name=name, parent_node=group, type=ValueTypes.STRING, values=value
+                )
+            )
+        return group
+
+    def _clear_all_users(self):
+        old_users = []
+        for child in self.children:
+            if isinstance(child, Group) and child.nx_class == "NXuser":
+                old_users.append(child)
+        for user in old_users:
+            self.children.remove(user)
+
     def _read_dataset_property(self, name: str, value: str) -> Tuple[str, bool]:
         dataset = self[name]
         if dataset:

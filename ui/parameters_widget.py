@@ -5,9 +5,11 @@ from PySide2.QtWidgets import (
     QLabel,
     QLineEdit,
     QCheckBox,
+    QPushButton,
 )
 
 from nexus_constructor.model.model import Model
+from ui.configure_users import ConfigureUsersDialog
 
 
 class ParametersView(QWidget):
@@ -42,6 +44,13 @@ class ParametersView(QWidget):
         self.title_layout.addWidget(self.title_text)
         self.title_layout.addWidget(self.title_placeholder)
         self.layout().addLayout(self.title_layout)
+
+        self.user_layout = QHBoxLayout()
+        self.edit_user_button = QPushButton()
+        self.edit_user_button.setText("Configure users")
+        self.edit_user_button.clicked.connect(self._edit_users)
+        self.user_layout.addWidget(self.edit_user_button)
+        self.layout().addLayout(self.user_layout)
 
     def set_up_model(self, model: Model):
         self.model = model
@@ -80,3 +89,8 @@ class ParametersView(QWidget):
 
     def _title_text_changed(self, text):
         self.model.entry.title = (text, self.title_placeholder.isChecked())
+
+    def _edit_users(self):
+        dialog = ConfigureUsersDialog(self.model.entry.users)
+        if dialog.exec_():
+            self.model.entry.users = dialog.get_users()
