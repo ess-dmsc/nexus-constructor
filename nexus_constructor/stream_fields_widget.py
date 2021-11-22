@@ -349,8 +349,8 @@ class StreamFieldsWidget(QDialog):
         :param stream: The stream data object to be modified.
         """
         stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
-        stream.chunk_size = self.f142_chunk_size_spinner.value()
-        stream.cue_interval = self.f142_cue_interval_spinner.value()
+        stream.chunk_size = self.ev42_chunk_size_spinner.value()
+        stream.cue_interval = self.ev42_cue_interval_spinner.value()
 
     def fill_in_existing_ev42_fields(self, field: EV42Stream):
         """
