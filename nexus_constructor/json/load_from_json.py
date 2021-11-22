@@ -31,6 +31,7 @@ from nexus_constructor.json.transformation_reader import (
 )
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.entry import USERS_PLACEHOLDER
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
@@ -252,6 +253,9 @@ class JSONReader:
             else:
                 self._add_object_warning("valid module type", parent_node)
                 return None
+        elif json_object == USERS_PLACEHOLDER:
+            self.model.entry.users_placeholder = True
+            return None
         else:
             self._add_object_warning(
                 f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
