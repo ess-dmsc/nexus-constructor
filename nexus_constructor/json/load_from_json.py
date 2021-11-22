@@ -278,6 +278,7 @@ class JSONReader:
                         attributes.set_attribute_value(
                             json_attr[CommonKeys.NAME], json_attr[CommonKeys.VALUES]
                         )
+                nexus_object.attributes = attributes
             if (
                 parent_node
                 and isinstance(nexus_object, Dataset)
