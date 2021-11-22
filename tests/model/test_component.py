@@ -3,7 +3,7 @@ import pytest
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import TRANSFORMS_GROUP_NAME, Component
-from nexus_constructor.model.stream import Link, NS10Stream
+from nexus_constructor.model.module import Link, NS10Stream
 from nexus_constructor.model.value_type import ValueTypes
 
 
@@ -92,7 +92,7 @@ def test_component_as_dict_contains_stream_field():
     topic = "topic1"
     name = "stream1"
     test_component = Component(name="test")
-    test_component[name] = NS10Stream(source=source, topic=topic)
+    test_component[name] = NS10Stream(parent_node=None, source=source, topic=topic)
 
     dictionary_output = test_component.as_dict([])
 
@@ -105,7 +105,7 @@ def test_component_as_dict_contains_links():
     name = "link1"
     target = "/entry/instrument/something"
     test_component = Component(name="test")
-    test_component[name] = Link(name=name, target=target)
+    test_component[name] = Link(parent_node=None, name=name, source=target)
 
     dictionary_output = test_component.as_dict([])
 

@@ -22,6 +22,7 @@ from nexus_constructor.treeview_utils import (
     expand_transformation_list,
     set_button_states,
 )
+from ui.parameters_widget import ParametersView
 
 
 class ComponentTreeViewTab(QWidget):
@@ -31,7 +32,10 @@ class ComponentTreeViewTab(QWidget):
         self.setParent(parent)
         self.componentsTabLayout = QVBoxLayout()
         self.component_tree_view = QTreeView()
+        self.parameters_widget = ParametersView(parent)
+        self.componentsTabLayout.addWidget(self.parameters_widget)
         self.componentsTabLayout.addWidget(self.component_tree_view)
+
         self.layout().addLayout(self.componentsTabLayout)
 
         self.sceneWidget = scene_widget
@@ -104,6 +108,7 @@ class ComponentTreeViewTab(QWidget):
         )
         self.component_tree_view.setItemDelegate(self.component_delegate)
         self.component_tree_view.setModel(self.component_model)
+        self.parameters_widget.set_up_model(model)
 
     def _set_button_state(self):
         set_button_states(

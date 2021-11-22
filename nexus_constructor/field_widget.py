@@ -1,7 +1,7 @@
 import logging
 import uuid
 from functools import partial
-from typing import TYPE_CHECKING, Any, List, Union
+from typing import Any, List, Union
 
 import numpy as np
 from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
@@ -23,9 +23,8 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import Link
+from nexus_constructor.model.module import Dataset, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -35,9 +34,6 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
-
-if TYPE_CHECKING:
-    from nexus_constructor.model.stream import StreamGroup
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -234,10 +230,11 @@ class FieldWidget(QFrame):
     @property
     def value(self) -> Union[Dataset, Group, Link, None]:
         dtype = self.value_type_combo.currentText()
-        return_object: Union[Dataset, StreamGroup, Link]
+        return_object: Union[Dataset, Group, Link]
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
             return_object = Dataset(
+                parent_node=None,
                 name=self.name,
                 type=dtype,
                 values=val,
@@ -246,6 +243,7 @@ class FieldWidget(QFrame):
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
+                parent_node=None,
                 name=self.name,
                 type=dtype,
                 values=array,
@@ -253,7 +251,9 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.kafka_stream:
             return_object = self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
-            return_object = Link(name=self.name, target=self.value_line_edit.text())
+            return_object = Link(
+                parent_node=None, name=self.name, source=self.value_line_edit.text()
+            )
         else:
             logging.error(f"unknown field type: {self.name}")
             return None

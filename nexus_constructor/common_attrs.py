@@ -37,6 +37,7 @@ class TransformationType:
 
 
 INSTRUMENT_NAME = "instrument"
+SAMPLE_NAME = "sample"
 ARRAY = "Array"
 SCALAR = "Scalar"
 SHAPE_GROUP_NAME = "shape"

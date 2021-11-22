@@ -1,7 +1,7 @@
 import numpy as np
 
 from nexus_constructor.model.component import Component, add_fields_to_component
-from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.module import Dataset
 
 
 class DummyListWidget:
@@ -35,6 +35,7 @@ def test_GIVEN_single_scalar_field_and_float_WHEN_adding_fields_to_component_THE
     field_value_raw = field_dtype(32.123)
 
     field_value = Dataset(
+        parent_node=component,
         name=field_name,
         type=field_dtype,
         values=field_value_raw,
@@ -59,6 +60,7 @@ def test_GIVEN_single_scalar_field_and_string_WHEN_adding_fields_to_component_TH
     field_value_raw = np.string_(b"some_value")
 
     field_value = Dataset(
+        parent_node=component,
         name=field_name,
         type=str,
         values=field_value_raw,

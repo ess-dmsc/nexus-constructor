@@ -112,7 +112,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     parent=self,
                 )
             if success:
-                self.model.entry = reader.entry
+                self.model.entry = reader.model.entry
                 self._update_views()
 
     def _update_transformations_3d_view(self):

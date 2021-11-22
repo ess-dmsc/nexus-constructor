@@ -11,8 +11,9 @@ from nexus_constructor.common_attrs import (
     NodeType,
     TransformationType,
 )
-from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.stream import StreamGroup
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.helpers import get_absolute_path
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
     DEGREES,
@@ -36,6 +37,10 @@ class Transformation(Dataset):
     _dependents = attr.ib(type=list, init=False)
     _ui_value = attr.ib(type=float, default=None)
     _ui_scale_factor = attr.ib(type=float, default=1.0, init=False)
+
+    @property
+    def absolute_path(self):
+        return get_absolute_path(self)
 
     @_dependents.default
     def _initialise_dependents(self):
@@ -184,27 +189,11 @@ class Transformation(Dataset):
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return_dict: Dict = {}
         if isinstance(self.values, Dataset):
-            values = self.values.values
-            if np.isscalar(values):
-                try:
-                    values = float(values)  # type:ignore
-                except ValueError:
-                    error_collector.append(
-                        f"value '{values}' is invalid for transformation '{self.name}' "
-                        "as expected a numeric value"
-                    )
-            if isinstance(values, np.ndarray):
-                values = values.tolist()
-            return_dict = {
-                CommonKeys.MODULE: "dataset",
-                NodeType.CONFIG: {
-                    CommonKeys.NAME: self.name,
-                    CommonKeys.DATA_TYPE: self.values.type,
-                    CommonKeys.VALUES: values,
-                },
-            }
-        elif isinstance(self.values, StreamGroup):
+            return_dict = self.values.as_dict(error_collector)
+        elif isinstance(self.values, Group):
             return_dict = self.values.children[0].as_dict(error_collector)
+
+        if NodeType.CONFIG in return_dict:
             return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 
         if self.attributes:

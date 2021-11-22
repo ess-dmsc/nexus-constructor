@@ -27,9 +27,10 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import F142Stream, Link, StreamGroup
+from nexus_constructor.model.module import F142Stream, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
@@ -1827,7 +1828,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
 
     entry = Entry()
     link_name = "link1"
-    link = Link(name=link_name, target=entry.name)
+    link = Link(parent_node=entry, name=link_name, source=entry.name)
 
     component[link_name] = link
 
@@ -1846,7 +1847,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
     assert widget.field_type_combo.currentText().lower() == "link"
     assert widget.value.name == link_name
-    assert widget.value.target == entry.name
+    assert widget.value.source == entry.name
 
 
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
@@ -1895,13 +1896,15 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
     )
 
     field_name = "stream1"
-    stream_group = StreamGroup(field_name)
+    stream_group = Group(field_name)
 
     topic = "topic1"
     pvname = "source1"
     pvtype = "double"
 
-    stream = F142Stream(topic=topic, source=pvname, type=pvtype)
+    stream = F142Stream(
+        parent_node=stream_group, topic=topic, source=pvname, type=pvtype
+    )
 
     stream_group.children.append(stream)
 
@@ -2086,7 +2089,7 @@ def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
     field.value_line_edit.setText(field_target)
 
     assert field.name == field_name
-    assert field.value.target == field_target
+    assert field.value.source == field_target
 
 
 def test_UI_GIVEN_valid_chopper_properties_WHEN_adding_component_with_no_shape_THEN_chopper_creator_is_called(

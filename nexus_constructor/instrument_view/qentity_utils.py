@@ -51,15 +51,16 @@ def create_qentity(
     return entity
 
 
-def create_neutron_source(gnomon_root_entity, neutron_animation_length=4):
-    cone_mesh = Qt3DExtras.QConeMesh(gnomon_root_entity)
-    cone_transform = Qt3DCore.QTransform(gnomon_root_entity)
+def create_neutron_source(root_entity, neutron_animation_length=4):
+    cone_mesh = Qt3DExtras.QConeMesh(root_entity)
+    cone_transform = Qt3DCore.QTransform(root_entity)
     set_cone_dimension(cone_mesh, 0.5, 1.0, neutron_animation_length, 50, 20)
     set_cone_transform(cone_transform, neutron_animation_length)
     material = create_material(
-        QColor("#928327"), QColor("#928327"), gnomon_root_entity, alpha=0.5
+        QColor("#928327"), QColor("#928327"), root_entity, alpha=0.5
     )
-    return create_qentity([cone_mesh, material, cone_transform], gnomon_root_entity)
+    create_qentity([cone_mesh, material, cone_transform], root_entity)
+    return root_entity
 
 
 def set_cone_dimension(cone_mesh, top_radius, bottom_radius, length, rings, slices):
@@ -71,8 +72,8 @@ def set_cone_dimension(cone_mesh, top_radius, bottom_radius, length, rings, slic
 
 
 def set_cone_transform(cone_transform, neutron_animation_distance):
+    # pass
     matrix = QMatrix4x4()
     matrix.rotate(90, QVector3D(1, 0, 0))
     matrix.translate(QVector3D(0, neutron_animation_distance * 0.5, 0))
-
     cone_transform.setMatrix(matrix)

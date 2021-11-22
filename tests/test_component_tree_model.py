@@ -10,9 +10,9 @@ from nexus_constructor.component_tree_model import (
     LinkTransformation,
 )
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.entry import Instrument
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 
@@ -23,7 +23,11 @@ def _add_component_to_file(
     component.set_field_value(
         field_name,
         Dataset(
-            name=field_name, type=ValueTypes.DOUBLE, size="[1]", values=field_value
+            parent_node=None,
+            name=field_name,
+            type=ValueTypes.DOUBLE,
+            size="[1]",
+            values=field_value,
         ),
         dtype=ValueTypes.DOUBLE,
     )

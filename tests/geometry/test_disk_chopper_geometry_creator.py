@@ -45,10 +45,10 @@ def expected_slit_boundary_face_points(center_to_slit_start: float, radius: floa
     :return: Four points that should be roughly equal to the points for slit boundary face.
     """
 
-    expected_upper_front = Point(radius, 0, EXPECTED_Z)
-    expected_lower_front = Point(center_to_slit_start, 0, EXPECTED_Z)
-    expected_upper_back = Point(radius, 0, -EXPECTED_Z)
-    expected_lower_back = Point(center_to_slit_start, 0, -EXPECTED_Z)
+    expected_upper_front = Point(0, radius, EXPECTED_Z)
+    expected_lower_front = Point(0, center_to_slit_start, EXPECTED_Z)
+    expected_upper_back = Point(0, radius, -EXPECTED_Z)
+    expected_lower_back = Point(0, center_to_slit_start, -EXPECTED_Z)
 
     return (
         expected_lower_back,
@@ -248,8 +248,8 @@ def test_GIVEN_r_and_theta_WHEN_creating_and_adding_mirrored_points_THEN_expecte
     r = 20
     theta = 0
 
-    expected_front_point = Point(r, 0, EXPECTED_Z)
-    expected_back_point = Point(r, 0, -EXPECTED_Z)
+    expected_front_point = Point(0, r, EXPECTED_Z)
+    expected_back_point = Point(0, r, -EXPECTED_Z)
 
     (
         actual_front_point,
@@ -415,8 +415,8 @@ def test_GIVEN_angle_distance_to_centre_and_two_points_WHEN_creating_wedge_shape
         theta, prev_back, prev_front, r
     )
 
-    assert current_front == Point(-r, 0, geometry_creator.z)
-    assert current_back == Point(-r, 0, -geometry_creator.z)
+    assert current_front == Point(0, -r, geometry_creator.z)
+    assert current_back == Point(0, -r, -geometry_creator.z)
 
     assert geometry_creator.faces[-3] == create_list_of_ids(
         prev_front, prev_back, current_back, current_front
@@ -464,8 +464,8 @@ def test_GIVEN_slit_boundaries_WHEN_creating_intermediate_points_and_faces_THEN_
 
     # The expected intermediate points should have a distance from the centres of r, an angle of 90 degrees and be
     # separated by 2 * z
-    expected_intermediate_front = Point(0, r, geometry_creator.z)
-    expected_intermediate_back = Point(0, r, -geometry_creator.z)
+    expected_intermediate_front = Point(r, 0, geometry_creator.z)
+    expected_intermediate_back = Point(r, 0, -geometry_creator.z)
 
     # Check that the last two points that were created in the geometry creator match what was expected
     actual_intermediate_front = geometry_creator.points[-2]
@@ -640,23 +640,23 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     assert geometry_creator.points[1] == Point(0, 0, -z)
 
     # Check the next four points that make form the "right" slit boundary
-    assert geometry_creator.points[2] == Point(radius, 0, z)
-    assert geometry_creator.points[3] == Point(radius, 0, -z)
-    assert geometry_creator.points[4] == Point(slit_height, 0, z)
-    assert geometry_creator.points[5] == Point(slit_height, 0, -z)
+    assert geometry_creator.points[2] == Point(0, radius, z)
+    assert geometry_creator.points[3] == Point(0, radius, -z)
+    assert geometry_creator.points[4] == Point(0, slit_height, z)
+    assert geometry_creator.points[5] == Point(0, slit_height, -z)
 
     assert [4, 2, 3, 5] in geometry_creator.faces
 
     # Check the next four points that make form the "left" slit boundary
-    assert geometry_creator.points[6] == Point(0, radius, z)
-    assert geometry_creator.points[7] == Point(0, radius, -z)
-    assert geometry_creator.points[8] == Point(0, slit_height, z)
-    assert geometry_creator.points[9] == Point(0, slit_height, -z)
+    assert geometry_creator.points[6] == Point(radius, 0, z)
+    assert geometry_creator.points[7] == Point(radius, 0, -z)
+    assert geometry_creator.points[8] == Point(slit_height, 0, z)
+    assert geometry_creator.points[9] == Point(slit_height, 0, -z)
 
     assert [9, 7, 6, 8] in geometry_creator.faces
 
     # Test the intermediate points in the slit
-    x, y = find_x(slit_height, angles[1]), find_y(slit_height, angles[1])
+    y, x = find_x(slit_height, angles[1]), find_y(slit_height, angles[1])
     assert geometry_creator.points[10] == Point(x, y, z)
     assert geometry_creator.points[11] == Point(x, y, -z)
 
@@ -665,7 +665,7 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     check_cake_slice_faces([10, 11, 9, 8])
 
     # Test for the next pair of points
-    x, y = find_x(radius, angles[2]), find_y(radius, angles[2])
+    y, x = find_x(radius, angles[2]), find_y(radius, angles[2])
     assert geometry_creator.points[12] == Point(x, y, z)
     assert geometry_creator.points[13] == Point(x, y, -z)
 
@@ -673,7 +673,7 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     check_cake_slice_faces([6, 7, 13, 12])
 
     # Test for the next pair of points
-    x, y = find_x(radius, angles[3]), find_y(radius, angles[3])
+    y, x = find_x(radius, angles[3]), find_y(radius, angles[3])
     assert geometry_creator.points[14] == Point(x, y, z)
     assert geometry_creator.points[15] == Point(x, y, -z)
 
@@ -681,7 +681,7 @@ def test_GIVEN_simple_chopper_details_WHEN_creating_disk_chopper_THEN_chopper_me
     check_cake_slice_faces([12, 13, 15, 14])
 
     # Test for the next pair of points
-    x, y = find_x(radius, angles[4]), find_y(radius, angles[4])
+    y, x = find_x(radius, angles[4]), find_y(radius, angles[4])
     assert geometry_creator.points[16] == Point(x, y, z)
     assert geometry_creator.points[17] == Point(x, y, -z)
 

@@ -9,36 +9,8 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.model.dataset import Dataset
-from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
-from nexus_constructor.model.stream import (
-    ADC_PULSE_DEBUG,
-    ARRAY_SIZE,
-    CHUNK_CHUNK_KB,
-    CHUNK_CHUNK_MB,
-    DATA_TYPE,
-    DATASET,
-    EDGE_TYPE,
-    ERROR_TYPE,
-    INDEX_EVERY_KB,
-    INDEX_EVERY_MB,
-    LINK,
-    SHAPE,
-    SOURCE,
-    STORE_LATEST_INTO,
-    TOPIC,
-    VALUE_UNITS,
-    EV42Stream,
-    F142Stream,
-    HS00Stream,
-    Link,
-    NS10Stream,
-    SENVStream,
-    Stream,
-    StreamGroup,
-    TDCTStream,
-    WriterModules,
-)
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import SOURCE, Dataset, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 DEPENDS_ON_IGNORE = [None, "."]
@@ -73,49 +45,6 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     except KeyError:
         pass
     return value
-
-
-def _add_field_to_group(item: Dict, group: Group):
-    child: Group
-    if CommonKeys.TYPE in item:
-        if item[CommonKeys.NAME] == TRANSFORMS_GROUP_NAME:
-            return
-        field_type = item[CommonKeys.TYPE]
-        child_name = item[CommonKeys.NAME]
-        if field_type == NodeType.GROUP:
-            child = _create_group(item, group)
-        else:
-            raise Exception(
-                f'Found unknown field type ("{field_type}") when loading JSON - {child_name}'
-            )
-        group[child_name] = child
-    elif CommonKeys.MODULE in item:
-        stream: Union[
-            Dataset,
-            Link,
-            NS10Stream,
-            SENVStream,
-            TDCTStream,
-            EV42Stream,
-            F142Stream,
-            HS00Stream,
-        ]
-        writer_module = item[CommonKeys.MODULE]
-        if writer_module == LINK:
-            stream = _create_link(item)
-        elif writer_module == DATASET:
-            if item[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
-                return
-            stream = _create_dataset(item, group)
-        else:
-            stream = _create_stream(item)
-        group.children.append(
-            stream
-        )  # Can't use the `[]` operator because streams do not have a name to use as a key
-    else:
-        raise Exception(
-            "Unable to add field as neither writer module type nor child type was found in the current node."
-        )
 
 
 def _find_depends_on_path(items: List[Dict], name: str) -> Optional[str]:
@@ -177,108 +106,6 @@ def _find_nx_class(entry: Union[list, dict]) -> str:
     return nx_class if nx_class is not None else ""
 
 
-def _create_stream(json_object: Dict) -> Stream:
-    """
-    Given a dictionary containing a stream, create a corresponding stream object to be used in the model.
-    :param json_object: JSON dictionary containing a stream.
-    :return: A stream object containing relevant data from the JSON.
-    """
-    stream_object = json_object[NodeType.CONFIG]
-    writer_module = json_object[CommonKeys.MODULE]
-    source = stream_object[SOURCE]
-    topic = stream_object[TOPIC]
-    # Common to ev42 and f142 stream objects
-    index_mb = (
-        stream_object[INDEX_EVERY_MB] if INDEX_EVERY_MB in stream_object else None
-    )
-    index_kb = (
-        stream_object[INDEX_EVERY_KB] if INDEX_EVERY_KB in stream_object else None
-    )
-    if writer_module == WriterModules.F142.value:
-        return __create_f142_stream(index_kb, index_mb, source, stream_object, topic)
-    if writer_module == WriterModules.EV42.value:
-        return __create_ev42_stream(index_kb, index_mb, source, stream_object, topic)
-    if writer_module == WriterModules.HS00.value:
-        data_type = stream_object[DATA_TYPE]
-        error_type = stream_object[ERROR_TYPE]
-        edge_type = stream_object[EDGE_TYPE]
-        shape = stream_object[SHAPE]
-        return HS00Stream(
-            source=source,
-            topic=topic,
-            data_type=data_type,
-            error_type=error_type,
-            edge_type=edge_type,
-            shape=shape,
-        )
-    if writer_module == WriterModules.NS10.value:
-        return NS10Stream(source=source, topic=topic)
-    if writer_module == WriterModules.SENV.value:
-        return SENVStream(source=source, topic=topic)
-    if writer_module == WriterModules.TDCTIME.value:
-        return TDCTStream(source=source, topic=topic)
-
-    return None
-
-
-def __create_ev42_stream(
-    index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
-):
-    adc = stream_object[ADC_PULSE_DEBUG] if ADC_PULSE_DEBUG in stream_object else None
-    chunk_mb = (
-        stream_object[CHUNK_CHUNK_MB] if CHUNK_CHUNK_MB in stream_object else None
-    )
-    chunk_kb = (
-        stream_object[CHUNK_CHUNK_KB] if CHUNK_CHUNK_KB in stream_object else None
-    )
-    return EV42Stream(
-        source=source,
-        topic=topic,
-        adc_pulse_debug=adc,
-        nexus_indices_index_every_kb=index_kb,
-        nexus_indices_index_every_mb=index_mb,
-        nexus_chunk_chunk_mb=chunk_mb,
-        nexus_chunk_chunk_kb=chunk_kb,
-    )
-
-
-def __create_f142_stream(
-    index_kb: str, index_mb: str, source: str, stream_object: Dict, topic: str
-):
-    value_type = stream_object[CommonKeys.DATA_TYPE]
-    value_units = stream_object[VALUE_UNITS] if VALUE_UNITS in stream_object else None
-    array_size = stream_object[ARRAY_SIZE] if ARRAY_SIZE in stream_object else None
-    store_latest_into = (
-        stream_object[STORE_LATEST_INTO] if STORE_LATEST_INTO in stream_object else None
-    )
-    return F142Stream(
-        source=source,
-        topic=topic,
-        type=value_type,
-        value_units=value_units,
-        array_size=array_size,
-        nexus_indices_index_every_mb=index_mb,
-        nexus_indices_index_every_kb=index_kb,
-        store_latest_into=store_latest_into,
-    )
-
-
-def _create_group(json_object: Dict, parent: Group) -> Group:
-    children = json_object[CommonKeys.CHILDREN]
-    name = json_object[CommonKeys.NAME]
-    group = Group(name=name, parent_node=parent)
-    for item in children:
-        if CommonKeys.MODULE in item:
-            group = StreamGroup(name=name, parent_node=parent)
-            break
-
-    for item in children:
-        _add_field_to_group(item, group)
-
-    _add_attributes(json_object, group)
-    return group
-
-
 def _get_data_type(json_object: Dict):
     if CommonKeys.DATA_TYPE in json_object:
         return json_object[CommonKeys.DATA_TYPE]
@@ -302,7 +129,7 @@ def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
 def _create_link(json_object: Dict) -> Link:
     name = json_object[NodeType.CONFIG][CommonKeys.NAME]
     target = json_object[NodeType.CONFIG][SOURCE]
-    return Link(name=name, target=target)
+    return Link(parent_node=None, name=name, source=target)
 
 
 def _add_attributes(json_object: Dict, model_object: Union[Group, Dataset]):

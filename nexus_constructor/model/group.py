@@ -4,24 +4,16 @@ import attr
 
 from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.helpers import (
     _get_item,
     _remove_item,
     _set_item,
     get_absolute_path,
 )
+from nexus_constructor.model.module import Dataset
 
 if TYPE_CHECKING:
-    from nexus_constructor.model.stream import (  # noqa: F401
-        EV42Stream,
-        F142Stream,
-        HS00Stream,
-        Link,
-        NS10Stream,
-        SENVStream,
-        TDCTStream,
-    )
+    from nexus_constructor.model.module import FileWriterModule  # noqa: F401
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -37,22 +29,12 @@ class Group:
 
     name = attr.ib(type=str)
     parent_node = attr.ib(type="Group", default=None)
-    children: List[
-        Union[
-            Dataset,
-            "NS10Stream",
-            "SENVStream",
-            "TDCTStream",
-            "EV42Stream",
-            "F142Stream",
-            "HS00Stream",
-            "Link",
-        ]
-    ] = attr.ib(  # noqa: F821
+    children: List[Union["FileWriterModule", "Group"]] = attr.ib(  # noqa: F821
         factory=list, init=False
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
+    child_dict: Dict = None  # TODO: Remove this attribute once new UI is in place.
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
@@ -60,7 +42,7 @@ class Group:
     def __setitem__(
         self,
         key: str,
-        value: Union["Group", Dataset, "Link"],
+        value: Union["Group", "FileWriterModule"],
     ):
         try:
             value.parent_node = self
@@ -92,7 +74,7 @@ class Group:
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
     def set_field_value(self, name: str, value: Any, dtype: str):
-        self[name] = Dataset(name=name, type=dtype, values=value)
+        self[name] = Dataset(parent_node=self, name=name, type=dtype, values=value)
 
     def get_field_value(self, name: str):
         return self[name].values
@@ -103,7 +85,9 @@ class Group:
             CommonKeys.TYPE: NodeType.GROUP,
         }
         if self.attributes:
-            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(error_collector)
+            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
+                error_collector
+            )
         return_dict[CommonKeys.CHILDREN] = (
             [
                 child.as_dict(error_collector)
