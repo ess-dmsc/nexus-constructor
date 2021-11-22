@@ -132,11 +132,7 @@ class Entry(Group):
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         if self._users_placeholder:
-            users = self._clear_all_users()
-            dictionary = super(Entry, self).as_dict(error_collector)
-            dictionary["children"].append(USERS_PLACEHOLDER)
-            for user in users:
-                self.children.append(user)
+            dictionary = self._insert_users_placeholder(error_collector)
         else:
             dictionary = super(Entry, self).as_dict(error_collector)
 
@@ -149,4 +145,13 @@ class Entry(Group):
         except AttributeError:
             # If instrument is not set then don't try to add sample to dictionary
             pass
+        return dictionary
+
+    def _insert_users_placeholder(self, error_collector):
+        # Temporarily remove any users while the dictionary is generated
+        users = self._clear_all_users()
+        dictionary = super(Entry, self).as_dict(error_collector)
+        dictionary["children"].append(USERS_PLACEHOLDER)
+        for user in users:
+            self.children.append(user)
         return dictionary
