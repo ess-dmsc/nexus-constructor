@@ -358,9 +358,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         """
         if check_if_advanced_options_should_be_enabled(
-            [
-                field.adc_pulse_debug,
-            ]
+            [field.adc_pulse_debug, field.chunk_size, field.cue_interval]
         ):
             self._show_advanced_options(True)
             self._fill_existing_advanced_ev42_fields(field)
@@ -390,7 +388,9 @@ class StreamFieldsWidget(QDialog):
         if field.value_units is not None:
             self.value_units_edit.setText(field.value_units)
 
-        if check_if_advanced_options_should_be_enabled([]):
+        if check_if_advanced_options_should_be_enabled(
+            [field.adc_pulse_debug, field.chunk_size, field.cue_interval]
+        ):
             self._show_advanced_options(True)
             self._fill_existing_advanced_f142_fields(field)
 
