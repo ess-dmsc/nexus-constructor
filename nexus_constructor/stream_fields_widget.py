@@ -213,12 +213,6 @@ class StreamFieldsWidget(QDialog):
             parent=self.show_advanced_options_button
         )
         self.f142_advanced_group_box.setLayout(QFormLayout())
-        self.f142_adc_pulse_debug_checkbox = QCheckBox()
-        self.f142_adc_pulse_debug_label = QLabel(ADC_PULSE_DEBUG)
-        self.f142_advanced_group_box.layout().addRow(
-            self.f142_adc_pulse_debug_label, self.f142_adc_pulse_debug_checkbox
-        )
-
         self.f142_chunk_size_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
                 CHUNK_SIZE, self.f142_advanced_group_box
@@ -339,7 +333,6 @@ class StreamFieldsWidget(QDialog):
         Save the advanced f142 properties to the stream data object.
         :param stream: The stream data object to be modified.
         """
-        stream.adc_pulse_debug = self.f142_adc_pulse_debug_checkbox.isChecked()
         stream.chunk_size = self.f142_chunk_size_spinner.value()
         stream.cue_interval = self.f142_cue_interval_spinner.value()
 
@@ -389,7 +382,7 @@ class StreamFieldsWidget(QDialog):
             self.value_units_edit.setText(field.value_units)
 
         if check_if_advanced_options_should_be_enabled(
-            [field.adc_pulse_debug, field.chunk_size, field.cue_interval]
+            [field.chunk_size, field.cue_interval]
         ):
             self._show_advanced_options(True)
             self._fill_existing_advanced_f142_fields(field)
@@ -399,7 +392,6 @@ class StreamFieldsWidget(QDialog):
         Fill the advanced fields in the interface with the existing f142 stream data.
         :param field: The f412 stream data object.
         """
-        self.f142_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
         self.f142_chunk_size_spinner.setValue(field.chunk_size)
         self.f142_cue_interval_spinner.setValue(field.cue_interval)
 

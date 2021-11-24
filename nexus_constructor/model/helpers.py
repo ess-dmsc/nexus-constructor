@@ -19,8 +19,7 @@ def __find_item_index(list_to_look_in: List[Any], item_name: str):
                 return count
         except AttributeError:
             continue
-    else:
-        return None
+    return None
 
 
 def _get_item(list_to_look_in: List[Any], item_name: str) -> Any:
