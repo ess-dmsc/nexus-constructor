@@ -81,9 +81,9 @@ class TDCTStream(StreamModule):
 @attr.s
 class EV42Stream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
-    adc_pulse_debug = attr.ib(type=bool, default=None, init=False)
-    cue_interval = attr.ib(type=int, default=None, init=False)
-    chunk_size = attr.ib(type=int, default=None, init=False)
+    adc_pulse_debug = attr.ib(type=bool, default=None)
+    cue_interval = attr.ib(type=int, default=None)
+    chunk_size = attr.ib(type=int, default=None)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -98,9 +98,9 @@ class EV42Stream(StreamModule):
 
 @attr.s
 class F142Stream(StreamModule):
-    cue_interval = attr.ib(type=int, default=None, init=False)
-    chunk_size = attr.ib(type=int, default=None, init=False)
     type = attr.ib(type=str)
+    cue_interval = attr.ib(type=int, default=None)
+    chunk_size = attr.ib(type=int, default=None)
     value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=list, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
