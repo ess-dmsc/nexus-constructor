@@ -32,9 +32,6 @@ from nexus_constructor.model.module import (
     WriterModules,
 )
 
-# TODO: CHECKS NEED TO BE IMPLEMENTED FOR NEW FIELDS IN STREAM ACCORDING TO
-# TODO: FILE WRITER DOCUMENTATION.
-
 F142_TYPES = [
     "byte",
     "ubyte",
@@ -181,12 +178,12 @@ class StreamFieldsWidget(QDialog):
             self.ev42_adc_pulse_debug_label, self.ev42_adc_pulse_debug_checkbox
         )
 
-        self.ev42_index_every_mb_spinner = (
+        self.ev42_chunk_size_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
                 CHUNK_SIZE, self.ev42_advanced_group_box
             )
         )
-        self.ev42_index_every_kb_spinner = (
+        self.ev42_cue_interval_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
                 CUE_INTERVAL, self.ev42_advanced_group_box
             )
@@ -216,13 +213,12 @@ class StreamFieldsWidget(QDialog):
             parent=self.show_advanced_options_button
         )
         self.f142_advanced_group_box.setLayout(QFormLayout())
-
-        self.f142_index_every_mb_spinner = (
+        self.f142_chunk_size_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
                 CHUNK_SIZE, self.f142_advanced_group_box
             )
         )
-        self.f142_index_every_kb_spinner = (
+        self.f142_cue_interval_spinner = (
             self.create_label_and_spinbox_for_advanced_option(
                 CUE_INTERVAL, self.f142_advanced_group_box
             )
@@ -337,7 +333,8 @@ class StreamFieldsWidget(QDialog):
         Save the advanced f142 properties to the stream data object.
         :param stream: The stream data object to be modified.
         """
-        raise NotImplementedError
+        stream.chunk_size = self.f142_chunk_size_spinner.value()
+        stream.cue_interval = self.f142_cue_interval_spinner.value()
 
     def _record_advanced_ev42_values(self, stream: EV42Stream):
         """
@@ -345,6 +342,8 @@ class StreamFieldsWidget(QDialog):
         :param stream: The stream data object to be modified.
         """
         stream.adc_pulse_debug = self.ev42_adc_pulse_debug_checkbox.isChecked()
+        stream.chunk_size = self.ev42_chunk_size_spinner.value()
+        stream.cue_interval = self.ev42_cue_interval_spinner.value()
 
     def fill_in_existing_ev42_fields(self, field: EV42Stream):
         """
@@ -352,9 +351,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         """
         if check_if_advanced_options_should_be_enabled(
-            [
-                field.adc_pulse_debug,
-            ]
+            [field.adc_pulse_debug, field.chunk_size, field.cue_interval]
         ):
             self._show_advanced_options(True)
             self._fill_existing_advanced_ev42_fields(field)
@@ -365,6 +362,8 @@ class StreamFieldsWidget(QDialog):
         :param field: The ev42 stream data object.
         """
         self.ev42_adc_pulse_debug_checkbox.setChecked(field.adc_pulse_debug)
+        self.ev42_chunk_size_spinner.setValue(field.chunk_size)
+        self.ev42_cue_interval_spinner.setValue(field.cue_interval)
 
     def fill_in_existing_f142_fields(self, field: F142Stream):
         """
@@ -382,7 +381,9 @@ class StreamFieldsWidget(QDialog):
         if field.value_units is not None:
             self.value_units_edit.setText(field.value_units)
 
-        if check_if_advanced_options_should_be_enabled([]):
+        if check_if_advanced_options_should_be_enabled(
+            [field.chunk_size, field.cue_interval]
+        ):
             self._show_advanced_options(True)
             self._fill_existing_advanced_f142_fields(field)
 
@@ -391,7 +392,8 @@ class StreamFieldsWidget(QDialog):
         Fill the advanced fields in the interface with the existing f142 stream data.
         :param field: The f412 stream data object.
         """
-        raise NotImplementedError
+        self.f142_chunk_size_spinner.setValue(field.chunk_size)
+        self.f142_cue_interval_spinner.setValue(field.cue_interval)
 
     def update_existing_stream_info(self, field):
         """
