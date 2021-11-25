@@ -68,4 +68,9 @@
             for a summary of the discussion.
         </doc>
     </attribute>
+    <group type="NXtransformations">
+      <doc>
+        Transformations used by this component to define its position and orientation.
+      </doc>
+    </group>
 </definition>
