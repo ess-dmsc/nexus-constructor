@@ -22,20 +22,22 @@ class UiTransformation:
     def __init__(self, Transformation: "EditTransformation"):
         Transformation.setObjectName("Transformation")
         Transformation.resize(361, 171)
+        self.setupUI(Transformation)
 
+    def setupUI(self, transformation):
         self.main_layout = QVBoxLayout()
         self.main_layout.setSpacing(4)
 
-        self.frame_layout = QVBoxLayout(Transformation)
+        self.frame_layout = QVBoxLayout(transformation)
         self.frame_layout.setContentsMargins(4, 4, 4, 4)
 
         self.name_layout = QHBoxLayout()
         self.name_layout.setSpacing(-1)
-        self.name_label = QLabel("Name", Transformation)
+        self.name_label = QLabel("Name", transformation)
         self._make_text_bold(self.name_label)
-        self.name_line_edit = QLineEdit(Transformation)
+        self.name_line_edit = QLineEdit(transformation)
 
-        self.vector_label = QLabel("", Transformation)
+        self.vector_label = QLabel("", transformation)
         self._make_text_bold(self.vector_label)
 
         self.value_label = QLabel("")
@@ -49,7 +51,7 @@ class UiTransformation:
 
         self.ui_placeholder_layout = QFormLayout()
 
-        self.value_spinbox = QDoubleSpinBox(Transformation)
+        self.value_spinbox = QDoubleSpinBox(transformation)
         self.value_spinbox.setToolTip("Placeholder value for 3D view to use")
         self.value_spinbox.setDecimals(8)
         self.value_spinbox.setMaximumSize(QSize(100, 16777215))
@@ -57,9 +59,6 @@ class UiTransformation:
             "Value to use in 3D view:", self.value_spinbox
         )
 
-        self.setupUI(Transformation)
-
-    def setupUI(self, transformation):
         self.setup_name_layout()
         self.setup_vector_layout(transformation)
         self.setup_value_and_magnitude()
