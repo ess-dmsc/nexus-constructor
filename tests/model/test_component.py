@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import TRANSFORMS_GROUP_NAME, Component
@@ -13,14 +12,6 @@ def test_component_set_item_with_brackets_works_with_another_component():
     comp1[comp2.name] = comp2
 
     assert comp1[comp2.name] == comp2
-
-
-def test_component_set_item_with_brackets_throws_when_string_is_entered():
-    comp1 = Component("comp1")
-    some_field_value = "test"
-    with pytest.raises(AttributeError):
-        comp1["some_field"] = some_field_value
-        assert comp1["some_field"] == some_field_value
 
 
 def test_component_set_description_correctly_sets_description():

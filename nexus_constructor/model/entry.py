@@ -25,11 +25,14 @@ EXP_ID_PLACEHOLDER = Dataset(
     type=ValueTypes.STRING,
 )
 
+USERS_PLACEHOLDER = "$USERS$"
+
 
 class Entry(Group):
     def __init__(self):
         super().__init__(name="entry", parent_node=None)
         self.nx_class = "NXentry"
+        self._users_placeholder = False
 
     @property
     def instrument(self) -> Instrument:
@@ -56,6 +59,55 @@ class Entry(Group):
     def title(self, values: Tuple[str, bool]):
         self._set_dataset_property(NEXUS_TITLE_NAME, TITLE_PLACEHOLDER, values)
 
+    @property
+    def users(self) -> List[Dict[str, str]]:
+        users = []
+        for child in self.children:
+            if isinstance(child, Group) and child.nx_class == "NXuser":
+                users.append(self._extract_user_info(child))
+        return users
+
+    @users.setter
+    def users(self, users: List[Dict[str, str]]):
+        self._clear_all_users()
+        for user in users:
+            group = Group(name="temporary name", parent_node=self)
+            group = self._create_user(group, user)
+            self[group.name] = group
+
+    @property
+    def users_placeholder(self) -> bool:
+        return self._users_placeholder
+
+    @users_placeholder.setter
+    def users_placeholder(self, enable: bool):
+        self._users_placeholder = enable
+
+    def _extract_user_info(self, group: Group) -> Dict[str, str]:
+        return {
+            ds.name: str(ds.values) for ds in group.children if isinstance(ds, Dataset)
+        }
+
+    def _create_user(self, group: Group, user_data: Dict[str, str]) -> Group:
+        group.name = f"user_{user_data['name'].replace(' ', '')}"
+        group.nx_class = "NXuser"
+        for name, value in user_data.items():
+            group.children.append(
+                Dataset(
+                    name=name, parent_node=group, type=ValueTypes.STRING, values=value
+                )
+            )
+        return group
+
+    def _clear_all_users(self):
+        old_users = []
+        for child in self.children:
+            if isinstance(child, Group) and child.nx_class == "NXuser":
+                old_users.append(child)
+        for user in old_users:
+            self.children.remove(user)
+        return old_users
+
     def _read_dataset_property(self, name: str, value: str) -> Tuple[str, bool]:
         dataset = self[name]
         if dataset:
@@ -79,7 +131,11 @@ class Entry(Group):
             self[name].values = value.strip()
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
-        dictionary = super(Entry, self).as_dict(error_collector)
+        if self._users_placeholder:
+            dictionary = self._insert_users_placeholder(error_collector)
+        else:
+            dictionary = super(Entry, self).as_dict(error_collector)
+
         # sample lives in instrument component list for purposes of GUI
         # but in the NeXus structure must live in the entry
         try:
@@ -89,4 +145,13 @@ class Entry(Group):
         except AttributeError:
             # If instrument is not set then don't try to add sample to dictionary
             pass
+        return dictionary
+
+    def _insert_users_placeholder(self, error_collector):
+        # Temporarily remove any users while the dictionary is generated
+        users = self._clear_all_users()
+        dictionary = super(Entry, self).as_dict(error_collector)
+        dictionary["children"].append(USERS_PLACEHOLDER)
+        for user in users:
+            self.children.append(user)
         return dictionary
