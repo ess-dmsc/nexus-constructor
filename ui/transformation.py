@@ -22,9 +22,9 @@ class UiTransformation:
     def __init__(self, Transformation: "EditTransformation"):
         Transformation.setObjectName("Transformation")
         Transformation.resize(361, 171)
-        self.setupUI(Transformation)
+        self.setup_ui(Transformation)
 
-    def setupUI(self, transformation):
+    def setup_ui(self, transformation):
         self.main_layout = QVBoxLayout()
         self.main_layout.setSpacing(4)
 
@@ -66,7 +66,7 @@ class UiTransformation:
 
         self.frame_layout.addLayout(self.main_layout)
 
-        self.retranslateUi(transformation)
+        self.retranslate_ui(transformation)
         QMetaObject.connectSlotsByName(transformation)
 
     def setup_value_and_magnitude(self):
@@ -129,7 +129,7 @@ class UiTransformation:
         label.setFont(font)
 
     @staticmethod
-    def retranslateUi(transformation):
+    def retranslate_ui(transformation):
         transformation.setWindowTitle(
             QApplication.translate("Transformation", "GroupBox", None, -1)
         )
