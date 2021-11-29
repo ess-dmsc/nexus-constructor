@@ -1,7 +1,5 @@
 from typing import Any, Dict, List, Optional, Union
 
-import numpy as np
-
 from nexus_constructor.common_attrs import (
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
@@ -9,9 +7,6 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import SOURCE, Dataset, Link
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 DEPENDS_ON_IGNORE = [None, "."]
 
@@ -89,42 +84,3 @@ def _find_nx_class(entry: Union[list, dict]) -> str:
     """
     nx_class = _find_attribute_from_list_or_dict(CommonAttrs.NX_CLASS, entry)
     return nx_class if nx_class is not None else ""
-
-
-def _get_data_type(json_object: Dict):
-    if CommonKeys.DATA_TYPE in json_object:
-        return json_object[CommonKeys.DATA_TYPE]
-    elif CommonKeys.TYPE in json_object:
-        return json_object[CommonKeys.TYPE]
-    raise KeyError
-
-
-def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
-    value_type = _get_data_type(json_object[NodeType.CONFIG])
-    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
-    values = json_object[NodeType.CONFIG][CommonKeys.VALUES]
-    if isinstance(values, list):
-        # convert to a numpy array using specified type
-        values = np.array(values, dtype=VALUE_TYPE_TO_NP[value_type])
-    ds = Dataset(name=name, values=values, type=value_type, parent_node=parent)
-    _add_attributes(json_object, ds)
-    return ds
-
-
-def _create_link(json_object: Dict) -> Link:
-    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
-    target = json_object[NodeType.CONFIG][SOURCE]
-    return Link(parent_node=None, name=name, source=target)
-
-
-def _add_attributes(json_object: Dict, model_object: Union[Group, Dataset]):
-    try:
-        attrs_list = json_object[CommonKeys.ATTRIBUTES]
-        for attribute in attrs_list:
-            attr_name = attribute[CommonKeys.NAME]
-            attr_values = attribute[CommonKeys.VALUES]
-            model_object.attributes.set_attribute_value(
-                attribute_name=attr_name, attribute_value=attr_values
-            )
-    except (KeyError, AttributeError):
-        pass

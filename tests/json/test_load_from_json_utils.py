@@ -1,15 +1,10 @@
 import numpy as np
 import pytest
 
-from nexus_constructor.json.load_from_json_utils import (
-    _add_attributes,
-    _create_dataset,
-    _create_link,
-    _find_nx_class,
-)
-from nexus_constructor.model.attributes import FieldAttribute
+from nexus_constructor.json.load_from_json_utils import _find_nx_class
+from nexus_constructor.model.attributes import Attributes, FieldAttribute
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset
+from nexus_constructor.model.module import Dataset, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 
 
@@ -31,31 +26,18 @@ def test_GIVEN_nx_class_in_different_formats_WHEN_reading_class_information_THEN
     assert _find_nx_class(class_attribute) == "NXmonitor"
 
 
-@pytest.mark.parametrize(
-    "test_input",
-    (
-        {},
-        {
-            "module": "dataset",
-            "config": {"values": 0},
-        },
-        {"attributes": []},
-    ),  # noqa E231
-)
-def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
-    test_input,
-):
+def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing():
     dataset = Dataset(parent_node=None, name="ds", values=123, type=ValueTypes.INT)
-    _add_attributes(test_input, dataset)
     assert not dataset.attributes
 
 
 def test_GIVEN_dictionary_containing_attribute_WHEN_adding_attributes_THEN_attribute_object_is_created():
     key = "units"
     value = "m"
-    test_dict = {"attributes": [{"name": key, "values": value}]}
     dataset = Dataset(parent_node=None, name="ds", values=123, type=ValueTypes.INT)
-    _add_attributes(test_dict, dataset)
+    attributes = Attributes()
+    attributes.set_attribute_value(key, value)
+    dataset.attributes = attributes
     assert len(dataset.attributes) == 1
     assert isinstance(dataset.attributes[0], FieldAttribute)
     assert dataset.attributes[0].name == key
@@ -67,11 +49,11 @@ def test_GIVEN_dictionary_containing_attributes_WHEN_adding_attributes_THEN_attr
     val1 = "m"
     key2 = "testkey"
     val2 = "testval"
-    test_dict = {
-        "attributes": [{"name": key1, "values": val1}, {"name": key2, "values": val2}]
-    }
     dataset = Dataset(parent_node=None, name="ds", values=123, type=ValueTypes.INT)
-    _add_attributes(test_dict, dataset)
+    attributes = Attributes()
+    attributes.set_attribute_value(key1, val1)
+    attributes.set_attribute_value(key2, val2)
+    dataset.attributes = attributes
     assert len(dataset.attributes) == 2
     assert dataset.attributes[0].name == key1
     assert dataset.attributes[0].values == val1
@@ -83,13 +65,7 @@ def test_GIVEN_dataset_with_string_value_WHEN_adding_dataset_THEN_dataset_object
     name = "description"
     values = "a description"
     parent = Group(name="test")
-    test_dict = {
-        "module": "dataset",
-        "config": {"type": ValueTypes.STRING, "values": values, "name": name},
-    }
-
-    ds = _create_dataset(test_dict, parent)
-
+    ds = Dataset(parent_node=parent, type=ValueTypes.STRING, values=values, name=name)
     assert ds.name == name
     assert ds.values == values
     assert ds.parent_node == parent
@@ -102,13 +78,8 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
     dtype = ValueTypes.FLOAT
 
     np_array = np.array(values, dtype=VALUE_TYPE_TO_NP[dtype])
-
-    test_dict = {
-        "module": "dataset",
-        "config": {"type": dtype, "values": values, "name": name},
-    }
     parent = Group(name="test")
-    ds = _create_dataset(test_dict, parent)
+    ds = Dataset(parent_node=parent, type=dtype, values=np_array, name=name)
 
     assert ds.name == name
     assert np.array_equal(ds.values, np_array)
@@ -119,10 +90,6 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
 def test_GIVEN_link_json_WHEN_adding_link_THEN_link_object_is_created():
     name = "link1"
     target = "/entry/instrument/detector1"
-    test_dict = {
-        "module": "link",
-        "config": {"name": name, "source": target},
-    }
-    link = _create_link(test_dict)
+    link = Link(parent_node=None, name=name, source=target)
     assert link.name == name
     assert link.source == target

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 import pytest
@@ -17,7 +17,6 @@ from nexus_constructor.common_attrs import (
 from nexus_constructor.json.json_warnings import JsonWarningsContainer
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
-    _get_data_type,
 )
 from nexus_constructor.json.shape_reader import (
     DETECTOR_NUMBER,
@@ -52,6 +51,14 @@ def getitem(name):
 
 def setitem(name, val):
     component_shape[name] = val
+
+
+def _get_data_type(json_object: Dict):
+    if CommonKeys.DATA_TYPE in json_object:
+        return json_object[CommonKeys.DATA_TYPE]
+    elif CommonKeys.TYPE in json_object:
+        return json_object[CommonKeys.TYPE]
+    raise KeyError
 
 
 @pytest.fixture(scope="function")
