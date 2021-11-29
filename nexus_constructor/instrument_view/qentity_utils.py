@@ -6,6 +6,17 @@ from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QColor, QMatrix4x4, QVector3D
 
+from nexus_constructor.component_type import SAMPLE_CLASS_NAME
+
+MATERIAL_COLORS = {
+    SAMPLE_CLASS_NAME: QColor("red"),
+}
+
+
+MATERIAL_ALPHA = {
+    SAMPLE_CLASS_NAME: 0.5,
+}
+
 
 def create_material(
     ambient: QColor,
@@ -103,11 +114,6 @@ class NeutronSource:
         self._source.removeComponent(component)
         for neutron in self._neutrons:
             neutron.removeComponent(component)
-
-    def get_entity(
-        self,
-    ):
-        pass
 
     def _redo_source_transformation(self, transform, matrix):
         transform.setMatrix(matrix * self._get_cylinder_transformatrion_matrix())

@@ -8,7 +8,7 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QColor, QVector3D
 from PySide2.QtWidgets import QVBoxLayout, QWidget
 
-from nexus_constructor.component_type import SAMPLE_CLASS_NAME, SOURCE_CLASS_NAME
+from nexus_constructor.component_type import SOURCE_CLASS_NAME
 from nexus_constructor.instrument_view.gnomon import Gnomon
 from nexus_constructor.instrument_view.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
@@ -16,6 +16,8 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.instrument_view.qentity_utils import (
+    MATERIAL_ALPHA,
+    MATERIAL_COLORS,
     NeutronSource,
     create_material,
     create_qentity,
@@ -219,10 +221,10 @@ class InstrumentView(QWidget):
         else:
             mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
             material = create_material(
-                QColor("black") if nx_class != SAMPLE_CLASS_NAME else QColor("red"),
+                MATERIAL_COLORS.get(nx_class, QColor("black")),
                 QColor("grey"),
                 self.component_root_entity,
-                alpha=0.5 if nx_class == SAMPLE_CLASS_NAME else None,
+                MATERIAL_ALPHA.get(nx_class, None),
             )
             self.component_entities[name] = create_qentity(
                 [mesh, material], self.component_root_entity
