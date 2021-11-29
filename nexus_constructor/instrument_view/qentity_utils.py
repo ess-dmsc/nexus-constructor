@@ -65,20 +65,22 @@ class NeutronSource:
             self.num_neutrons, self.source_radius, self.source_length
         )
 
-        self.create_neutron_source()
-        self.setup_neutrons()
+        self._create_neutron_source()
 
-    def create_neutron_source(self):
-        cone_mesh = Qt3DExtras.QConeMesh(self.root_entity)
+    def _create_neutron_source(self):
+        cylinder_mesh = Qt3DExtras.QCylinderMesh(self.root_entity)
         cone_transform = Qt3DCore.QTransform(self.root_entity)
-        self.set_cone_dimension(cone_mesh, self.source_radius, self.source_length)
-        cone_transform.setMatrix(self.get_cone_transformatrion_matrix())
+        self._set_cylinder_dimension(
+            cylinder_mesh, self.source_radius, self.source_length
+        )
+        cone_transform.setMatrix(self._get_cylinder_transformatrion_matrix())
         material = create_material(
             QColor("blue"), QColor("lightblue"), self.root_entity, alpha=0.5
         )
         self._source = create_qentity(
-            [cone_mesh, material, cone_transform], self.root_entity
+            [cylinder_mesh, material, cone_transform], self.root_entity
         )
+        self._setup_neutrons()
 
     def setParent(self, value=None):
         self._source.setParent(value)
@@ -102,20 +104,27 @@ class NeutronSource:
         for neutron in self._neutrons:
             neutron.removeComponent(component)
 
+    def get_entity(
+        self,
+    ):
+        pass
+
     def _redo_source_transformation(self, transform, matrix):
-        transform.setMatrix(matrix * self.get_cone_transformatrion_matrix())
+        transform.setMatrix(matrix * self._get_cylinder_transformatrion_matrix())
 
     def _redo_neutron_transformation(self, transform, matrix, offset):
-        transform.setMatrix(matrix * self.get_sphere_transformation_matrix(offset))
+        transform.setMatrix(matrix * self._get_sphere_transformation_matrix(offset))
 
-    def setup_neutrons(self):
+    def _setup_neutrons(self):
         neutron_radius = 0.1
         for i in range(self.num_neutrons):
             mesh = Qt3DExtras.QSphereMesh(self.root_entity)
-            self.set_sphere_mesh_radius(mesh, neutron_radius)
+            mesh.setRadius(neutron_radius)
 
             transform = Qt3DCore.QTransform(self.root_entity)
-            transform.setMatrix(self.get_sphere_transformation_matrix(self._offsets[i]))
+            transform.setMatrix(
+                self._get_sphere_transformation_matrix(self._offsets[i])
+            )
             neutron_material = create_material(
                 QColor("black"), QColor("grey"), self.root_entity
             )
@@ -124,11 +133,7 @@ class NeutronSource:
             )
 
     @staticmethod
-    def set_sphere_mesh_radius(sphere_mesh, radius):
-        sphere_mesh.setRadius(radius)
-
-    @staticmethod
-    def get_sphere_transformation_matrix(offset):
+    def _get_sphere_transformation_matrix(offset):
         matrix = QMatrix4x4()
         matrix.translate(QVector3D(offset[0], offset[1], offset[2]))
         return matrix
@@ -149,13 +154,12 @@ class NeutronSource:
         return np.array(offsets)
 
     @staticmethod
-    def get_cone_transformatrion_matrix():
+    def _get_cylinder_transformatrion_matrix():
         matrix = QMatrix4x4()
         matrix.rotate(90, QVector3D(1, 0, 0))
         return matrix
 
     @staticmethod
-    def set_cone_dimension(cone_mesh, top_radius, length):
-        cone_mesh.setTopRadius(top_radius)
-        cone_mesh.setBottomRadius(top_radius)
-        cone_mesh.setLength(length)
+    def _set_cylinder_dimension(cylinder_mesh, radius, length):
+        cylinder_mesh.setRadius(radius)
+        cylinder_mesh.setLength(length)

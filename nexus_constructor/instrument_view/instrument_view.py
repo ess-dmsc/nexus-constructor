@@ -210,7 +210,6 @@ class InstrumentView(QWidget):
         :param geometry: The geometry information of the component that is used to create a mesh.
         :param positions: Mesh is repeated at each of these positions
         """
-        print(name, nx_class)
         if geometry is None:
             return
 
