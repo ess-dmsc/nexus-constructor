@@ -69,11 +69,11 @@ class NeutronSource:
         self._source: Qt3DCore.QEntity = None
         self._neutrons: List[Qt3DCore.QEntity] = []
 
-        self.source_length = 4
-        self.source_radius = 1
-        self.num_neutrons = 8
-        self._offsets = self._generate_random_points_in_cylinder(
-            self.num_neutrons, self.source_radius, self.source_length
+        self._source_length = 4
+        self._source_radius = 1
+        self._num_neutrons = 8
+        self._neutron_offsets = self._generate_random_points_in_cylinder(
+            self._num_neutrons, self._source_radius, self._source_length
         )
 
         self._create_neutron_source()
@@ -82,7 +82,7 @@ class NeutronSource:
         cylinder_mesh = Qt3DExtras.QCylinderMesh(self.root_entity)
         cone_transform = Qt3DCore.QTransform(self.root_entity)
         self._set_cylinder_dimension(
-            cylinder_mesh, self.source_radius, self.source_length
+            cylinder_mesh, self._source_radius, self._source_length
         )
         cone_transform.setMatrix(self._get_cylinder_transformatrion_matrix())
         material = create_material(
@@ -107,7 +107,9 @@ class NeutronSource:
 
         for index, neutron in enumerate(self._neutrons):
             transform = Qt3DCore.QTransform(self.root_entity)
-            self._redo_neutron_transformation(transform, matrix, self._offsets[index])
+            self._redo_neutron_transformation(
+                transform, matrix, self._neutron_offsets[index]
+            )
             neutron.addComponent(transform)
 
     def removeComponent(self, component):
@@ -123,13 +125,13 @@ class NeutronSource:
 
     def _setup_neutrons(self):
         neutron_radius = 0.1
-        for i in range(self.num_neutrons):
+        for i in range(self._num_neutrons):
             mesh = Qt3DExtras.QSphereMesh(self.root_entity)
             mesh.setRadius(neutron_radius)
 
             transform = Qt3DCore.QTransform(self.root_entity)
             transform.setMatrix(
-                self._get_sphere_transformation_matrix(self._offsets[i])
+                self._get_sphere_transformation_matrix(self._neutron_offsets[i])
             )
             neutron_material = create_material(
                 QColor("black"), QColor("grey"), self.root_entity
@@ -137,6 +139,9 @@ class NeutronSource:
             self._neutrons.append(
                 create_qentity([mesh, neutron_material, transform], self.root_entity)
             )
+
+    def get_entity(self):
+        return self._source
 
     @staticmethod
     def _get_sphere_transformation_matrix(offset):

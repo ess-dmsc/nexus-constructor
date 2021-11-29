@@ -235,7 +235,10 @@ class InstrumentView(QWidget):
         Obtain the entity from the InstrumentView based on its name.
         """
         try:
-            return self.component_entities[component_name]
+            component = self.component_entities[component_name]
+            if isinstance(component, Qt3DCore.QEntity):
+                return component
+            return component.get_entity()
         except KeyError:
             logging.error(
                 f"Unable to retrieve component {component_name} because it doesn't exist."
