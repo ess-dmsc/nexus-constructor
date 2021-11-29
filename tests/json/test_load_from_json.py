@@ -11,7 +11,6 @@ from nexus_constructor.json.json_warnings import (
     TransformDependencyMissing,
 )
 from nexus_constructor.json.load_from_json import JSONReader
-from nexus_constructor.json.load_from_json_utils import _retrieve_children_list
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
@@ -339,18 +338,6 @@ def component_with_transformation() -> Component:
     )
     comp.depends_on = transformation
     return comp
-
-
-def test_GIVEN_unable_to_find_nexus_structure_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
-    assert not _retrieve_children_list(dict())
-
-
-def test_GIVEN_unable_to_find_first_children_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
-    assert not _retrieve_children_list({"": None})
-
-
-def test_GIVEN_unable_to_find_second_children_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
-    assert not _retrieve_children_list({"children": [dict()]})
 
 
 @pytest.mark.parametrize("nx_class", ["", "notannxclass"])

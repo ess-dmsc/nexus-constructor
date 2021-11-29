@@ -16,21 +16,6 @@ from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 DEPENDS_ON_IGNORE = [None, "."]
 
 
-def _retrieve_children_list(json_dict: Dict) -> List:
-    """
-    Attempts to retrieve the children from the JSON dictionary.
-    :param json_dict: The JSON dictionary loaded by the user.
-    :return: The children value is returned if it was found, otherwise an empty list is returned.
-    """
-    value = []
-    try:
-        entry = json_dict[CommonKeys.CHILDREN][0]
-        value = entry[CommonKeys.CHILDREN]
-    except (KeyError, IndexError, TypeError):
-        pass
-    return value
-
-
 def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     """
     Tries to get the shape information from a component.
