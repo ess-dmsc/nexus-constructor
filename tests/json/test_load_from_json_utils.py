@@ -8,8 +8,8 @@ from nexus_constructor.json.load_from_json_utils import (
     _find_nx_class,
 )
 from nexus_constructor.model.attributes import FieldAttribute
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 
 
@@ -45,7 +45,7 @@ def test_GIVEN_nx_class_in_different_formats_WHEN_reading_class_information_THEN
 def test_GIVEN_empty_dictionary_or_dictionary_with_no_attributes_WHEN_adding_attributes_THEN_returns_nothing(
     test_input,
 ):
-    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    dataset = Dataset(parent_node=None, name="ds", values=123, type=ValueTypes.INT)
     _add_attributes(test_input, dataset)
     assert not dataset.attributes
 
@@ -54,7 +54,7 @@ def test_GIVEN_dictionary_containing_attribute_WHEN_adding_attributes_THEN_attri
     key = "units"
     value = "m"
     test_dict = {"attributes": [{"name": key, "values": value}]}
-    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    dataset = Dataset(parent_node=None, name="ds", values=123, type=ValueTypes.INT)
     _add_attributes(test_dict, dataset)
     assert len(dataset.attributes) == 1
     assert isinstance(dataset.attributes[0], FieldAttribute)
@@ -70,7 +70,7 @@ def test_GIVEN_dictionary_containing_attributes_WHEN_adding_attributes_THEN_attr
     test_dict = {
         "attributes": [{"name": key1, "values": val1}, {"name": key2, "values": val2}]
     }
-    dataset = Dataset(name="ds", values=123, type=ValueTypes.INT)
+    dataset = Dataset(parent_node=None, name="ds", values=123, type=ValueTypes.INT)
     _add_attributes(test_dict, dataset)
     assert len(dataset.attributes) == 2
     assert dataset.attributes[0].name == key1

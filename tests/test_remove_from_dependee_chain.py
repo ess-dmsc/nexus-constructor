@@ -3,7 +3,7 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.stream import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 
 values = Dataset(

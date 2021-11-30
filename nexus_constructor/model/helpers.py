@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, List, Union
 if TYPE_CHECKING:
     from nexus_constructor.model.attributes import Attributes
     from nexus_constructor.model.group import Group
-    from nexus_constructor.model.stream import FileWriterModule
+    from nexus_constructor.model.module import FileWriterModule
 
 
 def __find_item_index(list_to_look_in: List[Any], item_name: str):
@@ -14,8 +14,12 @@ def __find_item_index(list_to_look_in: List[Any], item_name: str):
     :return: The index of the object if any are found.
     """
     for count, element in enumerate(list_to_look_in):
-        if element.name == item_name:
-            return count
+        try:
+            if element.name == item_name:
+                return count
+        except AttributeError:
+            continue
+    return None
 
 
 def _get_item(list_to_look_in: List[Any], item_name: str) -> Any:

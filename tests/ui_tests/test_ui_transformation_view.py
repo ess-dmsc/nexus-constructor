@@ -10,7 +10,7 @@ from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.stream import Dataset, F142Stream, Link
+from nexus_constructor.model.module import Dataset, F142Stream, Link
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
 

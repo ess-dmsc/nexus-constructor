@@ -18,7 +18,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import (
     _incorrect_data_type_message,
     _units_are_valid,
 )
-from nexus_constructor.model.dataset import Dataset
+from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
 from tests.geometry.chopper_test_helpers import (  # noqa: F401
     DEGREES_EDGES_ARR,
@@ -31,8 +31,8 @@ from tests.geometry.chopper_test_helpers import (  # noqa: F401
 
 def create_dataset(name: str, dtype: str, val: Any):
     if np.isscalar(val):
-        return Dataset(name=name, type=dtype, values=str(val))
-    return Dataset(name=name, type=dtype, values=val)
+        return Dataset(parent_node=None, name=name, type=dtype, values=str(val))
+    return Dataset(parent_node=None, name=name, type=dtype, values=val)
 
 
 @pytest.fixture(scope="function")

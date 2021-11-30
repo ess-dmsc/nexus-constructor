@@ -3,9 +3,8 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.dataset import Dataset
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import F142Stream, WriterModules
+from nexus_constructor.model.module import Dataset, F142Stream, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
@@ -20,7 +19,7 @@ def create_transform(
     ui_value=42.0,
     vector=QVector3D(1.0, 0.0, 0.0),
     type="translation",
-    values=Dataset(name="", values=None, type=ValueTypes.DOUBLE),
+    values=Dataset(parent_node=None, name="", values=None, type=ValueTypes.DOUBLE),
     units="m",
 ):
     translation = Transformation(
@@ -44,7 +43,7 @@ def test_can_get_transform_properties():
     test_ui_value = 42
     test_vector = QVector3D(1.0, 0.0, 0.0)
     test_type = "translation"
-    test_values = Dataset("test_dataset", None, [1])
+    test_values = Dataset(parent_node=None, name="test_dataset", values=None)
 
     transform = create_transform(
         name=test_name, vector=test_vector, ui_value=test_ui_value, values=test_values
@@ -95,7 +94,7 @@ def test_can_set_transform_properties():
     test_ui_value = 34.0
     test_vector = QVector3D(0.0, 0.0, 1.0)
     test_type = "rotation"
-    test_values = Dataset("valuedataset", None, [1, 2])
+    test_values = Dataset(parent_node=None, name="valuedataset", values=None)
 
     transform.name = test_name
     transform.ui_value = test_ui_value
@@ -372,7 +371,7 @@ def test_GIVEN_transformation_with_scalar_value_that_is_not_castable_to_int_WHEN
 
 def test_as_dict_method_of_transformation_when_values_is_a_dataset():
     name = ":: SOME NAME ::"
-    dataset = Dataset(name="", values=None, type=ValueTypes.DOUBLE)
+    dataset = Dataset(parent_node=None, name="", values=None, type=ValueTypes.DOUBLE)
     transform = create_transform(name=name, values=dataset)
     assert transform.values == dataset
     return_dict = transform.as_dict([])
@@ -399,21 +398,9 @@ def test_as_dict_method_of_transformation_when_values_is_a_f142_streamgroup():
     assert return_dict[NodeType.CONFIG]["topic"] == topic
 
 
-def test_if_scalar_and_invalid_value_entered_then_converting_to_dict_appends_error():
-    transform = create_transform(
-        values=Dataset(name="", values="not a number", type="double"),
-        type=ValueTypes.DOUBLE,
-    )
-
-    error_collector = []
-    transform.as_dict(error_collector)
-
-    assert error_collector
-
-
 def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
     transform = create_transform(
-        values=Dataset(name="", values="123", type="double"),
+        values=Dataset(parent_node=None, name="", values="123", type="double"),
         type=ValueTypes.DOUBLE,
     )
 

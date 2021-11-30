@@ -10,7 +10,7 @@ from nexus_constructor.common_attrs import (
     NodeType,
 )
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.stream import SOURCE, Dataset, Link
+from nexus_constructor.model.module import SOURCE, Dataset, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 DEPENDS_ON_IGNORE = [None, "."]

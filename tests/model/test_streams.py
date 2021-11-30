@@ -1,6 +1,6 @@
 import pytest
 
-from nexus_constructor.model.stream import (
+from nexus_constructor.model.module import (
     EV42Stream,
     F142Stream,
     NS10Stream,
