@@ -78,6 +78,9 @@ class Group:
     def get_field_value(self, name: str):
         return self[name].values
 
+    def is_component(self):
+        return True if self[CommonAttrs.DEPENDS_ON] else False
+
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return_dict: Dict = {
             CommonKeys.NAME: self.name,
