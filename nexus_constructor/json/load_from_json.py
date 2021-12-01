@@ -1,7 +1,5 @@
 import json
-from typing import Dict, List, Optional, Tuple, Union
-
-import numpy as np
+from typing import Dict, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
     INSTRUMENT_NAME,
@@ -21,7 +19,9 @@ from nexus_constructor.json.json_warnings import (
 )
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
+    _find_depends_on_path,
     _find_nx_class,
+    _find_shape_information,
 )
 from nexus_constructor.json.shape_reader import ShapeReader
 from nexus_constructor.json.transform_id import TransformId
@@ -36,15 +36,12 @@ from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
-    SOURCE,
     Dataset,
     FileWriterModule,
-    Link,
     WriterModules,
     create_fw_module_object,
 )
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 
 """
 The current implementation makes a couple of assumptions that may not hold true for all valid JSON descriptions of
@@ -60,53 +57,6 @@ CHILD_EXCLUDELIST = [
     TRANSFORMS_GROUP_NAME,
     CommonAttrs.DEPENDS_ON,
 ]
-
-
-def _retrieve_children_list(json_dict: Dict) -> List:
-    """
-    Attempts to retrieve the children from the JSON dictionary.
-    :param json_dict: The JSON dictionary loaded by the user.
-    :return: The children value is returned if it was found, otherwise an empty list is returned.
-    """
-    value = []
-    try:
-        entry = json_dict[CommonKeys.CHILDREN][0]
-        value = entry[CommonKeys.CHILDREN]
-    except (KeyError, IndexError, TypeError):
-        pass
-    return value
-
-
-def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
-    """
-    Tries to get the shape information from a component.
-    :param children: The list of dictionaries.
-    :return: The shape attribute if it could be found, otherwise None.
-    """
-    value = None
-    try:
-        for item in children:
-            if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
-                value = item
-    except KeyError:
-        pass
-    return value
-
-
-def _find_depends_on_path(items: List[Dict], name: str) -> Optional[str]:
-    if not isinstance(items, list):
-        raise RuntimeError(
-            f'List of children in node with the name "{name}" is not a list.'
-        )
-    for item in items:
-        try:
-            config = item[NodeType.CONFIG]
-            if config[CommonKeys.NAME] != CommonAttrs.DEPENDS_ON:
-                continue
-            return config[CommonKeys.VALUES]
-        except KeyError:
-            pass  # Not all items has a config node, ignore those that do not.
-    return None
 
 
 class JSONReader:
@@ -395,42 +345,3 @@ class JSONReader:
             self.warnings += shape_reader.warnings
 
         return component
-
-
-def _get_data_type(json_object: Dict):
-    if CommonKeys.DATA_TYPE in json_object:
-        return json_object[CommonKeys.DATA_TYPE]
-    elif CommonKeys.TYPE in json_object:
-        return json_object[CommonKeys.TYPE]
-    raise KeyError
-
-
-def _create_dataset(json_object: Dict, parent: Group) -> Dataset:
-    value_type = _get_data_type(json_object[NodeType.CONFIG])
-    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
-    values = json_object[NodeType.CONFIG][CommonKeys.VALUES]
-    if isinstance(values, list):
-        # convert to a numpy array using specified type
-        values = np.array(values, dtype=VALUE_TYPE_TO_NP[value_type])
-    ds = Dataset(name=name, values=values, type=value_type, parent_node=parent)
-    _add_attributes(json_object, ds)
-    return ds
-
-
-def _create_link(json_object: Dict, parent_node: Optional[Group] = None) -> Link:
-    name = json_object[NodeType.CONFIG][CommonKeys.NAME]
-    target = json_object[NodeType.CONFIG][SOURCE]
-    return Link(parent_node=parent_node, name=name, source=target)
-
-
-def _add_attributes(json_object: Dict, model_object: Union[Group, Dataset]):
-    try:
-        attrs_list = json_object[CommonKeys.ATTRIBUTES]
-        for attribute in attrs_list:
-            attr_name = attribute[CommonKeys.NAME]
-            attr_values = attribute[CommonKeys.VALUES]
-            model_object.attributes.set_attribute_value(
-                attribute_name=attr_name, attribute_value=attr_values
-            )
-    except (KeyError, AttributeError):
-        pass
