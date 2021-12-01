@@ -46,21 +46,20 @@ class OFFGeometry(ABC):
         self._file_path = file_path
 
     @property
-    @abstractmethod
     def winding_order(self) -> List[int]:
         """
         Flattened 1D list of indices in vertices for each face
         winding_order_indices gives the start index for each face in this list
         """
-        pass
+        return [point for face in self.faces for point in face]
 
     @property
-    @abstractmethod
     def winding_order_indices(self) -> List[int]:
         """
         The start index for each face in winding_order
         """
-        pass
+        face_sizes = [len(face) for face in self.faces]
+        return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
     @property
     @abstractmethod
@@ -111,15 +110,6 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
         self.name = name
         self._vertices = vertices
         self._faces = faces
-
-    @property
-    def winding_order(self) -> List[int]:
-        return [point for face in self.faces for point in face]
-
-    @property
-    def winding_order_indices(self) -> List[int]:
-        face_sizes = [len(face) for face in self.faces]
-        return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
     @property
     def off_geometry(self) -> OFFGeometry:
@@ -310,15 +300,6 @@ class OFFGeometryNexus(OFFGeometry, Group):
         :param detector_faces: The PixelMapping object containing IDs the user provided through the Add/Edit Component window.
         """
         self.set_field_value(DETECTOR_FACES, np.array(detector_faces), ValueTypes.INT)
-
-    @property
-    def winding_order(self) -> List[int]:
-        return [point for face in self.faces for point in face]
-
-    @property
-    def winding_order_indices(self) -> List[int]:
-        face_sizes = [len(face) for face in self.faces]
-        return [sum(face_sizes[0:i]) for i in range(len(face_sizes))]
 
     @property
     def off_geometry(self) -> OFFGeometry:
