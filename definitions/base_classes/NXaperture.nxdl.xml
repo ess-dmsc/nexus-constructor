@@ -35,6 +35,12 @@
         Points to the path to a field defining the last transformation in a chain of transformations
         which defines the position and orientation of this component or the string "." if located
         in the origin.
+
+        The reference point of the aperture is its center in the x and y axis. The reference point on the z axis is the
+        surface of the aperture pointing towards the source.
+
+        .. image:: aperture/aperture.png
+            :width: 40%
       </doc>
     </field>
     <group type="NXtransformations">
@@ -53,6 +59,7 @@
                 * Similar throughout base classes
                 * Some base classes do this much better
                 * Such as where is the gap written?
+
         </doc>
     </group>
     <group name="BLADE_GEOMETRY" type="NXgeometry">

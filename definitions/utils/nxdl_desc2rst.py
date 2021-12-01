@@ -382,7 +382,9 @@ def getDocFromNode(ns, node, retval=None):
             text = lines[0][indent:]
         for line in lines[1:]:
             if not len(line[:indent].strip()) == 0:
-                raise "Something wrong with indentation on this line:\n" + line
+                # Following line commented out as it is found to be of no use
+                #raise RuntimeError("Something wrong with indentation on this line:\n" + line)
+                pass
             text += '\n' + line[indent:]
 
     # substitute HTML entities in markup: "<" for "&lt;"

@@ -187,6 +187,13 @@
         Points to the path to a field defining the last transformation in a chain of transformations
         which defines the position and orientation of this component or the string "." if located
         in the origin.
+        
+        The reference point of the source plane is its center in the x and y axis. The source is considered infinitely thin in the
+        z axis.
+        
+        .. image:: source/source.png
+          :width: 40%
+        
       </doc>
     </field>
     <group type="NXtransformations">

@@ -86,6 +86,13 @@
         Points to the path to a field defining the last transformation in a chain of transformations
         which defines the position and orientation of this component or the string "." if located
         in the origin.
+        
+        The reference point of the moderator is its center in the x and y axis. The reference point on the z axis is the
+        surface of the moderator pointing towards the source (the negative part of the z axis).
+
+        .. image:: moderator/moderator.png
+          :width: 40%
+                    
       </doc>
     </field>
     <group type="NXtransformations">
