@@ -99,6 +99,7 @@
 
         .. image:: attenuator/attenuator.png
             :width: 40%
+
       </doc>
     </field>
     <group type="NXtransformations">

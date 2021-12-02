@@ -107,6 +107,10 @@
         Points to the path to a field defining the last transformation in a chain of transformations
         which defines the position and orientation of this component or the string "." if located
         in the origin.
+
+        .. todo::
+          Add a definition for the reference point of a x-ray lens.
+
       </doc>
     </field>
     <group type="NXtransformations">

@@ -131,6 +131,15 @@
         Points to the path to a field defining the last transformation in a chain of transformations
         which defines the position and orientation of this component or the string "." if located
         in the origin.
+
+        The reference plane of the monitor contains the surface of the detector that faces the source
+        and is the entry point of the beam. The reference point of the monitor in the x and y axis is
+        its centre on this surface. The reference plane is orthogonal to the the z axis and the
+        reference point on this z axis is where they intersect.
+
+        .. image:: monitor/monitor.png
+          :width: 40%
+
       </doc>
     </field>
     <group type="NXtransformations">
