@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME, CommonKeys
+from nexus_constructor.component_type import SAMPLE_CLASS_NAME
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 
@@ -13,7 +14,7 @@ class Instrument(Group):
         self.nx_class = "NXinstrument"
 
         self.sample = Component(SAMPLE_NAME, parent_node=self)
-        self.sample.nx_class = "NXsample"
+        self.sample.nx_class = SAMPLE_CLASS_NAME
         self.component_list = [self.sample]
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
