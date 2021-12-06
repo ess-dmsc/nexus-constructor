@@ -26,7 +26,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.components = self.model.entry.instrument.component_list
+        self.components = self.model.entry.instrument.get_components()
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1

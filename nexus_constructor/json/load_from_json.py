@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
     INSTRUMENT_NAME,
@@ -282,11 +282,8 @@ class JSONReader:
         instrument_group = self.entry_node[INSTRUMENT_NAME]
         if instrument_group:
             instrument_component = Instrument(parent_node=self.model.entry)
-            instrument_component.children = instrument_group.children
-            for child in instrument_component.children:
-                child.parent_node = instrument_component
             self.model.entry.instrument = instrument_component
-            self._add_components_to_instrument()
+            self._add_children_to_instrument(instrument_group.children)
 
         # Create sample according to old implementation.
         if self.sample_name:
@@ -301,8 +298,11 @@ class JSONReader:
                 )
             )
 
-    def _add_components_to_instrument(self):
-        for child in self.model.entry.instrument.children:
+    def _add_children_to_instrument(
+        self, children_list: List[Union[FileWriterModule, Group]]
+    ):
+        for child in children_list:
+            child.parent_node = self.model.entry.instrument
             if isinstance(child, Group) and child.nx_class in COMPONENT_TYPES:
                 component = Component(
                     name=child.name, parent_node=self.model.entry.instrument
@@ -311,10 +311,10 @@ class JSONReader:
                 for child_child in child.children:
                     child_child.parent_node = component
                     component.children.append(child_child)
-                res = self._add_transform_and_shape_to_component(
+                child = self._add_transform_and_shape_to_component(
                     component, child.child_dict
                 )
-                self.model.entry.instrument.component_list.append(res)
+            self.model.entry.instrument.children.append(child)
 
     def _add_transform_and_shape_to_component(self, component, children_dict):
         # Add transformations if they exist.

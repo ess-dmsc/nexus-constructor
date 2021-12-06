@@ -131,8 +131,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        component_list = self.instrument.component_list.copy()
-
+        component_list = self.instrument.get_components()
         if self.component_to_edit:
             for item in component_list:
                 if item.name == self.component_to_edit.name:
@@ -333,7 +332,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         return generate_unique_name(
             self.componentTypeComboBox.currentText().lstrip("NX"),
-            self.instrument.component_list,
+            self.instrument.get_components(),
         )
 
     def on_nx_class_changed(self):
@@ -489,6 +488,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         add_fields_to_component(component, self.fieldsListWidget)
 
         self.component_model.add_component(component)
+        self.instrument[component.name] = component
         return component.shape
 
     def edit_existing_component(
