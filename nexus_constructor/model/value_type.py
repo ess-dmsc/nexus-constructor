@@ -46,3 +46,14 @@ INT_TYPES = [
     ValueTypes.SHORT,
 ]
 FLOAT_TYPES = [ValueTypes.FLOAT, ValueTypes.DOUBLE]
+
+
+cast_to_json_serialisable_type = (
+    lambda dtype: int
+    if dtype in INT_TYPES
+    else (
+        float
+        if dtype in FLOAT_TYPES
+        else (str if dtype == ValueTypes.STRING else lambda y: y)  # type: ignore
+    )
+)

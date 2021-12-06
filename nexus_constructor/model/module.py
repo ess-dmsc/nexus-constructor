@@ -11,12 +11,7 @@ from nexus_constructor.model.attributes import Attributes
 if TYPE_CHECKING:
     from nexus_constructor.model.group import Group  # noqa: F401
 
-from nexus_constructor.model.value_type import (
-    FLOAT_TYPES,
-    INT_TYPES,
-    ValueType,
-    ValueTypes,
-)
+from nexus_constructor.model.value_type import ValueType, cast_to_json_serialisable_type
 
 ARRAY_SIZE = "array_size"
 VALUE_UNITS = "value_units"
@@ -167,15 +162,7 @@ class Dataset(FileWriterModule):
         return return_dict
 
     def _cast_to_type(self, data):
-        # Only cast to int, float or str so values can be
-        # serialised to json
-        if self.type in INT_TYPES:
-            data = int(data)
-        elif self.type in FLOAT_TYPES:
-            data = float(data)
-        elif self.type == ValueTypes.STRING:
-            data = str(data)
-        return data
+        return cast_to_json_serialisable_type(data)(data)  # type: ignore
 
 
 @attr.s
