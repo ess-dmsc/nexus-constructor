@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
@@ -14,13 +14,11 @@ from nexus_constructor.instrument_view.instrument_view_axes import InstrumentVie
 from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
-from nexus_constructor.instrument_view.neutron_source import NeutronSource
 from nexus_constructor.instrument_view.off_renderer import OffMesh
-from nexus_constructor.instrument_view.qentity_utils import (
-    MATERIAL_ALPHA,
-    MATERIAL_COLORS,
-    create_material,
-    create_qentity,
+from nexus_constructor.instrument_view.q_components import (
+    NeutronSource,
+    OffMeshQComponent,
+    QComponent,
 )
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
@@ -96,7 +94,7 @@ class InstrumentView(QWidget):
         InstrumentViewAxes(self.axes_root_entity, self.view.camera().farPlane())
 
         # Dictionary of components and transformations so that we can delete them later
-        self.component_entities = {}
+        self.component_entities: Dict[str, QComponent] = {}
         self.transformations = {}
 
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
@@ -215,30 +213,22 @@ class InstrumentView(QWidget):
         if geometry is None:
             return
 
+        q_component: QComponent = None
         if nx_class == SOURCE_CLASS_NAME:
-            entity = NeutronSource(self.component_root_entity)
-            self.component_entities[name] = entity
+            q_component = NeutronSource(self.component_root_entity, nx_class)
         else:
             mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
-            material = create_material(
-                MATERIAL_COLORS.get(nx_class, QColor("black")),
-                QColor("grey"),
-                self.component_root_entity,
-                MATERIAL_ALPHA.get(nx_class, None),
-            )
-            self.component_entities[name] = create_qentity(
-                [mesh, material], self.component_root_entity
-            )
+            q_component = OffMeshQComponent(mesh, self.component_root_entity, nx_class)
+
+        q_component.create_entities()
+        self.component_entities[name] = q_component
 
     def get_entity(self, component_name: str) -> Qt3DCore.QEntity:
         """
         Obtain the entity from the InstrumentView based on its name.
         """
         try:
-            component = self.component_entities[component_name]
-            if isinstance(component, Qt3DCore.QEntity):
-                return component
-            return component.get_entity()
+            return self.component_entities[component_name].get_entity()
         except KeyError:
             logging.error(
                 f"Unable to retrieve component {component_name} because it doesn't exist."
@@ -287,14 +277,16 @@ class InstrumentView(QWidget):
         """
         self.transformations[component_name] = transformation
         component = self.component_entities[component_name]
-        component.addComponent(transformation)
+        component.add_transformation(transformation)
 
     def clear_all_transformations(self):
         """
         Remove all transformations from all components
         """
         for component_name, transformation in self.transformations.items():
-            self.component_entities[component_name].removeComponent(transformation)
+            self.component_entities[component_name].remove_transformation(
+                transformation
+            )
         self.transformations = {}
 
     @staticmethod
