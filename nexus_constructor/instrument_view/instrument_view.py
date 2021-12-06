@@ -14,11 +14,11 @@ from nexus_constructor.instrument_view.instrument_view_axes import InstrumentVie
 from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
+from nexus_constructor.instrument_view.neutron_source import NeutronSource
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.instrument_view.qentity_utils import (
     MATERIAL_ALPHA,
     MATERIAL_COLORS,
-    NeutronSource,
     create_material,
     create_qentity,
 )
