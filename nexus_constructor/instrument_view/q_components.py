@@ -3,8 +3,10 @@ from typing import List
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
+from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QColor, QMatrix4x4, QVector3D
 
+from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.instrument_view.qentity_utils import (
     MATERIAL_ALPHA,
     MATERIAL_COLORS,
@@ -15,20 +17,20 @@ from nexus_constructor.instrument_view.qentity_utils import (
 
 
 class QComponent:
-    def __init__(self, root_entity, nx_class):
+    def __init__(self, root_entity: Qt3DCore.QEntity, nx_class: str):
         self.root_entity = root_entity
         self.nx_class = nx_class
 
         self.entities: List[Qt3DCore.QEntity] = []
-        self.default_material = self._create_default_material()
+        self.default_material: Qt3DRender.QMaterial = self._create_default_material()
 
     def create_entities(self):
         raise NotImplementedError
 
-    def add_transformation(self, transformation):
+    def add_transformation(self, transformation: Qt3DCore.QComponent):
         raise NotImplementedError
 
-    def remove_transformation(self, transformation):
+    def remove_transformation(self, transformation: Qt3DCore.QComponent):
         for entity in self.entities:
             entity.removeComponent(transformation)
 
@@ -39,7 +41,7 @@ class QComponent:
     def get_entity(self):
         return self.entities[0]
 
-    def _create_default_material(self):
+    def _create_default_material(self) -> Qt3DRender.QMaterial:
         return create_material(
             MATERIAL_COLORS.get(self.nx_class, QColor("black")),
             MATERIAL_DIFFUSE_COLORS.get(self.nx_class, QColor("grey")),
@@ -49,7 +51,7 @@ class QComponent:
 
 
 class OffMeshQComponent(QComponent):
-    def __init__(self, mesh, root_entity, nx_class):
+    def __init__(self, mesh: OffMesh, root_entity: Qt3DCore.QEntity, nx_class: str):
         super().__init__(root_entity, nx_class)
         self._mesh = mesh
 
@@ -58,7 +60,7 @@ class OffMeshQComponent(QComponent):
             create_qentity([self._mesh, self.default_material], self.root_entity)
         )
 
-    def add_transformation(self, transformation):
+    def add_transformation(self, transformation: Qt3DCore.QComponent):
         self.entities[0].addComponent(transformation)
 
 
@@ -76,7 +78,7 @@ class NeutronSource(QComponent):
         self._create_source()
         self._setup_neutrons()
 
-    def add_transformation(self, transformation):
+    def add_transformation(self, transformation: Qt3DCore.QComponent):
         matrix = transformation.matrix()
         for index, entity in enumerate(self.entities):
             if index == 0:  # source
@@ -121,20 +123,26 @@ class NeutronSource(QComponent):
             )
             self.entities.append(entity)
 
-    def _redo_source_transformation(self, transform, matrix):
+    def _redo_source_transformation(
+        self, transform: Qt3DCore.QComponent, matrix: QMatrix4x4
+    ):
         transform.setMatrix(matrix * self._get_cylinder_transformatrion_matrix())
 
-    def _redo_neutron_transformation(self, transform, matrix, offset):
+    def _redo_neutron_transformation(
+        self, transform: Qt3DCore.QComponent, matrix: QMatrix4x4, offset: np.ndarray
+    ):
         transform.setMatrix(matrix * self._get_sphere_transformation_matrix(offset))
 
     @staticmethod
-    def _get_sphere_transformation_matrix(offset):
+    def _get_sphere_transformation_matrix(offset: np.ndarray) -> QMatrix4x4:
         matrix = QMatrix4x4()
         matrix.translate(QVector3D(offset[0], offset[1], offset[2]))
         return matrix
 
     @staticmethod
-    def _generate_random_points_in_cylinder(num_points, radius, height):
+    def _generate_random_points_in_cylinder(
+        num_points: int, radius: float, height: float
+    ) -> np.ndarray:
         offsets = []
         for _ in range(num_points):
             theta = np.random.uniform(0, 2 * np.pi)
@@ -149,7 +157,7 @@ class NeutronSource(QComponent):
         return np.array(offsets)
 
     @staticmethod
-    def _get_cylinder_transformatrion_matrix():
+    def _get_cylinder_transformatrion_matrix() -> QMatrix4x4:
         matrix = QMatrix4x4()
         matrix.rotate(90, QVector3D(1, 0, 0))
         return matrix

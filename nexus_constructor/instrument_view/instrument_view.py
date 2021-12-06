@@ -207,6 +207,7 @@ class InstrumentView(QWidget):
         """
         Add a component to the instrument view given a name and its geometry.
         :param name: The name of the component.
+        :param nx_class: The Nexus class of the component
         :param geometry: The geometry information of the component that is used to create a mesh.
         :param positions: Mesh is repeated at each of these positions
         """
