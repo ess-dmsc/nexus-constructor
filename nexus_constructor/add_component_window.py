@@ -488,7 +488,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         add_fields_to_component(component, self.fieldsListWidget)
 
         self.component_model.add_component(component)
-        self.instrument[component.name] = component
         return component.shape
 
     def edit_existing_component(
