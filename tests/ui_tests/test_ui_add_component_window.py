@@ -392,7 +392,7 @@ def get_new_component_from_dialog(dialog: AddComponentDialog, name: str) -> Comp
     :param name: The name of the component that is being searched for.
     :return: The component.
     """
-    for component in dialog.instrument.component_list:
+    for component in dialog.instrument.get_components():
         if component.name == name:
             return component
 
