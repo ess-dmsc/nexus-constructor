@@ -1,4 +1,5 @@
-from typing import List
+from abc import ABC
+from typing import Callable, List, Tuple, Union
 
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
@@ -16,12 +17,14 @@ from nexus_constructor.instrument_view.qentity_utils import (
 )
 
 
-class QComponent:
+class EntityCollection(ABC):
     def __init__(self, root_entity: Qt3DCore.QEntity, nx_class: str):
         self.root_entity = root_entity
         self.nx_class = nx_class
 
-        self.entities: List[Qt3DCore.QEntity] = []
+        self.entities: List[
+            Union[Qt3DCore.QEntity, Tuple[Qt3DCore.QEntity, Callable]]
+        ] = []
         self.default_material: Qt3DRender.QMaterial = self._create_default_material()
 
     def create_entities(self):
@@ -35,10 +38,9 @@ class QComponent:
             entity.removeComponent(transformation)
 
     def setParent(self, value=None):
-        for entity in self.entities:
-            entity.setParent(value)
+        raise NotImplementedError
 
-    def get_entity(self):
+    def entity_to_zoom(self):
         return self.entities[0]
 
     def _create_default_material(self) -> Qt3DRender.QMaterial:
@@ -50,7 +52,7 @@ class QComponent:
         )
 
 
-class OffMeshQComponent(QComponent):
+class OffMeshEntityCollection(EntityCollection):
     def __init__(self, mesh: OffMesh, root_entity: Qt3DCore.QEntity, nx_class: str):
         super().__init__(root_entity, nx_class)
         self._mesh = mesh
@@ -61,10 +63,15 @@ class OffMeshQComponent(QComponent):
         )
 
     def add_transformation(self, transformation: Qt3DCore.QComponent):
-        self.entities[0].addComponent(transformation)
+        for entity in self.entities:
+            entity.addComponent(transformation)
+
+    def setParent(self, value=None):
+        for entity in self.entities:
+            entity.setParent(value)
 
 
-class NeutronSource(QComponent):
+class NeutronSourceEntityCollection(EntityCollection):
     def __init__(self, root_entity, nx_class):
         super().__init__(root_entity, nx_class)
         self._source_length = 4
@@ -78,18 +85,25 @@ class NeutronSource(QComponent):
         self._create_source()
         self._setup_neutrons()
 
+    def setParent(self, value=None):
+        for entity in self.entities:
+            entity[0].setParent(value)
+
     def add_transformation(self, transformation: Qt3DCore.QComponent):
-        matrix = transformation.matrix()
+        # matrix = transformation.matrix()
         for index, entity in enumerate(self.entities):
-            if index == 0:  # source
-                self._redo_source_transformation(transformation, matrix)
-                entity.addComponent(transformation)
-            else:  # neutrons
-                transform = Qt3DCore.QTransform(self.root_entity)
-                self._redo_neutron_transformation(
-                    transform, matrix, self._neutron_offsets[index - 1]
-                )
-                entity.addComponent(transform)
+            self._redo_transformation(transformation, entity[1])
+            entity[0].addComponent(transformation)
+            # if index == 0:  # source
+            #     transform = Qt3DCore.QTransform(self.root_entity)
+            #     self._redo_source_transformation(transform, matrix)
+            #     entity.addComponent(transform)
+            # else:  # neutrons
+            #     transform = Qt3DCore.QTransform(self.root_entity)
+            #     self._redo_neutron_transformation(
+            #         transform, matrix, self._neutron_offsets[index - 1]
+            #     )
+            #     entity.addComponent(transform)
 
     def _create_source(self):
         cylinder_mesh = Qt3DExtras.QCylinderMesh(self.root_entity)
@@ -100,10 +114,18 @@ class NeutronSource(QComponent):
         cone_transform.setMatrix(self._get_cylinder_transformatrion_matrix())
 
         self.entities.append(
-            create_qentity(
-                [cylinder_mesh, self.default_material, cone_transform], self.root_entity
+            (
+                create_qentity(
+                    [cylinder_mesh, self.default_material, cone_transform],
+                    self.root_entity,
+                ),
+                self._get_cylinder_transformatrion_matrix(),
             )
         )
+
+    def _redo_transformation(self, transformation, current_transformation_matrix):
+        matrix = transformation.matrix()
+        transformation.setMatrix(matrix * current_transformation_matrix)
 
     def _setup_neutrons(self):
         neutron_radius = 0.1
@@ -121,7 +143,12 @@ class NeutronSource(QComponent):
             entity = create_qentity(
                 [mesh, neutron_material, transform], self.root_entity
             )
-            self.entities.append(entity)
+            self.entities.append(
+                (
+                    entity,
+                    self._get_sphere_transformation_matrix(self._neutron_offsets[i]),
+                )
+            )
 
     def _redo_source_transformation(
         self, transform: Qt3DCore.QComponent, matrix: QMatrix4x4

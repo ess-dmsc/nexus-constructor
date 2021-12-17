@@ -9,17 +9,17 @@ from PySide2.QtGui import QColor, QVector3D
 from PySide2.QtWidgets import QVBoxLayout, QWidget
 
 from nexus_constructor.component_type import SOURCE_CLASS_NAME
+from nexus_constructor.instrument_view.entity_collections import (
+    EntityCollection,
+    NeutronSourceEntityCollection,
+    OffMeshEntityCollection,
+)
 from nexus_constructor.instrument_view.gnomon import Gnomon
 from nexus_constructor.instrument_view.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
-from nexus_constructor.instrument_view.q_components import (
-    NeutronSource,
-    OffMeshQComponent,
-    QComponent,
-)
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     NoShapeGeometry,
@@ -94,7 +94,7 @@ class InstrumentView(QWidget):
         InstrumentViewAxes(self.axes_root_entity, self.view.camera().farPlane())
 
         # Dictionary of components and transformations so that we can delete them later
-        self.component_entities: Dict[str, QComponent] = {}
+        self.component_entities: Dict[str, EntityCollection] = {}
         self.transformations = {}
 
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
@@ -214,12 +214,16 @@ class InstrumentView(QWidget):
         if geometry is None:
             return
 
-        q_component: QComponent = None
+        q_component: EntityCollection = None
         if nx_class == SOURCE_CLASS_NAME:
-            q_component = NeutronSource(self.component_root_entity, nx_class)
+            q_component = NeutronSourceEntityCollection(
+                self.component_root_entity, nx_class
+            )
         else:
             mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
-            q_component = OffMeshQComponent(mesh, self.component_root_entity, nx_class)
+            q_component = OffMeshEntityCollection(
+                mesh, self.component_root_entity, nx_class
+            )
 
         q_component.create_entities()
         self.component_entities[name] = q_component
@@ -229,7 +233,7 @@ class InstrumentView(QWidget):
         Obtain the entity from the InstrumentView based on its name.
         """
         try:
-            return self.component_entities[component_name].get_entity()
+            return self.component_entities[component_name].entity_to_zoom()
         except KeyError:
             logging.error(
                 f"Unable to retrieve component {component_name} because it doesn't exist."
