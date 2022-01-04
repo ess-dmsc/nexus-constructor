@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
@@ -8,22 +8,23 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QColor, QVector3D
 from PySide2.QtWidgets import QVBoxLayout, QWidget
 
+from nexus_constructor.component_type import SOURCE_CLASS_NAME
+from nexus_constructor.instrument_view.entity_collections import (
+    EntityCollection,
+    NeutronSourceEntityCollection,
+    OffMeshEntityCollection,
+)
 from nexus_constructor.instrument_view.gnomon import Gnomon
 from nexus_constructor.instrument_view.instrument_view_axes import InstrumentViewAxes
 from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
-from nexus_constructor.instrument_view.qentity_utils import (
-    create_material,
-    create_qentity,
-)
 from nexus_constructor.model.geometry import (
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.model.instrument import SAMPLE_NAME
 
 
 class InstrumentView(QWidget):
@@ -93,7 +94,7 @@ class InstrumentView(QWidget):
         InstrumentViewAxes(self.axes_root_entity, self.view.camera().farPlane())
 
         # Dictionary of components and transformations so that we can delete them later
-        self.component_entities = {}
+        self.component_entities: Dict[str, EntityCollection] = {}
         self.transformations = {}
 
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
@@ -199,36 +200,40 @@ class InstrumentView(QWidget):
     def add_component(
         self,
         name: str,
+        nx_class,
         geometry: Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
         positions: List[QVector3D] = None,
     ):
         """
         Add a component to the instrument view given a name and its geometry.
         :param name: The name of the component.
+        :param nx_class: The Nexus class of the component
         :param geometry: The geometry information of the component that is used to create a mesh.
         :param positions: Mesh is repeated at each of these positions
         """
         if geometry is None:
             return
 
-        mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
-        material = create_material(
-            QColor("black") if name != SAMPLE_NAME else QColor("red"),
-            QColor("grey"),
-            self.component_root_entity,
-            alpha=0.5 if name == SAMPLE_NAME else None,
-        )
+        q_component: EntityCollection = None
+        if nx_class == SOURCE_CLASS_NAME:
+            q_component = NeutronSourceEntityCollection(
+                self.component_root_entity, nx_class
+            )
+        else:
+            mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
+            q_component = OffMeshEntityCollection(
+                mesh, self.component_root_entity, nx_class
+            )
 
-        self.component_entities[name] = create_qentity(
-            [mesh, material], self.component_root_entity
-        )
+        q_component.create_entities()
+        self.component_entities[name] = q_component
 
     def get_entity(self, component_name: str) -> Qt3DCore.QEntity:
         """
         Obtain the entity from the InstrumentView based on its name.
         """
         try:
-            return self.component_entities[component_name]
+            return self.component_entities[component_name].entity_to_zoom()
         except KeyError:
             logging.error(
                 f"Unable to retrieve component {component_name} because it doesn't exist."
@@ -277,14 +282,16 @@ class InstrumentView(QWidget):
         """
         self.transformations[component_name] = transformation
         component = self.component_entities[component_name]
-        component.addComponent(transformation)
+        component.add_transformation(transformation)
 
     def clear_all_transformations(self):
         """
         Remove all transformations from all components
         """
         for component_name, transformation in self.transformations.items():
-            self.component_entities[component_name].removeComponent(transformation)
+            self.component_entities[component_name].remove_transformation(
+                transformation
+            )
         self.transformations = {}
 
     @staticmethod

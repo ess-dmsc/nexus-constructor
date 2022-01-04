@@ -456,7 +456,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 component_name, description, nx_class, pixel_data
             )
 
-        self.signals.component_added.emit(self.nameLineEdit.text(), shape, positions)
+        self.signals.component_added.emit(
+            self.nameLineEdit.text(), nx_class, shape, positions
+        )
 
         if self.component_to_edit:
             self.signals.transformation_changed.emit()

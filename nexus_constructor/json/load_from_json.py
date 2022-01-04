@@ -9,7 +9,11 @@ from nexus_constructor.common_attrs import (
     CommonKeys,
     NodeType,
 )
-from nexus_constructor.component_type import COMPONENT_TYPES, NX_CLASSES
+from nexus_constructor.component_type import (
+    COMPONENT_TYPES,
+    NX_CLASSES,
+    SAMPLE_CLASS_NAME,
+)
 from nexus_constructor.json.json_warnings import (
     InvalidJson,
     JsonWarningsContainer,
@@ -50,7 +54,6 @@ valid NeXus files, but are safe if the JSON was created by the NeXus Constructor
 2. All depends_on paths are absolute, not relative.
 """
 NX_INSTRUMENT = "NXinstrument"
-NX_SAMPLE = "NXsample"
 CHILD_EXCLUDELIST = [
     SHAPE_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
@@ -180,7 +183,7 @@ class JSONReader:
                 self._add_object_warning(CommonKeys.NAME, parent_node)
                 return None
             nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
-            if nx_class == NX_SAMPLE:
+            if nx_class == SAMPLE_CLASS_NAME:
                 self.sample_name = name
             if not self._validate_nx_class(name, nx_class):
                 self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
