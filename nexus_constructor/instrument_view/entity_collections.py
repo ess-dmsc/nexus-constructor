@@ -40,7 +40,7 @@ class EntityCollection(ABC):
         raise NotImplementedError
 
     def entity_to_zoom(self):
-        return self.entities[0]
+        raise NotImplementedError
 
     def _create_default_material(self) -> Qt3DRender.QMaterial:
         return create_material(
@@ -74,6 +74,9 @@ class OffMeshEntityCollection(EntityCollection):
         for entity in self.entities:
             entity.setParent(value)
 
+    def entity_to_zoom(self):
+        return self.entities[0]
+
 
 class NeutronSourceEntityCollection(EntityCollection):
     def __init__(self, root_entity, nx_class):
@@ -105,6 +108,9 @@ class NeutronSourceEntityCollection(EntityCollection):
         for entity in self.entities:
             entity[0].removeComponent(transformation)
 
+    def entity_to_zoom(self):
+        return self.entities[0][0]
+
     def _redo_transformation(
         self, matrix, transformation, current_transformation_matrix
     ):
@@ -116,7 +122,7 @@ class NeutronSourceEntityCollection(EntityCollection):
         self._set_cylinder_dimension(
             cylinder_mesh, self._source_radius, self._source_length
         )
-        cone_transform.setMatrix(self._get_cylinder_transformatrion_matrix())
+        cone_transform.setMatrix(self._get_cylinder_transformation_matrix())
 
         self.entities.append(
             (
@@ -124,7 +130,7 @@ class NeutronSourceEntityCollection(EntityCollection):
                     [cylinder_mesh, self.default_material, cone_transform],
                     self.root_entity,
                 ),
-                self._get_cylinder_transformatrion_matrix(),
+                self._get_cylinder_transformation_matrix(),
             )
         )
 
@@ -175,7 +181,7 @@ class NeutronSourceEntityCollection(EntityCollection):
         return np.array(offsets)
 
     @staticmethod
-    def _get_cylinder_transformatrion_matrix() -> QMatrix4x4:
+    def _get_cylinder_transformation_matrix() -> QMatrix4x4:
         matrix = QMatrix4x4()
         matrix.rotate(90, QVector3D(1, 0, 0))
         return matrix
