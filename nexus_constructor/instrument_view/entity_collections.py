@@ -34,8 +34,7 @@ class EntityCollection(ABC):
         raise NotImplementedError
 
     def remove_transformation(self, transformation: Qt3DCore.QComponent):
-        for entity in self.entities:
-            entity.removeComponent(transformation)
+        raise NotImplementedError
 
     def setParent(self, value=None):
         raise NotImplementedError
@@ -55,6 +54,7 @@ class EntityCollection(ABC):
 class OffMeshEntityCollection(EntityCollection):
     def __init__(self, mesh: OffMesh, root_entity: Qt3DCore.QEntity, nx_class: str):
         super().__init__(root_entity, nx_class)
+        self.entities: List[Qt3DCore.QEntity] = []
         self._mesh = mesh
 
     def create_entities(self):
@@ -65,6 +65,10 @@ class OffMeshEntityCollection(EntityCollection):
     def add_transformation(self, transformation: Qt3DCore.QComponent):
         for entity in self.entities:
             entity.addComponent(transformation)
+
+    def remove_transformation(self, transformation: Qt3DCore.QComponent):
+        for entity in self.entities:
+            entity.removeComponent(transformation)
 
     def setParent(self, value=None):
         for entity in self.entities:
@@ -90,20 +94,21 @@ class NeutronSourceEntityCollection(EntityCollection):
             entity[0].setParent(value)
 
     def add_transformation(self, transformation: Qt3DCore.QComponent):
-        # matrix = transformation.matrix()
+        matrix = transformation.matrix()
         for index, entity in enumerate(self.entities):
-            self._redo_transformation(transformation, entity[1])
+            if index:
+                transformation = Qt3DCore.QTransform(self.root_entity)
+            self._redo_transformation(matrix, transformation, entity[1])
             entity[0].addComponent(transformation)
-            # if index == 0:  # source
-            #     transform = Qt3DCore.QTransform(self.root_entity)
-            #     self._redo_source_transformation(transform, matrix)
-            #     entity.addComponent(transform)
-            # else:  # neutrons
-            #     transform = Qt3DCore.QTransform(self.root_entity)
-            #     self._redo_neutron_transformation(
-            #         transform, matrix, self._neutron_offsets[index - 1]
-            #     )
-            #     entity.addComponent(transform)
+
+    def remove_transformation(self, transformation: Qt3DCore.QComponent):
+        for entity in self.entities:
+            entity[0].removeComponent(transformation)
+
+    def _redo_transformation(
+        self, matrix, transformation, current_transformation_matrix
+    ):
+        transformation.setMatrix(matrix * current_transformation_matrix)
 
     def _create_source(self):
         cylinder_mesh = Qt3DExtras.QCylinderMesh(self.root_entity)
@@ -122,10 +127,6 @@ class NeutronSourceEntityCollection(EntityCollection):
                 self._get_cylinder_transformatrion_matrix(),
             )
         )
-
-    def _redo_transformation(self, transformation, current_transformation_matrix):
-        matrix = transformation.matrix()
-        transformation.setMatrix(matrix * current_transformation_matrix)
 
     def _setup_neutrons(self):
         neutron_radius = 0.1
@@ -149,16 +150,6 @@ class NeutronSourceEntityCollection(EntityCollection):
                     self._get_sphere_transformation_matrix(self._neutron_offsets[i]),
                 )
             )
-
-    def _redo_source_transformation(
-        self, transform: Qt3DCore.QComponent, matrix: QMatrix4x4
-    ):
-        transform.setMatrix(matrix * self._get_cylinder_transformatrion_matrix())
-
-    def _redo_neutron_transformation(
-        self, transform: Qt3DCore.QComponent, matrix: QMatrix4x4, offset: np.ndarray
-    ):
-        transform.setMatrix(matrix * self._get_sphere_transformation_matrix(offset))
 
     @staticmethod
     def _get_sphere_transformation_matrix(offset: np.ndarray) -> QMatrix4x4:
