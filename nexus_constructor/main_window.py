@@ -117,7 +117,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
-        for component in self.model.entry.instrument.component_list:
+        for component in self.model.entry.instrument.get_components():
             self.sceneWidget.add_transformation(component.name, component.qtransform)
 
     def _update_views(self):
@@ -127,7 +127,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.model.entry.instrument.component_list:
+        for component in self.model.entry.instrument.get_components():
             shape, positions = component.shape
             self.sceneWidget.add_component(
                 component.name, component.nx_class, shape, positions

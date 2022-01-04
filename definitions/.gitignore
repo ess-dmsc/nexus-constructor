@@ -11,9 +11,11 @@ manual/source/classes/*/NX*.rst
 manual/source/classes/*/*.nxdl.xml
 manual/source/classes/contributed_definitions/canSAS
 manual/makelog.txt
-build
+/build/
+/python/
 impatient-guide/_build
 .DS_Store
 __github_creds__.txt
 
-launch.json
+# Microsoft VSCode editor configuration
+.vscode

@@ -3,7 +3,7 @@
 <!--
 # NeXus - Neutron and X-ray Common Data Format
 # 
-# Copyright (C) 2008-2020 NeXus International Advisory Committee (NIAC)
+# Copyright (C) 2008-2021 NeXus International Advisory Committee (NIAC)
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@
 			to help define the path to the default dataset to be plotted.
 			
 			.. [#] NIAC2014 discussion summary:
-			    http://wiki.nexusformat.org/2014_How_to_find_default_data
+			    https://www.nexusformat.org/2014_How_to_find_default_data.html
 		</doc>
 	</attribute>
 	
@@ -81,7 +81,7 @@
 			   is optional, otherwise, it is required.
 	
 			   .. [#] NIAC2016: 
-			      http://wiki.nexusformat.org/NIAC2016,
+			      https://www.nexusformat.org/NIAC2016.html,
 			      https://github.com/nexusformat/NIAC/issues/16
 
 		</doc>
@@ -115,6 +115,10 @@
 	</field>
 	<field name="entry_identifier">
 		<doc>unique identifier for the measurement, defined by the facility.</doc>
+	</field>
+	<field name="entry_identifier_uuid">
+		<doc>UUID identifier for the measurement.</doc>
+		<attribute name="version"><doc>Version of UUID used</doc></attribute>
 	</field>
 	<field name="features">
 		<doc>

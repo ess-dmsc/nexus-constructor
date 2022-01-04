@@ -5,9 +5,13 @@ from PySide2.QtWidgets import (
     QLabel,
     QLineEdit,
     QCheckBox,
+    QPushButton,
+    QSpacerItem,
+    QSizePolicy,
 )
 
 from nexus_constructor.model.model import Model
+from ui.configure_users import ConfigureUsersDialog
 
 
 class ParametersView(QWidget):
@@ -43,6 +47,18 @@ class ParametersView(QWidget):
         self.title_layout.addWidget(self.title_placeholder)
         self.layout().addLayout(self.title_layout)
 
+        self.users_layout = QHBoxLayout()
+        self.edit_users_button = QPushButton()
+        self.edit_users_button.setText("Configure users")
+        self.edit_users_button.clicked.connect(self._edit_users)
+        self.users_placeholder = QCheckBox()
+        self.users_placeholder.toggled.connect(self._users_checked_changed)
+        self.users_placeholder.setText("Use placeholder")
+        self.users_layout.addSpacerItem(QSpacerItem(0, 0, hData=QSizePolicy.Expanding))
+        self.users_layout.addWidget(self.edit_users_button)
+        self.users_layout.addWidget(self.users_placeholder)
+        self.layout().addLayout(self.users_layout)
+
     def set_up_model(self, model: Model):
         self.model = model
         proposal_id, is_placeholder = model.entry.proposal_id
@@ -60,6 +76,11 @@ class ParametersView(QWidget):
         else:
             self.title_placeholder.setChecked(False)
             self.title_text.setText(title)
+
+        if model.entry.users_placeholder:
+            self.users_placeholder.setChecked(True)
+        else:
+            self.users_placeholder.setChecked(False)
 
     def _proposal_id_checked_changed(self):
         if self.proposal_placeholder.isChecked():
@@ -80,3 +101,15 @@ class ParametersView(QWidget):
 
     def _title_text_changed(self, text):
         self.model.entry.title = (text, self.title_placeholder.isChecked())
+
+    def _edit_users(self):
+        dialog = ConfigureUsersDialog(self.model.entry.users)
+        if dialog.exec_():
+            self.model.entry.users = dialog.get_users()
+
+    def _users_checked_changed(self):
+        if self.users_placeholder.isChecked():
+            self.model.entry.users_placeholder = True
+        else:
+            self.model.entry.users_placeholder = False
+        self.edit_users_button.setEnabled(not self.users_placeholder.isChecked())
