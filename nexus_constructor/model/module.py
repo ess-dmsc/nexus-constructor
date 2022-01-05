@@ -162,7 +162,7 @@ class Dataset(FileWriterModule):
         return return_dict
 
     def _cast_to_type(self, data):
-        return cast_to_json_serialisable_type(data)(data)  # type: ignore
+        return cast_to_json_serialisable_type(self.type)(data)  # type: ignore
 
 
 @attr.s
