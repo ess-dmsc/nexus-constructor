@@ -48,12 +48,15 @@ INT_TYPES = [
 FLOAT_TYPES = [ValueTypes.FLOAT, ValueTypes.DOUBLE]
 
 
-cast_to_json_serialisable_type = (
-    lambda dtype: int
-    if dtype in INT_TYPES
-    else (
-        float
-        if dtype in FLOAT_TYPES
-        else (str if dtype == ValueTypes.STRING else lambda y: y)  # type: ignore
-    )
-)
+class JsonSerialisableType:
+    @classmethod
+    def from_type(cls, type):
+        if type in INT_TYPES + [ValueTypes.BYTE, ValueTypes.UBYTE]:
+            return int
+        elif type in FLOAT_TYPES:
+            return float
+        elif type == ValueTypes.STRING:
+            return str
+        else:
+            # Do nothing to data
+            return lambda arg: arg
