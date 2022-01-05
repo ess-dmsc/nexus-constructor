@@ -242,7 +242,12 @@ class JSONReader:
                 and parent_node.nx_class == "NXentry"
             ):
                 self.model.entry[nexus_object.name] = nexus_object
-            if isinstance(nexus_object, Group) and nexus_object.nx_class == "NXuser":
+            if isinstance(nexus_object, Group) and not nexus_object.nx_class:
+                self._add_object_warning(
+                    f"valid {CommonAttrs.NX_CLASS}",
+                    parent_node,
+                )
+            elif isinstance(nexus_object, Group) and nexus_object.nx_class == "NXuser":
                 self.model.entry[nexus_object.name] = nexus_object
 
         return nexus_object
