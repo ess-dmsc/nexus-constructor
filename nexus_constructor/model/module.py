@@ -11,7 +11,7 @@ from nexus_constructor.model.attributes import Attributes
 if TYPE_CHECKING:
     from nexus_constructor.model.group import Group  # noqa: F401
 
-from nexus_constructor.model.value_type import ValueType
+from nexus_constructor.model.value_type import JsonSerialisableType, ValueType
 
 ARRAY_SIZE = "array_size"
 VALUE_UNITS = "value_units"
@@ -144,10 +144,7 @@ class Dataset(FileWriterModule):
     def as_dict(self, error_collector: List[str]):
         values = self.values
         if np.isscalar(values):
-            try:
-                values = float(values)  # type: ignore
-            except ValueError:
-                pass
+            values = self._cast_to_type(values)
         elif isinstance(values, np.ndarray):
             values = values.tolist()
 
@@ -163,6 +160,9 @@ class Dataset(FileWriterModule):
                 error_collector
             )
         return return_dict
+
+    def _cast_to_type(self, data):
+        return JsonSerialisableType.from_type(self.type)(data)
 
 
 @attr.s
