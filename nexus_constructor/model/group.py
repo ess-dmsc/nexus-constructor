@@ -67,10 +67,7 @@ class Group:
 
     @property
     def nx_class(self):
-        try:
-            return self.attributes.get_attribute_value(CommonAttrs.NX_CLASS)
-        except AttributeError:
-            return None
+        return self.attributes.get_attribute_value(CommonAttrs.NX_CLASS)
 
     @nx_class.setter
     def nx_class(self, new_nx_class: str):
