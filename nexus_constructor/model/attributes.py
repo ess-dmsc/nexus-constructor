@@ -28,7 +28,9 @@ class Attributes(list):
 
     def get_attribute_value(self, attribute_name: str):
         item = _get_item(self, attribute_name)
-        if item:
+        if contains_attribute(attribute_name):
+            return _get_item(self, attribute_name).values
+        return None       
             return item.values
         return None
 
