@@ -115,6 +115,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
+        self.boxRadioButton.clicked.connect(self.show_box_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
@@ -198,6 +199,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.meshRadioButton,
                 self.CylinderRadioButton,
                 self.noShapeRadioButton,
+                self.boxRadioButton,
             ]
         ]
 
@@ -228,6 +230,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.meshRadioButton.clicked.connect(self.set_pixel_related_changes)
         self.CylinderRadioButton.clicked.connect(self.set_pixel_related_changes)
         self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
+        self.boxRadioButton.clicked.connect(self.set_pixel_related_changes)
 
         self.change_pixel_options_visibility()
         parent_dialog.setAttribute(Qt.WA_DeleteOnClose)
@@ -359,6 +362,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
+        self.boxOptionsBox.setVisible(False)
+
+    def show_box_fields(self):
+        self.shapeOptionsBox.setVisible(True)
+        self.geometryFileBox.setVisible(False)
+        self.cylinderOptionsBox.setVisible(False)
+        self.boxOptionsBox.setVisible(True)
 
     def show_no_geometry_fields(self):
 
@@ -370,6 +380,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
+        self.boxOptionsBox.setVisible(False)
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
