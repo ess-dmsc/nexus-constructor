@@ -142,6 +142,88 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
         self._faces = new_faces
 
 
+class BoxGeometry(Group):
+    """
+    Box geometry shape.
+    """
+
+    def __init__(self, length: float, width: float, height: float, name: str = ""):
+        Group.__init__(self, name)
+        self._length = length
+        self._width = width
+        self._height = height
+
+    @property
+    def cylinders(self):
+        return None
+
+    @cylinders.setter
+    def cylinders(self, value):
+        pass
+
+    @property
+    def detector_number(self):
+        return None
+
+    @detector_number.setter
+    def detector_number(self, value):
+        pass
+
+    @property
+    def units(self) -> str:
+        return self.attributes.get_attribute_value(CommonAttrs.UNITS)
+
+    @property
+    def length(self) -> float:
+        return self._length
+
+    @length.setter
+    def length(self, new_length: float):
+        self._length = new_length
+
+    @property
+    def width(self) -> float:
+        return self._width
+
+    @width.setter
+    def width(self, new_width: float):
+        self._width = new_width
+
+    @property
+    def height(self) -> float:
+        return self._height
+
+    @height.setter
+    def height(self, new_height: float):
+        self._height = new_height
+
+    @property
+    def off_geometry(self) -> OFFGeometry:
+        x = self.width / 2
+        y = self.height / 2
+        z = self.length / 2
+        return OFFGeometryNoNexus(
+            vertices=[
+                QVector3D(-x, -y, z),
+                QVector3D(x, -y, z),
+                QVector3D(-x, y, z),
+                QVector3D(x, y, z),
+                QVector3D(-x, y, -z),
+                QVector3D(x, y, -z),
+                QVector3D(-x, -y, -z),
+                QVector3D(x, -y, -z),
+            ],
+            faces=[
+                [0, 1, 3, 2],
+                [2, 3, 5, 4],
+                [4, 5, 7, 6],
+                [6, 7, 1, 0],
+                [1, 7, 5, 3],
+                [6, 0, 2, 4],
+            ],
+        )
+
+
 class CylindricalGeometry(Group):
     @property
     def detector_number(self) -> List[int]:

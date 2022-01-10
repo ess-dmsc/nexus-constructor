@@ -25,6 +25,7 @@ from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMap
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
 from nexus_constructor.model.component import Component, add_fields_to_component
 from nexus_constructor.model.geometry import (
+    BoxGeometry,
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometryNexus,
@@ -304,6 +305,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
+            elif isinstance(component_shape, BoxGeometry):
+                self.boxRadioButton.clicked.emit()
+                self.boxRadioButton.setChecked(True)
+                self.boxLengthLineEdit.setValue(component_shape.length)
+                self.boxHeightLineEdit.setValue(component_shape.height)
+                self.boxWidthLineEdit.setValue(component_shape.width)
+                self.unitsLineEdit.setText(component_shape.units)
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
@@ -402,6 +410,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderRadiusLineEdit.value(),
                 self.unitsLineEdit.text(),
                 pixel_data=pixel_data,
+            )
+        elif self.boxRadioButton.isChecked():
+            component.set_box_shape(
+                self.boxLengthLineEdit.value(),
+                self.boxWidthLineEdit.value(),
+                self.boxHeightLineEdit.value(),
+                self.unitsLineEdit.text(),
             )
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()

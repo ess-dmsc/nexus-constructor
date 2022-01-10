@@ -13,6 +13,7 @@ from nexus_constructor.common_attrs import (
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
+    SHAPE_NX_CLASS,
     CommonAttrs,
     CommonKeys,
     NodeType,
@@ -35,6 +36,7 @@ from nexus_constructor.model.geometry import (
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
     Z_PIXEL_OFFSET,
+    BoxGeometry,
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometry,
@@ -311,7 +313,7 @@ class Component(Group):
     def shape(
         self,
     ) -> Tuple[
-        Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
+        Union[NoShapeGeometry, BoxGeometry, CylindricalGeometry, OFFGeometryNexus],
         Optional[List[QVector3D]],
     ]:
         if PIXEL_SHAPE_GROUP_NAME in self:
@@ -351,6 +353,20 @@ class Component(Group):
         self[shape_group] = geometry
         return geometry
 
+    def set_box_shape(
+        self,
+        length: float = 1.0,
+        width: float = 1.0,
+        height: float = 1.0,
+        units: Union[str, bytes] = "m",
+    ) -> BoxGeometry:
+        self.remove_shape()
+        geometry = BoxGeometry(length, width, height, SHAPE_GROUP_NAME)
+        geometry.nx_class = SHAPE_NX_CLASS
+        geometry.attributes.set_attribute_value(CommonAttrs.UNITS, units)
+        self[SHAPE_GROUP_NAME] = geometry
+        return geometry
+
     def set_cylinder_shape(
         self,
         axis_direction: QVector3D = QVector3D(0.0, 0.0, 1.0),
@@ -380,7 +396,6 @@ class Component(Group):
             geometry.detector_number = get_detector_number_from_pixel_mapping(
                 pixel_data
             )
-
         self[shape_group] = geometry
         return geometry
 
