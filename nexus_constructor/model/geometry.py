@@ -170,6 +170,7 @@ class BoxGeometry(Group):
         self._width = width
         self._height = height
         self._units = units
+        self.nx_class = NX_GEOMETRY
         self._create_datasets()
 
     def _create_datasets(self):
