@@ -341,7 +341,7 @@ class JSONReader:
             self._components_depends_on[component.name] = (component, None)
 
         # Add shape if there is a shape.
-        # print(children_dict)
+
         shape_info = _find_shape_information(children_dict)
         if shape_info:
             shape_reader = ShapeReader(component, shape_info)
