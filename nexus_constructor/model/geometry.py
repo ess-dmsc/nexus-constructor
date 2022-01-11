@@ -1,13 +1,20 @@
 from abc import ABC, abstractmethod
 from math import acos, cos, degrees, pi, sin
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import (
+    NX_GEOMETRY,
+    CommonAttrs,
+    CommonKeys,
+    NodeType,
+)
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
+from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import WriterModules, create_fw_module_object
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
@@ -152,6 +159,31 @@ class BoxGeometry(Group):
         self._length = length
         self._width = width
         self._height = height
+        self._create_datasets()
+
+    def _create_datasets(self):
+        for item in [
+            ("length", self._length),
+            ("width", self._width),
+            ("height", self._height),
+        ]:
+            new_child = create_fw_module_object(
+                WriterModules.DATASET.value,
+                self._get_dataset_config(item[1], item[0]),
+                self,
+            )
+            new_child.type = ValueTypes.DOUBLE
+            attributes = Attributes()
+            new_child.attributes = attributes.set_attribute_value(
+                CommonAttrs.UNITS, self.units
+            )
+            self.children.append(new_child)
+
+    def _get_dataset_config(self, value: float, name: str) -> Dict:
+        return {
+            CommonKeys.NAME: name,
+            CommonKeys.VALUES: value,
+        }
 
     @property
     def cylinders(self):
@@ -177,25 +209,13 @@ class BoxGeometry(Group):
     def length(self) -> float:
         return self._length
 
-    @length.setter
-    def length(self, new_length: float):
-        self._length = new_length
-
     @property
     def width(self) -> float:
         return self._width
 
-    @width.setter
-    def width(self, new_width: float):
-        self._width = new_width
-
     @property
     def height(self) -> float:
         return self._height
-
-    @height.setter
-    def height(self, new_height: float):
-        self._height = new_height
 
     @property
     def off_geometry(self) -> OFFGeometry:
@@ -222,6 +242,20 @@ class BoxGeometry(Group):
                 [6, 0, 2, 4],
             ],
         )
+
+    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
+        dictionary = super(BoxGeometry, self).as_dict(error_collector)
+        return {
+            CommonKeys.TYPE: NodeType.GROUP,
+            CommonKeys.NAME: "geometry",
+            CommonKeys.CHILDREN: [dictionary],
+            CommonKeys.ATTRIBUTES: [
+                {
+                    CommonKeys.NAME: CommonAttrs.NX_CLASS,
+                    CommonKeys.VALUES: NX_GEOMETRY,
+                }
+            ],
+        }
 
 
 class CylindricalGeometry(Group):
