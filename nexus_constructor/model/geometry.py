@@ -263,20 +263,6 @@ class BoxGeometry(Group):
             ],
         )
 
-    # def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
-    #     dictionary = super(BoxGeometry, self).as_dict(error_collector)
-    #     return {
-    #         CommonKeys.TYPE: NodeType.GROUP,
-    #         CommonKeys.NAME: GEOMETRY_GROUP_NAME,
-    #         CommonKeys.CHILDREN: [dictionary],
-    #         CommonKeys.ATTRIBUTES: [
-    #             {
-    #                 CommonKeys.NAME: CommonAttrs.NX_CLASS,
-    #                 CommonKeys.VALUES: NX_GEOMETRY,
-    #             }
-    #         ],
-    #     }
-
 
 class CylindricalGeometry(Group):
     @property
