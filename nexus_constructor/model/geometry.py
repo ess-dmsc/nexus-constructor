@@ -6,7 +6,10 @@ import numpy as np
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import (
+    GEOMETRY_GROUP_NAME,
+    NX_BOX,
     NX_GEOMETRY,
+    SHAPE_GROUP_NAME,
     CommonAttrs,
     CommonKeys,
     NodeType,
@@ -154,11 +157,19 @@ class BoxGeometry(Group):
     Box geometry shape.
     """
 
-    def __init__(self, length: float, width: float, height: float, name: str = ""):
+    def __init__(
+        self,
+        length: float,
+        width: float,
+        height: float,
+        name: str = "",
+        units: str = "m",
+    ):
         Group.__init__(self, name)
         self._length = length
         self._width = width
         self._height = height
+        self._units = units
         self._create_datasets()
 
     def _create_datasets(self):
@@ -174,12 +185,18 @@ class BoxGeometry(Group):
             )
             new_child.type = ValueTypes.DOUBLE
             attributes = Attributes()
-            new_child.attributes = attributes.set_attribute_value(
-                CommonAttrs.UNITS, self.units
-            )
+            attributes.set_attribute_value(CommonAttrs.UNITS, self._units)
+            new_child.attributes = attributes
             self.children.append(new_child)
+        self.children.append(
+            create_fw_module_object(
+                WriterModules.DATASET.value,
+                self._get_dataset_config(NX_BOX, SHAPE_GROUP_NAME),
+                self,
+            )
+        )
 
-    def _get_dataset_config(self, value: float, name: str) -> Dict:
+    def _get_dataset_config(self, value: Any, name: str) -> Dict:
         return {
             CommonKeys.NAME: name,
             CommonKeys.VALUES: value,
@@ -203,7 +220,7 @@ class BoxGeometry(Group):
 
     @property
     def units(self) -> str:
-        return self.attributes.get_attribute_value(CommonAttrs.UNITS)
+        return self._units
 
     @property
     def length(self) -> float:
@@ -247,7 +264,7 @@ class BoxGeometry(Group):
         dictionary = super(BoxGeometry, self).as_dict(error_collector)
         return {
             CommonKeys.TYPE: NodeType.GROUP,
-            CommonKeys.NAME: "geometry",
+            CommonKeys.NAME: GEOMETRY_GROUP_NAME,
             CommonKeys.CHILDREN: [dictionary],
             CommonKeys.ATTRIBUTES: [
                 {

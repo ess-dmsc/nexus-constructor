@@ -21,6 +21,7 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.model.geometry import (
+    BoxGeometry,
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometryNexus,
@@ -201,7 +202,9 @@ class InstrumentView(QWidget):
         self,
         name: str,
         nx_class,
-        geometry: Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
+        geometry: Union[
+            BoxGeometry, NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus
+        ],
         positions: List[QVector3D] = None,
     ):
         """

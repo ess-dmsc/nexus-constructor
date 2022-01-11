@@ -358,12 +358,11 @@ class Component(Group):
         length: float = 1.0,
         width: float = 1.0,
         height: float = 1.0,
-        units: Union[str, bytes] = "m",
+        units: str = "m",
     ) -> BoxGeometry:
         self.remove_shape()
-        geometry = BoxGeometry(length, width, height, SHAPE_GROUP_NAME)
+        geometry = BoxGeometry(length, width, height, SHAPE_GROUP_NAME, units)
         geometry.nx_class = SHAPE_NX_CLASS
-        geometry.attributes.set_attribute_value(CommonAttrs.UNITS, units)
         self[SHAPE_GROUP_NAME] = geometry
         return geometry
 
@@ -465,7 +464,6 @@ class Component(Group):
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict(error_collector)
-
         if self.transforms:
             # Add transformations in a child group
             dictionary[CommonKeys.CHILDREN].append(

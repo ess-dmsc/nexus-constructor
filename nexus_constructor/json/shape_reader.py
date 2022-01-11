@@ -5,6 +5,8 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
+    NX_BOX,
+    NX_GEOMETRY,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
@@ -27,6 +29,7 @@ from nexus_constructor.model.geometry import (
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
     Z_PIXEL_OFFSET,
+    BoxGeometry,
     CylindricalGeometry,
     OFFGeometryNexus,
 )
@@ -82,6 +85,13 @@ class ShapeReader:
             self._add_off_shape_to_component()
         elif shape_type == CYLINDRICAL_GEOMETRY_NX_CLASS:
             self._add_cylindrical_shape_to_component()
+        elif shape_type == NX_GEOMETRY:
+            for child in self.shape_info[CommonKeys.CHILDREN][0][CommonKeys.CHILDREN]:
+                if (
+                    child[NodeType.CONFIG][CommonKeys.NAME] == SHAPE_GROUP_NAME
+                    and child[NodeType.CONFIG][CommonKeys.VALUES] == NX_BOX
+                ):
+                    self._add_box_shape_to_component()
         else:
             self.warnings.append(
                 InvalidShape(
@@ -188,10 +198,46 @@ class ShapeReader:
         )
         return off_geometry
 
+    def _add_box_shape_to_component(self):
+        """
+        Attempts to create a box geometry and set this as the shape of the component. If the required
+        information can be found and passes validation then the geometry is created and written to the component,
+        otherwise the function just returns without changing the component.
+        """
+        children = self.children[0][CommonKeys.CHILDREN]
+        name = self.children[0][CommonKeys.NAME]
+        if not children:
+            return
+        tmp_dict = {}
+        for child in children:
+            if NodeType.CONFIG in child:
+                tmp_dict[child[NodeType.CONFIG][CommonKeys.NAME]] = child[
+                    NodeType.CONFIG
+                ]
+        units = self.__get_units(children)
+        box_geometry = BoxGeometry(
+            tmp_dict["length"][CommonKeys.VALUES],
+            tmp_dict["width"][CommonKeys.VALUES],
+            tmp_dict["height"][CommonKeys.VALUES],
+            name,
+            units,
+        )
+        self.component[name] = box_geometry
+        self.shape = box_geometry  # type:ignore
+
+    @staticmethod
+    def __get_units(children):
+        for child in children:
+            if CommonKeys.ATTRIBUTES in child:
+                for attr in child[CommonKeys.ATTRIBUTES]:
+                    if attr[CommonKeys.NAME] == CommonAttrs.UNITS:
+                        return attr[CommonKeys.VALUES]
+        return None
+
     def _add_cylindrical_shape_to_component(self):
         """
         Attempts to create a cylindrical geometry and set this as the shape of the component. If the required
-        information can be found and passes validation then the geometry is created and writen to the component,
+        information can be found and passes validation then the geometry is created and written to the component,
         otherwise the function just returns without changing the component.
         """
         children = self.children
