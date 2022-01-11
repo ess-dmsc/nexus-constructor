@@ -7,6 +7,7 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
+    GEOMETRY_GROUP_NAME,
     NX_GEOMETRY,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
@@ -714,10 +715,9 @@ def test_GIVEN_valid_pixel_mapping_and_cylindrical_shape_WHEN_reading_pixel_data
 def test_GIVEN_box_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
     box_shape_reader, box_shape_json, mock_component
 ):
-    name = box_shape_json[CommonKeys.CHILDREN][0][CommonKeys.NAME]
+    name = box_shape_json[CommonKeys.NAME]
     box_shape_reader.add_shape_to_component()
     shape = mock_component[name]
-
     assert isinstance(shape, BoxGeometry)
     assert shape.name == name
     assert shape.nx_class == NX_GEOMETRY
@@ -725,4 +725,4 @@ def test_GIVEN_box_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expect
     assert shape.width == 2.0
     assert shape.height == 3.0
     assert shape.units == "m"
-    assert shape.name == SHAPE_GROUP_NAME
+    assert shape.name == GEOMETRY_GROUP_NAME

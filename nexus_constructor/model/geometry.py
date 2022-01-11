@@ -6,13 +6,12 @@ import numpy as np
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import (
-    GEOMETRY_GROUP_NAME,
     NX_BOX,
     NX_GEOMETRY,
     SHAPE_GROUP_NAME,
+    SHAPE_NX_CLASS,
     CommonAttrs,
     CommonKeys,
-    NodeType,
 )
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
 from nexus_constructor.model.attributes import Attributes
@@ -171,9 +170,11 @@ class BoxGeometry(Group):
         self._height = height
         self._units = units
         self.nx_class = NX_GEOMETRY
-        self._create_datasets()
+        self._create_datasets_and_add_to_shape_group()
 
-    def _create_datasets(self):
+    def _create_datasets_and_add_to_shape_group(self):
+        group = Group(name=SHAPE_GROUP_NAME)
+        group.nx_class = SHAPE_NX_CLASS
         for item in [
             ("length", self._length),
             ("width", self._width),
@@ -182,20 +183,21 @@ class BoxGeometry(Group):
             new_child = create_fw_module_object(
                 WriterModules.DATASET.value,
                 self._get_dataset_config(item[1], item[0]),
-                self,
+                group,
             )
             new_child.type = ValueTypes.DOUBLE
             attributes = Attributes()
             attributes.set_attribute_value(CommonAttrs.UNITS, self._units)
             new_child.attributes = attributes
-            self.children.append(new_child)
-        self.children.append(
+            group.children.append(new_child)
+        group.children.append(
             create_fw_module_object(
                 WriterModules.DATASET.value,
                 self._get_dataset_config(NX_BOX, SHAPE_GROUP_NAME),
                 self,
             )
         )
+        self.children.append(group)
 
     def _get_dataset_config(self, value: Any, name: str) -> Dict:
         return {
@@ -261,19 +263,19 @@ class BoxGeometry(Group):
             ],
         )
 
-    def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
-        dictionary = super(BoxGeometry, self).as_dict(error_collector)
-        return {
-            CommonKeys.TYPE: NodeType.GROUP,
-            CommonKeys.NAME: GEOMETRY_GROUP_NAME,
-            CommonKeys.CHILDREN: [dictionary],
-            CommonKeys.ATTRIBUTES: [
-                {
-                    CommonKeys.NAME: CommonAttrs.NX_CLASS,
-                    CommonKeys.VALUES: NX_GEOMETRY,
-                }
-            ],
-        }
+    # def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
+    #     dictionary = super(BoxGeometry, self).as_dict(error_collector)
+    #     return {
+    #         CommonKeys.TYPE: NodeType.GROUP,
+    #         CommonKeys.NAME: GEOMETRY_GROUP_NAME,
+    #         CommonKeys.CHILDREN: [dictionary],
+    #         CommonKeys.ATTRIBUTES: [
+    #             {
+    #                 CommonKeys.NAME: CommonAttrs.NX_CLASS,
+    #                 CommonKeys.VALUES: NX_GEOMETRY,
+    #             }
+    #         ],
+    #     }
 
 
 class CylindricalGeometry(Group):

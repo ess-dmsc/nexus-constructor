@@ -9,6 +9,7 @@ from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
+    GEOMETRY_GROUP_NAME,
     NX_TRANSFORMATIONS,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
@@ -323,12 +324,21 @@ class Component(Group):
             )
         if SHAPE_GROUP_NAME in self:
             return self[SHAPE_GROUP_NAME], None
+        if GEOMETRY_GROUP_NAME in self:
+            return self[GEOMETRY_GROUP_NAME], None
         return NoShapeGeometry(), None
 
     def remove_shape(self):
-        for group_name in [PIXEL_SHAPE_GROUP_NAME, SHAPE_GROUP_NAME]:
+        for group_name in [
+            GEOMETRY_GROUP_NAME,
+            PIXEL_SHAPE_GROUP_NAME,
+            SHAPE_GROUP_NAME,
+        ]:
             if group_name in self:
-                del self[SHAPE_GROUP_NAME]
+                if group_name == GEOMETRY_GROUP_NAME:
+                    self[GEOMETRY_GROUP_NAME]
+                else:
+                    del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
         self,
@@ -361,9 +371,9 @@ class Component(Group):
         units: str = "m",
     ) -> BoxGeometry:
         self.remove_shape()
-        geometry = BoxGeometry(length, width, height, SHAPE_GROUP_NAME, units)
+        geometry = BoxGeometry(length, width, height, GEOMETRY_GROUP_NAME, units)
         geometry.nx_class = SHAPE_NX_CLASS
-        self[SHAPE_GROUP_NAME] = geometry
+        self[GEOMETRY_GROUP_NAME] = geometry
         return geometry
 
     def set_cylinder_shape(

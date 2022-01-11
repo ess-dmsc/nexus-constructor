@@ -205,7 +205,7 @@ class ShapeReader:
         otherwise the function just returns without changing the component.
         """
         children = self.children[0][CommonKeys.CHILDREN]
-        name = self.children[0][CommonKeys.NAME]
+        name = self.name
         if not children:
             return
         tmp_dict = {}
