@@ -6,10 +6,13 @@ import numpy as np
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import (
+    HEIGHT,
+    LENGTH,
     NX_BOX,
     NX_GEOMETRY,
     SHAPE_GROUP_NAME,
     SHAPE_NX_CLASS,
+    WIDTH,
     CommonAttrs,
     CommonKeys,
 )
@@ -176,9 +179,9 @@ class BoxGeometry(Group):
         group = Group(name=SHAPE_GROUP_NAME)
         group.nx_class = SHAPE_NX_CLASS
         for item in [
-            ("length", self._length),
-            ("width", self._width),
-            ("height", self._height),
+            (LENGTH, self._length),
+            (WIDTH, self._width),
+            (HEIGHT, self._height),
         ]:
             new_child = create_fw_module_object(
                 WriterModules.DATASET.value,

@@ -14,7 +14,6 @@ from nexus_constructor.common_attrs import (
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
-    SHAPE_NX_CLASS,
     CommonAttrs,
     CommonKeys,
     NodeType,
@@ -372,7 +371,6 @@ class Component(Group):
     ) -> BoxGeometry:
         self.remove_shape()
         geometry = BoxGeometry(length, width, height, GEOMETRY_GROUP_NAME, units)
-        geometry.nx_class = SHAPE_NX_CLASS
         self[GEOMETRY_GROUP_NAME] = geometry
         return geometry
 
