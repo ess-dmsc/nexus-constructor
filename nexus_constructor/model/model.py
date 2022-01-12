@@ -14,7 +14,7 @@ class Signals(QObject):
 
     file_changed = Signal("QVariant")
     file_opened = Signal("QVariant")
-    component_added = Signal(str, str, "QVariant", "QVariant")
+    component_added = Signal("QVariant")
     component_removed = Signal(str)
     transformation_changed = Signal()
     show_entries_dialog = Signal("QVariant", "QVariant")

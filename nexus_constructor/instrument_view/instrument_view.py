@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Tuple
 
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.Qt3DExtras import Qt3DExtras
@@ -20,11 +20,7 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
-from nexus_constructor.model.geometry import (
-    CylindricalGeometry,
-    NoShapeGeometry,
-    OFFGeometryNexus,
-)
+from nexus_constructor.model.component import Component
 
 
 class InstrumentView(QWidget):
@@ -197,20 +193,13 @@ class InstrumentView(QWidget):
         clear_buffers = Qt3DRender.QClearBuffers(camera_selector)
         return clear_buffers
 
-    def add_component(
-        self,
-        name: str,
-        nx_class,
-        geometry: Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
-        positions: List[QVector3D] = None,
-    ):
+    def add_component(self, component: Component):
         """
-        Add a component to the instrument view given a name and its geometry.
-        :param name: The name of the component.
-        :param nx_class: The Nexus class of the component
-        :param geometry: The geometry information of the component that is used to create a mesh.
-        :param positions: Mesh is repeated at each of these positions
+        Add a component to the instrument view.
+        :param component: The component to add.
         """
+        name, nx_class = component.name, component.nx_class
+        geometry, positions = component.shape
         if geometry is None:
             return
 
@@ -273,15 +262,14 @@ class InstrumentView(QWidget):
         except KeyError:
             pass  # no problem if there are no transformations to remove
 
-    def add_transformation(
-        self, component_name: str, transformation: Qt3DCore.QTransform
-    ):
+    def add_transformation(self, component):
         """
         Add a transformation to a component, each component has a single transformation which contains
         the resultant transformation for its entire depends_on chain of translations and rotations
         """
-        self.transformations[component_name] = transformation
-        component = self.component_entities[component_name]
+        name, transformation = component.name, component.qtransform
+        self.transformations[name] = transformation
+        component = self.component_entities[name]
         component.add_transformation(transformation)
 
     def clear_all_transformations(self):
