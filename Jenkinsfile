@@ -114,6 +114,65 @@ builders = pipeline_builder.createBuilders { container ->
     
 }
 
+def get_win10_pipeline() {
+return {
+    node('windows10') {
+      // Use custom location to avoid Win32 path length issues
+      ws('c:\\jenkins\\') {
+          cleanWs()
+          dir("${project}") {
+            stage("Checkout") {
+              scm_vars = checkout scm
+            }  // stage
+
+            // N.B. not using virtualenv as it takes >10 minutes to install the dependencies on the Jenkins node
+            stage("Setup") {
+                  bat """
+                  python -m pip install --user --upgrade -r requirements-dev.txt
+                  python -m pip install codecov==2.1.8
+                """
+            } // stage
+            stage("Run tests") {
+                bat """
+                set PYTEST_QT_API=pyside2
+                python -m pytest . -s --ignore=definitions --assert=plain --cov=nexus_constructor --cov-report=xml --junit-xml=test_results.xml
+                """
+
+        withCredentials([string(credentialsId: 'nexus-constructor-codecov-token', variable: 'TOKEN')]) {
+            bat """
+                codecov -t ${TOKEN} -c ${scm_vars.GIT_COMMIT} -f coverage.xml
+                """
+        }
+                junit "test_results.xml"
+            } // stage
+            if (env.CHANGE_ID) {
+                stage("Build Executable") {
+                    bat """
+                    set PATH=%PATH%;%APPDATA%\\Python\\Python36\\Scripts
+                    pyinstaller --windowed --noconfirm nexus-constructor.spec"""
+                } // stage
+                stage('Archive Executable') {
+                    def git_commit_short = scm_vars.GIT_COMMIT.take(7)
+                    // Compress-Archive cmdlet is really really slow, so better to use 7zip
+                    // Manually install with "Install-Module -Name 7Zip4PowerShell" if not already installed
+                    powershell label: 'Archiving build folder', script: "Compress-7Zip -Path .\\dist -ArchiveFileName nexus-constructor_windows_${git_commit_short}.zip -Format Zip"
+                    archiveArtifacts 'nexus-constructor*.zip'
+                } // stage
+/*                 stage("Test executable") {
+                    timeout(time:15, unit:'SECONDS') {
+                        bat """
+                        cd dist\\nexus-constructor\\
+                        nexus-constructor.exe --help
+                        """
+                        }
+                } */ // stage
+            } // ifz
+          } // dir
+      } //ws
+    } // node
+  } // return
+} // def
+
 def get_macos_pipeline() {
     return {
         node('macos') {
@@ -160,6 +219,5 @@ node("docker") {
     }
     
     builders['macOS'] = get_macos_pipeline()
-    builders['windows10'] = get_win10_pipeline()
     parallel builders
 }
