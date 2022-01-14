@@ -17,6 +17,7 @@ from nexus_constructor.model.geometry import (
     DETECTOR_NUMBER,
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
+    BoxGeometry,
     OFFGeometryNexus,
 )
 from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
@@ -262,7 +263,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if isinstance(shape, OFFGeometryNexus):
             self._fill_off_geometry_pixel_mapping(shape)
 
-        else:
+        elif not isinstance(shape, BoxGeometry):
             detector_number = shape.detector_number
             n_cylinders = shape.cylinders.size // 3
 

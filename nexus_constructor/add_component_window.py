@@ -308,9 +308,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             elif isinstance(component_shape, BoxGeometry):
                 self.boxRadioButton.clicked.emit()
                 self.boxRadioButton.setChecked(True)
-                self.boxLengthLineEdit.setValue(component_shape.length)
-                self.boxHeightLineEdit.setValue(component_shape.height)
-                self.boxWidthLineEdit.setValue(component_shape.width)
+                self.boxLengthLineEdit.setValue(component_shape.size[0])
+                self.boxWidthLineEdit.setValue(component_shape.size[1])
+                self.boxHeightLineEdit.setValue(component_shape.size[2])
                 self.unitsLineEdit.setText(component_shape.units)
 
     def create_new_ui_field(self, field):

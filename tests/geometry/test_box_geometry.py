@@ -13,7 +13,7 @@ def test_box_has_property_values_it_was_created_with():
         height=height, width=width, length=length, units=units
     )
 
-    assert box.height == approx(height)
-    assert box.length == approx(length)
-    assert box.width == approx(width)
+    assert box.size[0] == approx(length)
+    assert box.size[1] == approx(width)
+    assert box.size[2] == approx(height)
     assert box.units == units

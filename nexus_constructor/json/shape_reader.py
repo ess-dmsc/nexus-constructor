@@ -5,14 +5,12 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
-    HEIGHT,
-    LENGTH,
+    GEOMETRY_NX_CLASS,
     NX_BOX,
-    NX_GEOMETRY,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
-    WIDTH,
+    SIZE,
     CommonAttrs,
     CommonKeys,
     NodeType,
@@ -87,7 +85,7 @@ class ShapeReader:
             self._add_off_shape_to_component()
         elif shape_type == CYLINDRICAL_GEOMETRY_NX_CLASS:
             self._add_cylindrical_shape_to_component()
-        elif shape_type == NX_GEOMETRY:
+        elif shape_type == GEOMETRY_NX_CLASS:
             for child in self.shape_info[CommonKeys.CHILDREN][0][CommonKeys.CHILDREN]:
                 if (
                     child[NodeType.CONFIG][CommonKeys.NAME] == SHAPE_GROUP_NAME
@@ -217,13 +215,8 @@ class ShapeReader:
                     NodeType.CONFIG
                 ]
         units = self.__get_units(children)
-        box_geometry = BoxGeometry(
-            tmp_dict[LENGTH][CommonKeys.VALUES],
-            tmp_dict[WIDTH][CommonKeys.VALUES],
-            tmp_dict[HEIGHT][CommonKeys.VALUES],
-            name,
-            units,
-        )
+        size = tmp_dict[SIZE][CommonKeys.VALUES]
+        box_geometry = BoxGeometry(size[0], size[1], size[2], name, units)
         self.component[name] = box_geometry
         self.shape = box_geometry  # type:ignore
 

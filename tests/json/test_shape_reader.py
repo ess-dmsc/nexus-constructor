@@ -8,11 +8,10 @@ from PySide2.QtGui import QVector3D
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
     GEOMETRY_GROUP_NAME,
-    NX_GEOMETRY,
+    GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
-    SHAPE_NX_CLASS,
     CommonAttrs,
     CommonKeys,
     NodeType,
@@ -720,9 +719,9 @@ def test_GIVEN_box_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expect
     shape = mock_component[name]
     assert isinstance(shape, BoxGeometry)
     assert shape.name == name
-    assert shape.nx_class == NX_GEOMETRY
-    assert shape.length == 1.0
-    assert shape.width == 2.0
-    assert shape.height == 3.0
+    assert shape.nx_class == GEOMETRY_NX_CLASS
+    assert shape.size[0] == 6.0
+    assert shape.size[1] == 12.0
+    assert shape.size[2] == 15.0
     assert shape.units == "m"
     assert shape.name == GEOMETRY_GROUP_NAME

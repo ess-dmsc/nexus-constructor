@@ -278,8 +278,15 @@ def off_shape_json() -> Dict:
 def box_shape_json() -> dict:
     box_shape = """
     {
-      "type": "group",
       "name": "geometry",
+      "type": "group",
+      "attributes": [
+        {
+          "name": "NX_class",
+          "dtype": "string",
+          "values": "NXgeometry"
+        }
+      ],
       "children": [
         {
           "name": "shape",
@@ -295,38 +302,12 @@ def box_shape_json() -> dict:
             {
               "module": "dataset",
               "config": {
-                "name": "length",
-                "values": 1.0,
-                "type": "double"
-              },
-              "attributes": [
-                {
-                  "name": "units",
-                  "dtype": "string",
-                  "values": "m"
-                }
-              ]
-            },
-            {
-              "module": "dataset",
-              "config": {
-                "name": "width",
-                "values": 2.0,
-                "type": "double"
-              },
-              "attributes": [
-                {
-                  "name": "units",
-                  "dtype": "string",
-                  "values": "m"
-                }
-              ]
-            },
-            {
-              "module": "dataset",
-              "config": {
-                "name": "height",
-                "values": 3.0,
+                "name": "size",
+                "values": [
+                  6.0,
+                  12.0,
+                  15.0
+                ],
                 "type": "double"
               },
               "attributes": [
@@ -345,12 +326,6 @@ def box_shape_json() -> dict:
               }
             }
           ]
-        }
-      ],
-      "attributes": [
-        {
-          "name": "NX_class",
-          "values": "NXgeometry"
         }
       ]
     }

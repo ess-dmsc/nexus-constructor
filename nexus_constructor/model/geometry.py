@@ -6,13 +6,11 @@ import numpy as np
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import (
-    HEIGHT,
-    LENGTH,
+    GEOMETRY_NX_CLASS,
     NX_BOX,
-    NX_GEOMETRY,
     SHAPE_GROUP_NAME,
     SHAPE_NX_CLASS,
-    WIDTH,
+    SIZE,
     CommonAttrs,
     CommonKeys,
 )
@@ -168,31 +166,24 @@ class BoxGeometry(Group):
         units: str = "m",
     ):
         Group.__init__(self, name)
-        self._length = length
-        self._width = width
-        self._height = height
+        self._size = [length, width, height]
         self._units = units
-        self.nx_class = NX_GEOMETRY
+        self.nx_class = GEOMETRY_NX_CLASS
         self._create_datasets_and_add_to_shape_group()
 
     def _create_datasets_and_add_to_shape_group(self):
         group = Group(name=SHAPE_GROUP_NAME)
         group.nx_class = SHAPE_NX_CLASS
-        for item in [
-            (LENGTH, self._length),
-            (WIDTH, self._width),
-            (HEIGHT, self._height),
-        ]:
-            new_child = create_fw_module_object(
-                WriterModules.DATASET.value,
-                self._get_dataset_config(item[1], item[0]),
-                group,
-            )
-            new_child.type = ValueTypes.DOUBLE
-            attributes = Attributes()
-            attributes.set_attribute_value(CommonAttrs.UNITS, self._units)
-            new_child.attributes = attributes
-            group.children.append(new_child)
+        new_child = create_fw_module_object(
+            WriterModules.DATASET.value,
+            self._get_dataset_config(self._size, SIZE),
+            group,
+        )
+        new_child.type = ValueTypes.DOUBLE
+        attributes = Attributes()
+        attributes.set_attribute_value(CommonAttrs.UNITS, self._units)
+        new_child.attributes = attributes
+        group.children.append(new_child)
         group.children.append(
             create_fw_module_object(
                 WriterModules.DATASET.value,
@@ -209,42 +200,18 @@ class BoxGeometry(Group):
         }
 
     @property
-    def cylinders(self):
-        return None
-
-    @cylinders.setter
-    def cylinders(self, value):
-        pass
-
-    @property
-    def detector_number(self):
-        return None
-
-    @detector_number.setter
-    def detector_number(self, value):
-        pass
-
-    @property
     def units(self) -> str:
         return self._units
 
     @property
-    def length(self) -> float:
-        return self._length
-
-    @property
-    def width(self) -> float:
-        return self._width
-
-    @property
-    def height(self) -> float:
-        return self._height
+    def size(self) -> List[float]:
+        return self._size
 
     @property
     def off_geometry(self) -> OFFGeometry:
-        x = self.width / 2
-        y = self.height / 2
-        z = self.length / 2
+        x = self._size[1] / 2
+        y = self._size[2] / 2
+        z = self._size[0] / 2
         return OFFGeometryNoNexus(
             vertices=[
                 QVector3D(-x, -y, z),

@@ -335,7 +335,7 @@ class Component(Group):
         ]:
             if group_name in self:
                 if group_name == GEOMETRY_GROUP_NAME:
-                    self[GEOMETRY_GROUP_NAME]
+                    del self[GEOMETRY_GROUP_NAME]
                 else:
                     del self[SHAPE_GROUP_NAME]
 
