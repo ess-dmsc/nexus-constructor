@@ -9,6 +9,7 @@ from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
+    GEOMETRY_GROUP_NAME,
     NX_TRANSFORMATIONS,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
@@ -35,6 +36,7 @@ from nexus_constructor.model.geometry import (
     X_PIXEL_OFFSET,
     Y_PIXEL_OFFSET,
     Z_PIXEL_OFFSET,
+    BoxGeometry,
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometry,
@@ -311,7 +313,7 @@ class Component(Group):
     def shape(
         self,
     ) -> Tuple[
-        Union[NoShapeGeometry, CylindricalGeometry, OFFGeometryNexus],
+        Union[NoShapeGeometry, BoxGeometry, CylindricalGeometry, OFFGeometryNexus],
         Optional[List[QVector3D]],
     ]:
         if PIXEL_SHAPE_GROUP_NAME in self:
@@ -321,12 +323,21 @@ class Component(Group):
             )
         if SHAPE_GROUP_NAME in self:
             return self[SHAPE_GROUP_NAME], None
+        if GEOMETRY_GROUP_NAME in self:
+            return self[GEOMETRY_GROUP_NAME], None
         return NoShapeGeometry(), None
 
     def remove_shape(self):
-        for group_name in [PIXEL_SHAPE_GROUP_NAME, SHAPE_GROUP_NAME]:
+        for group_name in [
+            GEOMETRY_GROUP_NAME,
+            PIXEL_SHAPE_GROUP_NAME,
+            SHAPE_GROUP_NAME,
+        ]:
             if group_name in self:
-                del self[SHAPE_GROUP_NAME]
+                if group_name == GEOMETRY_GROUP_NAME:
+                    del self[GEOMETRY_GROUP_NAME]
+                else:
+                    del self[SHAPE_GROUP_NAME]
 
     def set_off_shape(
         self,
@@ -349,6 +360,18 @@ class Component(Group):
             geometry.detector_faces = get_detector_faces_from_pixel_mapping(pixel_data)
 
         self[shape_group] = geometry
+        return geometry
+
+    def set_box_shape(
+        self,
+        length: float = 1.0,
+        width: float = 1.0,
+        height: float = 1.0,
+        units: str = "m",
+    ) -> BoxGeometry:
+        self.remove_shape()
+        geometry = BoxGeometry(length, width, height, GEOMETRY_GROUP_NAME, units)
+        self[GEOMETRY_GROUP_NAME] = geometry
         return geometry
 
     def set_cylinder_shape(
@@ -380,7 +403,6 @@ class Component(Group):
             geometry.detector_number = get_detector_number_from_pixel_mapping(
                 pixel_data
             )
-
         self[shape_group] = geometry
         return geometry
 
@@ -450,7 +472,6 @@ class Component(Group):
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict(error_collector)
-
         if self.transforms:
             # Add transformations in a child group
             dictionary[CommonKeys.CHILDREN].append(

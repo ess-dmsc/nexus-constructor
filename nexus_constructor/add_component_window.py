@@ -25,6 +25,7 @@ from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMap
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
 from nexus_constructor.model.component import Component, add_fields_to_component
 from nexus_constructor.model.geometry import (
+    BoxGeometry,
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometryNexus,
@@ -115,6 +116,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
+        self.boxRadioButton.clicked.connect(self.show_box_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
@@ -198,6 +200,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.meshRadioButton,
                 self.CylinderRadioButton,
                 self.noShapeRadioButton,
+                self.boxRadioButton,
             ]
         ]
 
@@ -228,6 +231,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.meshRadioButton.clicked.connect(self.set_pixel_related_changes)
         self.CylinderRadioButton.clicked.connect(self.set_pixel_related_changes)
         self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
+        self.boxRadioButton.clicked.connect(self.set_pixel_related_changes)
 
         self.change_pixel_options_visibility()
         parent_dialog.setAttribute(Qt.WA_DeleteOnClose)
@@ -301,6 +305,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
+            elif isinstance(component_shape, BoxGeometry):
+                self.boxRadioButton.clicked.emit()
+                self.boxRadioButton.setChecked(True)
+                self.boxLengthLineEdit.setValue(component_shape.size[0])
+                self.boxWidthLineEdit.setValue(component_shape.size[1])
+                self.boxHeightLineEdit.setValue(component_shape.size[2])
+                self.unitsLineEdit.setText(component_shape.units)
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
@@ -359,6 +370,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
+        self.boxOptionsBox.setVisible(False)
+
+    def show_box_fields(self):
+        self.shapeOptionsBox.setVisible(True)
+        self.geometryFileBox.setVisible(False)
+        self.cylinderOptionsBox.setVisible(False)
+        self.boxOptionsBox.setVisible(True)
 
     def show_no_geometry_fields(self):
 
@@ -370,6 +388,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
+        self.boxOptionsBox.setVisible(False)
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
@@ -391,6 +410,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderRadiusLineEdit.value(),
                 self.unitsLineEdit.text(),
                 pixel_data=pixel_data,
+            )
+        elif self.boxRadioButton.isChecked():
+            component.set_box_shape(
+                self.boxLengthLineEdit.value(),
+                self.boxWidthLineEdit.value(),
+                self.boxHeightLineEdit.value(),
+                self.unitsLineEdit.text(),
             )
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()

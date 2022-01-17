@@ -62,7 +62,7 @@ class FieldNameLineEdit(QLineEdit):
     def update_possible_fields(self, possible_fields: List[str]):
         self.setCompleter(QCompleter())
         model = QStringListModel()
-        model.setStringList(possible_fields)
+        model.setStringList(sorted(possible_fields))
         self.completer().setModel(model)
 
 

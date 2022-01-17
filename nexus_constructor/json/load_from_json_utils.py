@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 
 from nexus_constructor.common_attrs import (
+    GEOMETRY_GROUP_NAME,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
     CommonAttrs,
@@ -18,12 +19,16 @@ def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:
     :return: The shape attribute if it could be found, otherwise None.
     """
     value = None
-    try:
-        for item in children:
-            if item[CommonKeys.NAME] in [SHAPE_GROUP_NAME, PIXEL_SHAPE_GROUP_NAME]:
+    for item in children:
+        try:
+            if item[CommonKeys.NAME] in [
+                SHAPE_GROUP_NAME,
+                PIXEL_SHAPE_GROUP_NAME,
+                GEOMETRY_GROUP_NAME,
+            ]:
                 value = item
-    except KeyError:
-        pass
+        except KeyError:
+            pass
     return value
 
 

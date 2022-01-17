@@ -90,6 +90,9 @@ class Ui_AddComponentDialog(object):
         self.noShapeRadioButton = QtWidgets.QRadioButton(self.shapeTypeBox)
         self.noShapeRadioButton.setObjectName("noShapeRadioButton")
         self.horizontalLayout.addWidget(self.noShapeRadioButton)
+        self.boxRadioButton = QtWidgets.QRadioButton(self.shapeTypeBox)
+        self.boxRadioButton.setObjectName("boxRadioButton")
+        self.horizontalLayout.addWidget(self.boxRadioButton)
         self.meshRadioButton = QtWidgets.QRadioButton(self.shapeTypeBox)
         self.meshRadioButton.setObjectName("meshRadioButton")
         self.horizontalLayout.addWidget(self.meshRadioButton)
@@ -123,6 +126,38 @@ class Ui_AddComponentDialog(object):
         self.fileBrowseButton.setObjectName("fileBrowseButton")
         self.horizontalLayout_2.addWidget(self.fileBrowseButton)
         self.gridLayout_2.addWidget(self.geometryFileBox, 1, 0, 1, 1)
+
+        # Box options.
+        self.boxOptionsBox = QtWidgets.QGroupBox(self.shapeOptionsBox)
+        self.boxOptionsBox.setObjectName("boxOptionsBox")
+        self.gridLayout_box = QtWidgets.QGridLayout(self.boxOptionsBox)
+        self.gridLayout_box.setObjectName("gridLayoutBox")
+        self.boxLengthLineEdit = QtWidgets.QDoubleSpinBox(self.boxOptionsBox)
+        self.boxLengthLineEdit.setMaximum(100000.0)
+        self.boxLengthLineEdit.setObjectName("boxLengthLineEdit")
+        self.gridLayout_box.addWidget(self.boxLengthLineEdit, 0, 1, 1, 1)
+        self.boxWidthLineEdit = QtWidgets.QDoubleSpinBox(self.boxOptionsBox)
+        self.boxWidthLineEdit.setMaximum(100000.0)
+        self.boxWidthLineEdit.setObjectName("boxWidthLineEdit")
+        self.gridLayout_box.addWidget(self.boxWidthLineEdit, 1, 1, 1, 1)
+        self.boxHeightLineEdit = QtWidgets.QDoubleSpinBox(self.boxOptionsBox)
+        self.boxHeightLineEdit.setMaximum(100000.0)
+        self.boxHeightLineEdit.setObjectName("boxHeightLineEdit")
+        self.gridLayout_box.addWidget(self.boxHeightLineEdit, 2, 1, 1, 1)
+        self.gridLayout_box.setColumnStretch(1, 1)
+        self.gridLayout_box.setColumnStretch(3, 1)
+        self.gridLayout_box.setColumnStretch(5, 1)
+        self.label_9 = QtWidgets.QLabel(self.boxOptionsBox)
+        self.label_9.setObjectName("label_9")
+        self.gridLayout_box.addWidget(self.label_9, 0, 0, 1, 1)
+        self.label_10 = QtWidgets.QLabel(self.boxOptionsBox)
+        self.label_10.setObjectName("label_10")
+        self.gridLayout_box.addWidget(self.label_10, 1, 0, 1, 1)
+        self.label_11 = QtWidgets.QLabel(self.boxOptionsBox)
+        self.label_11.setObjectName("label_11")
+        self.gridLayout_box.addWidget(self.label_11, 2, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.boxOptionsBox, 1, 0, 1, 1)
+
         self.cylinderOptionsBox = QtWidgets.QGroupBox(self.shapeOptionsBox)
         self.cylinderOptionsBox.setObjectName("cylinderOptionsBox")
         self.gridLayout = QtWidgets.QGridLayout(self.cylinderOptionsBox)
@@ -268,6 +303,9 @@ class Ui_AddComponentDialog(object):
         self.noShapeRadioButton.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "No Shape", None, -1)
         )
+        self.boxRadioButton.setText(
+            QtWidgets.QApplication.translate("AddComponentDialog", "Box", None, -1)
+        )
         self.meshRadioButton.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Mesh", None, -1)
         )
@@ -307,6 +345,17 @@ class Ui_AddComponentDialog(object):
         self.label_8.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Z:", None, -1)
         )
+
+        self.label_9.setText(
+            QtWidgets.QApplication.translate("AddComponentDialog", "Length:", None, -1)
+        )
+        self.label_10.setText(
+            QtWidgets.QApplication.translate("AddComponentDialog", "Width:", None, -1)
+        )
+        self.label_11.setText(
+            QtWidgets.QApplication.translate("AddComponentDialog", "Height:", None, -1)
+        )
+
         self.cylinderCountLabel.setText(
             QtWidgets.QApplication.translate(
                 "AddComponentDialog", "Cylinder Count:", None, -1
