@@ -474,17 +474,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             pixel_data = None
 
         if self.component_to_edit:
-            shape, positions = self.edit_existing_component(
+            component = self.edit_existing_component(
                 component_name, description, nx_class, pixel_data
             )
         else:
-            shape, positions = self.create_new_component(
+            component = self.create_new_component(
                 component_name, description, nx_class, pixel_data
             )
 
-        self.signals.component_added.emit(
-            self.nameLineEdit.text(), nx_class, shape, positions
-        )
+        self.signals.component_added.emit(component)
 
         if self.component_to_edit:
             self.signals.transformation_changed.emit()
@@ -516,7 +514,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         add_fields_to_component(component, self.fieldsListWidget)
 
         self.component_model.add_component(component)
-        return component.shape
+        return component
 
     def edit_existing_component(
         self,
@@ -546,7 +544,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-        return self.component_to_edit.shape if self.component_to_edit else None
+        return self.component_to_edit if self.component_to_edit else None
 
     @staticmethod
     def write_pixel_data_to_component(
