@@ -80,6 +80,32 @@ class UnitValidator(QValidator):
     is_valid = Signal(bool)
 
 
+class AttributeNameValidator(QValidator):
+    """
+    Validator to ensure that attributes are valid with respect to name.
+    """
+
+    def __init__(self, get_attr_names, invalid_names: List = None):
+        super().__init__()
+        self.invalid_names = ["units"]
+        if invalid_names:
+            self.invalid_names += invalid_names
+        self.get_attr_names = get_attr_names
+
+    def validate(self, input: str, pos: int):
+        attr_names = self.get_attr_names()
+        if not input or input in self.invalid_names:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        if attr_names.count(input) > 1:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)
+
+
 class NameValidator(QValidator):
     """
     Validator to ensure item names are unique within a model that has a 'name' property
