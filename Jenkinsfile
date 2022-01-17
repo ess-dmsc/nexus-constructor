@@ -219,6 +219,5 @@ node("docker") {
     }
     
     builders['macOS'] = get_macos_pipeline()
-    builders['windows10'] = get_win10_pipeline()
     parallel builders
 }
