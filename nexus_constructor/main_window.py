@@ -112,14 +112,13 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     parent=self,
                 )
             if success:
-                self.model.entry = reader.entry_node  # type: ignore
-                print(self.model.entry)  # TODO: Remove once tree view works.
+                self.model.entry = reader.model.entry
                 self._update_views()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
-        for component in self.model.entry.instrument.component_list:
-            self.sceneWidget.add_transformation(component.name, component.qtransform)
+        for component in self.model.entry.instrument.get_components():
+            self.sceneWidget.add_transformation(component)
 
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
@@ -128,10 +127,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.model.entry.instrument.component_list:
-            shape, positions = component.shape
-            self.sceneWidget.add_component(component.name, shape, positions)
-            self.sceneWidget.add_transformation(component.name, component.qtransform)
+        for component in self.model.entry.instrument.get_components():
+            self.sceneWidget.add_component(component)
+            self.sceneWidget.add_transformation(component)
 
     def show_add_component_window(self, component: Optional[Component] = None):
         self.add_component_window = QDialogCustom()

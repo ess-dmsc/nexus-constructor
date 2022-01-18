@@ -11,18 +11,13 @@ from nexus_constructor.model.attributes import Attributes
 if TYPE_CHECKING:
     from nexus_constructor.model.group import Group  # noqa: F401
 
-from nexus_constructor.model.value_type import ValueType
+from nexus_constructor.model.value_type import JsonSerialisableType, ValueType
 
 ARRAY_SIZE = "array_size"
 VALUE_UNITS = "value_units"
-CHUNK_CHUNK_KB = "nexus.chunk.chunk_kb"
-CHUNK_CHUNK_MB = "nexus.chunk.chunk_mb"
 CHUNK_SIZE = "chunk_size"
 CUE_INTERVAL = "cue_interval"
-INDEX_EVERY_KB = "nexus.indices.index_every_kb"
-INDEX_EVERY_MB = "nexus.indices.index_every_mb"
 ADC_PULSE_DEBUG = "adc_pulse_debug"
-STORE_LATEST_INTO = "store_latest_into"
 SOURCE = "source"
 TOPIC = "topic"
 DATASET = "dataset"
@@ -86,9 +81,9 @@ class TDCTStream(StreamModule):
 @attr.s
 class EV42Stream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
-    adc_pulse_debug = attr.ib(type=bool, default=None, init=False)
-    cue_interval = attr.ib(type=int, default=None, init=False)
-    chunk_size = attr.ib(type=int, default=None, init=False)
+    adc_pulse_debug = attr.ib(type=bool, default=None)
+    cue_interval = attr.ib(type=int, default=None)
+    chunk_size = attr.ib(type=int, default=None)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -102,20 +97,26 @@ class EV42Stream(StreamModule):
 
 
 @attr.s
-class F142Stream(EV42Stream):
+class F142Stream(StreamModule):
     type = attr.ib(type=str)
+    cue_interval = attr.ib(type=int, default=None)
+    chunk_size = attr.ib(type=int, default=None)
     value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=list, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
-        module_dict = EV42Stream.as_dict(self, error_collector)
+        module_dict = StreamModule.as_dict(self, error_collector)
         if self.type:
             module_dict[NodeType.CONFIG][CommonKeys.DATA_TYPE] = self.type
         if self.value_units:
             module_dict[NodeType.CONFIG][VALUE_UNITS] = self.value_units
         if self.array_size:
             module_dict[NodeType.CONFIG][ARRAY_SIZE] = self.array_size
+        if self.chunk_size:
+            module_dict[NodeType.CONFIG][CHUNK_SIZE] = self.chunk_size
+        if self.cue_interval:
+            module_dict[NodeType.CONFIG][CUE_INTERVAL] = self.cue_interval
         return module_dict
 
 
@@ -143,10 +144,7 @@ class Dataset(FileWriterModule):
     def as_dict(self, error_collector: List[str]):
         values = self.values
         if np.isscalar(values):
-            try:
-                values = float(values)  # type: ignore
-            except ValueError:
-                pass
+            values = self._cast_to_type(values)
         elif isinstance(values, np.ndarray):
             values = values.tolist()
 
@@ -162,6 +160,9 @@ class Dataset(FileWriterModule):
                 error_collector
             )
         return return_dict
+
+    def _cast_to_type(self, data):
+        return JsonSerialisableType.from_type(self.type)(data)
 
 
 @attr.s
@@ -218,7 +219,7 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             type=f142_type,
         )
         if ARRAY_SIZE in configuration:
-            fw_mod_obj.array_size = configuration[ADC_PULSE_DEBUG]
+            fw_mod_obj.array_size = configuration[ARRAY_SIZE]
         if VALUE_UNITS in configuration:
             fw_mod_obj.value_units = configuration[VALUE_UNITS]
     elif mod_type == WriterModules.LINK.value:
@@ -235,15 +236,18 @@ def create_fw_module_object(mod_type, configuration, parent_node):
         )
 
     if mod_type in [WriterModules.F142.value, WriterModules.EV42.value]:
-        if ADC_PULSE_DEBUG in configuration:
-            fw_mod_obj.adc_pulse_debug = configuration[ADC_PULSE_DEBUG]
         if CUE_INTERVAL in configuration:
             fw_mod_obj.cue_interval = configuration[CUE_INTERVAL]
         if CHUNK_SIZE in configuration:
             fw_mod_obj.chunk_size = configuration[CHUNK_SIZE]
 
+    if mod_type == WriterModules.EV42.value:
+        if ADC_PULSE_DEBUG in configuration:
+            fw_mod_obj.adc_pulse_debug = configuration[ADC_PULSE_DEBUG]
+
     if mod_type == WriterModules.ADAR.value:
         fw_mod_obj.array_size = configuration[ARRAY_SIZE]
+
     return fw_mod_obj
 
 

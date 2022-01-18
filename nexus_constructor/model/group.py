@@ -34,6 +34,7 @@ class Group:
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
+    child_dict: Dict = None  # TODO: Remove this attribute once new UI is in place.
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)

@@ -11,7 +11,6 @@ from nexus_constructor.json.json_warnings import (
     TransformDependencyMissing,
 )
 from nexus_constructor.json.load_from_json import JSONReader
-from nexus_constructor.json.load_from_json_utils import _retrieve_children_list
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
@@ -341,18 +340,6 @@ def component_with_transformation() -> Component:
     return comp
 
 
-def test_GIVEN_unable_to_find_nexus_structure_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
-    assert not _retrieve_children_list(dict())
-
-
-def test_GIVEN_unable_to_find_first_children_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
-    assert not _retrieve_children_list({"": None})
-
-
-def test_GIVEN_unable_to_find_second_children_field_WHEN_loading_from_json_THEN_json_loader_returns_false():
-    assert not _retrieve_children_list({"children": [dict()]})
-
-
 @pytest.mark.parametrize("nx_class", ["", "notannxclass"])
 def test_GIVEN_invalid_nx_class_WHEN_obtained_nx_class_value_THEN_validate_nx_class_returns_false(
     nx_class, json_reader
@@ -408,6 +395,7 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     assert node.children[0].nx_class == component_class
 
 
+@pytest.mark.skip(reason="not a valid test anymore due to reimplementation")
 def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_component_in_model_contains_transform(
     json_dict_with_component_and_transform, json_reader
 ):
@@ -510,10 +498,10 @@ def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
         create=True,
     ):
         json_reader.load_model_from_json("filename")
-        model = json_reader.entry_node
+        entry = json_reader.model.entry
 
     success = False
-    for child in model.children:
+    for child in entry.children:
         try:
             if child.name == "experiment_identifier" and child.values == "ID_123456":
                 success = True
@@ -558,10 +546,10 @@ def test_when_title_in_json_then_it_is_added_to_entry(json_reader):
         create=True,
     ):
         json_reader.load_model_from_json("filename")
-        model = json_reader.entry_node
+        entry = json_reader.model.entry
 
     success = False
-    for child in model.children:
+    for child in entry.children:
         try:
             if child.name == "title" and child.values == "my title":
                 success = True
@@ -569,3 +557,173 @@ def test_when_title_in_json_then_it_is_added_to_entry(json_reader):
         except RuntimeError:
             pass
     assert success
+
+
+def test_when_users_are_in_json_then_they_are_added_to_entry(json_reader):
+    user_john = {
+        "name": "John Smith",
+        "email": "js@ess.eu",
+        "facility_user_id": "js90",
+        "affiliation": "ESS",
+    }
+
+    user_betty = {
+        "name": "Betty Boo",
+        "email": "bb@doing.the.do",
+        "facility_user_id": "bb70",
+        "affiliation": "She Rockers",
+    }
+
+    json_string = """
+        {
+        "children": [
+            {
+                "name": "entry",
+                "type": "group",
+                "attributes": [
+                    {"name": "NX_class", "dtype": "string", "values": "NXentry"}
+                ],
+                "children": [
+                    {
+                        "name": "user_JohnSmith",
+                        "type": "group",
+                        "attributes": [
+                            {"name": "NX_class", "dtype": "string", "values": "NXuser"}
+                        ],
+                        "children": [
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "name",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "email",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "facility_user_id",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "affiliation",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "user_BettyBoo",
+                        "type": "group",
+                        "attributes": [
+                            {"name": "NX_class", "dtype": "string", "values": "NXuser"}
+                        ],
+                        "children": [
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "name",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "email",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "facility_user_id",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            },
+                            {
+                                "module": "dataset",
+                                "config": {
+                                    "name": "affiliation",
+                                    "dtype": "string",
+                                    "values": "%s"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+    """ % (
+        user_john["name"],
+        user_john["email"],
+        user_john["facility_user_id"],
+        user_john["affiliation"],
+        user_betty["name"],
+        user_betty["email"],
+        user_betty["facility_user_id"],
+        user_betty["affiliation"],
+    )
+
+    with patch(
+        "nexus_constructor.json.load_from_json.open",
+        mock_open(read_data=json_string),
+        create=True,
+    ):
+        json_reader.load_model_from_json("filename")
+        entry = json_reader.model.entry
+
+    results = []
+    for child in entry.children:
+        try:
+            if child.attributes[0].values == "NXuser":
+                results.append({ds.name: ds.values for ds in child.children})
+        except RuntimeError:
+            pass
+
+    assert user_john in results
+    assert user_betty in results
+
+
+def test_when_users_placeholder_in_json_then_entry_set(json_reader):
+    json_string = """
+        {
+        "children": [
+            {
+                "name": "entry",
+                "type": "group",
+                "attributes": [
+                    {"name": "NX_class", "dtype": "string", "values": "NXentry"}
+                ],
+                "children": [
+                    "$USERS$"
+                ]
+            }
+        ]
+    }
+    """
+
+    with patch(
+        "nexus_constructor.json.load_from_json.open",
+        mock_open(read_data=json_string),
+        create=True,
+    ):
+        json_reader.load_model_from_json("filename")
+
+    assert json_reader.model.entry.users_placeholder

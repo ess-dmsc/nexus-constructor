@@ -26,7 +26,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.components = self.model.entry.instrument.component_list
+        self.components = self.model.entry.instrument.get_components()
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -83,6 +83,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def add_component(self, new_component: Component):
         self.beginInsertRows(QModelIndex(), len(self.components), len(self.components))
         self.components.append(new_component)
+        self.model.entry.instrument[new_component.name] = new_component
         self.endInsertRows()
 
     def _remove_link(self, index: QModelIndex):
@@ -151,6 +152,7 @@ class ComponentTreeModel(QAbstractItemModel):
         for transform in transforms:
             transform.remove_from_dependee_chain()
         self.components.remove(component)
+        del self.model.entry.instrument[component.name]
         self.endRemoveRows()
         self.model.signals.component_removed.emit(component.name)
 

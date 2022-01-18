@@ -1,13 +1,23 @@
 from abc import ABC, abstractmethod
 from math import acos, cos, degrees, pi, sin
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 from PySide2.QtGui import QMatrix4x4, QVector3D
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import (
+    GEOMETRY_NX_CLASS,
+    NX_BOX,
+    SHAPE_GROUP_NAME,
+    SHAPE_NX_CLASS,
+    SIZE,
+    CommonAttrs,
+    CommonKeys,
+)
 from nexus_constructor.geometry.utils import get_an_orthogonal_unit_vector
+from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import WriterModules, create_fw_module_object
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.ui_utils import (
     numpy_array_to_qvector3d,
@@ -130,6 +140,88 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
     @faces.setter
     def faces(self, new_faces: List[List[int]]):
         self._faces = new_faces
+
+
+class BoxGeometry(Group):
+    """
+    Box geometry shape.
+    """
+
+    def __init__(
+        self,
+        length: float,
+        width: float,
+        height: float,
+        name: str = "",
+        units: str = "m",
+    ):
+        Group.__init__(self, name)
+        self._size = [length, width, height]
+        self._units = units
+        self.nx_class = GEOMETRY_NX_CLASS
+        self._create_datasets_and_add_to_shape_group()
+
+    def _create_datasets_and_add_to_shape_group(self):
+        group = Group(name=SHAPE_GROUP_NAME)
+        group.nx_class = SHAPE_NX_CLASS
+        new_child = create_fw_module_object(
+            WriterModules.DATASET.value,
+            self._get_dataset_config(self._size, SIZE),
+            group,
+        )
+        new_child.type = ValueTypes.DOUBLE
+        attributes = Attributes()
+        attributes.set_attribute_value(CommonAttrs.UNITS, self._units)
+        new_child.attributes = attributes
+        group.children.append(new_child)
+        group.children.append(
+            create_fw_module_object(
+                WriterModules.DATASET.value,
+                self._get_dataset_config(NX_BOX, SHAPE_GROUP_NAME),
+                self,
+            )
+        )
+        self.children.append(group)
+
+    def _get_dataset_config(self, value: Any, name: str) -> Dict:
+        return {
+            CommonKeys.NAME: name,
+            CommonKeys.VALUES: value,
+        }
+
+    @property
+    def units(self) -> str:
+        return self._units
+
+    @property
+    def size(self) -> List[float]:
+        return self._size
+
+    @property
+    def off_geometry(self) -> OFFGeometry:
+        x = self._size[1] / 2
+        y = self._size[2] / 2
+        z = self._size[0] / 2
+        return OFFGeometryNoNexus(
+            vertices=[
+                QVector3D(-x, -y, z),
+                QVector3D(x, -y, z),
+                QVector3D(-x, y, z),
+                QVector3D(x, y, z),
+                QVector3D(-x, y, -z),
+                QVector3D(x, y, -z),
+                QVector3D(-x, -y, -z),
+                QVector3D(x, -y, -z),
+            ],
+            faces=[
+                [0, 1, 3, 2],
+                [2, 3, 5, 4],
+                [4, 5, 7, 6],
+                [6, 7, 1, 0],
+                [1, 7, 5, 3],
+                [6, 0, 2, 4],
+            ],
+        )
 
 
 class CylindricalGeometry(Group):

@@ -11,7 +11,7 @@ from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.unit_utils import METRES, RADIANS
 from ui.link import Ui_Link
-from ui.transformation import Ui_Transformation
+from ui.transformation import UiTransformation
 
 if TYPE_CHECKING:
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
@@ -21,8 +21,7 @@ class EditTransformation(QGroupBox):
     def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
         super().__init__(parent)
         self.model = model
-        self.transformation_frame = Ui_Transformation()
-        self.transformation_frame.setupUi(self)
+        self.transformation_frame = UiTransformation(self)
         self.transformation = transformation
         current_vector = self.transformation.vector
         self._fill_in_existing_fields(current_vector)
@@ -169,7 +168,7 @@ class EditTransformationLink(QFrame):
         self.link_frame.transformations_combo_box.clear()
         self.link_frame.transformations_combo_box.addItem("(None)", userData=None)
         self.link_frame.transformations_combo_box.setCurrentIndex(0)
-        components = self.instrument.component_list
+        components = self.instrument.get_components()
         for current_component in components:
             transformations = current_component.transforms
             self.link_frame.transformations_combo_box.addItem(

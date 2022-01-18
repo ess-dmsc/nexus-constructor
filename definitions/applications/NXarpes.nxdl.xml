@@ -3,7 +3,7 @@
 <!--
 # NeXus - Neutron and X-ray Common Data Format
 # 
-# Copyright (C) 2012-2020 NeXus International Advisory Committee (NIAC)
+# Copyright (C) 2012-2021 NeXus International Advisory Committee (NIAC)
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -104,16 +104,22 @@
           </doc>
         </field>
         <field name="sensor_size" type="NX_INT">
-          <doc>number of raw active elements in fast and slow pixel dimension direction</doc>
-          <dimensions rank="2" />
+          <doc>number of raw active elements in each dimension</doc>
+          <dimensions rank="1">
+          	<dim index="1" value="2" />
+          </dimensions>
         </field>
         <field name="region_origin" type="NX_INT">
           <doc>origin of rectangular region selected for readout</doc>
-          <dimensions rank="2" />
+          <dimensions rank="1">
+          	<dim index="1" value="2" />
+          </dimensions>
         </field>
         <field name="region_size" type="NX_INT">
           <doc>size of rectangular region selected for readout</doc>
-          <dimensions rank="2" />
+          <dimensions rank="1" >
+          	<dim index="1" value="2" />
+          </dimensions>
         </field>
       </group>
     </group>
