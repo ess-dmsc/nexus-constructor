@@ -187,7 +187,12 @@ class JSONReader:
                 self.sample_name = name
             if not self._validate_nx_class(name, nx_class):
                 self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
-            nexus_object = Group(name=name, parent_node=parent_node)
+            if nx_class in COMPONENT_TYPES:
+                nexus_object = Component(name=name, parent_node=parent_node)
+                children_dict = json_object[CommonKeys.CHILDREN]
+                self._add_transform_and_shape_to_component(nexus_object, children_dict)
+            else:
+                nexus_object = Group(name=name, parent_node=parent_node)
             if CommonKeys.CHILDREN in json_object:
                 nexus_object.child_dict = json_object[CommonKeys.CHILDREN]
             nexus_object.nx_class = nx_class
@@ -295,34 +300,15 @@ class JSONReader:
 
         # Create sample according to old implementation.
         if self.sample_name:
-            sample = self.model.entry.instrument.sample
-            sample.name = self.sample_name
-            sample.children = self.entry_node[self.sample_name].children
-            for child in sample.children:
-                child.parent_node = sample
-            self.model.entry.instrument.sample = (
-                self._add_transform_and_shape_to_component(
-                    sample, self.entry_node[self.sample_name].child_dict
-                )
-            )
+            self.model.entry.instrument.sample = self.entry_node[self.sample_name]
+            self.model.entry.instrument.sample.parent_node = self.model.entry.instrument
 
-    def _add_children_to_instrument(
-        self, children_list: List[Union[FileWriterModule, Group]]
-    ):
+        self.model.entry.instrument = instrument_component
+
+    def _add_children_to_instrument(self, children_list: List[Group]):
         for child in children_list:
             child.parent_node = self.model.entry.instrument
-            if isinstance(child, Group) and child.nx_class in COMPONENT_TYPES:
-                component = Component(
-                    name=child.name, parent_node=self.model.entry.instrument
-                )
-                component.attributes = child.attributes
-                for child_child in child.children:
-                    child_child.parent_node = component
-                    component.children.append(child_child)
-                child = self._add_transform_and_shape_to_component(
-                    component, child.child_dict
-                )
-            self.model.entry.instrument.children.append(child)
+            self.model.entry.instrument[child.name] = child
 
     def _add_transform_and_shape_to_component(self, component, children_dict):
         # Add transformations if they exist.
