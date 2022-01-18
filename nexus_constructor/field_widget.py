@@ -259,11 +259,11 @@ class FieldWidget(QFrame):
             return None
 
         if self.field_type != FieldType.link:
-            for attr_name, attr_tuple in self.attrs_dialog.get_attrs().items():
+            for name, value, dtype in self.attrs_dialog.get_attrs():
                 return_object.attributes.set_attribute_value(
-                    attribute_name=attr_name,
-                    attribute_value=attr_tuple[0],
-                    attribute_type=attr_tuple[1],
+                    attribute_name=name,
+                    attribute_value=value,
+                    attribute_type=dtype,
                 )
             if self.units and self.units is not None:
                 return_object.attributes.set_attribute_value(
