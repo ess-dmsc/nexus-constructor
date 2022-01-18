@@ -1,7 +1,7 @@
 import os
 import re
 from enum import Enum
-from typing import List
+from typing import Callable, List
 
 import numpy as np
 import pint
@@ -85,7 +85,7 @@ class AttributeNameValidator(QValidator):
     Validator to ensure that attributes are valid with respect to name.
     """
 
-    def __init__(self, get_attr_names, invalid_names: List = None):
+    def __init__(self, get_attr_names: Callable, invalid_names: List = None):
         super().__init__()
         self.invalid_names = ["units"]
         if invalid_names:
