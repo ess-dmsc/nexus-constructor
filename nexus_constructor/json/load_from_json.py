@@ -37,7 +37,6 @@ from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import USERS_PLACEHOLDER
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
-from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     Dataset,
@@ -160,7 +159,7 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
-        # TODO: Remove the three function calls below once new UI is in place.
+        # TODO: Remove the _fit_into_model once new tree model is in place.
         self._fit_into_model()
         self._set_transforms_depends_on()
         self._set_components_depends_on()
@@ -187,15 +186,20 @@ class JSONReader:
                 self.sample_name = name
             if not self._validate_nx_class(name, nx_class):
                 self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
-            nexus_object = Group(name=name, parent_node=parent_node)
+            if nx_class in COMPONENT_TYPES:
+                nexus_object = Component(name=name, parent_node=parent_node)
+                children_dict = json_object[CommonKeys.CHILDREN]
+                self._add_transform_and_shape_to_component(nexus_object, children_dict)
+            else:
+                nexus_object = Group(name=name, parent_node=parent_node)
             if CommonKeys.CHILDREN in json_object:
                 nexus_object.child_dict = json_object[CommonKeys.CHILDREN]
             nexus_object.nx_class = nx_class
             if CommonKeys.CHILDREN in json_object:
                 for child in json_object[CommonKeys.CHILDREN]:
                     node = self._read_json_object(child, nexus_object)
-                    if node:
-                        nexus_object.children.append(node)
+                    if node and node.name not in nexus_object:
+                        nexus_object[node.name] = node
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]
             if module_type in [x.value for x in WriterModules]:
@@ -289,40 +293,16 @@ class JSONReader:
         """
         instrument_group = self.entry_node[INSTRUMENT_NAME]
         if instrument_group:
-            instrument_component = Instrument(parent_node=self.model.entry)
-            self.model.entry.instrument = instrument_component
             self._add_children_to_instrument(instrument_group.children)
-
         # Create sample according to old implementation.
         if self.sample_name:
-            sample = self.model.entry.instrument.sample
-            sample.name = self.sample_name
-            sample.children = self.entry_node[self.sample_name].children
-            for child in sample.children:
-                child.parent_node = sample
-            self.model.entry.instrument.sample = (
-                self._add_transform_and_shape_to_component(
-                    sample, self.entry_node[self.sample_name].child_dict
-                )
-            )
+            self.model.entry.instrument.sample = self.entry_node[self.sample_name]
+            self.model.entry.instrument.sample.parent_node = self.model.entry.instrument
 
-    def _add_children_to_instrument(
-        self, children_list: List[Union[FileWriterModule, Group]]
-    ):
+    def _add_children_to_instrument(self, children_list: List[Group]):
         for child in children_list:
             child.parent_node = self.model.entry.instrument
-            if isinstance(child, Group) and child.nx_class in COMPONENT_TYPES:
-                component = Component(
-                    name=child.name, parent_node=self.model.entry.instrument
-                )
-                component.attributes = child.attributes
-                for child_child in child.children:
-                    child_child.parent_node = component
-                    component.children.append(child_child)
-                child = self._add_transform_and_shape_to_component(
-                    component, child.child_dict
-                )
-            self.model.entry.instrument.children.append(child)
+            self.model.entry.instrument[child.name] = child
 
     def _add_transform_and_shape_to_component(self, component, children_dict):
         # Add transformations if they exist.
@@ -341,7 +321,6 @@ class JSONReader:
             self._components_depends_on[component.name] = (component, None)
 
         # Add shape if there is a shape.
-
         shape_info = _find_shape_information(children_dict)
         if shape_info:
             shape_reader = ShapeReader(component, shape_info)
