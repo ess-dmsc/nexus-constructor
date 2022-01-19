@@ -159,7 +159,7 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
-        # TODO: Remove the three function calls below once new UI is in place.
+        # TODO: Remove the _fit_into_model once new tree model is in place.
         self._fit_into_model()
         self._set_transforms_depends_on()
         self._set_components_depends_on()
