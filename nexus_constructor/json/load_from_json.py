@@ -37,7 +37,6 @@ from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import USERS_PLACEHOLDER
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
-from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     Dataset,
@@ -199,8 +198,8 @@ class JSONReader:
             if CommonKeys.CHILDREN in json_object:
                 for child in json_object[CommonKeys.CHILDREN]:
                     node = self._read_json_object(child, nexus_object)
-                    if node:
-                        nexus_object.children.append(node)
+                    if node and node.name not in nexus_object:
+                        nexus_object[node.name] = node
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]
             if module_type in [x.value for x in WriterModules]:
@@ -294,16 +293,11 @@ class JSONReader:
         """
         instrument_group = self.entry_node[INSTRUMENT_NAME]
         if instrument_group:
-            instrument_component = Instrument(parent_node=self.model.entry)
-            self.model.entry.instrument = instrument_component
             self._add_children_to_instrument(instrument_group.children)
-
         # Create sample according to old implementation.
         if self.sample_name:
             self.model.entry.instrument.sample = self.entry_node[self.sample_name]
             self.model.entry.instrument.sample.parent_node = self.model.entry.instrument
-
-        self.model.entry.instrument = instrument_component
 
     def _add_children_to_instrument(self, children_list: List[Group]):
         for child in children_list:
