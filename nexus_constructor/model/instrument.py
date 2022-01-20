@@ -1,7 +1,7 @@
 from typing import List
 
 from nexus_constructor.common_attrs import INSTRUMENT_NAME
-from nexus_constructor.component_type import COMPONENT_TYPES, SAMPLE_CLASS_NAME
+from nexus_constructor.component_type import SAMPLE_CLASS_NAME
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 
@@ -16,9 +16,15 @@ class Instrument(Group):
         self.sample.nx_class = SAMPLE_CLASS_NAME
 
     def get_components(self) -> List:
-        component_list = []
+        return self._get_nexus_instances(Component)
+
+    def get_groups(self) -> List:
+        return self._get_nexus_instances(Group)
+
+    def _get_nexus_instances(self, nexus_type) -> List:
+        nexus_list = []
         for child in self.children:
-            if isinstance(child, Group) and child.nx_class in COMPONENT_TYPES:
-                component_list.append(child)
-        component_list.append(self.sample)
-        return component_list
+            if isinstance(child, nexus_type):
+                nexus_list.append(child)
+        nexus_list.append(self.sample)
+        return nexus_list

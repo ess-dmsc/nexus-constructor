@@ -25,6 +25,15 @@ class Model:
         self.signals = Signals()
         self.entry = Entry()
         self.entry.instrument = Instrument()
+        self._entry_node = None
+
+    @property
+    def entry_node(self):
+        return self._entry_node
+
+    @entry_node.setter
+    def entry_node(self, node):
+        self._entry_node = node
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return {CommonKeys.CHILDREN: [self.entry.as_dict(error_collector)]}

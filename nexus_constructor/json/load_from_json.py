@@ -163,6 +163,7 @@ class JSONReader:
         self._fit_into_model()
         self._set_transforms_depends_on()
         self._set_components_depends_on()
+        self.model.entry_node = self.entry_node
         return True
 
     def _read_json_object(self, json_object: Dict, parent_node: Group = None):

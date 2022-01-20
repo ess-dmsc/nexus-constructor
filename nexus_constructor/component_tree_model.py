@@ -22,6 +22,37 @@ class ComponentInfo(object):
         self.parent = parent
 
 
+class NexusTreeModel(QAbstractItemModel):
+    def __init__(self, model: Model, parent=None):
+        super().__init__(parent)
+        self.model = model
+        self.entry_node = self.model.entry_node
+
+    def columnCount(self, parent: QModelIndex) -> int:
+        pass
+
+    def parent(self, index: QModelIndex):
+        pass
+
+    def data(self, index: QModelIndex, role: Qt.DisplayRole):
+        if not index.isValid():
+            return None
+        item = index.internalPointer()
+        if role == Qt.DisplayRole:
+            return item
+        elif role == Qt.SizeHintRole:
+            return
+
+    def index(self, row: int, column: int, parent: QModelIndex) -> QModelIndex:
+        pass
+
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        pass
+
+    def rowCount(self, parent: QModelIndex) -> int:
+        pass
+
+
 class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
@@ -329,7 +360,7 @@ class ComponentTreeModel(QAbstractItemModel):
             )
         elif isinstance(parent_item, LinkTransformation):
             return self.createIndex(1, 0, parent_item.parent)
-        raise RuntimeError("Unknown element type.")
+        raise RuntimeError(f"Unknown element type: {type(parent_item)}.")
 
     def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
@@ -347,4 +378,4 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_item, (Transformation, ComponentInfo, LinkTransformation)
         ):
             return 0
-        raise RuntimeError("Unknown element type.")
+        raise RuntimeError(f"Unknown element type: {type(parent_item)}.")
