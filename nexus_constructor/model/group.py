@@ -62,30 +62,27 @@ class Group:
         _remove_item(self.children, key)
 
     def tree_depth(self):
-        if not self.children:
-            return 1
-        else:
-            return (
-                max(
-                    [
-                        child.tree_depth() if isinstance(child, Group) else 1
-                        for child in self.children
-                    ]
-                )
-                + 1
-            )
+        """
+        The depth of the tree.
+        """
+        return self._apply_function_to_tree_structure(max)
 
     def tree_size(self):
         """
         Number of nodes in the tree structure.
         """
+        return self._apply_function_to_tree_structure(sum)
+
+    def _apply_function_to_tree_structure(self, func):
         if not self.children:
             return 1
         else:
             return (
-                sum(
+                func(
                     [
-                        child.tree_size() if isinstance(child, Group) else 1
+                        child._apply_function_to_tree_structure(func)
+                        if isinstance(child, Group)
+                        else 1
                         for child in self.children
                     ]
                 )
