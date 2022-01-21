@@ -2,6 +2,7 @@ import pytest
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import Dataset
 
 
 def test_get_field_value_throws_if_field_does_not_exist():
@@ -36,8 +37,9 @@ def test_group_depth_returns_expected_tree_depth():
     c1 = Component("c1", parent_node=instrument)
     c2 = Group("c2", parent_node=instrument)
 
+    dataset = Dataset(name="dataset", values=0, parent_node=sample)
     entry.children = [sample, instrument]
-    sample.children = [g1, g2]
+    sample.children = [g1, g2, dataset]
     g2.children = [g21]
     instrument.children = [c1, c2]
 
