@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 import pytest
@@ -7,6 +7,8 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
+    GEOMETRY_GROUP_NAME,
+    GEOMETRY_NX_CLASS,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
@@ -17,7 +19,6 @@ from nexus_constructor.common_attrs import (
 from nexus_constructor.json.json_warnings import JsonWarningsContainer
 from nexus_constructor.json.load_from_json_utils import (
     _find_attribute_from_list_or_dict,
-    _get_data_type,
 )
 from nexus_constructor.json.shape_reader import (
     DETECTOR_NUMBER,
@@ -27,9 +28,14 @@ from nexus_constructor.json.shape_reader import (
     ShapeReader,
 )
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.geometry import CylindricalGeometry, OFFGeometryNexus
+from nexus_constructor.model.geometry import (
+    BoxGeometry,
+    CylindricalGeometry,
+    OFFGeometryNexus,
+)
 from nexus_constructor.model.value_type import ValueTypes
 from tests.json.shape_json import (
+    box_shape_json,
     cylindrical_shape_json,
     off_shape_json,
     pixel_grid_list,
@@ -52,6 +58,14 @@ def getitem(name):
 
 def setitem(name, val):
     component_shape[name] = val
+
+
+def _get_data_type(json_object: Dict):
+    if CommonKeys.DATA_TYPE in json_object:
+        return json_object[CommonKeys.DATA_TYPE]
+    elif CommonKeys.TYPE in json_object:
+        return json_object[CommonKeys.TYPE]
+    raise KeyError
 
 
 @pytest.fixture(scope="function")
@@ -85,6 +99,11 @@ def off_shape_reader(mock_component, off_shape_json) -> ShapeReader:
 @pytest.fixture(scope="function")
 def cylindrical_shape_reader(mock_component, cylindrical_shape_json):
     return ShapeReader(mock_component, cylindrical_shape_json)
+
+
+@pytest.fixture(scope="function")
+def box_shape_reader(mock_component, box_shape_json):
+    return ShapeReader(mock_component, box_shape_json)
 
 
 def _any_warning_message_has_substrings(
@@ -690,3 +709,19 @@ def test_GIVEN_valid_pixel_mapping_and_cylindrical_shape_WHEN_reading_pixel_data
         DETECTOR_NUMBER, detector_number, detector_number_dtype
     )
     assert mock_cylindrical_shape.detector_number == detector_number
+
+
+def test_GIVEN_box_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expected_properties(
+    box_shape_reader, box_shape_json, mock_component
+):
+    name = box_shape_json[CommonKeys.NAME]
+    box_shape_reader.add_shape_to_component()
+    shape = mock_component[name]
+    assert isinstance(shape, BoxGeometry)
+    assert shape.name == name
+    assert shape.nx_class == GEOMETRY_NX_CLASS
+    assert shape.size[0] == 6.0
+    assert shape.size[1] == 12.0
+    assert shape.size[2] == 15.0
+    assert shape.units == "m"
+    assert shape.name == GEOMETRY_GROUP_NAME

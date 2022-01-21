@@ -27,7 +27,9 @@ class Attributes(list):
         )
 
     def get_attribute_value(self, attribute_name: str):
-        return _get_item(self, attribute_name).values
+        if self.contains_attribute(attribute_name):
+            return _get_item(self, attribute_name).values
+        return None
 
     def contains_attribute(self, attribute_name):
         result = _get_item(self, attribute_name)

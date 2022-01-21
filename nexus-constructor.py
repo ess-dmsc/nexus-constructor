@@ -5,9 +5,11 @@ Requires Python 3.6+
 import argparse
 import logging
 import os
-os.environ['QT_MAC_WANTS_LAYER'] = '1'
-import sys
+
+os.environ["QT_MAC_WANTS_LAYER"] = "1"
 import locale
+import signal
+import sys
 
 from PySide2 import QtCore
 from PySide2.QtGui import QIcon
@@ -16,6 +18,8 @@ from PySide2.QtWidgets import QApplication, QMainWindow
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.model import Model
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 if getattr(sys, "frozen", False):
     # frozen

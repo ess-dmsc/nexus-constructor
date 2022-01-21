@@ -25,6 +25,7 @@ from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMap
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
 from nexus_constructor.model.component import Component, add_fields_to_component
 from nexus_constructor.model.geometry import (
+    BoxGeometry,
     CylindricalGeometry,
     NoShapeGeometry,
     OFFGeometryNexus,
@@ -115,6 +116,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
+        self.boxRadioButton.clicked.connect(self.show_box_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
@@ -131,8 +133,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        component_list = self.instrument.component_list.copy()
-
+        component_list = self.instrument.get_components()
         if self.component_to_edit:
             for item in component_list:
                 if item.name == self.component_to_edit.name:
@@ -199,6 +200,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.meshRadioButton,
                 self.CylinderRadioButton,
                 self.noShapeRadioButton,
+                self.boxRadioButton,
             ]
         ]
 
@@ -229,6 +231,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.meshRadioButton.clicked.connect(self.set_pixel_related_changes)
         self.CylinderRadioButton.clicked.connect(self.set_pixel_related_changes)
         self.noShapeRadioButton.clicked.connect(self.set_pixel_related_changes)
+        self.boxRadioButton.clicked.connect(self.set_pixel_related_changes)
 
         self.change_pixel_options_visibility()
         parent_dialog.setAttribute(Qt.WA_DeleteOnClose)
@@ -302,6 +305,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderYLineEdit.setValue(component_shape.axis_direction.y())
                 self.cylinderZLineEdit.setValue(component_shape.axis_direction.z())
                 self.unitsLineEdit.setText(component_shape.units)
+            elif isinstance(component_shape, BoxGeometry):
+                self.boxRadioButton.clicked.emit()
+                self.boxRadioButton.setChecked(True)
+                self.boxLengthLineEdit.setValue(component_shape.size[0])
+                self.boxWidthLineEdit.setValue(component_shape.size[1])
+                self.boxHeightLineEdit.setValue(component_shape.size[2])
+                self.unitsLineEdit.setText(component_shape.units)
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
@@ -333,7 +343,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         return generate_unique_name(
             self.componentTypeComboBox.currentText().lstrip("NX"),
-            self.instrument.component_list,
+            self.instrument.get_components(),
         )
 
     def on_nx_class_changed(self):
@@ -360,6 +370,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
+        self.boxOptionsBox.setVisible(False)
+
+    def show_box_fields(self):
+        self.shapeOptionsBox.setVisible(True)
+        self.geometryFileBox.setVisible(False)
+        self.cylinderOptionsBox.setVisible(False)
+        self.boxOptionsBox.setVisible(True)
 
     def show_no_geometry_fields(self):
 
@@ -371,6 +388,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
+        self.boxOptionsBox.setVisible(False)
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
@@ -392,6 +410,13 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.cylinderRadiusLineEdit.value(),
                 self.unitsLineEdit.text(),
                 pixel_data=pixel_data,
+            )
+        elif self.boxRadioButton.isChecked():
+            component.set_box_shape(
+                self.boxLengthLineEdit.value(),
+                self.boxWidthLineEdit.value(),
+                self.boxHeightLineEdit.value(),
+                self.unitsLineEdit.text(),
             )
         elif self.meshRadioButton.isChecked():
             mesh_geometry = OFFGeometryNoNexus()
@@ -449,15 +474,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             pixel_data = None
 
         if self.component_to_edit:
-            shape, positions = self.edit_existing_component(
+            component = self.edit_existing_component(
                 component_name, description, nx_class, pixel_data
             )
         else:
-            shape, positions = self.create_new_component(
+            component = self.create_new_component(
                 component_name, description, nx_class, pixel_data
             )
 
-        self.signals.component_added.emit(self.nameLineEdit.text(), shape, positions)
+        self.signals.component_added.emit(component)
 
         if self.component_to_edit:
             self.signals.transformation_changed.emit()
@@ -489,7 +514,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         add_fields_to_component(component, self.fieldsListWidget)
 
         self.component_model.add_component(component)
-        return component.shape
+        return component
 
     def edit_existing_component(
         self,
@@ -519,7 +544,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         self.generate_geometry_model(self.component_to_edit, pixel_data)
-        return self.component_to_edit.shape if self.component_to_edit else None
+        return self.component_to_edit if self.component_to_edit else None
 
     @staticmethod
     def write_pixel_data_to_component(

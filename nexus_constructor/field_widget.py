@@ -62,7 +62,7 @@ class FieldNameLineEdit(QLineEdit):
     def update_possible_fields(self, possible_fields: List[str]):
         self.setCompleter(QCompleter())
         model = QStringListModel()
-        model.setStringList(possible_fields)
+        model.setStringList(sorted(possible_fields))
         self.completer().setModel(model)
 
 
@@ -259,11 +259,11 @@ class FieldWidget(QFrame):
             return None
 
         if self.field_type != FieldType.link:
-            for attr_name, attr_tuple in self.attrs_dialog.get_attrs().items():
+            for name, value, dtype in self.attrs_dialog.get_attrs():
                 return_object.attributes.set_attribute_value(
-                    attribute_name=attr_name,
-                    attribute_value=attr_tuple[0],
-                    attribute_type=attr_tuple[1],
+                    attribute_name=name,
+                    attribute_value=value,
+                    attribute_type=dtype,
                 )
             if self.units and self.units is not None:
                 return_object.attributes.set_attribute_value(

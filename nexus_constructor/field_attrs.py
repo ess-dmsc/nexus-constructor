@@ -19,7 +19,7 @@ from nexus_constructor.common_attrs import ARRAY, SCALAR, CommonAttrs
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import FieldValueValidator
+from nexus_constructor.validators import AttributeNameValidator, FieldValueValidator
 
 ATTRS_EXCLUDELIST = [CommonAttrs.UNITS]
 
@@ -71,6 +71,7 @@ class FieldAttrsDialog(QDialog):
         self.list_widget.addItem(item)
         frame = existing_frame if existing_frame is not None else FieldAttrFrame()
         item.setSizeHint(frame.sizeHint())
+        self._setup_attribute_name_validator(frame)
         self.list_widget.setItemWidget(item, frame)
 
     def _remove_attrs(self):
@@ -78,12 +79,29 @@ class FieldAttrsDialog(QDialog):
             self.list_widget.takeItem(index.row())
 
     def get_attrs(self):
-        attrs_dict = {}
+        attrs_list = []
         for index in range(self.list_widget.count()):
             item = self.list_widget.item(index)
             widget = self.list_widget.itemWidget(item)
-            attrs_dict[widget.name] = (widget.value, widget.dtype)
-        return attrs_dict
+            if widget:
+                attrs_list.append((widget.name, widget.value, widget.dtype))
+        return attrs_list
+
+    def get_attr_names(self):
+        return [item[0] for item in self.get_attrs()]
+
+    def _setup_attribute_name_validator(self, frame):
+        frame.attr_name_lineedit.setValidator(
+            AttributeNameValidator(self.get_attr_names)
+        )
+        frame.attr_name_lineedit.validator().is_valid.connect(
+            partial(
+                validate_line_edit,
+                frame.attr_name_lineedit,
+                tooltip_on_accept="Attribute name is valid.",
+                tooltip_on_reject="Attribute name is not valid",
+            )
+        )
 
 
 class FieldAttrFrame(QFrame):

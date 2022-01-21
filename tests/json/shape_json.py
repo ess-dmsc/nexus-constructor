@@ -275,6 +275,65 @@ def off_shape_json() -> Dict:
 
 
 @pytest.fixture(scope="function")
+def box_shape_json() -> dict:
+    box_shape = """
+    {
+      "name": "geometry",
+      "type": "group",
+      "attributes": [
+        {
+          "name": "NX_class",
+          "dtype": "string",
+          "values": "NXgeometry"
+        }
+      ],
+      "children": [
+        {
+          "name": "shape",
+          "type": "group",
+          "attributes": [
+            {
+              "name": "NX_class",
+              "dtype": "string",
+              "values": "NXshape"
+            }
+          ],
+          "children": [
+            {
+              "module": "dataset",
+              "config": {
+                "name": "size",
+                "values": [
+                  6.0,
+                  12.0,
+                  15.0
+                ],
+                "type": "double"
+              },
+              "attributes": [
+                {
+                  "name": "units",
+                  "dtype": "string",
+                  "values": "m"
+                }
+              ]
+            },
+            {
+              "module": "dataset",
+              "config": {
+                "name": "shape",
+                "values": "nxbox"
+              }
+            }
+          ]
+        }
+      ]
+    }
+    """
+    return json.loads(box_shape)
+
+
+@pytest.fixture(scope="function")
 def cylindrical_shape_json() -> dict:
     cylindrical_shape = """
     {
