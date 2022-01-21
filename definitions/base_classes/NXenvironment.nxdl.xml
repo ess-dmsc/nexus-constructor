@@ -42,7 +42,7 @@
     <field name="program">
         <doc>Program controlling the apparatus; e.g. LabView VI name</doc>
     </field>
-    <group name="position" type="NXgeometry" deprecated="Use the field `depends_on` and :ref:`NXtransformations` instead.">
+    <group name="position" type="NXgeometry">
         <doc>The position and orientation of the apparatus</doc>
     </group>
     <group type="NXnote">
