@@ -823,9 +823,8 @@
       which defines the position and orientation of this component or the string "." if located
       in the origin.
 
-      .. todo::
-        Add a definition for the reference point of a detector.
-
+      The reference point of the detector is the center of the first pixel.
+      In complex geometries the NXoff_geometry groups can be used to provide an umabigous reference.
     </doc>
   </field>
   <group type="NXtransformations">

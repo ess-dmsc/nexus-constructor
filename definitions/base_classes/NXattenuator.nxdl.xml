@@ -40,7 +40,7 @@
     </doc>
     <!-- 
         TODO compare with SHADOW definition "screen"
-        TODO  SHADOW: http://ftp.esrf.eu/pub/scisoft/shadow       or (older)   http://www.nanotech.wisc.edu/shadow  
+        TODO  SHADOW: https://github.com/oasys-kit/shadow3  
     -->
 
     <field name="distance" type="NX_FLOAT" units="NX_LENGTH">
@@ -97,6 +97,8 @@
         The reference point of the attenuator is its center in the x and y axis. The reference point on the z axis is the
         surface of the attenuator pointing towards the source.
 
+        For complex geometries, where identifing a centre in x and y is not obvious 
+
         .. image:: attenuator/attenuator.png
             :width: 40%
 
@@ -105,6 +107,11 @@
     <group type="NXtransformations">
       <doc>
         Transformations used by this component to define its position and orientation.
+      </doc>
+    </group>
+    <group name="shape" type="NXoff_geometry">
+      <doc>
+        Shape of by this component. Particulary useful to define the origin for position and orientation in non-standard cases.
       </doc>
     </group>
 </definition>
