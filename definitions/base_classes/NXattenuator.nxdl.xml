@@ -111,7 +111,7 @@
     </group>
     <group name="shape" type="NXoff_geometry">
       <doc>
-        Shape of by this component. Particulary useful to define the origin for position and orientation in non-standard cases.
+        Shape of this component. Particulary useful to define the origin for position and orientation in non-standard cases.
       </doc>
     </group>
 </definition>
