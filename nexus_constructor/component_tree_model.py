@@ -52,7 +52,10 @@ class NexusTreeModel(QAbstractItemModel):
             return
 
     def index(self, row: int, column: int, parent: QModelIndex) -> QModelIndex:
-        pass
+        if not self.hasIndex(row, column, parent):
+            return QModelIndex()
+        if not parent.isValid():
+            return self.createIndex(row, column, None)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         pass

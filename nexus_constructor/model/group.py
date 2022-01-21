@@ -75,6 +75,23 @@ class Group:
                 + 1
             )
 
+    def tree_size(self):
+        """
+        Number of nodes in the tree structure.
+        """
+        if not self.children:
+            return 1
+        else:
+            return (
+                sum(
+                    [
+                        child.tree_size() if isinstance(child, Group) else 1
+                        for child in self.children
+                    ]
+                )
+                + 1
+            )
+
     @property
     def absolute_path(self):
         return get_absolute_path(self)
