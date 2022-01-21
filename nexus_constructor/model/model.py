@@ -4,6 +4,7 @@ from PySide2.QtCore import QObject, Signal
 
 from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.instrument import Instrument
 
 
@@ -21,11 +22,11 @@ class Signals(QObject):
 
 
 class Model:
-    def __init__(self):
+    def __init__(self, entry_node: Group = Group(name="", parent_node=None)):
         self.signals = Signals()
         self.entry = Entry()
         self.entry.instrument = Instrument()
-        self._entry_node = None
+        self._entry_node: Group = entry_node
 
     @property
     def entry_node(self):

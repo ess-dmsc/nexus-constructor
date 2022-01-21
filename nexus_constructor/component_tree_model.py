@@ -8,6 +8,7 @@ from PySide2.QtWidgets import QMessageBox
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.transformation import Transformation
@@ -29,7 +30,14 @@ class NexusTreeModel(QAbstractItemModel):
         self.entry_node = self.model.entry_node
 
     def columnCount(self, parent: QModelIndex) -> int:
-        pass
+        if not parent.isValid():
+            return self.entry_node.tree_depth()
+        else:
+            node = parent.internalPointer()
+            if isinstance(node, Group):
+                return node.tree_depth()
+            else:
+                return 1
 
     def parent(self, index: QModelIndex):
         pass

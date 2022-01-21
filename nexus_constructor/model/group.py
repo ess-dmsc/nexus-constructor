@@ -61,6 +61,20 @@ class Group:
     def __delitem__(self, key):
         _remove_item(self.children, key)
 
+    def tree_depth(self):
+        if not self.children:
+            return 1
+        else:
+            return (
+                max(
+                    [
+                        child.tree_depth() if isinstance(child, Group) else 1
+                        for child in self.children
+                    ]
+                )
+                + 1
+            )
+
     @property
     def absolute_path(self):
         return get_absolute_path(self)
