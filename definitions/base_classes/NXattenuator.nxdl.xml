@@ -90,7 +90,7 @@
     </attribute>
     <field name="depends_on" type="NX_CHAR">
       <doc>
-        Points to the path to a field defining the last transformation in a chain of transformations
+        Points to the path of a field defining the last transformation in a chain of transformations
         which defines the position and orientation of this component or the string "." if located
         in the origin.
 
