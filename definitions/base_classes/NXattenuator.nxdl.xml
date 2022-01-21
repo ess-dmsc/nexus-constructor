@@ -97,7 +97,7 @@
         The reference point of the attenuator is its center in the x and y axis. The reference point on the z axis is the
         surface of the attenuator pointing towards the source.
 
-        For complex geometries, where identifing a centre in x and y is not obvious 
+        For complex geometries, where identifying a centre in x and y is not obvious 
 
         .. image:: attenuator/attenuator.png
             :width: 40%
