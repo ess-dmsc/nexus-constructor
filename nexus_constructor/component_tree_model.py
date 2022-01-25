@@ -30,17 +30,13 @@ class NexusTreeModel(QAbstractItemModel):
         self.entry_node = self.model.entry_node
 
     def columnCount(self, parent: QModelIndex) -> int:
-        if not parent.isValid():
-            return self.entry_node.tree_depth()
-        else:
-            node = parent.internalPointer()
-            if isinstance(node, Group):
-                return node.tree_depth()
-            else:
-                return 1
+        return 1
 
     def parent(self, index: QModelIndex):
-        pass
+        if not index.isValid():
+            return QModelIndex()
+        parent_item = index.internalPointer()
+        return self.createIndex(index.row(), 0, parent_item)
 
     def data(self, index: QModelIndex, role: Qt.DisplayRole):
         if not index.isValid():
@@ -55,13 +51,23 @@ class NexusTreeModel(QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if not parent.isValid():
-            return self.createIndex(row, column, None)
+            return self.createIndex(row, 0, self.model.entry.children[row].name)
+
+        parent_item = parent.internalPointer()
+        return self.createIndex(row, 0, parent_item)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
-        pass
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
 
     def rowCount(self, parent: QModelIndex) -> int:
-        pass
+        if not parent.isValid():
+            return 1
+        else:
+            node = parent.internalPointer()
+            if isinstance(node, Group):
+                return len(node.children)
+            else:
+                return 1
 
 
 class ComponentTreeModel(QAbstractItemModel):
