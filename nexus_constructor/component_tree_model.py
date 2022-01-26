@@ -27,7 +27,7 @@ class NexusTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.entry_node = self.model.entry_node
+        self.tree_root = self.model.entry_node
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -35,8 +35,13 @@ class NexusTreeModel(QAbstractItemModel):
     def parent(self, index: QModelIndex):
         if not index.isValid():
             return QModelIndex()
-        parent_item = index.internalPointer()
-        return self.createIndex(index.row(), 0, parent_item)
+        if not index.internalPointer():
+            return QModelIndex()
+        parent_item = index.internalPointer().parent_node
+        if index.internalPointer() == self.tree_root:
+            return QModelIndex()
+        else:
+            return self.createIndex(index.row(), 0, parent_item)
 
     def data(self, index: QModelIndex, role: Qt.DisplayRole):
         if not index.isValid():
@@ -51,8 +56,7 @@ class NexusTreeModel(QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if not parent.isValid():
-            print(row, "entered", self.entry_node.name)
-            return self.createIndex(row, 0, self.entry_node)
+            return self.createIndex(row, 0, self.tree_root)
 
         parent_item = parent.internalPointer()
         if isinstance(parent_item, Group):
@@ -68,6 +72,7 @@ class NexusTreeModel(QAbstractItemModel):
         else:
             node = parent.internalPointer()
             if isinstance(node, Group):
+                print("nbr_children", node.number_of_children())
                 return node.number_of_children()
             else:
                 return 1
