@@ -28,7 +28,6 @@ class NexusTreeModel(QAbstractItemModel):
         super().__init__(parent)
         self.model = model
         self.entry_node = self.model.entry_node
-        print(self.entry_node)
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -52,10 +51,13 @@ class NexusTreeModel(QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if not parent.isValid():
-            return self.createIndex(row, 0, self.model.entry.children[row - 1])
+            print(row, "entered", self.entry_node.name)
+            return self.createIndex(row, 0, self.entry_node)
 
         parent_item = parent.internalPointer()
-        return self.createIndex(row, 0, parent_item)
+        if isinstance(parent_item, Group):
+            print(row, [child.name for child in parent_item.children])
+        return self.createIndex(row, 0, parent_item.children[row])
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
@@ -68,7 +70,7 @@ class NexusTreeModel(QAbstractItemModel):
             if isinstance(node, Group):
                 return node.number_of_children()
             else:
-                return 0
+                return 1
 
 
 class ComponentTreeModel(QAbstractItemModel):
