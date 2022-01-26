@@ -61,6 +61,9 @@ class Group:
     def __delitem__(self, key):
         _remove_item(self.children, key)
 
+    def number_of_children(self):
+        return len(self.children)
+
     def tree_depth(self):
         """
         The depth of the tree.

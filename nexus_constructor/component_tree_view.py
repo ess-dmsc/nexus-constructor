@@ -13,6 +13,7 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformations_list import TransformationsList
@@ -20,6 +21,7 @@ from nexus_constructor.treeview_utils import (
     fill_selection,
     get_component_frame,
     get_component_info_frame,
+    get_group_frame,
     get_link_transformation_frame,
     get_transformation_frame,
     get_transformations_list_frame,
@@ -54,9 +56,11 @@ class ComponentEditorDelegate(QStyledItemDelegate):
 
         if isinstance(value, Component):
             get_component_frame(frame, value)
+        elif isinstance(value, Group):
+            get_group_frame(frame, value)
         elif isinstance(value, TransformationsList):
             get_transformations_list_frame(frame)
-        elif isinstance(value, ComponentInfo):
+        elif isinstance(value, ComponentInfo):  # TODO: Call this GroupInfo.
             get_component_info_frame(frame)
         elif isinstance(value, Transformation):
             get_transformation_frame(frame, self.model, value)
