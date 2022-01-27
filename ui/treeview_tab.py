@@ -1,3 +1,5 @@
+from os import environ
+
 from PySide2.QtCore import QModelIndex
 from PySide2.QtWidgets import (
     QAbstractItemView,
@@ -103,7 +105,10 @@ class ComponentTreeViewTab(QWidget):
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
     def set_up_model(self, model: Model):
-        self.component_model = NexusTreeModel(model)
+        if int(environ.get("USE_NEW_TREE_STRUCT", 0)):
+            self.component_model = NexusTreeModel(model)
+        else:
+            self.component_model = ComponentTreeModel(model)
         self.component_delegate = ComponentEditorDelegate(
             self.component_tree_view, model
         )
