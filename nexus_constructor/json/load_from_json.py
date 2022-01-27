@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
@@ -64,6 +65,7 @@ CHILD_EXCLUDELIST = [
 class JSONReader:
     def __init__(self):
         self.entry_node: Group = None
+        self.tree_root: Group = None
         self.model = Model()
         self.sample_name: str = ""
         self.warnings = JsonWarningsContainer()
@@ -163,6 +165,7 @@ class JSONReader:
         self._fit_into_model()
         self._set_transforms_depends_on()
         self._set_components_depends_on()
+        self.model.entry_node = self.tree_root
         return True
 
     def _read_json_object(self, json_object: Dict, parent_node: Group = None):
@@ -291,6 +294,7 @@ class JSONReader:
         """
         Create model used in tree-view according to old implementation.
         """
+        self.tree_root = deepcopy(self.entry_node)
         instrument_group = self.entry_node[INSTRUMENT_NAME]
         if instrument_group:
             self._add_children_to_instrument(instrument_group.children)

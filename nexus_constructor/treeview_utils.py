@@ -243,6 +243,7 @@ def get_transformation_frame(frame: QFrame, model: Model, value: Transformation)
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
+# TODO: Remove this and use group instead.
 def get_component_info_frame(frame):
     frame.label = QLabel("", frame)
     frame.layout().addWidget(frame.label)
@@ -253,6 +254,26 @@ def get_transformations_list_frame(frame):
     frame.layout().addWidget(frame.label)
 
 
+# TODO: Remove this and use group instead.
 def get_component_frame(frame, value):
     frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
+    frame.layout().addWidget(frame.label)
+
+
+def get_group_info_frame(frame):
+    frame.label = QLabel("", frame)
+    frame.layout().addWidget(frame.label)
+
+
+def get_group_frame(frame, value):
+    frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
+    frame.layout().addWidget(frame.label)
+
+
+def get_module_info_frame(frame):
+    pass
+
+
+def get_module_frame(frame, value):
+    frame.label = QLabel(f"Module {value.writer_module}")
     frame.layout().addWidget(frame.label)

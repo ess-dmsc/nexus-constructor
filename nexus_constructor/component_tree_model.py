@@ -8,6 +8,7 @@ from PySide2.QtWidgets import QMessageBox
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.transformation import Transformation
@@ -20,6 +21,53 @@ class ComponentInfo(object):
     def __init__(self, parent: Component):
         super().__init__()
         self.parent = parent
+
+
+class NexusTreeModel(QAbstractItemModel):
+    def __init__(self, model: Model, parent=None):
+        super().__init__(parent)
+        self.model = model
+        self.tree_root = self.model.entry_node
+
+    def columnCount(self, parent: QModelIndex) -> int:
+        return 1
+
+    def parent(self, index: QModelIndex):
+        if index.isValid():
+            parent_item = index.internalPointer().parent_node
+            if parent_item:
+                return self.createIndex(index.row(), 0, parent_item)
+        return QModelIndex()
+
+    def data(self, index: QModelIndex, role: Qt.DisplayRole):
+        if not index.isValid():
+            return None
+        item = index.internalPointer()
+        if role == Qt.DisplayRole:
+            return item
+        elif role == Qt.SizeHintRole:
+            return
+
+    def index(self, row: int, column: int, parent: QModelIndex) -> QModelIndex:
+        if not self.hasIndex(row, column, parent):
+            return QModelIndex()
+        if not parent.isValid():
+            return self.createIndex(row, column, self.tree_root)
+        parent_item = parent.internalPointer()
+        return self.createIndex(row, column, parent_item.children[row])
+
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+
+    def rowCount(self, parent: QModelIndex) -> int:
+        if not parent.isValid():
+            return 1
+        else:
+            node = parent.internalPointer()
+            if isinstance(node, Group):
+                return node.number_of_children()
+            else:
+                return 0
 
 
 class ComponentTreeModel(QAbstractItemModel):
@@ -329,7 +377,7 @@ class ComponentTreeModel(QAbstractItemModel):
             )
         elif isinstance(parent_item, LinkTransformation):
             return self.createIndex(1, 0, parent_item.parent)
-        raise RuntimeError("Unknown element type.")
+        raise RuntimeError(f"Unknown element type: {type(parent_item)}.")
 
     def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
@@ -347,4 +395,4 @@ class ComponentTreeModel(QAbstractItemModel):
             parent_item, (Transformation, ComponentInfo, LinkTransformation)
         ):
             return 0
-        raise RuntimeError("Unknown element type.")
+        raise RuntimeError(f"Unknown element type: {type(parent_item)}.")

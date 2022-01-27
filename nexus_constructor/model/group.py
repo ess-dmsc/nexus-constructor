@@ -61,6 +61,37 @@ class Group:
     def __delitem__(self, key):
         _remove_item(self.children, key)
 
+    def number_of_children(self):
+        return len(self.children)
+
+    def tree_depth(self):
+        """
+        The depth of the tree.
+        """
+        return self._apply_function_to_tree_structure(max)
+
+    def tree_size(self):
+        """
+        Number of nodes in the tree structure.
+        """
+        return self._apply_function_to_tree_structure(sum)
+
+    def _apply_function_to_tree_structure(self, func):
+        if not self.children:
+            return 1
+        else:
+            return (
+                func(
+                    [
+                        child._apply_function_to_tree_structure(func)
+                        if isinstance(child, Group)
+                        else 1
+                        for child in self.children
+                    ]
+                )
+                + 1
+            )
+
     @property
     def absolute_path(self):
         return get_absolute_path(self)
