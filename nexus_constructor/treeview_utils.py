@@ -276,3 +276,4 @@ def get_module_info_frame(frame):
 
 def get_module_frame(frame, value):
     frame.label = QLabel(f"Module {value.writer_module}")
+    frame.layout().addWidget(frame.label)

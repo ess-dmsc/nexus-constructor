@@ -15,6 +15,7 @@ from nexus_constructor.component_tree_model import ComponentInfo, LinkTransforma
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import FileWriterModule
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.treeview_utils import (
@@ -23,6 +24,7 @@ from nexus_constructor.treeview_utils import (
     get_component_info_frame,
     get_group_frame,
     get_link_transformation_frame,
+    get_module_frame,
     get_transformation_frame,
     get_transformations_list_frame,
 )
@@ -66,6 +68,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             get_transformation_frame(frame, self.model, value)
         elif isinstance(value, LinkTransformation):
             get_link_transformation_frame(frame, self.model, value)
+        elif isinstance(value, FileWriterModule):
+            get_module_frame(frame, value)
         return frame
 
     def paint(

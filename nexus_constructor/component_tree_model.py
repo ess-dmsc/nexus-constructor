@@ -69,7 +69,7 @@ class NexusTreeModel(QAbstractItemModel):
             if isinstance(node, Group):
                 return node.number_of_children()
             else:
-                return 1
+                return 0
 
 
 class ComponentTreeModel(QAbstractItemModel):
