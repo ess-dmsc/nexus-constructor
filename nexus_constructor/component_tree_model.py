@@ -33,13 +33,11 @@ class NexusTreeModel(QAbstractItemModel):
         return 1
 
     def parent(self, index: QModelIndex):
-        if not index.isValid() or not index.internalPointer():
-            return QModelIndex()
-        if index.internalPointer() == self.tree_root:
-            return QModelIndex()
-        else:
+        if index.isValid():
             parent_item = index.internalPointer().parent_node
-            return self.createIndex(index.row(), 0, parent_item)
+            if parent_item:
+                return self.createIndex(index.row(), 0, parent_item)
+        return QModelIndex()
 
     def data(self, index: QModelIndex, role: Qt.DisplayRole):
         if not index.isValid():
