@@ -33,14 +33,12 @@ class NexusTreeModel(QAbstractItemModel):
         return 1
 
     def parent(self, index: QModelIndex):
-        if not index.isValid():
+        if not index.isValid() or not index.internalPointer():
             return QModelIndex()
-        if not index.internalPointer():
-            return QModelIndex()
-        parent_item = index.internalPointer().parent_node
         if index.internalPointer() == self.tree_root:
             return QModelIndex()
         else:
+            parent_item = index.internalPointer().parent_node
             return self.createIndex(index.row(), 0, parent_item)
 
     def data(self, index: QModelIndex, role: Qt.DisplayRole):
@@ -56,12 +54,9 @@ class NexusTreeModel(QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if not parent.isValid():
-            return self.createIndex(row, 0, self.tree_root)
-
+            return self.createIndex(row, column, self.tree_root)
         parent_item = parent.internalPointer()
-        if isinstance(parent_item, Group):
-            print(row, [child.name for child in parent_item.children])
-        return self.createIndex(row, 0, parent_item.children[row])
+        return self.createIndex(row, column, parent_item.children[row])
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
@@ -72,7 +67,6 @@ class NexusTreeModel(QAbstractItemModel):
         else:
             node = parent.internalPointer()
             if isinstance(node, Group):
-                print("nbr_children", node.number_of_children())
                 return node.number_of_children()
             else:
                 return 1
