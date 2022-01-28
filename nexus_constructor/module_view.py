@@ -1,15 +1,15 @@
 from PySide2.QtWidgets import QGroupBox, QVBoxLayout, QWidget
 
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import CommonAttrs, CommonKeys
 from nexus_constructor.field_utils import find_field_type
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import WriterModules
+from nexus_constructor.model.module import FileWriterModule, WriterModules
 from nexus_constructor.model.value_type import ValueTypes
 
 
 class ModuleView(QGroupBox):
-    def __init__(self, module, parent: QWidget, model: Model):
+    def __init__(self, module: FileWriterModule, parent: QWidget, model: Model):
         super().__init__(module.writer_module.upper(), parent)
         layout = QVBoxLayout()
         self.field_widget = FieldWidget()
@@ -25,7 +25,7 @@ class ModuleView(QGroupBox):
         if update_function is not None:
             update_function(module, self.field_widget)
         self.field_widget.name = module.name
-        if hasattr(module, "type") and not module.type:
+        if hasattr(module, CommonKeys.TYPE) and not module.type:
             self.field_widget.dtype = ValueTypes.STRING
         units = module.attributes.get_attribute_value(CommonAttrs.UNITS)
         if units:
