@@ -19,6 +19,7 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import FileWriterModule
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.module_view import ModuleView
 from nexus_constructor.transformation_view import (
@@ -275,7 +276,7 @@ def get_group_frame(frame, value):
     frame.layout().addWidget(frame.label)
 
 
-def get_module_frame(frame, value):
-    module_frame = ModuleView(value, frame)
+def get_module_frame(frame: QFrame, model: Model, value: FileWriterModule):
+    module_frame = ModuleView(value, frame, model)
     frame.module_frame = module_frame
     frame.layout().addWidget(frame.module_frame)

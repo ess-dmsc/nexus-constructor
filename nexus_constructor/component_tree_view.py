@@ -71,7 +71,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, LinkTransformation):
             get_link_transformation_frame(frame, self.model, value)
         elif isinstance(value, FileWriterModule):
-            get_module_frame(frame, value)
+            get_module_frame(frame, self.model, value)
         return frame
 
     def paint(
