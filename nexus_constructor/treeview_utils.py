@@ -277,4 +277,5 @@ def get_group_frame(frame, value):
 
 def get_module_frame(frame, value):
     module_frame = ModuleView(value, frame)
-    frame.layout().addWidget(module_frame)
+    frame.module_frame = module_frame
+    frame.layout().addWidget(frame.module_frame)

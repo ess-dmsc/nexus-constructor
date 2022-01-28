@@ -106,6 +106,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     ):
         if hasattr(editorWidget, TRANSFORMATION_FRAME):
             editorWidget.transformation_frame.save_all_changes()
+        else:
+            editorWidget.module_frame.save_module_changes()
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()
