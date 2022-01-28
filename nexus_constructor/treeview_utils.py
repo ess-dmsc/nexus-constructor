@@ -270,7 +270,10 @@ def get_group_info_frame(frame):
 
 
 def get_group_frame(frame, value):
-    frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
+    text = f"{value.name}"
+    if value.nx_class:
+        text += f" ({value.nx_class})"
+    frame.label = QLabel(text, frame)
     frame.layout().addWidget(frame.label)
 
 
