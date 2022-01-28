@@ -16,10 +16,13 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.field_utils import find_field_type
+from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformation_view import (
     EditRotation,
     EditTransformationLink,
@@ -28,6 +31,7 @@ from nexus_constructor.transformation_view import (
 from nexus_constructor.transformations_list import TransformationsList
 
 # We have to use this for cx freeze as __file__ does not work
+
 if getattr(sys, "frozen", False):
     root_dir = os.path.dirname(sys.executable)
 else:
@@ -270,10 +274,12 @@ def get_group_frame(frame, value):
     frame.layout().addWidget(frame.label)
 
 
-def get_module_info_frame(frame):
-    pass
-
-
 def get_module_frame(frame, value):
-    frame.label = QLabel(f"Module {value.writer_module}")
-    frame.layout().addWidget(frame.label)
+    field = FieldWidget()
+    update_function = find_field_type(value, [])
+    if update_function is not None:
+        update_function(value, field)
+    field.name = value.name
+    if hasattr(value, "type") and not value.type:
+        field.dtype = ValueTypes.STRING
+    frame.layout().addWidget(field)

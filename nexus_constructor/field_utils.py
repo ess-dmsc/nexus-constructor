@@ -80,8 +80,8 @@ def get_fields_with_update_functions(
     return items_with_update_functions
 
 
-def find_field_type(item: "ValueType") -> Callable:
-    if isinstance(item, Dataset) and item.name not in INVALID_FIELD_NAMES:
+def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Callable:
+    if isinstance(item, Dataset) and item.name not in ignore_names:
         if np.isscalar(item.values):
             return update_existing_scalar_field
         else:
