@@ -29,6 +29,8 @@ from nexus_constructor.treeview_utils import (
     get_transformations_list_frame,
 )
 
+TRANSFORMATION_FRAME = "transformation_frame"
+
 
 class ComponentEditorDelegate(QStyledItemDelegate):
     frameSize = QSize(30, 10)
@@ -69,7 +71,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, LinkTransformation):
             get_link_transformation_frame(frame, self.model, value)
         elif isinstance(value, FileWriterModule):
-            get_module_frame(frame, value)
+            get_module_frame(frame, self.model, value)
         return frame
 
     def paint(
@@ -93,7 +95,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
         frame = self.get_frame(value)
-        frame.transformation_frame.enable()
+        if hasattr(frame, TRANSFORMATION_FRAME):
+            frame.transformation_frame.enable()
         frame.setParent(parent)
         self.frameSize = frame.sizeHint()
         return frame
@@ -101,7 +104,10 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def setModelData(
         self, editorWidget: QWidget, model: QAbstractItemModel, index: QModelIndex
     ):
-        editorWidget.transformation_frame.save_all_changes()
+        if hasattr(editorWidget, TRANSFORMATION_FRAME):
+            editorWidget.transformation_frame.save_all_changes()
+        else:
+            editorWidget.module_frame.save_module_changes()
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()

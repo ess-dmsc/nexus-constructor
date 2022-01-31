@@ -19,7 +19,9 @@ from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.model import Model
+from nexus_constructor.model.module import FileWriterModule
 from nexus_constructor.model.transformation import Transformation
+from nexus_constructor.module_view import ModuleView
 from nexus_constructor.transformation_view import (
     EditRotation,
     EditTransformationLink,
@@ -28,6 +30,7 @@ from nexus_constructor.transformation_view import (
 from nexus_constructor.transformations_list import TransformationsList
 
 # We have to use this for cx freeze as __file__ does not work
+
 if getattr(sys, "frozen", False):
     root_dir = os.path.dirname(sys.executable)
 else:
@@ -266,14 +269,14 @@ def get_group_info_frame(frame):
 
 
 def get_group_frame(frame, value):
-    frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
+    text = f"{value.name}"
+    if value.nx_class:
+        text += f" ({value.nx_class})"
+    frame.label = QLabel(text, frame)
     frame.layout().addWidget(frame.label)
 
 
-def get_module_info_frame(frame):
-    pass
-
-
-def get_module_frame(frame, value):
-    frame.label = QLabel(f"Module {value.writer_module}")
-    frame.layout().addWidget(frame.label)
+def get_module_frame(frame: QFrame, model: Model, value: FileWriterModule):
+    module_frame = ModuleView(value, frame, model)
+    frame.module_frame = module_frame
+    frame.layout().addWidget(frame.module_frame)
