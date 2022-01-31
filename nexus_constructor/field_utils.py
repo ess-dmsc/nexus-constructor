@@ -27,6 +27,7 @@ def update_existing_link_field(field: Link, new_ui_field: "QFrame"):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.link
+    new_ui_field.name = field.name
     new_ui_field.value = field.source
 
 

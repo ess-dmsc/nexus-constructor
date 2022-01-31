@@ -20,12 +20,13 @@ class ModuleView(QGroupBox):
 
     def _set_existing_items(self):
         module = self.module
-        if self.module.writer_module == WriterModules.DATASET.value:
+        if (
+            self.module.writer_module == WriterModules.DATASET.value
+            or self.module.writer_module == WriterModules.LINK.value
+        ):
             update_function = find_field_type(module, [])
             if update_function is not None:
                 update_function(module, self.field_widget)
-        elif self.module.writer_module == WriterModules.LINK.value:
-            pass
         else:
             update_function = find_field_type(module.parent_node, [])
             if update_function is not None:
@@ -40,7 +41,8 @@ class ModuleView(QGroupBox):
                 CommonAttrs.UNITS, self.field_widget.units
             )
         elif self.module.writer_module == WriterModules.LINK.value:
-            pass
+            self.module.source = self.field_widget.value.source  # type: ignore
+            self.module.name = self.field_widget.name
         else:
             self.module.parent_node.name = self.field_widget.name
             self.module.type = self.field_widget.dtype
