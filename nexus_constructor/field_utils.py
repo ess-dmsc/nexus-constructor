@@ -8,15 +8,23 @@ from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.module import (
+    Dataset,
+    FileWriterModule,
+    Link,
+    StreamModule,
+    WriterModules,
+)
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
     from PySide2.QtWidgets import QFrame  # noqa: F401
 
+    from nexus_constructor.model.model import Model  # noqa: F401
     from nexus_constructor.model.module import HS00Stream  # noqa: F401
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
+    from nexus_constructor.module_view import ModuleView  # noqa: F401
     from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
 
 
@@ -112,3 +120,23 @@ def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Call
             f"Object {item} not handled as field - could be used for other parts of UI instead"
         )
     return None
+
+
+def save_module_changes(module_view: "ModuleView", model: "Model"):
+    ui_field = module_view.field_widget
+    field = module_view.module
+    if field.writer_module == WriterModules.DATASET.value:
+        field.name = ui_field.name
+        field.values = ui_field.value
+        field.type = ui_field.dtype
+        field.attributes.set_attribute_value(CommonAttrs.UNITS, ui_field.units)
+    elif field.writer_module == WriterModules.LINK.value:
+        pass
+    else:
+        field.parent_node.name = ui_field.name
+        field.type = ui_field.dtype
+        field.parent_node.attributes.set_attribute_value(
+            CommonAttrs.UNITS, ui_field.units
+        )
+        field.parent_node.attributes.type = ui_field.dtype
+    model.signals.module_changed.emit()

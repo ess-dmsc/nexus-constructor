@@ -12,6 +12,7 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
+from nexus_constructor.field_utils import save_module_changes
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
@@ -71,7 +72,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, LinkTransformation):
             get_link_transformation_frame(frame, self.model, value)
         elif isinstance(value, FileWriterModule):
-            get_module_frame(frame, self.model, value)
+            get_module_frame(frame, value)
         return frame
 
     def paint(
@@ -107,7 +108,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         if hasattr(editorWidget, TRANSFORMATION_FRAME):
             editorWidget.transformation_frame.save_all_changes()
         else:
-            editorWidget.module_frame.save_module_changes()
+            # editorWidget.module_frame.save_module_changes()
+            save_module_changes(editorWidget.module_frame, self.model)
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()
