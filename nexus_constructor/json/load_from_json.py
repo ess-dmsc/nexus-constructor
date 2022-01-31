@@ -42,6 +42,7 @@ from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     Dataset,
     FileWriterModule,
+    StreamModule,
     WriterModules,
     create_fw_module_object,
 )
@@ -201,7 +202,9 @@ class JSONReader:
             if CommonKeys.CHILDREN in json_object:
                 for child in json_object[CommonKeys.CHILDREN]:
                     node = self._read_json_object(child, nexus_object)
-                    if node and node.name not in nexus_object:
+                    if node and isinstance(node, StreamModule):
+                        nexus_object.children.append(node)
+                    elif node and node.name not in nexus_object:
                         nexus_object[node.name] = node
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]

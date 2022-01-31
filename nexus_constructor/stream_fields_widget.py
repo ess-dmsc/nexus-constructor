@@ -16,7 +16,7 @@ from PySide2.QtWidgets import (
     QSpinBox,
 )
 
-from nexus_constructor.common_attrs import ARRAY, SCALAR
+from nexus_constructor.common_attrs import ARRAY, LOG_NX_CLASS, SCALAR
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
@@ -325,6 +325,7 @@ class StreamFieldsWidget(QDialog):
         elif current_schema == WriterModules.TDCTIME.value:
             stream = TDCTStream(parent_node=stream_group, source=source, topic=topic)
         stream_group[group_name] = stream
+        stream_group.nx_class = LOG_NX_CLASS
 
         return stream_group
 

@@ -40,7 +40,7 @@ class WriterModules(Enum):
 class FileWriterModule(ABC):
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     writer_module = attr.ib(type=str, init=False)
-    parent_node = attr.ib(type=NodeType.GROUP)
+    parent_node = attr.ib(type=Group)
 
     def as_dict(self, error_collector: List[str]):
         raise NotImplementedError
