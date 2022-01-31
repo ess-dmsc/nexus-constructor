@@ -34,7 +34,7 @@ class ModuleView(QGroupBox):
     def save_module_changes(self):
         if self.module.writer_module == WriterModules.DATASET.value:
             self.module.name = self.field_widget.name
-            self.module.values = self.field_widget.value
+            self.module.values = self.field_widget.value.values
             self.module.type = self.field_widget.dtype
             self.module.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
@@ -47,5 +47,5 @@ class ModuleView(QGroupBox):
             self.module.parent_node.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
             )
-            self.module.parent_node.attributes.type = self.field_widget.dtype
+
         self.model.signals.module_changed.emit()
