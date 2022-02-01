@@ -113,12 +113,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 )
             if success:
                 self.model.entry = reader.model.entry
-                self.model.entry_node = reader.model.entry_node
                 self._update_views()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
-        for component in self.model.entry.instrument.get_components():
+        for component in self.model.get_components():
             self.sceneWidget.add_transformation(component)
 
     def _update_views(self):
@@ -128,7 +127,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.model.entry.instrument.get_components():
+        for component in self.model.get_components():
             self.sceneWidget.add_component(component)
             self.sceneWidget.add_transformation(component)
 

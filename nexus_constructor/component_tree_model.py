@@ -27,7 +27,8 @@ class NexusTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.tree_root = self.model.entry_node
+        self.components = self.model.get_components()
+        self.tree_root = self.model.entry
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -74,7 +75,7 @@ class ComponentTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.components = self.model.entry.instrument.get_components()
+        self.components = self.model.get_components()
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
