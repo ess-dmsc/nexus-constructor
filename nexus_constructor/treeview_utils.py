@@ -15,7 +15,7 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.common_attrs import TransformationType
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
@@ -195,7 +195,7 @@ def handle_number_of_items_selected_is_not_one(
 def expand_transformation_list(
     node: QModelIndex,
     component_tree_view: QTreeView,
-    component_model: ComponentTreeModel,
+    component_model: NexusTreeModel,
 ):
     current_pointer = node.internalPointer()
     if isinstance(current_pointer, TransformationsList) or isinstance(
@@ -218,7 +218,7 @@ def expand_transformation_list(
 def add_transformation(
     transformation_type: str,
     component_tree_view: QTreeView,
-    component_model: ComponentTreeModel,
+    component_model: NexusTreeModel,
 ):
     selected = component_tree_view.selectedIndexes()
     if len(selected) > 0:

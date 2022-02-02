@@ -6,7 +6,7 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QFrame, QToolBar, QTreeView, QVBoxLayout, QWidget
 
 from nexus_constructor.common_attrs import TransformationType
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
 from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset

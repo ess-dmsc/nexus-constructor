@@ -3,7 +3,7 @@ from mock import Mock
 from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from tests.test_utils import NX_CLASS_DEFINITIONS

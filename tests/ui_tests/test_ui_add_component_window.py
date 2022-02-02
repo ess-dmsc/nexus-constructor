@@ -14,7 +14,7 @@ from pytestqt.qtbot import QtBot
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.pixel_data_utils import PIXEL_FIELDS
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
@@ -28,7 +28,6 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNoNexus,
 )
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.instrument import Instrument
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import F142Stream, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
