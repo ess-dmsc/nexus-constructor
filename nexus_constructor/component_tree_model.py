@@ -268,7 +268,7 @@ class NexusTreeModel(QAbstractItemModel):
         for transform in transforms:
             transform.remove_from_dependee_chain()
         self.components.remove(component)
-        del self.model.entry.instrument[component.name]
+        del self.model.entry[component.name]
         self.endRemoveRows()
         self.model.signals.component_removed.emit(component.name)
 
