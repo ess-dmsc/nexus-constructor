@@ -8,9 +8,10 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget, QListWidgetItem
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
+    COMPONENT_TYPES,
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
 )
@@ -31,6 +32,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Link
 from nexus_constructor.pixel_options import PixelOptions
@@ -77,7 +79,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     def __init__(
         self,
         model: Model,
-        component_model: ComponentTreeModel,
+        component_model: NexusTreeModel,
         component_to_edit: Component = None,
         nx_classes=None,
         parent=None,
@@ -88,7 +90,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if parent:
             self.setParent(parent)
         self.signals = model.signals
-        self.instrument = model.entry.instrument
+        self.model = model
         self.component_model = component_model
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
@@ -133,7 +135,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        component_list = self.instrument.get_components()
+        component_list = self.model.get_components()
         if self.component_to_edit:
             for item in component_list:
                 if item.name == self.component_to_edit.name:
@@ -343,7 +345,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         return generate_unique_name(
             self.componentTypeComboBox.currentText().lstrip("NX"),
-            self.instrument.get_components(),
+            self.model.get_components(),
         )
 
     def on_nx_class_changed(self):
@@ -482,39 +484,43 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 component_name, description, nx_class, pixel_data
             )
 
-        self.signals.component_added.emit(component)
+        if isinstance(component, Component):
+            self.signals.component_added.emit(component)
 
         if self.component_to_edit:
             self.signals.transformation_changed.emit()
 
     def create_new_component(
         self,
-        component_name: str,
+        nexus_obj_name: str,
         description: str,
         nx_class: str,
         pixel_data: PixelData,
     ):
         """
         Creates a new component.
-        :param component_name: The name of the component.
+        :param nexus_obj_name: The name of the component.
         :param description: The component description.
         :param nx_class: The component class.
         :param pixel_data: The PixelData for the component. Will be None if it was not given of if the component type
             doesn't have pixel-related fields.
         :return: The geometry object.
         """
-
-        component = Component(name=component_name, parent_node=self.instrument)
-        component.nx_class = nx_class
-        component.description = description
+        if nx_class in COMPONENT_TYPES:
+            nexus_object = Component(name=nexus_obj_name, parent_node=None)
+        else:
+            nexus_object = Group(name=nexus_obj_name, parent_node=None)
+        nexus_object.nx_class = nx_class
+        if description:
+            nexus_object.description = description
         # Add shape information
-        self.generate_geometry_model(component, pixel_data)
+        if isinstance(nexus_object, Component):
+            self.generate_geometry_model(nexus_object, pixel_data)
+            self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
+        add_fields_to_component(nexus_object, self.fieldsListWidget)
 
-        self.write_pixel_data_to_component(component, nx_class, pixel_data)
-        add_fields_to_component(component, self.fieldsListWidget)
-
-        self.component_model.add_component(component)
-        return component
+        self.component_model.add_group(nexus_object)
+        return nexus_object
 
     def edit_existing_component(
         self,

@@ -1,4 +1,5 @@
 import logging
+from typing import Optional, Tuple, Union
 
 import PySide2.QtGui
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
@@ -10,7 +11,7 @@ from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import Dataset
+from nexus_constructor.model.module import Dataset, FileWriterModule
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -29,6 +30,9 @@ class NexusTreeModel(QAbstractItemModel):
         self.model = model
         self.components = self.model.get_components()
         self.tree_root = self.model.entry
+        self.current_nxs_obj: Optional[
+            Tuple[Union[Group, FileWriterModule], QModelIndex]
+        ] = (None, None)
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -44,6 +48,7 @@ class NexusTreeModel(QAbstractItemModel):
         if not index.isValid():
             return None
         item = index.internalPointer()
+        self.current_nxs_obj = (item, index)
         if role == Qt.DisplayRole:
             return item
         elif role == Qt.SizeHintRole:
@@ -60,6 +65,9 @@ class NexusTreeModel(QAbstractItemModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
 
+    def supportedDropActions(self) -> PySide2.QtCore.Qt.DropActions:
+        return Qt.DropAction.MoveAction
+
     def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
             return 1
@@ -69,6 +77,17 @@ class NexusTreeModel(QAbstractItemModel):
                 return node.number_of_children()
             else:
                 return 0
+
+    def add_group(self, new_group: Group):
+        parent_node, pointer = self.current_nxs_obj
+        self.beginInsertRows(
+            pointer, parent_node.number_of_children(), parent_node.number_of_children()
+        )
+        if isinstance(new_group, Component):
+            self.components.append(new_group)
+        parent_node.children.append(new_group)
+        new_group.parent_node = parent_node
+        self.endInsertRows()
 
 
 class ComponentTreeModel(QAbstractItemModel):
