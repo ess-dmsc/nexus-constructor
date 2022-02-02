@@ -42,7 +42,7 @@
 			If desired the location of the slit can also be described relative to
 			an NXbeam, which will allow a simple description of a non-centred slit.
 
-			The reference plane of the slit is orhogonal to the z axis and includes the
+			The reference plane of the slit is orthogonal to the z axis and includes the
 			surface that is the entry surface of the slit. The reference point of the slit
 			is the centre of the slit opening in the x and y axis on the reference plane.
 			The reference point on the z axis is the reference plane.
