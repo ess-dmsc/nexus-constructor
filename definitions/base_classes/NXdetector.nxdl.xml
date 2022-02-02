@@ -824,7 +824,7 @@
       in the origin.
 
       The reference point of the detector is the center of the first pixel.
-      In complex geometries the NXoff_geometry groups can be used to provide an umabigous reference.
+      In complex geometries the NXoff_geometry groups can be used to provide an unambiguous reference.
     </doc>
   </field>
   <group type="NXtransformations">
