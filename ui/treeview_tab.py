@@ -50,7 +50,7 @@ class ComponentTreeViewTab(QWidget):
         self.component_tool_bar = QToolBar("Actions", self)
         self.new_component_action = create_and_add_toolbar_action(
             "new_component.png",
-            "Component",
+            "Group",
             self.parent().show_add_component_window,
             self.component_tool_bar,
             self,
@@ -114,6 +114,7 @@ class ComponentTreeViewTab(QWidget):
     def _set_button_state(self):
         set_button_states(
             self.component_tree_view,
+            self.new_component_action,
             self.delete_action,
             self.new_rotation_action,
             self.new_translation_action,

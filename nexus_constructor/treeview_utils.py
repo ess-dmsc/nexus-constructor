@@ -18,6 +18,7 @@ from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import ComponentTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import FileWriterModule
 from nexus_constructor.model.transformation import Transformation
@@ -69,6 +70,7 @@ def create_and_add_toolbar_action(
 
 def set_button_states(
     component_tree_view: QTreeView,
+    new_component_action: QAction,
     delete_action: QAction,
     new_rotation_action: QAction,
     new_translation_action: QAction,
@@ -89,6 +91,7 @@ def set_button_states(
     selection_indices = component_tree_view.selectedIndexes()
     if len(selection_indices) != 1:
         handle_number_of_items_selected_is_not_one(
+            new_component_action,
             create_link_action,
             delete_action,
             new_rotation_action,
@@ -99,27 +102,37 @@ def set_button_states(
     else:
         selected_object = selection_indices[0].internalPointer()
         selected_object_is_component = isinstance(selected_object, Component)
+        selected_object_is_group = isinstance(selected_object, Group)
+        selected_object_is_not_group_or_fw_module = isinstance(
+            selected_object, Component
+        ) or not isinstance(selected_object, (Group, FileWriterModule))
         set_enabled_and_raise(zoom_action, selected_object_is_component)
 
-        selected_object_is_component_or_transform = isinstance(
-            selected_object, (Component, Transformation)
+        selected_object_is_nexus_object_or_transform = isinstance(
+            selected_object, (Component, Group, FileWriterModule, Transformation)
         )
-        set_enabled_and_raise(edit_component_action, selected_object_is_component)
+        set_enabled_and_raise(new_component_action, selected_object_is_group)
+        set_enabled_and_raise(edit_component_action, selected_object_is_group)
 
         selected_object_is_not_link_transform = not isinstance(
             selected_object, LinkTransformation
         )
+
         set_enabled_and_raise(
-            new_rotation_action, selected_object_is_not_link_transform
+            new_rotation_action,
+            selected_object_is_not_link_transform
+            and selected_object_is_not_group_or_fw_module,
         )
 
         set_enabled_and_raise(
-            new_translation_action, selected_object_is_not_link_transform
+            new_translation_action,
+            selected_object_is_not_link_transform
+            and selected_object_is_not_group_or_fw_module,
         )
 
         set_enabled_and_raise(
             delete_action,
-            selected_object_is_component_or_transform
+            selected_object_is_nexus_object_or_transform
             or not selected_object_is_not_link_transform,
         )
         if isinstance(selected_object, Component):

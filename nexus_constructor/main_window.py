@@ -183,7 +183,7 @@ class QDialogCustom(QDialog):
         if not self._is_accepting_component:
             event.accept()
             return
-        quit_msg = "Do you want to close the component editor?"
+        quit_msg = "Do you want to close the group editor?"
         reply = QMessageBox.question(
             self,
             "Really quit?",

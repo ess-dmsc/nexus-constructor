@@ -105,19 +105,6 @@ class Component(Group):
             new_depends_on.register_dependent(self)
 
     @property
-    def description(self) -> str:
-        try:
-            return self.get_field_value(CommonAttrs.DESCRIPTION)
-        except AttributeError:
-            return ""
-
-    @description.setter
-    def description(self, new_description: str):
-        self.set_field_value(
-            CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING
-        )
-
-    @property
     def qtransform(self) -> QTransform:
         """
         Creates a QTransform based on the full chain of transforms this component points to.

@@ -147,8 +147,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             partial(
                 validate_line_edit,
                 self.nameLineEdit,
-                tooltip_on_accept="Component name is valid.",
-                tooltip_on_reject="Component name is not valid. Suggestion: ",
+                tooltip_on_accept="Group name is valid.",
+                tooltip_on_reject="Group name is not valid. Suggestion: ",
                 suggestion_callable=self.generate_name_suggestion,
             )
         )
@@ -181,10 +181,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         if self.component_to_edit:
-            parent_dialog.setWindowTitle(
-                f"Edit Component: {self.component_to_edit.name}"
-            )
-            self.ok_button.setText("Edit Component")
+            parent_dialog.setWindowTitle(f"Edit group: {self.component_to_edit.name}")
+            self.ok_button.setText("Edit group")
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
@@ -267,7 +265,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
-        self.__fill_existing_shape_info()
+        if isinstance(self.component_to_edit, Component):
+            self.__fill_existing_shape_info()
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
@@ -545,11 +544,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.component_to_edit.children = []
             self.component_to_edit.name = component_name
             self.component_to_edit.nx_class = nx_class
+        if description:
             self.component_to_edit.description = description
-
-        self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
+        if isinstance(self.component_to_edit, Component):
+            self.write_pixel_data_to_component(
+                self.component_to_edit, nx_class, pixel_data
+            )
+            self.generate_geometry_model(self.component_to_edit, pixel_data)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
-        self.generate_geometry_model(self.component_to_edit, pixel_data)
         return self.component_to_edit if self.component_to_edit else None
 
     @staticmethod
