@@ -48,43 +48,38 @@ def create_component_tree_model(
     components: Optional[List[Component]] = None,
 ) -> Tuple[ComponentTreeModel, Entry]:
     model = Model()
-    component_model = ComponentTreeModel(model)
-    # remove sample component for purposes of tests
-    component_model.remove_node(
-        component_model.createIndex(0, 0, component_model.components[0])
-    )
     if components is not None:
         for component in components:
-            component_model.add_component(component)
+            model.entry.children.append(component)
+            model.append_component(component)
+            component.parent_node = model.entry
+    component_model = ComponentTreeModel(model)
 
     return component_model, model.entry
 
 
-def test_number_of_components_0():
+def test_number_of_groups_0():
     test_component_tree_model, _ = create_component_tree_model()
-    test_index = QModelIndex()
+    test_index = test_component_tree_model.index(0, 0, QModelIndex())
     assert test_component_tree_model.rowCount(test_index) == 0
 
 
-def test_number_of_components_1():
+def test_number_of_groups_1():
     test_component_tree_model, _ = create_component_tree_model([get_component()])
-
-    test_index = QModelIndex()
-
+    test_index = test_component_tree_model.index(0, 0, QModelIndex())
     assert test_component_tree_model.rowCount(test_index) == 1
 
 
-def test_number_of_components_2():
+def test_number_of_groups_2():
     test_component_tree_model, _ = create_component_tree_model(
         [get_component(), get_component()]
     )
-
-    test_index = QModelIndex()
+    test_index = test_component_tree_model.index(0, 0, QModelIndex())
 
     assert test_component_tree_model.rowCount(test_index) == 2
 
 
-def test_component_has_2_rows():
+def test_component_has_0_rows():
     test_component_tree_model, test_instrument = create_component_tree_model(
         [get_component()]
     )
@@ -93,26 +88,10 @@ def test_component_has_2_rows():
         0, 0, test_instrument.children[0]
     )
 
-    assert test_component_tree_model.rowCount(test_index) == 2
-
-
-def test_transformation_list_has_0_rows():
-    test_component_tree_model, test_instrument = create_component_tree_model(
-        [get_component()]
-    )
-
-    test_instrument.children[0].stored_transforms = test_instrument.children[
-        0
-    ].transforms
-
-    test_index = test_component_tree_model.createIndex(
-        0, 0, test_instrument.children[0].stored_transforms
-    )
-
     assert test_component_tree_model.rowCount(test_index) == 0
 
 
-def test_transformation_list_has_1_rows():
+def test_transformation_list_has_0_rows():
     component = get_component()
     translation = component.add_translation(QVector3D(1.0, 0.0, 0.0))
     component.depends_on = translation
@@ -123,7 +102,7 @@ def test_transformation_list_has_1_rows():
         0, 0, component.stored_transforms
     )
 
-    assert test_component_tree_model.rowCount(test_index) == 1
+    assert test_component_tree_model.rowCount(test_index) == 0
 
 
 def test_transformation_has_0_rows():
@@ -154,15 +133,6 @@ def test_transformation_link_has_0_rows():
     assert test_component_tree_model.rowCount(test_index) == 0
 
 
-def test_rowCount_gets_unknown_type():
-    test_component_tree_model, _ = create_component_tree_model()
-
-    test_index = test_component_tree_model.createIndex(0, 0, {})
-
-    with pytest.raises(RuntimeError):
-        test_component_tree_model.rowCount(test_index)
-
-
 def test_get_default_parent():
     test_component_tree_model, _ = create_component_tree_model()
 
@@ -179,8 +149,9 @@ def test_get_component_parent():
     test_index = test_component_tree_model.createIndex(
         0, 0, test_instrument.children[0]
     )
+    index = test_component_tree_model.index(0, 0, QModelIndex())
 
-    assert test_component_tree_model.parent(test_index) == QModelIndex()
+    assert test_component_tree_model.parent(test_index) == index
 
 
 def test_get_transform_list_parent():
@@ -368,19 +339,17 @@ def test_get_flags_other():
     )
 
 
-def test_add_component():
+def test_add_group():
     test_component_tree_model, _ = create_component_tree_model()
-
-    assert test_component_tree_model.rowCount(QModelIndex()) == 0
-    test_component_tree_model.add_component(get_component())
-
     assert test_component_tree_model.rowCount(QModelIndex()) == 1
+    test_component_tree_model.add_group(get_component())
+    index = test_component_tree_model.index(0, 0, QModelIndex())
+    assert test_component_tree_model.rowCount(index) == 1
 
 
 def test_add_rotation():
     test_component_tree_model, _ = create_component_tree_model()
-
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
@@ -393,7 +362,7 @@ def test_add_rotation():
 def test_add_translation():
     test_component_tree_model, _ = create_component_tree_model()
 
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
@@ -406,7 +375,7 @@ def test_add_translation():
 def test_add_transformation_alt_1():
     test_component_tree_model, _ = create_component_tree_model()
 
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
@@ -417,7 +386,7 @@ def test_add_transformation_alt_1():
 def test_add_transformation_alt_2():
     test_component_tree_model, _ = create_component_tree_model()
 
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     test_component_tree_model.add_translation(transformation_list_index)
@@ -430,7 +399,7 @@ def test_add_transformation_alt_2():
 def test_add_link_alt_1():
     test_component_tree_model, _ = create_component_tree_model()
 
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
@@ -443,7 +412,7 @@ def test_add_link_alt_1():
 def test_add_link_alt_2():
     test_component_tree_model, _ = create_component_tree_model()
 
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
@@ -456,7 +425,7 @@ def test_add_link_alt_2():
 def test_add_link_alt_3():
     test_component_tree_model, _ = create_component_tree_model()
 
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     test_component_tree_model.add_rotation(component_index)
@@ -471,7 +440,7 @@ def test_add_link_alt_3():
 def test_add_link_multiple_times():
     test_component_tree_model, _ = create_component_tree_model()
 
-    test_component_tree_model.add_component(get_component())
+    test_component_tree_model.add_group(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
     assert test_component_tree_model.rowCount(transformation_list_index) == 0
@@ -486,7 +455,7 @@ def test_add_link_multiple_times():
 
 def test_remove_component(model):
     test_component_tree_model = ComponentTreeModel(model)
-    test_component_tree_model.add_component(Component(name="Some name"))
+    test_component_tree_model.add_group(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     # Should be 2 components as the sample counts as 1
     assert test_component_tree_model.rowCount(QModelIndex()) == 2
@@ -497,7 +466,7 @@ def test_remove_component(model):
 
 def test_remove_component_with_transformation(model):
     test_component_tree_model = ComponentTreeModel(model)
-    test_component_tree_model.add_component(Component(name="Some name"))
+    test_component_tree_model.add_group(Component(name="Some name"))
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     test_component_tree_model.add_rotation(component_index)
     # Should be 2 components as the sample counts as 1
@@ -512,7 +481,7 @@ def test_remove_component_with_transformation(model):
 
 def test_remove_transformation(model):
     test_component_tree_model = ComponentTreeModel(model)
-    model.entry.instrument.children.append(get_component())
+    model.entry.children.append(get_component())
     component_index = test_component_tree_model.index(0, 0, QModelIndex())
     test_component_tree_model.add_rotation(component_index)
     transformation_list_index = test_component_tree_model.index(1, 0, component_index)
@@ -526,10 +495,12 @@ def test_remove_transformation(model):
 
 def test_remove_link(model):
     test_component_tree_model = ComponentTreeModel(model)
-    model.entry.instrument.children.append(get_component())
-    component_index = test_component_tree_model.index(0, 0, QModelIndex())
+    model.entry.children.append(get_component())
+    component_index_m = test_component_tree_model.index(0, 0, QModelIndex())
+    component_index = test_component_tree_model.index(0, 0, component_index_m)
     test_component_tree_model.add_link(component_index)
-    transformation_list_index = test_component_tree_model.index(1, 0, component_index)
+    transformation_list_index = test_component_tree_model.index(1, 0, component_index_m)
+    print(transformation_list_index.internalPointer())
     transformation_index = test_component_tree_model.index(
         0, 0, transformation_list_index
     )

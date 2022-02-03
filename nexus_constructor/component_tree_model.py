@@ -31,7 +31,7 @@ class NexusTreeModel(QAbstractItemModel):
         self.tree_root = self.model.entry
         self.current_nxs_obj: Optional[
             Tuple[Union[Group, FileWriterModule], QModelIndex]
-        ] = (None, None)
+        ] = (self.model.entry, None)
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
@@ -86,6 +86,8 @@ class NexusTreeModel(QAbstractItemModel):
 
     def add_group(self, new_group: Group):
         parent_node, pointer = self.current_nxs_obj
+        if isinstance(parent_node, FileWriterModule):
+            return
         self.beginInsertRows(
             pointer, parent_node.number_of_children(), parent_node.number_of_children()
         )
