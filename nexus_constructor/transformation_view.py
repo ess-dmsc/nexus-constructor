@@ -157,7 +157,7 @@ class EditTransformationLink(QFrame):
         super().__init__(parent)
         self.link = link
         self.signals = model.signals
-        self.instrument = model.entry.instrument
+        self.model = model
         self.link_frame = Ui_Link()
         self.link_frame.setupUi(self)
         self.populate_combo_box()
@@ -168,7 +168,7 @@ class EditTransformationLink(QFrame):
         self.link_frame.transformations_combo_box.clear()
         self.link_frame.transformations_combo_box.addItem("(None)", userData=None)
         self.link_frame.transformations_combo_box.setCurrentIndex(0)
-        components = self.instrument.get_components()
+        components = self.model.get_components()
         for current_component in components:
             transformations = current_component.transforms
             self.link_frame.transformations_combo_box.addItem(

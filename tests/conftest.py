@@ -3,8 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from nexus_constructor.main_window import QDialogCustom as QDialog
-from nexus_constructor.model.instrument import Instrument
-from nexus_constructor.model.model import Model
+from nexus_constructor.model.model import Entry, Model
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import PixelValidator
 from tests.geometry.chopper_test_helpers import chopper_details  # noqa: F401
@@ -18,8 +17,8 @@ def template(qtbot) -> QDialog:
 
 
 @pytest.fixture(scope="function")
-def instrument() -> Instrument:
-    return Instrument()
+def entry() -> Entry:
+    return Entry()
 
 
 @pytest.fixture(scope="function")

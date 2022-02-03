@@ -4,13 +4,10 @@ import pytest
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.component_tree_model import (
-    ComponentInfo,
-    ComponentTreeModel,
-    LinkTransformation,
-)
+from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
+from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.entry import Instrument
+from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
@@ -49,7 +46,7 @@ def get_component():
 
 def create_component_tree_model(
     components: Optional[List[Component]] = None,
-) -> Tuple[ComponentTreeModel, Instrument]:
+) -> Tuple[ComponentTreeModel, Entry]:
     model = Model()
     component_model = ComponentTreeModel(model)
     # remove sample component for purposes of tests
@@ -60,7 +57,7 @@ def create_component_tree_model(
         for component in components:
             component_model.add_component(component)
 
-    return component_model, model.entry.instrument
+    return component_model, model.entry
 
 
 def test_number_of_components_0():
