@@ -59,6 +59,8 @@ class NexusTreeModel(QAbstractItemModel):
         if not parent.isValid():
             return self.createIndex(row, column, self.tree_root)
         parent_item = parent.internalPointer()
+        if isinstance(parent_item, Component):
+            return self.createIndex(row, column, parent_item.stored_items[row])
         return self.createIndex(row, column, parent_item.children[row])
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
@@ -161,7 +163,11 @@ class NexusTreeModel(QAbstractItemModel):
         )
 
         new_transformation.parent_component = parent_component
-        self.beginInsertRows(target_index, target_pos, target_pos)
+        self.beginInsertRows(
+            target_index,
+            parent_component.number_of_children(),
+            parent_component.number_of_children(),
+        )
         transformation_list.insert(target_pos, new_transformation)
         self.endInsertRows()
         parent_component.depends_on = transformation_list[0]

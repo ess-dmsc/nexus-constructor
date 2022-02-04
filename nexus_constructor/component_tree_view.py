@@ -20,9 +20,8 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.treeview_utils import (
     fill_selection,
-    get_component_frame,
-    get_component_info_frame,
     get_group_frame,
+    get_group_info_frame,
     get_link_transformation_frame,
     get_module_frame,
     get_transformation_frame,
@@ -58,14 +57,12 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.setLayout(QVBoxLayout())
         frame.layout().setContentsMargins(0, 0, 0, 0)
 
-        if isinstance(value, Component):
-            get_component_frame(frame, value)
-        elif isinstance(value, Group):
+        if isinstance(value, Group):
             get_group_frame(frame, value)
         elif isinstance(value, TransformationsList):
             get_transformations_list_frame(frame)
         elif isinstance(value, ComponentInfo):  # TODO: Call this GroupInfo.
-            get_component_info_frame(frame)
+            get_group_info_frame(frame, value)
         elif isinstance(value, Transformation):
             get_transformation_frame(frame, self.model, value)
         elif isinstance(value, LinkTransformation):
