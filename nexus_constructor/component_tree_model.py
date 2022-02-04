@@ -87,17 +87,16 @@ class NexusTreeModel(QAbstractItemModel):
                 return 0
 
     def add_group(self, new_group: Group):
-        parent_node, pointer = self.current_nxs_obj
-        if isinstance(parent_node, FileWriterModule):
-            return
-        self.beginInsertRows(
-            pointer, parent_node.number_of_children(), parent_node.number_of_children()
-        )
+        parent_node, _ = self.current_nxs_obj
+        # pointer = self.createIndex(parent_node.number_of_children(), 0, parent_node)
+        # self.beginInsertRows(
+        #     pointer, parent_node.number_of_children(), parent_node.number_of_children()
+        # )
         if isinstance(new_group, Component):
             self.components.append(new_group)
         parent_node.children.append(new_group)
         new_group.parent_node = parent_node
-        self.endInsertRows()
+        # self.endInsertRows()
 
     @staticmethod
     def _get_row_of_child(row_child):
@@ -112,7 +111,7 @@ class NexusTreeModel(QAbstractItemModel):
         parent_node, pointer = self.current_nxs_obj
         if isinstance(parent_node, FileWriterModule):
             parent_node = parent_node.parent_node
-            idx = self._get_row_of_child(parent_node)
+            idx = self._get_row_of_child(new_module)
             if idx == -1:
                 idx = parent_node.number_of_children()
             pointer = self.createIndex(idx, 0, parent_node)

@@ -35,7 +35,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import FileWriterModule, Link
+from nexus_constructor.model.module import Link
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,
@@ -555,10 +555,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.generate_geometry_model(self.component_to_edit, pixel_data)
         for child in children_copy:
             child.parent_node = self.component_to_edit
-            if isinstance(child, FileWriterModule):
-                self.component_model.add_module(child)
-            elif isinstance(child, Group):
-                self.component_model.add_group(child)
+            # if isinstance(child, FileWriterModule):
+            #     self.component_model.add_module(child)
+            # elif isinstance(child, Group):
+            #     self.component_model.add_group(child)
+            self.component_to_edit.children.append(child)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         return self.component_to_edit if self.component_to_edit else None
 
@@ -648,7 +649,6 @@ def get_fields_and_update_functions_for_component(component: Component):
 def add_fields_to_component(
     component: Group,
     fields_widget: QListWidget,
-    component_model: NexusTreeModel = None,
 ):
     """
     Adds fields from a list widget to a component.
@@ -659,8 +659,6 @@ def add_fields_to_component(
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
             component[widget.name] = widget.value
-            if component_model:
-                component_model.add_module(widget.value)
         except ValueError as error:
             show_warning_dialog(
                 f"Warning: field {widget.name} not added",
