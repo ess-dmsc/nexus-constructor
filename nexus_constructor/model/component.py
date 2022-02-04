@@ -5,7 +5,6 @@ import attr
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QTransform, QVector3D
-from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
@@ -48,7 +47,6 @@ from nexus_constructor.model.module import DATASET, Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
-from nexus_constructor.ui_utils import show_warning_dialog
 
 if TYPE_CHECKING:
     from nexus_constructor.component_tree_model import ComponentInfo  # noqa: F401
@@ -492,22 +490,3 @@ class Component(Group):
         except AttributeError:
             pass
         return dictionary
-
-
-def add_fields_to_component(component: Component, fields_widget: QListWidget):
-    """
-    Adds fields from a list widget to a component.
-    :param component: Component to add the field to.
-    :param fields_widget: The field list widget to extract field information such the name and value of each field.
-    """
-    for i in range(fields_widget.count()):
-        widget = fields_widget.itemWidget(fields_widget.item(i))
-        try:
-            component[widget.name] = widget.value
-        except ValueError as error:
-            show_warning_dialog(
-                f"Warning: field {widget.name} not added",
-                title="Field invalid",
-                additional_info=str(error),
-                parent=fields_widget.parent().parent(),
-            )

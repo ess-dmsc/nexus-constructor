@@ -25,7 +25,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
-from nexus_constructor.model.component import Component, add_fields_to_component
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import (
     BoxGeometry,
     CylindricalGeometry,
@@ -35,11 +35,12 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import Link
+from nexus_constructor.model.module import FileWriterModule, Link
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,
     generate_unique_name,
+    show_warning_dialog,
     validate_line_edit,
 )
 from nexus_constructor.unit_utils import METRES
@@ -506,6 +507,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             doesn't have pixel-related fields.
         :return: The geometry object.
         """
+        nexus_object: Group
         if nx_class in COMPONENT_TYPES:
             nexus_object = Component(name=nexus_obj_name, parent_node=None)
         else:
@@ -517,9 +519,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if isinstance(nexus_object, Component):
             self.generate_geometry_model(nexus_object, pixel_data)
             self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
-        add_fields_to_component(nexus_object, self.fieldsListWidget)
-
         self.component_model.add_group(nexus_object)
+        add_fields_to_component(nexus_object, self.fieldsListWidget)
         return nexus_object
 
     def edit_existing_component(
@@ -553,8 +554,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
             self.generate_geometry_model(self.component_to_edit, pixel_data)
         for child in children_copy:
-            self.component_to_edit.children.append(child)
             child.parent_node = self.component_to_edit
+            if isinstance(child, FileWriterModule):
+                self.component_model.add_module(child)
+            elif isinstance(child, Group):
+                self.component_model.add_group(child)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         return self.component_to_edit if self.component_to_edit else None
 
@@ -639,3 +643,28 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
 def get_fields_and_update_functions_for_component(component: Component):
     return get_fields_with_update_functions(component)
+
+
+def add_fields_to_component(
+    component: Group,
+    fields_widget: QListWidget,
+    component_model: NexusTreeModel = None,
+):
+    """
+    Adds fields from a list widget to a component.
+    :param component: Component to add the field to.
+    :param fields_widget: The field list widget to extract field information such the name and value of each field.
+    """
+    for i in range(fields_widget.count()):
+        widget = fields_widget.itemWidget(fields_widget.item(i))
+        try:
+            component[widget.name] = widget.value
+            if component_model:
+                component_model.add_module(widget.value)
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
+                parent=fields_widget.parent().parent(),
+            )

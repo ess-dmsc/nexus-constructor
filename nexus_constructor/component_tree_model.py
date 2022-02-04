@@ -97,6 +97,30 @@ class NexusTreeModel(QAbstractItemModel):
         new_group.parent_node = parent_node
         self.endInsertRows()
 
+    @staticmethod
+    def _get_row_of_child(row_child):
+        if not row_child.parent_node:
+            return -1
+        for c, child in enumerate(row_child.parent_node.children):
+            if row_child == child:
+                return c
+        return -1
+
+    def add_module(self, new_module: FileWriterModule):
+        parent_node, pointer = self.current_nxs_obj
+        if isinstance(parent_node, FileWriterModule):
+            parent_node = parent_node.parent_node
+            pointer = self.createIndex(
+                self._get_row_of_child(parent_node), 0, parent_node
+            )
+            self.current_nxs_obj = parent_node, pointer
+
+        self.beginInsertRows(
+            pointer, parent_node.number_of_children(), parent_node.number_of_children()
+        )
+        parent_node.children.append(new_module)
+        self.endInsertRows()
+
     def headerData(self, section, orientation, role):
         return None
 
@@ -239,7 +263,7 @@ class NexusTreeModel(QAbstractItemModel):
         return new_transformation
 
     def remove_node(self, node: QModelIndex):
-        if isinstance(node.internalPointer(), Component):
+        if isinstance(node.internalPointer(), Group):
             self._remove_component(node)
         elif isinstance(node.internalPointer(), Transformation):
             self._remove_transformation(node)
@@ -248,7 +272,9 @@ class NexusTreeModel(QAbstractItemModel):
 
     def _remove_component(self, index: QModelIndex):
         component = index.internalPointer()
-        transforms = component.transforms
+        transforms = []  # type: ignore
+        if isinstance(component, Component):
+            transforms = component.transforms
         if transforms:
             has_dependents_other_than_the_component_being_deleted = (
                 len(transforms[0].dependents) > 1
@@ -265,12 +291,22 @@ class NexusTreeModel(QAbstractItemModel):
                     pass
                 elif reply == QMessageBox.No:
                     return
-        remove_index = self.components.index(index.internalPointer())
-        self.beginRemoveRows(QModelIndex(), remove_index, remove_index)
+        parent_index = QModelIndex()
+        if index.internalPointer().parent_node:
+            row = self._get_row_of_child(index.internalPointer().parent_node)
+            if not row < 0:
+                parent_index = self.createIndex(
+                    row, 0, index.internalPointer().parent_node
+                )
+        remove_index = self._get_row_of_child(index.internalPointer())
+        self.beginRemoveRows(parent_index, remove_index, remove_index)
         for transform in transforms:
             transform.remove_from_dependee_chain()
-        self.components.remove(component)
-        del self.model.entry[component.name]
+        if isinstance(component, Component) and component.name in [
+            c.name for c in self.components
+        ]:
+            self.components.remove(component)
+        del component.parent_node[component.name]
         self.endRemoveRows()
         self.model.signals.component_removed.emit(component.name)
 

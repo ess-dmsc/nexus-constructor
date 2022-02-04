@@ -1,6 +1,7 @@
 import numpy as np
 
-from nexus_constructor.model.component import Component, add_fields_to_component
+from nexus_constructor.add_component_window import add_fields_to_component
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.module import Dataset
 
 
