@@ -112,9 +112,10 @@ class NexusTreeModel(QAbstractItemModel):
         parent_node, pointer = self.current_nxs_obj
         if isinstance(parent_node, FileWriterModule):
             parent_node = parent_node.parent_node
-            pointer = self.createIndex(
-                self._get_row_of_child(parent_node), 0, parent_node
-            )
+            idx = self._get_row_of_child(parent_node)
+            if idx == -1:
+                idx = parent_node.number_of_children()
+            pointer = self.createIndex(idx, 0, parent_node)
             self.current_nxs_obj = parent_node, pointer
 
         self.beginInsertRows(
