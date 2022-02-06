@@ -59,8 +59,6 @@ class NexusTreeModel(QAbstractItemModel):
         if not parent.isValid():
             return self.createIndex(row, column, self.tree_root)
         parent_item = parent.internalPointer()
-        if isinstance(parent_item, Component):
-            return self.createIndex(row, column, parent_item.stored_items[row])
         return self.createIndex(row, column, parent_item.children[row])
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:

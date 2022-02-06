@@ -540,7 +540,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         # remove the previous object from the qt3d view
         children_copy = deepcopy(self.component_to_edit.children)
-        self.parent().sceneWidget.delete_component(self.component_to_edit.name)
+        for child in children_copy:
+            child.parent_node = None
+        if isinstance(self.component_to_edit, Component):
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
         if self.component_to_edit:
             self.component_to_edit.name = component_name
@@ -554,12 +557,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
             self.generate_geometry_model(self.component_to_edit, pixel_data)
         for child in children_copy:
-            child.parent_node = self.component_to_edit
-            # if isinstance(child, FileWriterModule):
-            #     self.component_model.add_module(child)
-            # elif isinstance(child, Group):
-            #     self.component_model.add_group(child)
-            self.component_to_edit.children.append(child)
+            if isinstance(child, Group):
+                self.component_to_edit[child.name] = child
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         return self.component_to_edit if self.component_to_edit else None
 
@@ -646,10 +645,7 @@ def get_fields_and_update_functions_for_component(component: Component):
     return get_fields_with_update_functions(component)
 
 
-def add_fields_to_component(
-    component: Group,
-    fields_widget: QListWidget,
-):
+def add_fields_to_component(component: Group, fields_widget: QListWidget):
     """
     Adds fields from a list widget to a component.
     :param component: Component to add the field to.

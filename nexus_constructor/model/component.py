@@ -94,11 +94,6 @@ class Component(Group):
             return self.children
         return self.stored_transforms + self.children
 
-    def number_of_children(self):
-        if not self.stored_transforms:
-            return len(self.children)
-        return len(self.stored_transforms + self.children)
-
     @property
     def depends_on(self) -> "Transformation":
         return self._depends_on
