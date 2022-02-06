@@ -86,15 +86,14 @@ class NexusTreeModel(QAbstractItemModel):
 
     def add_group(self, new_group: Group):
         parent_node, _ = self.current_nxs_obj
-        # pointer = self.createIndex(parent_node.number_of_children(), 0, parent_node)
-        # self.beginInsertRows(
-        #     pointer, parent_node.number_of_children(), parent_node.number_of_children()
-        # )
+        pointer = self.createIndex(parent_node.number_of_children(), 0, parent_node)
+        self.beginInsertRows(
+            pointer, parent_node.number_of_children(), parent_node.number_of_children()
+        )
         if isinstance(new_group, Component):
             self.components.append(new_group)
-        parent_node.children.append(new_group)
-        new_group.parent_node = parent_node
-        # self.endInsertRows()
+        parent_node[new_group.name] = new_group
+        self.endInsertRows()
 
     @staticmethod
     def _get_row_of_child(row_child):
@@ -105,16 +104,17 @@ class NexusTreeModel(QAbstractItemModel):
                 return c
         return -1
 
-    def add_module(self, new_module: FileWriterModule):
-        parent_node, pointer = self.current_nxs_obj
-        if isinstance(parent_node, FileWriterModule):
-            parent_node = parent_node.parent_node
-            idx = self._get_row_of_child(new_module)
-            if idx == -1:
-                idx = parent_node.number_of_children()
-            pointer = self.createIndex(idx, 0, parent_node)
-            self.current_nxs_obj = parent_node, pointer
-
+    def add_module(self, new_module: FileWriterModule, component):
+        # parent_node, pointer = self.current_nxs_obj
+        # if isinstance(parent_node, FileWriterModule):
+        #     parent_node = parent_node.parent_node
+        #     idx = self._get_row_of_child(new_module)
+        #     if idx == -1:
+        #         idx = parent_node.number_of_children()
+        #     pointer = self.createIndex(idx, 0, parent_node)
+        #     self.current_nxs_obj = parent_node, pointer
+        parent_node = component
+        pointer = self.createIndex(parent_node.number_of_children(), 0, parent_node)
         self.beginInsertRows(
             pointer, parent_node.number_of_children(), parent_node.number_of_children()
         )
@@ -329,7 +329,7 @@ class NexusTreeModel(QAbstractItemModel):
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
         self.model.signals.transformation_changed.emit()
-        self.model.signals.transformation_changed.emit()
+        # self.model.signals.transformation_changed.emit()
 
     def _remove_link(self, index: QModelIndex):
         transformation_list = index.internalPointer().parent

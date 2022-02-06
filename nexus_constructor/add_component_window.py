@@ -559,6 +559,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         for child in children_copy:
             if isinstance(child, Group):
                 self.component_to_edit[child.name] = child
+                if isinstance(child, Group):
+                    self.component_model.model.append_component(child)
         add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
         return self.component_to_edit if self.component_to_edit else None
 
