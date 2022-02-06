@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 from PySide2.QtCore import QObject, Signal
 
 from nexus_constructor.common_attrs import CommonKeys
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 
 
@@ -26,7 +27,7 @@ class Model:
         self.entry = Entry()
         self._components: List = []
 
-    def append_component(self, component):
+    def append_component(self, component: Component):
         self._components.append(component)
 
     def get_components(self):
