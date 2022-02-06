@@ -22,7 +22,10 @@ class Attributes(list):
             self,
             attribute_name,
             FieldAttribute(
-                name=attribute_name, values=attribute_value, type=attribute_type
+                parent_node=self,
+                name=attribute_name,
+                values=attribute_value,
+                type=attribute_type,
             ),
         )
 
@@ -50,6 +53,7 @@ class FieldAttribute:
 
     name = attr.ib(type=str)
     values = attr.ib(type=ValueType, cmp=False)
+    parent_node = attr.ib(type=Attributes, default=None)
     type = attr.ib(type=str, default=ValueTypes.STRING)
 
     def __eq__(self, other_attribute):
