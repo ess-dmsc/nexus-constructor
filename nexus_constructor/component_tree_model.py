@@ -86,6 +86,8 @@ class NexusTreeModel(QAbstractItemModel):
 
     def add_group(self, new_group: Group):
         parent_node, _ = self.current_nxs_obj
+        if not isinstance(parent_node, Group):
+            parent_node = parent_node.parent_node
         pointer = self.createIndex(parent_node.number_of_children(), 0, parent_node)
         self.beginInsertRows(
             pointer, parent_node.number_of_children(), parent_node.number_of_children()

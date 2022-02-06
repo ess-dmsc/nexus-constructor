@@ -28,6 +28,7 @@ from nexus_constructor.treeview_utils import (
     get_transformations_list_frame,
 )
 
+MODULE_FRAME = "module_frame"
 TRANSFORMATION_FRAME = "transformation_frame"
 
 
@@ -103,7 +104,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     ):
         if hasattr(editorWidget, TRANSFORMATION_FRAME):
             editorWidget.transformation_frame.save_all_changes()
-        else:
+        elif hasattr(editorWidget, MODULE_FRAME):
             editorWidget.module_frame.save_module_changes()
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
