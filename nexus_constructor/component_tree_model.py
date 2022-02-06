@@ -5,7 +5,7 @@ from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
-from nexus_constructor.common_attrs import TransformationType
+from nexus_constructor.common_attrs import TRANSFORMATIONS, TransformationType
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
@@ -107,14 +107,7 @@ class NexusTreeModel(QAbstractItemModel):
         return -1
 
     def add_module(self, new_module: FileWriterModule, component):
-        # parent_node, pointer = self.current_nxs_obj
-        # if isinstance(parent_node, FileWriterModule):
-        #     parent_node = parent_node.parent_node
-        #     idx = self._get_row_of_child(new_module)
-        #     if idx == -1:
-        #         idx = parent_node.number_of_children()
-        #     pointer = self.createIndex(idx, 0, parent_node)
-        #     self.current_nxs_obj = parent_node, pointer
+
         parent_node = component
         pointer = self.createIndex(parent_node.number_of_children(), 0, parent_node)
         self.beginInsertRows(
@@ -269,11 +262,17 @@ class NexusTreeModel(QAbstractItemModel):
         return new_transformation
 
     def remove_node(self, node: QModelIndex):
-        if isinstance(node.internalPointer(), Group):
-            self._remove_component(node)
-        elif isinstance(node.internalPointer(), Transformation):
+        nexus_object = node.internalPointer()
+        if isinstance(nexus_object, Transformation):
             self._remove_transformation(node)
-        elif isinstance(node.internalPointer(), LinkTransformation):
+        if isinstance(nexus_object, Group):
+            if nexus_object.name == TRANSFORMATIONS:
+                for transform in nexus_object.parent_node.transforms:  # type: ignore
+                    transform.remove_from_dependee_chain()
+                nexus_object.parent_node.stored_transforms = None  # type: ignore
+                self.model.signals.transformation_changed.emit()
+            self._remove_component(node)
+        elif isinstance(nexus_object, LinkTransformation):
             self._remove_link(node)
 
     def _remove_component(self, index: QModelIndex):
@@ -314,7 +313,8 @@ class NexusTreeModel(QAbstractItemModel):
             self.components.remove(component)
         del component.parent_node[component.name]
         self.endRemoveRows()
-        self.model.signals.component_removed.emit(component.name)
+        if component.name != TRANSFORMATIONS:
+            self.model.signals.component_removed.emit(component.name)
 
     def _remove_transformation(self, index: QModelIndex):
         remove_transform = index.internalPointer()
@@ -331,7 +331,6 @@ class NexusTreeModel(QAbstractItemModel):
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
         self.model.signals.transformation_changed.emit()
-        # self.model.signals.transformation_changed.emit()
 
     def _remove_link(self, index: QModelIndex):
         transformation_list = index.internalPointer().parent
