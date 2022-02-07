@@ -520,7 +520,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.generate_geometry_model(nexus_object, pixel_data)
             self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
         self.component_model.add_group(nexus_object)
-        add_fields_to_component(nexus_object, self.fieldsListWidget)
+        add_fields_to_component(
+            nexus_object, self.fieldsListWidget, self.component_model
+        )
         return nexus_object
 
     def edit_existing_component(
@@ -561,7 +563,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.component_to_edit[child.name] = child
         if isinstance(self.component_to_edit, Component):
             self.component_model.components.append(self.component_to_edit)
-        add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
+        add_fields_to_component(
+            self.component_to_edit, self.fieldsListWidget, self.component_model
+        )
         return self.component_to_edit if self.component_to_edit else None
 
     @staticmethod
@@ -647,7 +651,9 @@ def get_fields_and_update_functions_for_component(component: Component):
     return get_fields_with_update_functions(component)
 
 
-def add_fields_to_component(component: Group, fields_widget: QListWidget):
+def add_fields_to_component(
+    component: Group, fields_widget: QListWidget, component_model: NexusTreeModel = None
+):
     """
     Adds fields from a list widget to a component.
     :param component: Component to add the field to.
@@ -657,6 +663,9 @@ def add_fields_to_component(component: Group, fields_widget: QListWidget):
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
             component[widget.name] = widget.value
+            if component_model:
+                component_model.rowCount(component_model.current_nxs_obj[1])
+                component_model.createIndex(i, 0, component_model.current_nxs_obj[1])
         except ValueError as error:
             show_warning_dialog(
                 f"Warning: field {widget.name} not added",

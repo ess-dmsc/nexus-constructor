@@ -57,7 +57,9 @@ class NexusTreeModel(QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if not parent.isValid():
-            return self.createIndex(row, column, self.tree_root)
+            index = self.createIndex(row, column, self.tree_root)
+            self.current_nxs_obj = (self.tree_root, index)
+            return index
         parent_item = parent.internalPointer()
         index = self.createIndex(row, column, parent_item.children[row])
         self.current_nxs_obj = (parent_item.children[row], index)
