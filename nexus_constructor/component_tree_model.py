@@ -82,7 +82,7 @@ class NexusTreeModel(QAbstractItemModel):
         else:
             node = parent.internalPointer()
             if isinstance(node, Group):
-                return max(1, node.number_of_children())
+                return node.number_of_children()
             else:
                 return 0
 
