@@ -34,7 +34,7 @@ class ProgressBar(QProgressBar):
         self.setValue(0)
 
 
-def status_indicator(parent=None):
+def status_indicator():
     def wrapper(func):
         @wraps(func)
         def inner(*args, **kwargs):
@@ -73,6 +73,7 @@ def status_indicator(parent=None):
                     self.task.wait()
                     super().closeEvent(QCloseEvent)
 
+            parent = args[0]
             status = _StatusDialog(parent, func, *args, **kwargs)
             status.open()
 
@@ -88,16 +89,14 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         button = QPushButton("Start long task")
         layout.addWidget(button)
-        button.clicked.connect(self.test)
+        button.clicked.connect(lambda x: self.test(4))
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
-    def test(self):
-        @status_indicator(parent=self)
-        def hello(x):
-            time.sleep(x)
-
-        hello(4)
+    @status_indicator()
+    def test(self, x):
+        time.sleep(x)
+        print("Done")
 
 
 if __name__ == "__main__":
