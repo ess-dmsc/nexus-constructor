@@ -1,5 +1,6 @@
 import sys
 import time
+from functools import wraps
 
 from PySide2 import QtCore
 from PySide2.QtWidgets import (
@@ -33,41 +34,46 @@ class ProgressBar(QProgressBar):
         self.setValue(0)
 
 
-def status_indicator(func):
-    def inner(*args, **kwargs):
-        class _TaskThread(QtCore.QThread):
-            finished = QtCore.Signal()
+def status_indicator(parent=None):
+    def wrapper(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            class _TaskThread(QtCore.QThread):
+                finished = QtCore.Signal()
 
-            def __init__(self, operation, args=(), parent=None) -> None:
-                super().__init__(parent)
-                self.operation = operation
-                self.args = args
+                def __init__(self, operation, *args, **kwargs) -> None:
+                    super().__init__(parent)
+                    self.operation = operation
+                    self.args = args
+                    self.kwargs = kwargs
 
-            def run(self):
-                self.operation(*self.args)
-                self.finished.emit()
+                def run(self):
+                    self.operation(*self.args, **kwargs)
+                    self.finished.emit()
 
-        class _StatusDialog(QDialog):
-            def __init__(self, operation, args=(), parent=None) -> None:
-                super().__init__(parent)
-                self.initUi()
-                self.task = _TaskThread(operation, args)
-                self.task.finished.connect(self._on_task_finished)
-                self.task.start()
+            class _StatusDialog(QDialog):
+                def __init__(self, parent, operation, *args, **kwargs) -> None:
+                    super().__init__(parent)
+                    self.initUi()
+                    self.task = _TaskThread(operation, *args, **kwargs)
+                    self.task.finished.connect(self._on_task_finished)
+                    self.task.start()
 
-            def initUi(self):
-                layout = QVBoxLayout()
-                progress_bar = ProgressBar(self, minimum=0, maximum=0)
-                layout.addWidget(progress_bar)
-                self.setLayout(layout)
+                def initUi(self):
+                    layout = QVBoxLayout()
+                    progress_bar = ProgressBar(self, minimum=0, maximum=0)
+                    layout.addWidget(progress_bar)
+                    self.setLayout(layout)
 
-            def _on_task_finished(self):
-                self.accept()
+                def _on_task_finished(self):
+                    self.accept()
 
-        status = _StatusDialog(func, args, parent=kwargs["parent"])
-        status.open()
+            status = _StatusDialog(parent, func, *args, **kwargs)
+            status.open()
 
-    return inner
+        return inner
+
+    return wrapper
 
 
 class MainWindow(QMainWindow):
@@ -82,13 +88,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def test(self):
-        @status_indicator
+        @status_indicator(parent=self)
         def hello(x):
             time.sleep(x)
 
-        hello(4, parent=self)
-        # with StatusDialog(time.sleep, args=(4,), parent=None) as _:
-        #     print("Done!!")
+        hello(4)
 
 
 if __name__ == "__main__":
