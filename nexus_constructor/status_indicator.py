@@ -68,6 +68,11 @@ def status_indicator(parent=None):
                 def _on_task_finished(self):
                     self.accept()
 
+                def closeEvent(self, QCloseEvent):
+                    self.task.terminate()
+                    self.task.wait()
+                    super().closeEvent(QCloseEvent)
+
             status = _StatusDialog(parent, func, *args, **kwargs)
             status.open()
 
