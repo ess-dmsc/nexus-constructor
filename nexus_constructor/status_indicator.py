@@ -1,18 +1,7 @@
-import sys
-import time
 from functools import wraps
 
 from PySide2 import QtCore
-from PySide2.QtWidgets import (
-    QApplication,
-    QDialog,
-    QHBoxLayout,
-    QMainWindow,
-    QProgressBar,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide2.QtWidgets import QDialog, QProgressBar, QVBoxLayout
 
 
 class ProgressBar(QProgressBar):
@@ -80,27 +69,3 @@ def status_indicator():
         return inner
 
     return wrapper
-
-
-class MainWindow(QMainWindow):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        central_widget = QWidget()
-        layout = QHBoxLayout()
-        button = QPushButton("Start long task")
-        layout.addWidget(button)
-        button.clicked.connect(lambda x: self.test(4))
-        central_widget.setLayout(layout)
-        self.setCentralWidget(central_widget)
-
-    @status_indicator()
-    def test(self, x):
-        time.sleep(x)
-        print("Done")
-
-
-if __name__ == "__main__":
-    app = QApplication()
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
