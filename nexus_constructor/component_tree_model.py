@@ -349,13 +349,20 @@ class NexusTreeModel(QAbstractItemModel):
             parent_transform.depends_on = None
         self.model.signals.transformation_changed.emit()
 
-    def __update_link_rows(self):
-        nr_of_components = self.rowCount(QModelIndex())
-        for i in range(nr_of_components):
+    def __update_link_rows(
+        self,
+    ):  # TODO: this function is a bit shaky and needs an update in a future PR.
+        try:
+            component = self.current_nxs_obj[0].parent_component  # type: ignore
+        except AttributeError:
+            print("Not able to update link rows.")
+            return
+        nr_of_children = component.parent_node.number_of_children()
+        for i in range(nr_of_children):
             component_index = self.index(i, 0, QModelIndex())
             transformations_index = self.index(1, 0, component_index)
             transformations = transformations_index.internalPointer()
-            if transformations.has_link:
+            if transformations and transformations.has_link:
                 transformation_rows = self.rowCount(transformations_index)
                 link_index = self.index(
                     transformation_rows - 1, 0, transformations_index
