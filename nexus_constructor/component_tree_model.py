@@ -47,7 +47,6 @@ class NexusTreeModel(QAbstractItemModel):
         if not index.isValid():
             return None
         item = index.internalPointer()
-        self.current_nxs_obj = (item, index)
         if role == Qt.DisplayRole:
             return item
         elif role == Qt.SizeHintRole:
@@ -57,18 +56,16 @@ class NexusTreeModel(QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if not parent.isValid():
-            index = self.createIndex(row, column, self.tree_root)
-            self.current_nxs_obj = (self.tree_root, index)
-            return index
+            return self.createIndex(row, column, self.tree_root)
         parent_item = parent.internalPointer()
         index = self.createIndex(row, column, parent_item.children[row])
-        self.current_nxs_obj = (parent_item.children[row], index)
         return index
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         if not index.isValid():
             return Qt.NoItemFlags
         parent_item = index.internalPointer()
+        self.current_nxs_obj = (parent_item, index)
         if isinstance(parent_item, (Component, TransformationsList)):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif isinstance(parent_item, ComponentInfo):
