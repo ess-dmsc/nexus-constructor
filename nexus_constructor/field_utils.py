@@ -6,7 +6,6 @@ import numpy as np
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
 from nexus_constructor.model.value_type import ValueTypes
@@ -75,7 +74,7 @@ def update_existing_stream_field(field: Group, new_ui_field: "StreamFieldsWidget
 
 
 def get_fields_with_update_functions(
-    component: Component,
+    component: Group,
 ) -> List[Tuple[Union["FileWriterModule", "Group"], Callable]]:
     """
     Return a list of fields in a given component group.

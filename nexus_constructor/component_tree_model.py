@@ -108,7 +108,6 @@ class NexusTreeModel(QAbstractItemModel):
         return -1
 
     def add_module(self, new_module: FileWriterModule, component):
-
         parent_node = component
         pointer = self.createIndex(parent_node.number_of_children(), 0, parent_node)
         self.beginInsertRows(
@@ -275,6 +274,18 @@ class NexusTreeModel(QAbstractItemModel):
             self._remove_component(node)
         elif isinstance(nexus_object, LinkTransformation):
             self._remove_link(node)
+        elif isinstance(nexus_object, FileWriterModule):
+            self._remove_fw_module(node, nexus_object)
+
+    def _remove_fw_module(self, node, module):
+        parent = self.parent(node)
+        remove_index = self._get_row_of_child(module)
+        self.beginRemoveRows(parent, remove_index, remove_index)
+        children = parent.internalPointer().children
+        if children:
+            children.pop(remove_index)
+            del module
+        self.endRemoveRows()
 
     def _remove_component(self, index: QModelIndex):
         component = index.internalPointer()

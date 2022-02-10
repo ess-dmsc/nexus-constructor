@@ -107,10 +107,6 @@ def set_button_states(
             selected_object, Component
         ) or not isinstance(selected_object, (Group, FileWriterModule))
         set_enabled_and_raise(zoom_action, selected_object_is_component)
-
-        selected_object_is_group_or_transform = isinstance(
-            selected_object, (Component, Group, Transformation)
-        )
         set_enabled_and_raise(new_component_action, selected_object_is_group)
         set_enabled_and_raise(edit_component_action, selected_object_is_group)
 
@@ -134,14 +130,7 @@ def set_button_states(
         if hasattr(selected_object, "parent_node") and not selected_object.parent_node:
             not_tree_root = False
 
-        set_enabled_and_raise(
-            delete_action,
-            not_tree_root
-            and (
-                selected_object_is_group_or_transform
-                or not selected_object_is_not_link_transform
-            ),
-        )
+        set_enabled_and_raise(delete_action, not_tree_root)
         if isinstance(selected_object, Component):
             if selected_object.stored_transforms is None:
                 selected_object.stored_transforms = selected_object.transforms

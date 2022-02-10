@@ -18,11 +18,14 @@ if TYPE_CHECKING:
 
 
 class EditTransformation(QGroupBox):
+    transformation_parent = None
+
     def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
         super().__init__(parent)
         self.model = model
         self.transformation_frame = UiTransformation(self)
         self.transformation = transformation
+        self.transformation_parent = transformation.parent_component
         current_vector = self.transformation.vector
         self._fill_in_existing_fields(current_vector)
         self.transformation_frame.magnitude_widget.enable_3d_value_spinbox.connect(

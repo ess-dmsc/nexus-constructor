@@ -78,6 +78,7 @@ class FieldWidget(QFrame):
 
     def __init__(
         self,
+        node_parent,
         possible_field_names=None,
         parent: QListWidget = None,
         hide_name_field: bool = False,
@@ -88,6 +89,7 @@ class FieldWidget(QFrame):
         if possible_field_names is None:
             possible_field_names = []
         self._show_only_f142_stream = show_only_f142_stream
+        self._node_parent = node_parent
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
@@ -234,7 +236,7 @@ class FieldWidget(QFrame):
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
             return_object = Dataset(
-                parent_node=None,
+                parent_node=self._node_parent,
                 name=self.name,
                 type=dtype,
                 values=val,
@@ -243,7 +245,7 @@ class FieldWidget(QFrame):
             # Squeeze the array so 1D arrays can exist. Should not affect dimensional arrays.
             array = np.squeeze(self.table_view.model.array)
             return_object = Dataset(
-                parent_node=None,
+                parent_node=self._node_parent,
                 name=self.name,
                 type=dtype,
                 values=array,
@@ -252,7 +254,9 @@ class FieldWidget(QFrame):
             return_object = self.streams_widget.get_stream_group()
         elif self.field_type == FieldType.link:
             return_object = Link(
-                parent_node=None, name=self.name, source=self.value_line_edit.text()
+                parent_node=self._node_parent,
+                name=self.name,
+                source=self.value_line_edit.text(),
             )
         else:
             logging.error(f"unknown field type: {self.name}")
