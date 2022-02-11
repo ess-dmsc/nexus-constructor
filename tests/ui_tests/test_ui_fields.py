@@ -30,7 +30,7 @@ def test_ui_field_GIVEN_field_has_units_filled_in_ui_WHEN_getting_field_group_TH
     qtbot,
 ):
     listwidget = QListWidget()
-    field = FieldWidget(["test"], listwidget)
+    field = FieldWidget(None, ["test"], listwidget)
     field_name = "test"
     field.name = field_name
     field.value_line_edit.setText("1")
@@ -47,7 +47,7 @@ def test_ui_field_GIVEN_field_does_not_have_units_filled_in_ui_WHEN_getting_fiel
     qtbot,
 ):
     listwidget = QListWidget()
-    field = FieldWidget(["test"], listwidget)
+    field = FieldWidget(None, ["test"], listwidget)
     field_name = "test"
     field.name = field_name
     field.value_line_edit.setText("1")
@@ -62,7 +62,7 @@ def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_combo_is_changed_THEN_value
     qtbot,
 ):
     listwidget = QListWidget()
-    field = FieldWidget(["test"], listwidget)
+    field = FieldWidget(None, ["test"], listwidget)
     field_name = "test"
     field.name = field_name
 
@@ -79,7 +79,7 @@ def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_advanced_options_are_clicke
     qtbot,
 ):
     listwidget = QListWidget()
-    field = FieldWidget(["test"], listwidget)
+    field = FieldWidget(None, ["test"], listwidget)
     field_name = "test"
     field.name = field_name
 
@@ -100,7 +100,7 @@ def test_ui_stream_field_GIVEN_ev42_is_selected_WHEN_advanced_options_are_clicke
     qtbot,
 ):
     listwidget = QListWidget()
-    field = FieldWidget(["test"], listwidget)
+    field = FieldWidget(None, ["test"], listwidget)
     field_name = "test"
     field.name = field_name
 
