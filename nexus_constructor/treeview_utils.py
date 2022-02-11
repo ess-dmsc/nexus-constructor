@@ -283,8 +283,8 @@ def get_group_frame(frame, value):
 
 
 def get_module_frame(frame: QFrame, model: Model, value: FileWriterModule):
-    if isinstance(value, Dataset) and value.name in EXCLUDED_PIXEL_GRID:
-        return
     module_frame = ModuleView(value, frame, model)
     frame.module_frame = module_frame
     frame.layout().addWidget(frame.module_frame)
+    if isinstance(value, Dataset) and value.name in EXCLUDED_PIXEL_GRID:
+        frame.setEnabled(False)
