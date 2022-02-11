@@ -18,9 +18,15 @@ from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import (
+    DETECTOR_NUMBER,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+    Z_PIXEL_OFFSET,
+)
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import FileWriterModule
+from nexus_constructor.model.module import Dataset, FileWriterModule
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.module_view import ModuleView
 from nexus_constructor.transformation_view import (
@@ -36,6 +42,8 @@ if getattr(sys, "frozen", False):
     root_dir = os.path.dirname(sys.executable)
 else:
     root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+
+EXCLUDED_PIXEL_GRID = [DETECTOR_NUMBER, X_PIXEL_OFFSET, Y_PIXEL_OFFSET, Z_PIXEL_OFFSET]
 
 
 def create_and_add_toolbar_action(
@@ -275,6 +283,8 @@ def get_group_frame(frame, value):
 
 
 def get_module_frame(frame: QFrame, model: Model, value: FileWriterModule):
+    if isinstance(value, Dataset) and value.name in EXCLUDED_PIXEL_GRID:
+        return
     module_frame = ModuleView(value, frame, model)
     frame.module_frame = module_frame
     frame.layout().addWidget(frame.module_frame)
