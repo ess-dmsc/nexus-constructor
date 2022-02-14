@@ -453,13 +453,14 @@ class Component(Group):
             z_offsets = self.get_field_value(Z_PIXEL_OFFSET)
         except AttributeError:
             z_offsets = np.zeros_like(x_offsets)
+        if not isinstance(x_offsets, list):
+            x_offsets = x_offsets.flatten()
+        if not isinstance(y_offsets, list):
+            y_offsets = y_offsets.flatten()
+        if not isinstance(z_offsets, list):
+            z_offsets = z_offsets.flatten()
         # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
-        return [
-            QVector3D(x, y, z)
-            for x, y, z in zip(
-                x_offsets.flatten(), y_offsets.flatten(), z_offsets.flatten()
-            )
-        ]
+        return [QVector3D(x, y, z) for x, y, z in zip(x_offsets, y_offsets, z_offsets)]
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict(error_collector)
