@@ -40,6 +40,7 @@ from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     Dataset,
     FileWriterModule,
+    Link,
     StreamModule,
     WriterModules,
     create_fw_module_object,
@@ -160,7 +161,10 @@ class JSONReader:
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
         for child in self.entry_node.children:
-            self.model.entry.children.append(child)
+            if isinstance(child, (Dataset, Link, Group)):
+                self.model.entry[child.name] = child
+            else:
+                self.model.entry.children.append(child)
             child.parent_node = self.model.entry
         self._set_transforms_depends_on()
         self._set_components_depends_on()
