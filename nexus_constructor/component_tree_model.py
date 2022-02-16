@@ -10,7 +10,7 @@ from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import Dataset, FileWriterModule
+from nexus_constructor.model.module import Dataset, FileWriterModule, Link
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -113,7 +113,10 @@ class NexusTreeModel(QAbstractItemModel):
         self.beginInsertRows(
             pointer, parent_node.number_of_children(), parent_node.number_of_children()
         )
-        parent_node.children.append(new_module)
+        if isinstance(new_module, (Dataset, Link)):
+            parent_node[new_module.name] = new_module
+        else:
+            parent_node.children.append(new_module)
         self.endInsertRows()
 
     def headerData(self, section, orientation, role):
