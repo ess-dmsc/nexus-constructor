@@ -62,7 +62,7 @@ def _set_item(
         list_to_look_in[index] = new_value
     else:
         list_to_look_in.append(new_value)
-    if hasattr(new_value, "parent"):
+    if hasattr(new_value, "parent_node"):
         new_value.parent_node = parent
 
 

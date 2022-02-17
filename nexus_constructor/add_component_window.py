@@ -544,8 +544,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         # remove the previous object from the qt3d view
         children_copy = deepcopy(self.component_to_edit.children)
-        for child in children_copy:
-            child.parent_node = None
         if isinstance(self.component_to_edit, Component):
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
