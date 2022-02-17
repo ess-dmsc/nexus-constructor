@@ -663,9 +663,6 @@ def add_fields_to_component(
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
             component[widget.name] = widget.value
-            if component_model:
-                component_model.rowCount(component_model.current_nxs_obj[1])
-                component_model.createIndex(i, 0, component_model.current_nxs_obj[1])
         except ValueError as error:
             show_warning_dialog(
                 f"Warning: field {widget.name} not added",
@@ -673,3 +670,6 @@ def add_fields_to_component(
                 additional_info=str(error),
                 parent=fields_widget.parent().parent(),
             )
+    if component_model and component_model.current_nxs_obj[1]:
+        row = component_model.rowCount(component_model.current_nxs_obj[1])
+        component_model.createIndex(row, 0, component_model.current_nxs_obj[1])
