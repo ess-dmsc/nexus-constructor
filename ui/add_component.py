@@ -274,12 +274,12 @@ class Ui_AddComponentDialog(object):
     def retranslateUi(self, AddComponentDialog):
         AddComponentDialog.setWindowTitle(
             QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Add Component", None, -1
+                "AddComponentDialog", "Add group", None, -1
             )
         )
         self.ok_button.setText(
             QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Add component", None, -1
+                "AddComponentDialog", "Add group", None, -1
             )
         )
         self.label.setText(
@@ -292,7 +292,7 @@ class Ui_AddComponentDialog(object):
         )
         self.label_3.setText(
             QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Component type:", None, -1
+                "AddComponentDialog", "Group type:", None, -1
             )
         )
         self.shapeTypeBox.setTitle(

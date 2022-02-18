@@ -305,12 +305,12 @@ class ShapeReader:
         :param children: The children list where we expect to find the dataset.
         :return: The dataset if it could be found, otherwise None is returned.
         """
-        try:
-            for dataset in children:
+        for dataset in children:
+            try:
                 if dataset[NodeType.CONFIG][CommonKeys.NAME] == dataset_name:
                     return dataset
-        except KeyError:
-            pass  # This "pass" ensures that we create a warning message.
+            except KeyError:
+                pass
         if warning:
             self.warnings.append(
                 InvalidShape(

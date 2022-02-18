@@ -151,5 +151,5 @@ def _create_base_class_dict(
     except KeyError:
         pass
     class_definitions[nx_class_name] = class_fields
-    if nx_class_name in COMPONENT_TYPES:
+    if nx_class_name in NX_CLASSES:
         component_definitions[nx_class_name] = class_fields

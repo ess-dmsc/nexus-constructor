@@ -15,11 +15,18 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.common_attrs import TransformationType
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import (
+    DETECTOR_NUMBER,
+    X_PIXEL_OFFSET,
+    Y_PIXEL_OFFSET,
+    Z_PIXEL_OFFSET,
+)
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import FileWriterModule
+from nexus_constructor.model.module import Dataset, FileWriterModule
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.module_view import ModuleView
 from nexus_constructor.transformation_view import (
@@ -35,6 +42,8 @@ if getattr(sys, "frozen", False):
     root_dir = os.path.dirname(sys.executable)
 else:
     root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+
+EXCLUDED_PIXEL_GRID = [DETECTOR_NUMBER, X_PIXEL_OFFSET, Y_PIXEL_OFFSET, Z_PIXEL_OFFSET]
 
 
 def create_and_add_toolbar_action(
@@ -69,6 +78,7 @@ def create_and_add_toolbar_action(
 
 def set_button_states(
     component_tree_view: QTreeView,
+    new_component_action: QAction,
     delete_action: QAction,
     new_rotation_action: QAction,
     new_translation_action: QAction,
@@ -89,6 +99,7 @@ def set_button_states(
     selection_indices = component_tree_view.selectedIndexes()
     if len(selection_indices) != 1:
         handle_number_of_items_selected_is_not_one(
+            new_component_action,
             create_link_action,
             delete_action,
             new_rotation_action,
@@ -99,29 +110,35 @@ def set_button_states(
     else:
         selected_object = selection_indices[0].internalPointer()
         selected_object_is_component = isinstance(selected_object, Component)
+        selected_object_is_group = isinstance(selected_object, Group)
+        selected_object_is_not_group_or_fw_module = isinstance(
+            selected_object, Component
+        ) or not isinstance(selected_object, (Group, FileWriterModule))
         set_enabled_and_raise(zoom_action, selected_object_is_component)
-
-        selected_object_is_component_or_transform = isinstance(
-            selected_object, (Component, Transformation)
-        )
-        set_enabled_and_raise(edit_component_action, selected_object_is_component)
+        set_enabled_and_raise(new_component_action, selected_object_is_group)
+        set_enabled_and_raise(edit_component_action, selected_object_is_group)
 
         selected_object_is_not_link_transform = not isinstance(
             selected_object, LinkTransformation
         )
+
         set_enabled_and_raise(
-            new_rotation_action, selected_object_is_not_link_transform
+            new_rotation_action,
+            selected_object_is_not_link_transform
+            and selected_object_is_not_group_or_fw_module,
         )
 
         set_enabled_and_raise(
-            new_translation_action, selected_object_is_not_link_transform
+            new_translation_action,
+            selected_object_is_not_link_transform
+            and selected_object_is_not_group_or_fw_module,
         )
 
-        set_enabled_and_raise(
-            delete_action,
-            selected_object_is_component_or_transform
-            or not selected_object_is_not_link_transform,
-        )
+        not_tree_root = True
+        if hasattr(selected_object, "parent_node") and not selected_object.parent_node:
+            not_tree_root = False
+
+        set_enabled_and_raise(delete_action, not_tree_root)
         if isinstance(selected_object, Component):
             if selected_object.stored_transforms is None:
                 selected_object.stored_transforms = selected_object.transforms
@@ -161,6 +178,7 @@ def set_enabled_and_raise(action: QAction, value: bool):
 
 def handle_number_of_items_selected_is_not_one(
     delete_action: QAction,
+    new_component_action: QAction,
     new_rotation_action: QAction,
     new_translation_action: QAction,
     create_link_action: QAction,
@@ -182,7 +200,7 @@ def handle_number_of_items_selected_is_not_one(
 def expand_transformation_list(
     node: QModelIndex,
     component_tree_view: QTreeView,
-    component_model: ComponentTreeModel,
+    component_model: NexusTreeModel,
 ):
     current_pointer = node.internalPointer()
     if isinstance(current_pointer, TransformationsList) or isinstance(
@@ -205,7 +223,7 @@ def expand_transformation_list(
 def add_transformation(
     transformation_type: str,
     component_tree_view: QTreeView,
-    component_model: ComponentTreeModel,
+    component_model: NexusTreeModel,
 ):
     selected = component_tree_view.selectedIndexes()
     if len(selected) > 0:
@@ -246,25 +264,13 @@ def get_transformation_frame(frame: QFrame, model: Model, value: Transformation)
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
-# TODO: Remove this and use group instead.
-def get_component_info_frame(frame):
-    frame.label = QLabel("", frame)
-    frame.layout().addWidget(frame.label)
-
-
 def get_transformations_list_frame(frame):
     frame.label = QLabel("Transformations", frame)
     frame.layout().addWidget(frame.label)
 
 
-# TODO: Remove this and use group instead.
-def get_component_frame(frame, value):
+def get_group_info_frame(frame, value):
     frame.label = QLabel(f"{value.name} ({value.nx_class})", frame)
-    frame.layout().addWidget(frame.label)
-
-
-def get_group_info_frame(frame):
-    frame.label = QLabel("", frame)
     frame.layout().addWidget(frame.label)
 
 
@@ -280,3 +286,5 @@ def get_module_frame(frame: QFrame, model: Model, value: FileWriterModule):
     module_frame = ModuleView(value, frame, model)
     frame.module_frame = module_frame
     frame.layout().addWidget(frame.module_frame)
+    if isinstance(value, Dataset) and value.name in EXCLUDED_PIXEL_GRID:
+        frame.setEnabled(False)

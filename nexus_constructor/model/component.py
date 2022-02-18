@@ -5,7 +5,6 @@ import attr
 import numpy as np
 from PySide2.Qt3DCore import Qt3DCore
 from PySide2.QtGui import QMatrix4x4, QTransform, QVector3D
-from PySide2.QtWidgets import QListWidget
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
@@ -48,7 +47,6 @@ from nexus_constructor.model.module import DATASET, Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
-from nexus_constructor.ui_utils import show_warning_dialog
 
 if TYPE_CHECKING:
     from nexus_constructor.component_tree_model import ComponentInfo  # noqa: F401
@@ -91,6 +89,12 @@ class Component(Group):
     stored_transforms: list = None
 
     @property
+    def stored_items(self) -> List:
+        if not self.stored_transforms:
+            return self.children
+        return self.stored_transforms + self.children
+
+    @property
     def depends_on(self) -> "Transformation":
         return self._depends_on
 
@@ -103,19 +107,6 @@ class Component(Group):
         self._depends_on = new_depends_on
         if new_depends_on is not None:
             new_depends_on.register_dependent(self)
-
-    @property
-    def description(self) -> str:
-        try:
-            return self.get_field_value(CommonAttrs.DESCRIPTION)
-        except AttributeError:
-            return ""
-
-    @description.setter
-    def description(self, new_description: str):
-        self.set_field_value(
-            CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING
-        )
 
     @property
     def qtransform(self) -> QTransform:
@@ -462,13 +453,14 @@ class Component(Group):
             z_offsets = self.get_field_value(Z_PIXEL_OFFSET)
         except AttributeError:
             z_offsets = np.zeros_like(x_offsets)
+        if not isinstance(x_offsets, list):
+            x_offsets = x_offsets.flatten()
+        if not isinstance(y_offsets, list):
+            y_offsets = y_offsets.flatten()
+        if not isinstance(z_offsets, list):
+            z_offsets = z_offsets.flatten()
         # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
-        return [
-            QVector3D(x, y, z)
-            for x, y, z in zip(
-                x_offsets.flatten(), y_offsets.flatten(), z_offsets.flatten()
-            )
-        ]
+        return [QVector3D(x, y, z) for x, y, z in zip(x_offsets, y_offsets, z_offsets)]
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         dictionary = super(Component, self).as_dict(error_collector)
@@ -505,22 +497,3 @@ class Component(Group):
         except AttributeError:
             pass
         return dictionary
-
-
-def add_fields_to_component(component: Component, fields_widget: QListWidget):
-    """
-    Adds fields from a list widget to a component.
-    :param component: Component to add the field to.
-    :param fields_widget: The field list widget to extract field information such the name and value of each field.
-    """
-    for i in range(fields_widget.count()):
-        widget = fields_widget.itemWidget(fields_widget.item(i))
-        try:
-            component[widget.name] = widget.value
-        except ValueError as error:
-            show_warning_dialog(
-                f"Warning: field {widget.name} not added",
-                title="Field invalid",
-                additional_info=str(error),
-                parent=fields_widget.parent().parent(),
-            )

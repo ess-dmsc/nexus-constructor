@@ -11,7 +11,7 @@ class ModuleView(QGroupBox):
     def __init__(self, module, parent: QWidget, model: Model):
         super().__init__(module.writer_module.upper(), parent)
         layout = QVBoxLayout()
-        self.field_widget = FieldWidget()
+        self.field_widget = FieldWidget(module.parent_node)
         layout.addWidget(self.field_widget)
         self.setLayout(layout)
         self.module = module
