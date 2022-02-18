@@ -148,13 +148,10 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
     assert (
         view.transformation_frame.magnitude_widget.field_type == FieldType.kafka_stream
     )
-    assert view.transformation_frame.magnitude_widget.value.children[0].topic == topic
-    assert view.transformation_frame.magnitude_widget.value.children[0].type == type
-    assert (
-        view.transformation_frame.magnitude_widget.value.children[0].writer_module
-        == "f142"
-    )
-    assert view.transformation_frame.magnitude_widget.value.children[0].source == source
+    assert view.transformation_frame.magnitude_widget.value.topic == topic
+    assert view.transformation_frame.magnitude_widget.value.type == type
+    assert view.transformation_frame.magnitude_widget.value.writer_module == "f142"
+    assert view.transformation_frame.magnitude_widget.value.source == source
 
 
 def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(

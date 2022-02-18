@@ -98,7 +98,7 @@ class EditTransformation(QGroupBox):
         if self.transformation_frame.magnitude_widget.field_type_is_scalar():
             try:
                 value_3d_view: "ValueType" = (
-                    self.transformation_frame.magnitude_widget.value.values
+                    self.transformation_frame.magnitude_widget.value.values  # type: ignore
                 )
                 self.transformation_frame.value_spinbox.setValue(float(value_3d_view))
             except ValueError:

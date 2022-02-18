@@ -1836,7 +1836,7 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
     widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
-    stream = widget.value.children[0]
+    stream = widget.value
     assert stream.topic == topic
     assert stream.source == pvname
     assert stream.type == pvtype
@@ -2237,9 +2237,9 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     array_size = 2
     streams_widget.array_size_spinbox.setValue(array_size)
 
-    stream = streams_widget.get_stream_group()
+    stream = streams_widget.get_stream_module(None)
 
-    assert stream.children[0].array_size == array_size
+    assert stream.array_size == array_size
 
 
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
