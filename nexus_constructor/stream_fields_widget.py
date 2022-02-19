@@ -279,7 +279,7 @@ class StreamFieldsWidget(QDialog):
             self.ev42_advanced_group_box.setVisible(False)
         elif schema == WriterModules.ADAR.value:
             self._set_edits_visible(True, False)
-            self._showarray_size_table(True)
+            self._show_array_size_table(True)
         elif schema == WriterModules.HS00.value:
             self._set_edits_visible(True, False)
             self.hs00_unimplemented_label.setVisible(True)
@@ -290,7 +290,7 @@ class StreamFieldsWidget(QDialog):
         ):
             self._set_edits_visible(True, False)
 
-    def _showarray_size_table(self, show: bool):
+    def _show_array_size_table(self, show: bool):
         self.array_size_label.setVisible(show)
         self.array_size_table.setVisible(show)
 
