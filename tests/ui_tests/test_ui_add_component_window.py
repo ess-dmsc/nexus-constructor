@@ -2060,6 +2060,35 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ev42_THEN_stre
     assert not streams_widget.type_combo.isVisible()
 
 
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ADar_THEN_stream_dialog_shown_with_correct_options(
+    qtbot, add_component_dialog, template
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("ADAr")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+    assert streams_widget.array_size_label.isVisible()
+    assert streams_widget.array_size_table.isVisible()
+
+
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stream_dialog_shown_with_correct_options(
     qtbot, add_component_dialog, template
 ):

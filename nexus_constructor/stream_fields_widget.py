@@ -7,20 +7,25 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDialog,
     QFormLayout,
+    QFrame,
     QGridLayout,
     QGroupBox,
+    QHeaderView,
     QLabel,
     QLineEdit,
     QPushButton,
     QRadioButton,
     QSpinBox,
+    QTableWidget,
 )
 
+from nexus_constructor.array_dataset_table_widget import ValueDelegate
 from nexus_constructor.common_attrs import ARRAY, SCALAR
 from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
     CHUNK_SIZE,
     CUE_INTERVAL,
+    ADARStream,
     EV42Stream,
     F142Stream,
     HS00Stream,
@@ -84,9 +89,24 @@ class StreamFieldsWidget(QDialog):
         self.source_label = QLabel("Source: ")
         self.source_line_edit = QLineEdit()
 
-        self.array_size_label = QLabel("Array size")
+        self.array_size_label = QLabel("Array size: ")
         self.array_size_spinbox = QSpinBox()
         self.array_size_spinbox.setMaximum(np.iinfo(np.int32).max)
+
+        self.array_size_table = QTableWidget(1, 3)
+        self.array_size_table.setHorizontalHeaderLabels(["x", "y", "z"])
+        self.array_size_table.setVerticalHeaderLabels([""])
+        table_height = self.array_size_table.sizeHintForRow(
+            0
+        ) + self.array_size_table.sizeHintForRow(1)
+        self.array_size_table.setMaximumHeight(table_height)
+        self.array_size_table.setFrameStyle(QFrame.NoFrame)
+        self.array_size_table.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch
+        )
+        self.array_size_table.resizeColumnsToContents()
+        self.array_size_table.resizeRowsToContents()
+        self.array_size_table.setItemDelegate(ValueDelegate(int, self.array_size_table))
 
         self.type_label = QLabel("Type: ")
         self.type_combo = QComboBox()
@@ -146,6 +166,7 @@ class StreamFieldsWidget(QDialog):
 
         self.layout().addWidget(self.array_size_label, 6, 0)
         self.layout().addWidget(self.array_size_spinbox, 6, 1)
+        self.layout().addWidget(self.array_size_table, 6, 1)
 
         self.layout().addWidget(self.hs00_unimplemented_label, 7, 0, 1, 2)
 
@@ -245,6 +266,7 @@ class StreamFieldsWidget(QDialog):
         self.show_advanced_options_button.setChecked(False)
         self.value_units_label.setVisible(False)
         self.value_units_edit.setVisible(False)
+        self.array_size_table.setVisible(False)
         if schema == WriterModules.F142.value:
             self.value_units_label.setVisible(True)
             self.value_units_edit.setVisible(True)
@@ -255,6 +277,9 @@ class StreamFieldsWidget(QDialog):
             self._set_edits_visible(True, False)
             self.show_advanced_options_button.setVisible(True)
             self.ev42_advanced_group_box.setVisible(False)
+        elif schema == WriterModules.ADAR.value:
+            self._set_edits_visible(True, False)
+            self._show_array_size_table(True)
         elif schema == WriterModules.HS00.value:
             self._set_edits_visible(True, False)
             self.hs00_unimplemented_label.setVisible(True)
@@ -264,6 +289,10 @@ class StreamFieldsWidget(QDialog):
             schema == WriterModules.TDCTIME.value or schema == WriterModules.SENV.value
         ):
             self._set_edits_visible(True, False)
+
+    def _show_array_size_table(self, show: bool):
+        self.array_size_label.setVisible(show)
+        self.array_size_table.setVisible(show)
 
     def _set_edits_visible(self, source: bool, type: bool, source_hint=None):
         self.source_label.setVisible(source)
@@ -303,6 +332,14 @@ class StreamFieldsWidget(QDialog):
                 stream.array_size = array_size
             if self.advanced_options_enabled:
                 self._record_advanced_f142_values(stream)
+        elif current_schema == WriterModules.ADAR.value:
+            array_size = []
+            for i in range(self.array_size_table.columnCount()):
+                table_value = self.array_size_table.item(0, i)
+                if table_value:
+                    array_size.append(int(table_value.text()))
+            stream = ADARStream(parent_node=parent, source=source, topic=topic)
+            stream.array_size = array_size
         elif current_schema == WriterModules.EV42.value:
             stream = EV42Stream(parent_node=parent, source=source, topic=topic)
             if self.advanced_options_enabled:
