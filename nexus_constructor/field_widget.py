@@ -23,7 +23,7 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.module import Dataset, Link, StreamModule
+from nexus_constructor.model.module import Dataset, FileWriterModule, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -229,9 +229,9 @@ class FieldWidget(QFrame):
         self.attrs_dialog.fill_existing_attrs(field)
 
     @property
-    def value(self) -> Union[Dataset, StreamModule, Link, None]:
+    def value(self) -> Union[FileWriterModule, None]:
         dtype = self.value_type_combo.currentText()
-        return_object: Union[Dataset, StreamModule, Link]
+        return_object: FileWriterModule
         if self.field_type == FieldType.scalar_dataset:
             val = self.value_line_edit.text()
             return_object = Dataset(
