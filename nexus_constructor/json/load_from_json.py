@@ -1,4 +1,5 @@
 import json
+from json import JSONDecodeError
 from typing import Dict, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
@@ -145,10 +146,9 @@ class JSONReader:
         :return: True if the model was loaded without problems, False otherwise.
         """
         with open(filename, "r") as json_file:
-            json_data = json_file.read()
             try:
-                json_dict = json.loads(json_data)
-            except ValueError as exception:
+                json_dict = json.load(json_file)
+            except JSONDecodeError as exception:
                 self.warnings.append(
                     InvalidJson(
                         f"Provided file not recognised as valid JSON. Exception: {exception}"
