@@ -1836,7 +1836,7 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
     widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
 
-    stream = widget.value.children[0]
+    stream = widget.value
     assert stream.topic == topic
     assert stream.source == pvname
     assert stream.type == pvtype
@@ -2060,6 +2060,35 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ev42_THEN_stre
     assert not streams_widget.type_combo.isVisible()
 
 
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ADar_THEN_stream_dialog_shown_with_correct_options(
+    qtbot, add_component_dialog, template
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("ADAr")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+    assert streams_widget.array_size_label.isVisible()
+    assert streams_widget.array_size_table.isVisible()
+
+
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_ns10_THEN_stream_dialog_shown_with_correct_options(
     qtbot, add_component_dialog, template
 ):
@@ -2237,9 +2266,9 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     array_size = 2
     streams_widget.array_size_spinbox.setValue(array_size)
 
-    stream = streams_widget.get_stream_group()
+    stream = streams_widget.get_stream_module(None)
 
-    assert stream.children[0].array_size == array_size
+    assert stream.array_size == array_size
 
 
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(

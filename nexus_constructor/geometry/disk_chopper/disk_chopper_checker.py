@@ -62,7 +62,7 @@ def _unsuccessful_conversion_message(field_widget: FieldWidget, field_name: str)
     :return: A string that tells the user that the given field could not be converted.
     """
     return (
-        f"Unable to convert input in {field_name} field to {field_widget.dtype}. Found"
+        f"Unable to convert input in {field_name} field to {field_widget.dtype}. Found"  # type: ignore
         f" input {field_widget.value.values}."
     )
 

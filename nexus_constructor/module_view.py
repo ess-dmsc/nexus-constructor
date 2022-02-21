@@ -35,7 +35,7 @@ class ModuleView(QGroupBox):
     def save_module_changes(self):
         if self.module.writer_module == WriterModules.DATASET.value:
             self.module.name = self.field_widget.name
-            self.module.values = self.field_widget.value.values
+            self.module.values = self.field_widget.value.values  # type: ignore
             self.module.type = self.field_widget.dtype
             self.module.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
