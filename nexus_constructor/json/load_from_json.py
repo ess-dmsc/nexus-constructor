@@ -1,4 +1,5 @@
 import json
+from json import JSONDecodeError
 from typing import Dict, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
@@ -147,7 +148,7 @@ class JSONReader:
         with open(filename, "r") as json_file:
             try:
                 json_dict = json.load(json_file)
-            except ValueError as exception:
+            except JSONDecodeError as exception:
                 self.warnings.append(
                     InvalidJson(
                         f"Provided file not recognised as valid JSON. Exception: {exception}"
