@@ -145,9 +145,8 @@ class JSONReader:
         :return: True if the model was loaded without problems, False otherwise.
         """
         with open(filename, "r") as json_file:
-            json_data = json_file.read()
             try:
-                json_dict = json.loads(json_data)
+                json_dict = json.load(json_file)
             except ValueError as exception:
                 self.warnings.append(
                     InvalidJson(
