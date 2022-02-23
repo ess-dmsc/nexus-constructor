@@ -1,17 +1,17 @@
 import copy
 from typing import Dict, List
 
-from PySide2.QtCore import QAbstractTableModel, Qt
+from PySide2.QtCore import QAbstractTableModel, QModelIndex, Qt
 from PySide2.QtWidgets import (
     QDialog,
-    QVBoxLayout,
-    QHBoxLayout,
-    QTableView,
     QDialogButtonBox,
-    QPushButton,
-    QSpacerItem,
-    QSizePolicy,
+    QHBoxLayout,
     QLabel,
+    QPushButton,
+    QSizePolicy,
+    QSpacerItem,
+    QTableView,
+    QVBoxLayout,
 )
 
 
@@ -46,19 +46,30 @@ class TableModel(QAbstractTableModel):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self._headings[section]
 
-    def add_new_user(self):
-        self._data.append({k: "" for k in self._headings})
-        self.layoutChanged.emit()
+    def add_new_user(self, position):
+        self._data.insert(position, {k: "" for k in self._headings})
 
-    def delete_users(self, indexes):
-        for row in sorted(indexes, reverse=True):
-            self._data.pop(row)
-        self.layoutChanged.emit()
+    def insertRow(self, position, index=QModelIndex()):
+        self.beginInsertRows(index, position, position)
+        self.add_new_user(position)
+        self.endInsertRows()
+        return True
+
+    def removeRows(self, rows, index=QModelIndex()):
+        for row in sorted(rows, reverse=True):
+            self.beginRemoveRows(QModelIndex(), row, row)
+            del self._data[row]
+            self.endRemoveRows()
+        return True
 
     @property
     def users(self):
         # Ignore users with no name set.
         return [copy.copy(user) for user in self._data if user["name"].strip() != ""]
+
+    @property
+    def num_rows(self):
+        return len(self._data)
 
     def are_users_unique(self):
         users = set()
@@ -135,11 +146,13 @@ class ConfigureUsersDialog(QDialog):
         self.button_box.button(self.button_box.Ok).setFocus()
 
     def _add_user_clicked(self):
-        self.model.add_new_user()
+        self.users_table.model().insertRow(self.model.num_rows)
 
     def _delete_user_clicked(self):
-        indexes = [index.row() for index in self.users_table.selectedIndexes()]
-        self.model.delete_users(indexes)
+        rows_to_remove = set()
+        for index in self.users_table.selectedIndexes():
+            rows_to_remove.add(index.row())
+        self.users_table.model().removeRows(list(rows_to_remove))
 
     def get_users(self):
         return self.model.users
