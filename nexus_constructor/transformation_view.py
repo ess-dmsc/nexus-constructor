@@ -48,6 +48,7 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.magnitude_widget.units_line_edit.textChanged.connect(
             self.save_magnitude
         )
+        self.transformation_frame.value_spinbox.textChanged.connect(self.save_magnitude)
 
     def _change_3d_value_spinbox_visibility(self, show: bool):
         self.transformation_frame.value_spinbox.setEnabled(show)
