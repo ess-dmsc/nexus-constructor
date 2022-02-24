@@ -18,11 +18,14 @@ if TYPE_CHECKING:
 
 
 class EditTransformation(QGroupBox):
+    transformation_parent = None
+
     def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
         super().__init__(parent)
         self.model = model
         self.transformation_frame = UiTransformation(self)
         self.transformation = transformation
+        self.transformation_parent = transformation.parent_component
         current_vector = self.transformation.vector
         self._fill_in_existing_fields(current_vector)
         self.transformation_frame.magnitude_widget.enable_3d_value_spinbox.connect(
@@ -96,7 +99,7 @@ class EditTransformation(QGroupBox):
         if self.transformation_frame.magnitude_widget.field_type_is_scalar():
             try:
                 value_3d_view: "ValueType" = (
-                    self.transformation_frame.magnitude_widget.value.values
+                    self.transformation_frame.magnitude_widget.value.values  # type: ignore
                 )
                 self.transformation_frame.value_spinbox.setValue(float(value_3d_view))
             except ValueError:
@@ -158,7 +161,7 @@ class EditTransformationLink(QFrame):
         super().__init__(parent)
         self.link = link
         self.signals = model.signals
-        self.instrument = model.entry.instrument
+        self.model = model
         self.link_frame = Ui_Link()
         self.link_frame.setupUi(self)
         self.populate_combo_box()
@@ -169,7 +172,7 @@ class EditTransformationLink(QFrame):
         self.link_frame.transformations_combo_box.clear()
         self.link_frame.transformations_combo_box.addItem("(None)", userData=None)
         self.link_frame.transformations_combo_box.setCurrentIndex(0)
-        components = self.instrument.get_components()
+        components = self.model.get_components()
         for current_component in components:
             transformations = current_component.transforms
             self.link_frame.transformations_combo_box.addItem(
