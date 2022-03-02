@@ -3,7 +3,7 @@
 <!--
 # NeXus - Neutron and X-ray Common Data Format
 # 
-# Copyright (C) 2008-2021 NeXus International Advisory Committee (NIAC)
+# Copyright (C) 2008-2022 NeXus International Advisory Committee (NIAC)
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -38,6 +38,8 @@
 
         The reference point of the aperture is its center in the x and y axis. The reference point on the z axis is the
         surface of the aperture pointing towards the source.
+
+        In complex (asymmetic) geometries an NXoff_geometry group can be used to provide an unambiguous reference.
 
         .. image:: aperture/aperture.png
             :width: 40%
