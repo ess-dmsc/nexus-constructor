@@ -3,11 +3,12 @@ from typing import TYPE_CHECKING, Callable, List, Tuple, Union
 
 import numpy as np
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
@@ -25,6 +26,7 @@ def update_existing_link_field(field: Link, new_ui_field: "QFrame"):
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.link
+    new_ui_field.name = field.name
     new_ui_field.value = field.source
 
 
@@ -39,9 +41,12 @@ def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):
 
 
 def __update_existing_dataset_field(field: Dataset, new_ui_field: FieldWidget):
-    new_ui_field.dtype = field.type
+    new_ui_field.name = field.name
+    new_ui_field.dtype = ValueTypes.STRING if not field.type else field.type
     new_ui_field.value = field.values  # type: ignore
     new_ui_field.attrs = field
+    units = field.attributes.get_attribute_value(CommonAttrs.UNITS)
+    new_ui_field.units = units
 
 
 def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
@@ -60,13 +65,16 @@ def update_existing_stream_field(field: Group, new_ui_field: "StreamFieldsWidget
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
+    new_ui_field.name = field.name
     new_ui_field.field_type = FieldType.kafka_stream
     new_ui_field.streams_widget.update_existing_stream_info(field)
     new_ui_field.attrs = field
+    units = field.attributes.get_attribute_value(CommonAttrs.UNITS)
+    new_ui_field.units = units
 
 
 def get_fields_with_update_functions(
-    component: Component,
+    component: Group,
 ) -> List[Tuple[Union["FileWriterModule", "Group"], Callable]]:
     """
     Return a list of fields in a given component group.
@@ -80,8 +88,8 @@ def get_fields_with_update_functions(
     return items_with_update_functions
 
 
-def find_field_type(item: "ValueType") -> Callable:
-    if isinstance(item, Dataset) and item.name not in INVALID_FIELD_NAMES:
+def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Callable:
+    if isinstance(item, Dataset) and item.name not in ignore_names:
         if np.isscalar(item.values):
             return update_existing_scalar_field
         else:

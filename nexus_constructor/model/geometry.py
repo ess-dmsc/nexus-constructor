@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from math import acos, cos, degrees, pi, sin
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from PySide2.QtGui import QMatrix4x4, QVector3D
@@ -235,13 +235,17 @@ class BoxGeometry(Group):
 
 
 class CylindricalGeometry(Group):
+    _detector: Optional[np.array] = None
+
     @property
     def detector_number(self) -> List[int]:
-        return self.get_field_value(DETECTOR_NUMBER).tolist()
+        if self._detector is None:
+            return None
+        return self._detector.tolist()
 
     @detector_number.setter
     def detector_number(self, pixel_ids: List[int]):
-        self.set_field_value(DETECTOR_NUMBER, np.array(pixel_ids), ValueTypes.INT)
+        self._detector = np.array(pixel_ids)
 
     @property
     def units(self) -> str:

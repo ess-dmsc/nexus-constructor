@@ -11,6 +11,7 @@ from nexus_constructor.model.helpers import (
     get_absolute_path,
 )
 from nexus_constructor.model.module import Dataset
+from nexus_constructor.model.value_type import ValueTypes
 
 if TYPE_CHECKING:
     from nexus_constructor.model.module import FileWriterModule  # noqa: F401
@@ -60,6 +61,50 @@ class Group:
 
     def __delitem__(self, key):
         _remove_item(self.children, key)
+
+    @property
+    def description(self) -> str:
+        try:
+            return self.get_field_value(CommonAttrs.DESCRIPTION)
+        except AttributeError:
+            return ""
+
+    @description.setter
+    def description(self, new_description: str):
+        self.set_field_value(
+            CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING
+        )
+
+    def number_of_children(self):
+        return len(self.children)
+
+    def tree_depth(self):
+        """
+        The depth of the tree.
+        """
+        return self._apply_function_to_tree_structure(max)
+
+    def tree_size(self):
+        """
+        Number of nodes in the tree structure.
+        """
+        return self._apply_function_to_tree_structure(sum)
+
+    def _apply_function_to_tree_structure(self, func):
+        if not self.children:
+            return 1
+        else:
+            return (
+                func(
+                    [
+                        child._apply_function_to_tree_structure(func)
+                        if isinstance(child, Group)
+                        else 1
+                        for child in self.children
+                    ]
+                )
+                + 1
+            )
 
     @property
     def absolute_path(self):

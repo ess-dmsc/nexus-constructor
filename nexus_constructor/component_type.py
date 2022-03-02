@@ -113,7 +113,7 @@ def __list_base_class_files(file_list):
 
 
 def make_dictionary_of_class_definitions(
-    repo_directory="nexus_definitions", black_list: List[str] = None
+    repo_directory="nexus_definitions", not_allowed: List[str] = None
 ):
     base_class_dir = os.path.join(repo_directory, "base_classes")
 
@@ -123,7 +123,7 @@ def make_dictionary_of_class_definitions(
         with open(os.path.join(base_class_dir, base_class_file)) as def_file:
             _create_base_class_dict(
                 def_file.read(),
-                black_list,
+                not_allowed,
                 all_class_definitions,
                 component_definitions,
             )
@@ -131,14 +131,14 @@ def make_dictionary_of_class_definitions(
 
 
 def _create_base_class_dict(
-    xml_text, black_list, class_definitions, component_definitions
+    xml_text, not_allowed, class_definitions, component_definitions
 ):
-    if black_list is None:
-        black_list = []
+    if not_allowed is None:
+        not_allowed = []
 
     xml_definition = xmltodict.parse(xml_text)["definition"]
     nx_class_name = xml_definition["@name"]
-    if nx_class_name in black_list:
+    if nx_class_name in not_allowed:
         return
     class_fields = []
     try:
@@ -151,5 +151,5 @@ def _create_base_class_dict(
     except KeyError:
         pass
     class_definitions[nx_class_name] = class_fields
-    if nx_class_name in COMPONENT_TYPES:
+    if nx_class_name in NX_CLASSES:
         component_definitions[nx_class_name] = class_fields

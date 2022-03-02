@@ -1,8 +1,8 @@
 import json
-from typing import Dict, List, Optional, Tuple, Union
+from json import JSONDecodeError
+from typing import Dict, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
-    INSTRUMENT_NAME,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
     CommonAttrs,
@@ -41,6 +41,8 @@ from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     Dataset,
     FileWriterModule,
+    Link,
+    StreamModule,
     WriterModules,
     create_fw_module_object,
 )
@@ -144,10 +146,9 @@ class JSONReader:
         :return: True if the model was loaded without problems, False otherwise.
         """
         with open(filename, "r") as json_file:
-            json_data = json_file.read()
             try:
-                json_dict = json.loads(json_data)
-            except ValueError as exception:
+                json_dict = json.load(json_file)
+            except JSONDecodeError as exception:
                 self.warnings.append(
                     InvalidJson(
                         f"Provided file not recognised as valid JSON. Exception: {exception}"
@@ -159,8 +160,12 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
-        # TODO: Remove the _fit_into_model once new tree model is in place.
-        self._fit_into_model()
+        for child in self.entry_node.children:
+            if isinstance(child, (Dataset, Link, Group)):
+                self.model.entry[child.name] = child
+            else:
+                self.model.entry.children.append(child)
+            child.parent_node = self.model.entry
         self._set_transforms_depends_on()
         self._set_components_depends_on()
         return True
@@ -190,6 +195,7 @@ class JSONReader:
                 nexus_object = Component(name=name, parent_node=parent_node)
                 children_dict = json_object[CommonKeys.CHILDREN]
                 self._add_transform_and_shape_to_component(nexus_object, children_dict)
+                self.model.append_component(nexus_object)
             else:
                 nexus_object = Group(name=name, parent_node=parent_node)
             if CommonKeys.CHILDREN in json_object:
@@ -198,7 +204,9 @@ class JSONReader:
             if CommonKeys.CHILDREN in json_object:
                 for child in json_object[CommonKeys.CHILDREN]:
                     node = self._read_json_object(child, nexus_object)
-                    if node and node.name not in nexus_object:
+                    if node and isinstance(node, StreamModule):
+                        nexus_object.children.append(node)
+                    elif node and node.name not in nexus_object:
                         nexus_object[node.name] = node
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]
@@ -286,23 +294,6 @@ class JSONReader:
         if nx_class not in NX_CLASSES:
             return False
         return True
-
-    def _fit_into_model(self):
-        """
-        Create model used in tree-view according to old implementation.
-        """
-        instrument_group = self.entry_node[INSTRUMENT_NAME]
-        if instrument_group:
-            self._add_children_to_instrument(instrument_group.children)
-        # Create sample according to old implementation.
-        if self.sample_name:
-            self.model.entry.instrument.sample = self.entry_node[self.sample_name]
-            self.model.entry.instrument.sample.parent_node = self.model.entry.instrument
-
-    def _add_children_to_instrument(self, children_list: List[Group]):
-        for child in children_list:
-            child.parent_node = self.model.entry.instrument
-            self.model.entry.instrument[child.name] = child
 
     def _add_transform_and_shape_to_component(self, component, children_dict):
         # Add transformations if they exist.

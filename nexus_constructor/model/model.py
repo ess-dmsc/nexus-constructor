@@ -3,8 +3,8 @@ from typing import Any, Dict, List
 from PySide2.QtCore import QObject, Signal
 
 from nexus_constructor.common_attrs import CommonKeys
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
-from nexus_constructor.model.instrument import Instrument
 
 
 class Signals(QObject):
@@ -18,13 +18,20 @@ class Signals(QObject):
     component_removed = Signal(str)
     transformation_changed = Signal()
     show_entries_dialog = Signal("QVariant", "QVariant")
+    module_changed = Signal()
 
 
 class Model:
     def __init__(self):
         self.signals = Signals()
         self.entry = Entry()
-        self.entry.instrument = Instrument()
+        self._components: List = []
+
+    def append_component(self, component: Component):
+        self._components.append(component)
+
+    def get_components(self):
+        return self._components
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return {CommonKeys.CHILDREN: [self.entry.as_dict(error_collector)]}

@@ -112,13 +112,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     parent=self,
                 )
             if success:
-                self.model.entry = reader.model.entry
+                self.model = reader.model
                 self._update_views()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
-        for component in self.model.entry.instrument.get_components():
-            self.sceneWidget.add_transformation(component)
+        for component in self.model.get_components():
+            if isinstance(component, Component):
+                self.sceneWidget.add_transformation(component)
 
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
@@ -127,7 +128,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
-        for component in self.model.entry.instrument.get_components():
+        for component in self.model.get_components():
             self.sceneWidget.add_component(component)
             self.sceneWidget.add_transformation(component)
 
@@ -183,7 +184,7 @@ class QDialogCustom(QDialog):
         if not self._is_accepting_component:
             event.accept()
             return
-        quit_msg = "Do you want to close the component editor?"
+        quit_msg = "Do you want to close the group editor?"
         reply = QMessageBox.question(
             self,
             "Really quit?",

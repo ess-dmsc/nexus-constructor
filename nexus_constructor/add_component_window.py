@@ -1,5 +1,6 @@
 import logging
 from collections import OrderedDict
+from copy import deepcopy
 from functools import partial
 from typing import List
 
@@ -8,9 +9,10 @@ from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget, QListWidgetItem
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
-from nexus_constructor.component_tree_model import ComponentTreeModel
+from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
+    COMPONENT_TYPES,
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
 )
@@ -23,7 +25,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
-from nexus_constructor.model.component import Component, add_fields_to_component
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import (
     BoxGeometry,
     CylindricalGeometry,
@@ -31,12 +33,14 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Link
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,
     generate_unique_name,
+    show_warning_dialog,
     validate_line_edit,
 )
 from nexus_constructor.unit_utils import METRES
@@ -77,7 +81,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     def __init__(
         self,
         model: Model,
-        component_model: ComponentTreeModel,
+        component_model: NexusTreeModel,
         component_to_edit: Component = None,
         nx_classes=None,
         parent=None,
@@ -88,7 +92,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if parent:
             self.setParent(parent)
         self.signals = model.signals
-        self.instrument = model.entry.instrument
+        self.model = model
         self.component_model = component_model
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
@@ -133,7 +137,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        component_list = self.instrument.get_components()
+        component_list = self.model.get_components()
         if self.component_to_edit:
             for item in component_list:
                 if item.name == self.component_to_edit.name:
@@ -145,8 +149,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             partial(
                 validate_line_edit,
                 self.nameLineEdit,
-                tooltip_on_accept="Component name is valid.",
-                tooltip_on_reject="Component name is not valid. Suggestion: ",
+                tooltip_on_accept="Group name is valid.",
+                tooltip_on_reject="Group name is not valid. Suggestion: ",
                 suggestion_callable=self.generate_name_suggestion,
             )
         )
@@ -179,10 +183,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         if self.component_to_edit:
-            parent_dialog.setWindowTitle(
-                f"Edit Component: {self.component_to_edit.name}"
-            )
-            self.ok_button.setText("Edit Component")
+            parent_dialog.setWindowTitle(f"Edit group: {self.component_to_edit.name}")
+            self.ok_button.setText("Edit group")
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
@@ -265,7 +267,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.nameLineEdit.setText(self.component_to_edit.name)
         self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
         self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
-        self.__fill_existing_shape_info()
+        if isinstance(self.component_to_edit, Component):
+            self.__fill_existing_shape_info()
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
@@ -320,7 +323,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
-        field = FieldWidget(self.possible_fields, self.fieldsListWidget)
+        field = FieldWidget(
+            self.component_to_edit, self.possible_fields, self.fieldsListWidget
+        )
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
@@ -343,7 +348,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         return generate_unique_name(
             self.componentTypeComboBox.currentText().lstrip("NX"),
-            self.instrument.get_components(),
+            self.model.get_components(),
         )
 
     def on_nx_class_changed(self):
@@ -482,39 +487,45 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 component_name, description, nx_class, pixel_data
             )
 
-        self.signals.component_added.emit(component)
+        if isinstance(component, Component):
+            self.signals.component_added.emit(component)
 
         if self.component_to_edit:
             self.signals.transformation_changed.emit()
 
     def create_new_component(
         self,
-        component_name: str,
+        nexus_obj_name: str,
         description: str,
         nx_class: str,
         pixel_data: PixelData,
     ):
         """
         Creates a new component.
-        :param component_name: The name of the component.
+        :param nexus_obj_name: The name of the component.
         :param description: The component description.
         :param nx_class: The component class.
         :param pixel_data: The PixelData for the component. Will be None if it was not given of if the component type
             doesn't have pixel-related fields.
         :return: The geometry object.
         """
-
-        component = Component(name=component_name, parent_node=self.instrument)
-        component.nx_class = nx_class
-        component.description = description
+        nexus_object: Group
+        if nx_class in COMPONENT_TYPES:
+            nexus_object = Component(name=nexus_obj_name, parent_node=None)
+        else:
+            nexus_object = Group(name=nexus_obj_name, parent_node=None)
+        nexus_object.nx_class = nx_class
+        if description:
+            nexus_object.description = description
         # Add shape information
-        self.generate_geometry_model(component, pixel_data)
-
-        self.write_pixel_data_to_component(component, nx_class, pixel_data)
-        add_fields_to_component(component, self.fieldsListWidget)
-
-        self.component_model.add_component(component)
-        return component
+        if isinstance(nexus_object, Component):
+            self.generate_geometry_model(nexus_object, pixel_data)
+            self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
+        self.component_model.add_group(nexus_object)
+        add_fields_to_component(
+            nexus_object, self.fieldsListWidget, self.component_model
+        )
+        return nexus_object
 
     def edit_existing_component(
         self,
@@ -532,18 +543,29 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The geometry object.
         """
         # remove the previous object from the qt3d view
-        self.parent().sceneWidget.delete_component(self.component_to_edit.name)
-
+        children_copy = deepcopy(self.component_to_edit.children)
+        if isinstance(self.component_to_edit, Component):
+            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
         if self.component_to_edit:
-            self.component_to_edit.children = []
             self.component_to_edit.name = component_name
+            self.component_to_edit.children = []
             self.component_to_edit.nx_class = nx_class
+        if description:
             self.component_to_edit.description = description
-
-        self.write_pixel_data_to_component(self.component_to_edit, nx_class, pixel_data)
-        add_fields_to_component(self.component_to_edit, self.fieldsListWidget)
-        self.generate_geometry_model(self.component_to_edit, pixel_data)
+        if isinstance(self.component_to_edit, Component):
+            self.write_pixel_data_to_component(
+                self.component_to_edit, nx_class, pixel_data
+            )
+            self.generate_geometry_model(self.component_to_edit, pixel_data)
+        for child in children_copy:
+            if isinstance(child, Group):
+                self.component_to_edit[child.name] = child
+        if isinstance(self.component_to_edit, Component):
+            self.component_model.components.append(self.component_to_edit)
+        add_fields_to_component(
+            self.component_to_edit, self.fieldsListWidget, self.component_model
+        )
         return self.component_to_edit if self.component_to_edit else None
 
     @staticmethod
@@ -627,3 +649,27 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
 def get_fields_and_update_functions_for_component(component: Component):
     return get_fields_with_update_functions(component)
+
+
+def add_fields_to_component(
+    component: Group, fields_widget: QListWidget, component_model: NexusTreeModel = None
+):
+    """
+    Adds fields from a list widget to a component.
+    :param component: Component to add the field to.
+    :param fields_widget: The field list widget to extract field information such the name and value of each field.
+    """
+    for i in range(fields_widget.count()):
+        widget = fields_widget.itemWidget(fields_widget.item(i))
+        try:
+            component[widget.name] = widget.value
+        except ValueError as error:
+            show_warning_dialog(
+                f"Warning: field {widget.name} not added",
+                title="Field invalid",
+                additional_info=str(error),
+                parent=fields_widget.parent().parent(),
+            )
+    if component_model and component_model.current_nxs_obj[1]:
+        row = component_model.rowCount(component_model.current_nxs_obj[1])
+        component_model.createIndex(row, 0, component_model.current_nxs_obj[1])

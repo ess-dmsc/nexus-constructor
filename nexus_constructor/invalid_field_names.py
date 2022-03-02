@@ -5,6 +5,7 @@
 from nexus_constructor.common_attrs import (
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
+    TRANSFORMATIONS,
     CommonAttrs,
 )
 from nexus_constructor.geometry.pixel_data_utils import PIXEL_FIELDS
@@ -14,5 +15,5 @@ INVALID_FIELD_NAMES = [
     SHAPE_GROUP_NAME,
     CommonAttrs.DEPENDS_ON,
     PIXEL_SHAPE_GROUP_NAME,
-    "transformations",
+    TRANSFORMATIONS,
 ] + PIXEL_FIELDS
