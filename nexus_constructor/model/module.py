@@ -36,6 +36,16 @@ class WriterModules(Enum):
     ADAR = "ADAr"
 
 
+class StreamModules(Enum):
+    F142 = "f142"
+    EV42 = "ev42"
+    TDCTIME = "tdct"
+    NS10 = "ns10"
+    HS00 = "hs00"
+    SENV = "senv"
+    ADAR = "ADAr"
+
+
 @attr.s
 class FileWriterModule(ABC):
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
