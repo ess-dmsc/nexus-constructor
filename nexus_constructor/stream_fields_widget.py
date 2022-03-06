@@ -21,6 +21,7 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
 from nexus_constructor.common_attrs import ARRAY, SCALAR
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
     CHUNK_SIZE,
@@ -435,9 +436,8 @@ class StreamFieldsWidget(QDialog):
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
         """
-        field = field.children[
-            0
-        ]  # only the first stream in the stream group can be edited currently
+        if isinstance(field, Group):
+            field = field.children[0]
         schema = field.writer_module
         self.schema_combo.setCurrentText(schema)
         self.topic_line_edit.setText(field.topic)

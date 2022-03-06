@@ -59,13 +59,14 @@ def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
     __update_existing_dataset_field(field, new_ui_field)
 
 
-def update_existing_stream_field(field: Group, new_ui_field: "StreamFieldsWidget"):
+def update_existing_stream_field(
+    field: StreamModule, new_ui_field: "StreamFieldsWidget"
+):
     """
     Fill in a UI stream field for an existing stream field in the component group
     :param field: The dataset to copy into the value line edit
     :param new_ui_field: The new UI field to fill in with existing data
     """
-    new_ui_field.name = field.name
     new_ui_field.field_type = FieldType.kafka_stream
     new_ui_field.streams_widget.update_existing_stream_info(field)
     new_ui_field.attrs = field
@@ -94,6 +95,8 @@ def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Call
             return update_existing_scalar_field
         else:
             return update_existing_array_field
+    elif isinstance(item, StreamModule):
+        return update_existing_stream_field
     elif isinstance(item, Group):
         if item.children:
             if isinstance(item.children[0], StreamModule):

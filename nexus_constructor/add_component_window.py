@@ -35,7 +35,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import Link
+from nexus_constructor.model.module import Dataset, Link
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,
@@ -318,7 +318,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def create_new_ui_field(self, field):
         new_ui_field = self.add_field()
-        new_ui_field.name = field.name
+        if isinstance(field, Dataset):
+            new_ui_field.name = field.name
         return new_ui_field
 
     def add_field(self) -> FieldWidget:
@@ -553,24 +554,22 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.component_to_edit.nx_class = nx_class
         if description:
             self.component_to_edit.description = description
-        if isinstance(self.component_to_edit, Component):
-            self.write_pixel_data_to_component(
-                self.component_to_edit, nx_class, pixel_data
-            )
-            self.generate_geometry_model(self.component_to_edit, pixel_data)
         for child in children_copy:
             if isinstance(child, Group):
                 self.component_to_edit[child.name] = child
         if isinstance(self.component_to_edit, Component):
             self.component_model.components.append(self.component_to_edit)
+            self.generate_geometry_model(self.component_to_edit, pixel_data)
+            self.write_pixel_data_to_component(
+                self.component_to_edit, nx_class, pixel_data
+            )
         add_fields_to_component(
             self.component_to_edit, self.fieldsListWidget, self.component_model
         )
         return self.component_to_edit if self.component_to_edit else None
 
-    @staticmethod
     def write_pixel_data_to_component(
-        component: Component, nx_class: str, pixel_data: PixelData
+        self, component: Component, nx_class: str, pixel_data: PixelData
     ):
         """
         Writes the detector number/pixel grid data to a component.
@@ -585,7 +584,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         if isinstance(pixel_data, PixelMapping):
             component.record_pixel_mapping(pixel_data)
-        if isinstance(pixel_data, PixelGrid):
+        if isinstance(pixel_data, PixelGrid) and self.get_pixel_visibility_condition():
             component.record_pixel_grid(pixel_data)
 
     def change_pixel_options_visibility(self):
@@ -662,7 +661,10 @@ def add_fields_to_component(
     for i in range(fields_widget.count()):
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
-            component[widget.name] = widget.value
+            if not isinstance(widget.value, Dataset):
+                component.children.append(widget.value)
+            else:
+                component[widget.name] = widget.value
         except ValueError as error:
             show_warning_dialog(
                 f"Warning: field {widget.name} not added",
