@@ -41,7 +41,6 @@ class StreamModules(Enum):
     EV42 = "ev42"
     TDCTIME = "tdct"
     NS10 = "ns10"
-    HS00 = "hs00"
     SENV = "senv"
     ADAR = "ADAr"
 
