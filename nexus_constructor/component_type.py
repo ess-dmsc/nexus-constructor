@@ -130,6 +130,16 @@ def make_dictionary_of_class_definitions(
     return all_class_definitions, component_definitions
 
 
+nexus_dtype_dict = {
+    "NX_CHAR": "string",
+    "NX_FLOAT": "float",
+    "NX_INT": "int32",
+    "NX_NUMBER": "float",
+    "NX_POSINT": "uint32",
+    "NX_UINT": "uint32",
+}
+
+
 def _create_base_class_dict(
     xml_text, not_allowed, class_definitions, component_definitions
 ):
@@ -145,9 +155,16 @@ def _create_base_class_dict(
         fields = xml_definition["field"]
         try:
             for field in fields:
-                class_fields.append(field["@name"])
+                data_type = "string"
+                if "@type" in field:
+                    data_type = nexus_dtype_dict.get(field["@type"], "string")
+                class_fields.append((field["@name"], data_type))
+
         except Exception:
-            class_fields.append(fields["@name"])
+            data_type = "string"
+            if "@type" in fields:
+                data_type = nexus_dtype_dict.get(fields["@type"], "string")
+            class_fields.append((fields["@name"], data_type))
     except KeyError:
         pass
     class_definitions[nx_class_name] = class_fields

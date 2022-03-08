@@ -78,15 +78,20 @@ class FieldWidget(QFrame):
     def __init__(
         self,
         node_parent,
-        possible_field_names=None,
+        possible_fields=None,
         parent: QListWidget = None,
         hide_name_field: bool = False,
         show_only_f142_stream: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
 
-        if possible_field_names is None:
-            possible_field_names = []
+        possible_field_names = []
+        self.default_field_types_dict = {}
+        if possible_fields:
+            possible_field_names, default_field_types = zip(*possible_fields)
+            self.default_field_types_dict = dict(
+                zip(possible_field_names, default_field_types)
+            )
         self._show_only_f142_stream = show_only_f142_stream
         self._node_parent = node_parent
 
@@ -97,6 +102,8 @@ class FieldWidget(QFrame):
             self.parent().parent().destroyed.connect(self.attrs_dialog.close)
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
+        if self.default_field_types_dict:
+            self.field_name_edit.textChanged.connect(self.update_default_type)
         self.hide_name_field = hide_name_field
         if hide_name_field:
             self.name = str(uuid.uuid4())
@@ -290,6 +297,11 @@ class FieldWidget(QFrame):
     @units.setter
     def units(self, new_units: str):
         self.units_line_edit.setText(new_units)
+
+    def update_default_type(self):
+        self.value_type_combo.setCurrentText(
+            self.default_field_types_dict.get(self.field_name_edit.text(), "string")
+        )
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
