@@ -132,7 +132,8 @@ def make_dictionary_of_class_definitions(
 
 nexus_dtype_dict = {
     "NX_CHAR": "string",
-    "NX_FLOAT": "float",
+    "NX_DATE_TIME": "string",
+    "NX_FLOAT": "double",
     "NX_INT": "int32",
     "NX_NUMBER": "float",
     "NX_POSINT": "uint32",
@@ -157,13 +158,13 @@ def _create_base_class_dict(
             for field in fields:
                 data_type = "string"
                 if "@type" in field:
-                    data_type = nexus_dtype_dict.get(field["@type"], "string")
+                    data_type = nexus_dtype_dict.get(field["@type"], "double")
                 class_fields.append((field["@name"], data_type))
 
         except Exception:
             data_type = "string"
             if "@type" in fields:
-                data_type = nexus_dtype_dict.get(fields["@type"], "string")
+                data_type = nexus_dtype_dict.get(fields["@type"], "double")
             class_fields.append((fields["@name"], data_type))
     except KeyError:
         pass

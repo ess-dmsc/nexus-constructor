@@ -300,7 +300,7 @@ class FieldWidget(QFrame):
 
     def update_default_type(self):
         self.value_type_combo.setCurrentText(
-            self.default_field_types_dict.get(self.field_name_edit.text(), "string")
+            self.default_field_types_dict.get(self.field_name_edit.text(), "double")
         )
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
