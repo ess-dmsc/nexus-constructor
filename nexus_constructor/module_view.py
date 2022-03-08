@@ -4,7 +4,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_utils import find_field_type
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import WriterModules
+from nexus_constructor.model.module import StreamModules, WriterModules
 
 
 class ModuleView(QGroupBox):
@@ -23,6 +23,8 @@ class ModuleView(QGroupBox):
         if (
             self.module.writer_module == WriterModules.DATASET.value
             or self.module.writer_module == WriterModules.LINK.value
+            or self.module.writer_module
+            in [StreamMode.value for StreamMode in StreamModules]
         ):
             update_function = find_field_type(module, [])
             if update_function is not None:
@@ -37,6 +39,14 @@ class ModuleView(QGroupBox):
             self.module.name = self.field_widget.name
             self.module.values = self.field_widget.value.values  # type: ignore
             self.module.type = self.field_widget.dtype
+            self.module.attributes.set_attribute_value(
+                CommonAttrs.UNITS, self.field_widget.units
+            )
+        elif self.module.writer_module in [
+            StreamMode.value for StreamMode in StreamModules
+        ]:
+            self.module.source = self.field_widget.value.source  # type: ignore
+            self.module.topic = self.field_widget.value.topic  # type: ignore
             self.module.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
             )

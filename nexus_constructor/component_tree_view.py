@@ -62,7 +62,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             get_group_frame(frame, value)
         elif isinstance(value, TransformationsList):
             get_transformations_list_frame(frame)
-        elif isinstance(value, ComponentInfo):  # TODO: Call this GroupInfo.
+        elif isinstance(value, ComponentInfo):
             get_group_info_frame(frame, value)
         elif isinstance(value, Transformation):
             get_transformation_frame(frame, self.model, value)
