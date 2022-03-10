@@ -361,7 +361,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.possible_fields = self.nx_component_classes[
             self.componentTypeComboBox.currentText()
         ]
-        self.nx_class_changed.emit(self.possible_fields)
+        possible_field_names, _ = zip(*self.possible_fields)
+        self.nx_class_changed.emit(possible_field_names)
 
     def mesh_file_picker(self):
         """
