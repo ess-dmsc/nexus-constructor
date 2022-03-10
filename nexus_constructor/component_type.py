@@ -134,7 +134,7 @@ nexus_dtype_dict = {
     "NX_CHAR": "string",
     "NX_DATE_TIME": "string",
     "NX_FLOAT": "double",
-    "NX_INT": "int32",
+    "NX_INT": "int64",
     "NX_NUMBER": "double",
     "NX_POSINT": "uint32",
     "NX_UINT": "uint32",
