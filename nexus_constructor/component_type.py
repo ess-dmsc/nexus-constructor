@@ -136,8 +136,8 @@ nexus_dtype_dict = {
     "NX_FLOAT": "double",
     "NX_INT": "int64",
     "NX_NUMBER": "double",
-    "NX_POSINT": "uint32",
-    "NX_UINT": "uint32",
+    "NX_POSINT": "uint64",
+    "NX_UINT": "uint64",
 }
 
 
