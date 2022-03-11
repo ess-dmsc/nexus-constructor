@@ -1,4 +1,5 @@
-from PySide2.QtWidgets import QGroupBox, QVBoxLayout, QWidget
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_utils import find_field_type
@@ -8,6 +9,42 @@ from nexus_constructor.model.module import StreamModules, WriterModules
 
 
 class ModuleView(QGroupBox):
+    def __init__(self, module, parent: QWidget, model: Model):
+        super().__init__(module.writer_module.upper(), parent)
+        self.setFixedHeight(65)
+        self.model = model
+        self._setup_frame(module)
+
+    def _setup_frame(self, module):
+        self.layout = QHBoxLayout()
+        if module.writer_module in [StreamMode.value for StreamMode in StreamModules]:
+            topic = module.topic if module.topic else "not specified"
+            source = module.source if module.topic else "not specified"
+            self.layout.addWidget(self._get_label(f"topic: {topic}, "))
+            self.layout.addWidget(self._get_label(f"source: {source}, "))
+        elif module.writer_module == WriterModules.LINK.value:
+            name = module.name if module.name else "not specified"
+            source = module.source if module.source else "not specified"
+            self.layout.addWidget(self._get_label(f"name: {name}, "))
+            self.layout.addWidget(self._get_label(f"source: {source}"))
+        elif module.writer_module == WriterModules.DATASET.value:
+            name = module.name if module.name else "not specified"
+            dtype = module.type if module.type else "not specified"
+            self.layout.addWidget(self._get_label(f"name: {name}, "))
+            self.layout.addWidget(self._get_label(f"data type: {dtype}"))
+        self.layout.setAlignment(Qt.AlignLeft)
+        self.setLayout(self.layout)
+
+    @staticmethod
+    def _get_label(content):
+        label = QLabel(content)
+        font = label.font()
+        font.setBold(True)
+        label.setFont(font)
+        return label
+
+
+class ModuleViewEditable(QGroupBox):
     def __init__(self, module, parent: QWidget, model: Model):
         super().__init__(module.writer_module.upper(), parent)
         layout = QVBoxLayout()
