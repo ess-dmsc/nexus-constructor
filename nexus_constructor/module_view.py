@@ -21,7 +21,7 @@ class ModuleView(QGroupBox):
             topic = module.topic if module.topic else "not specified"
             source = module.source if module.topic else "not specified"
             self.layout.addWidget(self._get_label(f"topic: {topic}, "))
-            self.layout.addWidget(self._get_label(f"source: {source}, "))
+            self.layout.addWidget(self._get_label(f"source: {source}"))
         elif module.writer_module == WriterModules.LINK.value:
             name = module.name if module.name else "not specified"
             source = module.source if module.source else "not specified"

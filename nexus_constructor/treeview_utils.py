@@ -28,7 +28,7 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset, FileWriterModule
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.module_view import ModuleView
+from nexus_constructor.module_view import ModuleView, ModuleViewEditable
 from nexus_constructor.transformation_view import (
     EditRotation,
     EditTransformationLink,
@@ -286,5 +286,9 @@ def get_module_frame(frame: QFrame, model: Model, value: FileWriterModule):
     module_frame = ModuleView(value, frame, model)
     frame.module_frame = module_frame
     frame.layout().addWidget(frame.module_frame)
-    if isinstance(value, Dataset) and value.name in EXCLUDED_PIXEL_GRID:
+    if (
+        isinstance(module_frame, ModuleViewEditable)
+        and isinstance(value, Dataset)
+        and value.name in EXCLUDED_PIXEL_GRID
+    ):
         frame.setEnabled(False)
