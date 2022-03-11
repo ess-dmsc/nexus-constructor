@@ -20,17 +20,17 @@ class ModuleView(QGroupBox):
         if module.writer_module in [StreamMode.value for StreamMode in StreamModules]:
             topic = module.topic if module.topic else "not specified"
             source = module.source if module.topic else "not specified"
-            self.layout.addWidget(self._get_label(f"topic: {topic}, "))
+            self.layout.addWidget(self._get_label(f"topic: {topic}   |  "))
             self.layout.addWidget(self._get_label(f"source: {source}"))
         elif module.writer_module == WriterModules.LINK.value:
             name = module.name if module.name else "not specified"
             source = module.source if module.source else "not specified"
-            self.layout.addWidget(self._get_label(f"name: {name}, "))
+            self.layout.addWidget(self._get_label(f"link name: {name}   |  "))
             self.layout.addWidget(self._get_label(f"source: {source}"))
         elif module.writer_module == WriterModules.DATASET.value:
             name = module.name if module.name else "not specified"
             dtype = module.type if module.type else "not specified"
-            self.layout.addWidget(self._get_label(f"name: {name}, "))
+            self.layout.addWidget(self._get_label(f"dataset name: {name}   |  "))
             self.layout.addWidget(self._get_label(f"data type: {dtype}"))
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
