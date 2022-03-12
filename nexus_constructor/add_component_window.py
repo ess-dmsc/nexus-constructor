@@ -468,6 +468,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         Retrieves information from the interface in order to create a component. By this point the input should already
         be valid as the validators control whether or not the Add Component button is enabled.
         """
+        _, index = self.component_model.current_nxs_obj
+        self.model.signals.group_edited.emit(index, False)
         nx_class = self.componentTypeComboBox.currentText()
         component_name = self.nameLineEdit.text()
         description = self.descriptionPlainTextEdit.text()
@@ -494,6 +496,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         if self.component_to_edit:
             self.signals.transformation_changed.emit()
+        self.model.signals.group_edited.emit(index, True)
 
     def create_new_component(
         self,
