@@ -81,7 +81,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
 
     def on_simple_tree_view(self, value):
-        self.model.signals.use_simple_tree_view.emit(value)
+        self.component_tree_view_tab.reset_model()
+        self.component_tree_view_tab.component_delegate.use_simple_tree_view(value)
 
     def show_edit_component_dialog(self):
         selected_component = (

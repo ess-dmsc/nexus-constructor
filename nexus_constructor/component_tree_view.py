@@ -39,7 +39,6 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def __init__(self, parent: QObject, model: Model):
         super().__init__(parent)
         self.model = model
-        self.model.signals.use_simple_tree_view.connect(self.use_simple_tree_view)
 
     def get_frame(
         self,
@@ -121,5 +120,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         editor.setGeometry(option.rect)
 
     def use_simple_tree_view(self, use_simple_view):
+        # global variable is needed as the constructor of this class is called
+        # multiple times during runtime and internal class attributes will reset.
         global USE_SIMPLE_TREE_VIEW
         USE_SIMPLE_TREE_VIEW = use_simple_view
