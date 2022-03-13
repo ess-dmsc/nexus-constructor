@@ -20,6 +20,7 @@ class Signals(QObject):
     show_entries_dialog = Signal("QVariant", "QVariant")
     module_changed = Signal()
     group_edited = Signal(QModelIndex, bool)
+    use_simple_tree_view = Signal(bool)
 
 
 class Model:

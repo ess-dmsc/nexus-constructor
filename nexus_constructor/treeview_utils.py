@@ -282,8 +282,13 @@ def get_group_frame(frame, value):
     frame.layout().addWidget(frame.label)
 
 
-def get_module_frame(frame: QFrame, model: Model, value: FileWriterModule):
-    module_frame = ModuleView(value, frame, model)
+def get_module_frame(
+    frame: QFrame, model: Model, value: FileWriterModule, use_simple_tree_view: bool
+):
+    if use_simple_tree_view:
+        module_frame = ModuleView(value, frame)
+    else:
+        module_frame = ModuleViewEditable(value, frame, model)
     frame.module_frame = module_frame
     frame.layout().addWidget(frame.module_frame)
     if (

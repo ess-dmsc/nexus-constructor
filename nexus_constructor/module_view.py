@@ -9,10 +9,9 @@ from nexus_constructor.model.module import StreamModules, WriterModules
 
 
 class ModuleView(QGroupBox):
-    def __init__(self, module, parent: QWidget, model: Model):
+    def __init__(self, module, parent: QWidget):
         super().__init__(module.writer_module.upper(), parent)
         self.setFixedHeight(65)
-        self.model = model
         self._setup_frame(module)
 
     def _setup_frame(self, module):

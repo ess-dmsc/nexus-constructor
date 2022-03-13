@@ -111,6 +111,7 @@ class ComponentTreeViewTab(QWidget):
         model.signals.group_edited.connect(
             self.component_tree_view.collapse_group_in_tree
         )
+        model.signals.use_simple_tree_view.connect(self._reset_model)
         self.component_model = NexusTreeModel(model)
         self.component_delegate = ComponentEditorDelegate(
             self.component_tree_view, model
@@ -118,6 +119,9 @@ class ComponentTreeViewTab(QWidget):
         self.component_tree_view.setItemDelegate(self.component_delegate)
         self.component_tree_view.setModel(self.component_model)
         self.parameters_widget.set_up_model(model)
+
+    def _reset_model(self, value):
+        self.set_up_model(self.component_model.model)
 
     def _set_button_state(self):
         set_button_states(

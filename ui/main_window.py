@@ -1,4 +1,5 @@
 from PySide2.QtCore import QMetaObject, QObject, QRect, QSize
+from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (
     QAction,
     QGridLayout,
@@ -10,7 +11,6 @@ from PySide2.QtWidgets import (
     QTabWidget,
     QWidget,
 )
-from PySide2.QtGui import QKeySequence
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from ui.treeview_tab import ComponentTreeViewTab
@@ -72,9 +72,12 @@ class Ui_MainWindow(object):
         self.view_menu = QMenu(self.menu_bar)
         self.show_action_labels = QAction(MainWindow)
         self.show_action_labels.setCheckable(True)
+        self.simple_tree_view = QAction(MainWindow)
+        self.simple_tree_view.setCheckable(True)
         self.about_window = QAction(MainWindow)
         self.view_menu.addAction(self.about_window)
         self.view_menu.addAction(self.show_action_labels)
+        self.view_menu.addAction(self.simple_tree_view)
 
         self.menu_bar.addAction(self.file_menu.menuAction())
         self.menu_bar.addAction(self.view_menu.menuAction())
@@ -91,4 +94,5 @@ class Ui_MainWindow(object):
 
         self.view_menu.setTitle("View")
         self.show_action_labels.setText("Show Button Labels")
+        self.simple_tree_view.setText("Use Simple Tree Model View")
         self.about_window.setText("About")
