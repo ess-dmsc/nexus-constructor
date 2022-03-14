@@ -30,7 +30,6 @@ from nexus_constructor.treeview_utils import (
 
 MODULE_FRAME = "module_frame"
 TRANSFORMATION_FRAME = "transformation_frame"
-USE_SIMPLE_TREE_VIEW: bool = False
 
 
 class ComponentEditorDelegate(QStyledItemDelegate):
@@ -39,6 +38,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def __init__(self, parent: QObject, model: Model):
         super().__init__(parent)
         self.model = model
+        self._use_simple_tree_view = False
 
     def get_frame(
         self,
@@ -70,7 +70,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, LinkTransformation):
             get_link_transformation_frame(frame, self.model, value)
         elif isinstance(value, FileWriterModule):
-            get_module_frame(frame, self.model, value, USE_SIMPLE_TREE_VIEW)
+            get_module_frame(frame, self.model, value, self._use_simple_tree_view)
         return frame
 
     def paint(
@@ -120,7 +120,4 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         editor.setGeometry(option.rect)
 
     def use_simple_tree_view(self, use_simple_view):
-        # global variable is needed as the constructor of this class is called
-        # multiple times during runtime and internal class attributes will reset.
-        global USE_SIMPLE_TREE_VIEW
-        USE_SIMPLE_TREE_VIEW = use_simple_view
+        self._use_simple_tree_view = use_simple_view
