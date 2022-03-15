@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from PySide2.QtCore import QObject, Signal
+from PySide2.QtCore import QModelIndex, QObject, Signal
 
 from nexus_constructor.common_attrs import CommonKeys
 from nexus_constructor.model.component import Component
@@ -19,6 +19,7 @@ class Signals(QObject):
     transformation_changed = Signal()
     show_entries_dialog = Signal("QVariant", "QVariant")
     module_changed = Signal()
+    group_edited = Signal(QModelIndex, bool)
 
 
 class Model:

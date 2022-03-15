@@ -1948,7 +1948,6 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     field.field_type_combo.setCurrentText(FieldType.scalar_dataset.value)
     field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
 
-    field.value_type_combo.setCurrentText(ValueTypes.STRING)
     field.value_type_combo.currentTextChanged.emit(field.value_type_combo.currentText)
 
     field_name = "testfield"
@@ -1956,6 +1955,7 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
 
     field.field_name_edit.setText(field_name)
     field.value_line_edit.setText(field_value)
+    field.value_type_combo.setCurrentText(ValueTypes.STRING)
 
     assert field.dtype == ValueTypes.STRING
 

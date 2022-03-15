@@ -22,13 +22,18 @@ from nexus_constructor.treeview_utils import (
 from ui.parameters_widget import ParametersView
 
 
+class QNexusTreeView(QTreeView):
+    def collapse_group_in_tree(self, index: QModelIndex, expand: bool):
+        self.setExpanded(index, expand)
+
+
 class ComponentTreeViewTab(QWidget):
     def __init__(self, scene_widget: InstrumentView, parent=None):
         super().__init__()
         self.setLayout(QVBoxLayout())
         self.setParent(parent)
         self.componentsTabLayout = QVBoxLayout()
-        self.component_tree_view = QTreeView()
+        self.component_tree_view = QNexusTreeView()
         self.parameters_widget = ParametersView(parent)
         self.componentsTabLayout.addWidget(self.parameters_widget)
         self.componentsTabLayout.addWidget(self.component_tree_view)
@@ -103,6 +108,9 @@ class ComponentTreeViewTab(QWidget):
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
     def set_up_model(self, model: Model):
+        model.signals.group_edited.connect(
+            self.component_tree_view.collapse_group_in_tree
+        )
         self.component_model = NexusTreeModel(model)
         self.component_delegate = ComponentEditorDelegate(
             self.component_tree_view, model
@@ -110,6 +118,9 @@ class ComponentTreeViewTab(QWidget):
         self.component_tree_view.setItemDelegate(self.component_delegate)
         self.component_tree_view.setModel(self.component_model)
         self.parameters_widget.set_up_model(model)
+
+    def reset_model(self):
+        self.set_up_model(self.component_model.model)
 
     def _set_button_state(self):
         set_button_states(

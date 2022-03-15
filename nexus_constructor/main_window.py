@@ -36,6 +36,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.show_action_labels.triggered.connect(
             lambda: self.on_show_action_labels(self.show_action_labels.isChecked())
         )
+        self.simple_tree_view.triggered.connect(
+            lambda: self.on_simple_tree_view(self.simple_tree_view.isChecked())
+        )
+
         self.about_window.triggered.connect(lambda: self.onOpenAboutWindow(AboutWindow))
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
@@ -75,6 +79,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view_tab.component_tool_bar.setToolButtonStyle(
             Qt.ToolButtonTextUnderIcon if value else Qt.ToolButtonIconOnly
         )
+
+    def on_simple_tree_view(self, value):
+        self.component_tree_view_tab.reset_model()
+        self.component_tree_view_tab.component_delegate.use_simple_tree_view(value)
 
     def show_edit_component_dialog(self):
         selected_component = (
