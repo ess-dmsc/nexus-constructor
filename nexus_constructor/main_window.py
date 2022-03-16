@@ -52,6 +52,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
 
         self._update_views()
+        self.simple_tree_view.triggered.emit()
 
     def onOpenAboutWindow(self, instance):
         if self.checkWindowOpen(instance, self._registered_windows):
