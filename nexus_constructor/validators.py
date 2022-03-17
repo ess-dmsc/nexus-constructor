@@ -326,7 +326,6 @@ class FieldType(Enum):
     array_dataset = "Array dataset"
     kafka_stream = "Kafka stream"
     link = "Link"
-    nx_class = "NX class/group"
 
 
 class FieldValueValidator(QValidator):
