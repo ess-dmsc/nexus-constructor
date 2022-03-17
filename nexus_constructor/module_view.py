@@ -34,6 +34,9 @@ class ModuleView(QGroupBox):
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
 
+    def save_module_changes(self):
+        pass
+
     @staticmethod
     def _get_label(content):
         label = QLabel(content)

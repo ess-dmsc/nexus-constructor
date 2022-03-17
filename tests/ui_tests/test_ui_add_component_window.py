@@ -1799,7 +1799,7 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     assert widget2.value.values == str(field_value2)
 
 
-def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
+def test_UI_GIVEN_group_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
     qtbot,
 ):
     component, model, treeview_model = create_group_with_component(
@@ -1819,13 +1819,10 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
     stream_group.children.append(stream)
 
-    field_name1 = "stream1"
-    component[field_name1] = stream_group
-
     dialog = AddComponentDialog(
         model,
         treeview_model,
-        component_to_edit=component,
+        component_to_edit=stream_group,
         nx_classes=NX_CLASS_DEFINITIONS,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)

@@ -665,8 +665,10 @@ def add_fields_to_component(
     for i in range(fields_widget.count()):
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
-            if not isinstance(widget.value, Dataset):
-                component.children.append(widget.value)
+            if not isinstance(widget.value, (Link, Dataset)):
+                stream_module = deepcopy(widget.value)
+                stream_module.parent_node = component
+                component.children.append(stream_module)
             else:
                 component[widget.name] = widget.value
         except ValueError as error:

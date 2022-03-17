@@ -48,6 +48,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             Transformation,
             LinkTransformation,
             TransformationsList,
+            FileWriterModule,
         ],
     ):
         frame = QFrame()
