@@ -338,8 +338,6 @@ class FieldWidget(QFrame):
                 show_attrs_edit=False,
             )
             self._set_up_value_validator(False)
-        elif self.field_type == FieldType.nx_class:
-            self.set_visibility(False, True, False, False)
 
     def _set_up_value_validator(self, is_link: bool):
         self.value_line_edit.setValidator(None)
