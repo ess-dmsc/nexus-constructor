@@ -87,6 +87,7 @@ class FieldWidget(QFrame):
 
         possible_field_names = []
         self.default_field_types_dict = {}
+        self.streams_widget: StreamFieldsWidget = None
         if possible_fields:
             possible_field_names, default_field_types = zip(*possible_fields)
             self.default_field_types_dict = dict(

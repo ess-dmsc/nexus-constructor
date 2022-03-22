@@ -51,11 +51,12 @@ class ModuleViewEditable(QGroupBox):
         super().__init__(module.writer_module.upper(), parent)
         layout = QVBoxLayout()
         self.field_widget = FieldWidget(module.parent_node)
-        layout.addWidget(self.field_widget)
-        self.setLayout(layout)
+        self.field_widget.field_type_combo.setEnabled(False)
         self.module = module
         self.model = model
         self._set_existing_items()
+        layout.addWidget(self.field_widget)
+        self.setLayout(layout)
 
     def _set_existing_items(self):
         module = self.module
@@ -98,5 +99,4 @@ class ModuleViewEditable(QGroupBox):
             self.module.parent_node.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
             )
-
         self.model.signals.module_changed.emit()
