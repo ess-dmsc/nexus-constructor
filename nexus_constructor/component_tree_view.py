@@ -78,9 +78,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def paint(
         self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
     ):
-        if index not in self._dict_frames:
-            model = index.model()
-            value = model.data(index, Qt.DisplayRole)
+        model = index.model()
+        value = model.data(index, Qt.DisplayRole)
+        if index not in self._dict_frames or isinstance(value, Group):
             frame = self.get_frame(value)
             self._dict_frames[index] = frame
         else:
