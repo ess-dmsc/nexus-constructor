@@ -1,5 +1,3 @@
-from platform import system
-
 from PySide2.QtCore import QMetaObject, QObject, QRect, QSize
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (
@@ -16,8 +14,6 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from ui.treeview_tab import ComponentTreeViewTab
-
-MAC_OS = "Darwin"
 
 
 class Ui_MainWindow(object):
@@ -78,8 +74,6 @@ class Ui_MainWindow(object):
         self.show_action_labels.setCheckable(True)
         self.simple_tree_view = QAction(MainWindow)
         self.simple_tree_view.setCheckable(True)
-        if system() == MAC_OS:
-            self.simple_tree_view.setChecked(True)
         self.about_window = QAction(MainWindow)
         self.view_menu.addAction(self.about_window)
         self.view_menu.addAction(self.show_action_labels)
