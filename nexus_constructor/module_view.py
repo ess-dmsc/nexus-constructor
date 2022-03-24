@@ -85,11 +85,14 @@ class ModuleViewEditable(QGroupBox):
         elif self.module.writer_module in [
             StreamMode.value for StreamMode in StreamModules
         ]:
+            self.module.writer_module = self.field_widget.value.writer_module
+            self.setTitle(self.module.writer_module.upper())
             self.module.source = self.field_widget.value.source  # type: ignore
             self.module.topic = self.field_widget.value.topic  # type: ignore
             self.module.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
             )
+            self._set_additional_options()
         elif self.module.writer_module == WriterModules.LINK.value:
             self.module.source = self.field_widget.value.source  # type: ignore
             self.module.name = self.field_widget.name
@@ -100,3 +103,16 @@ class ModuleViewEditable(QGroupBox):
                 CommonAttrs.UNITS, self.field_widget.units
             )
         self.model.signals.module_changed.emit()
+
+    def _set_additional_options(self):
+        if self.module.writer_module == StreamModules.ADAR.value:
+            array_size_table = self.field_widget.streams_widget.array_size_table
+            self.module.array_size = []
+            for i in range(array_size_table.columnCount()):
+                table_value = array_size_table.item(0, i)
+                if table_value:
+                    self.module.array_size.append(int(table_value.text()))
+        elif self.module.writer_module == StreamModules.F142.value:
+            self.field_widget.streams_widget.record_advanced_f142_values(self.module)
+        elif self.module.writer_module == StreamModules.EV42.value:
+            self.field_widget.streams_widget.record_advanced_ev42_values(self.module)

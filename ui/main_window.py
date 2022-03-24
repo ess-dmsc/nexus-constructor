@@ -86,7 +86,7 @@ class Ui_MainWindow(object):
     def _set_up_titles(self, MainWindow):
         MainWindow.setWindowTitle("NeXus Constructor")
         self.tab_widget.setTabText(
-            self.tab_widget.indexOf(self.component_tree_view_tab), "Components"
+            self.tab_widget.indexOf(self.component_tree_view_tab), "Nexus Structure"
         )
         self.file_menu.setTitle("File")
         self.open_json_file_action.setText("Open Filewriter JSON file")
