@@ -228,8 +228,8 @@ class NexusTreeModel(QAbstractItemModel):
         if isinstance(parent_item, Component):
             transformation_list = parent_item.transforms
             target_index = self.index(1, 0, node)
-        elif isinstance(parent_item, TransformationsList):
-            transformation_list = parent_item
+        elif isinstance(parent_item, Group):
+            transformation_list = parent_item.parent_node.transforms  # type: ignore
             target_index = node
         elif isinstance(parent_item, Transformation):
             transformation_list = parent_item.parent_component.transforms
