@@ -298,6 +298,7 @@ class Component(Group):
             return self[TRANSFORMS_GROUP_NAME]
 
         self[TRANSFORMS_GROUP_NAME] = Group(TRANSFORMS_GROUP_NAME, parent_node=self)
+        self[TRANSFORMS_GROUP_NAME].nx_class = "NXtransformations"
         return self[TRANSFORMS_GROUP_NAME]
 
     @property

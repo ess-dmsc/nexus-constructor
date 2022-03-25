@@ -148,8 +148,13 @@ def set_button_states(
             )
             set_enabled_and_raise(create_link_action, add_link_enabled)
 
-        elif isinstance(selected_object, TransformationsList):
-            set_enabled_and_raise(create_link_action, not selected_object.has_link)
+        elif (
+            isinstance(selected_object, Group)
+            and selected_object.nx_class == "NXtransformations"
+        ):
+            set_enabled_and_raise(
+                create_link_action, not selected_object.parent_node.transforms.has_link
+            )
         elif isinstance(selected_object, Transformation):
             set_enabled_and_raise(
                 create_link_action,
