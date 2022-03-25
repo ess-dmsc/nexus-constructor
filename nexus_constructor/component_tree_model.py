@@ -336,13 +336,10 @@ class NexusTreeModel(QAbstractItemModel):
         transformation_list = remove_transform.parent_component.stored_transforms
         transformation_list_index = self.parent(index)
         remove_pos = transformation_list.index(remove_transform)
-        component = transformation_list.parent_component
-
         remove_transform.remove_from_dependee_chain()
         self.__update_link_rows()
 
         self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
-        component.remove_transformation(remove_transform)
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
         self.model.signals.transformation_changed.emit()
