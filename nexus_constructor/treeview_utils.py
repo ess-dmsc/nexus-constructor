@@ -142,9 +142,11 @@ def set_button_states(
         if isinstance(selected_object, Component):
             if selected_object.stored_transforms is None:
                 selected_object.stored_transforms = selected_object.transforms
-            set_enabled_and_raise(
-                create_link_action, not selected_object.stored_transforms.has_link
+            add_link_enabled = (
+                len(selected_object.stored_transforms)
+                and not selected_object.stored_transforms.has_link
             )
+            set_enabled_and_raise(create_link_action, add_link_enabled)
 
         elif isinstance(selected_object, TransformationsList):
             set_enabled_and_raise(create_link_action, not selected_object.has_link)
