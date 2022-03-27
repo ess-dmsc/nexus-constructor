@@ -5,7 +5,11 @@ from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
-from nexus_constructor.common_attrs import TRANSFORMATIONS, TransformationType
+from nexus_constructor.common_attrs import (
+    NX_TRANSFORMATIONS,
+    TRANSFORMATIONS,
+    TransformationType,
+)
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
@@ -125,13 +129,21 @@ class NexusTreeModel(QAbstractItemModel):
     def add_link(self, node: QModelIndex):
         parent_item = node.internalPointer()
 
-        target_index, transformation_list = self._get_transformation_list(
+        target_index, transformation_list, component = self._get_transformation_list(
             node, parent_item
         )
         if transformation_list.has_link:
             return
+        group = None
+        for child in component.children:
+            if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
+                group = child
+                break
+
         target_pos = len(transformation_list)
         self.beginInsertRows(target_index, target_pos, target_pos)
+        group.children.append(transformation_list.link)
+        transformation_list.link.parent_node = group
         transformation_list.has_link = True
         self.endInsertRows()
 
@@ -228,13 +240,16 @@ class NexusTreeModel(QAbstractItemModel):
         if isinstance(parent_item, Component):
             transformation_list = parent_item.transforms
             target_index = self.index(1, 0, node)
+            component = parent_item
         elif isinstance(parent_item, Group):
             transformation_list = parent_item.parent_node.transforms  # type: ignore
             target_index = node
+            component = parent_item.parent_node  # type: ignore
         elif isinstance(parent_item, Transformation):
             transformation_list = parent_item.parent_component.transforms
             target_index = self.parent(node)
-        return target_index, transformation_list
+            component = parent_item.parent_component
+        return target_index, transformation_list, component
 
     @staticmethod
     def _create_new_transformation(
@@ -348,6 +363,11 @@ class NexusTreeModel(QAbstractItemModel):
         transformation_list = index.internalPointer().parent
         transformation_list_index = self.parent(index)
         remove_pos = len(transformation_list)
+        parent_group = index.internalPointer().parent_node
+        for i, child in enumerate(parent_group.children):
+            if isinstance(child, LinkTransformation):
+                parent_group.children.pop(i)
+                break
         self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
         transformation_list.has_link = False
         self.endRemoveRows()

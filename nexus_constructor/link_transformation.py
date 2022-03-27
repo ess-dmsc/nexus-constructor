@@ -14,6 +14,7 @@ class LinkTransformation:
     def __init__(self, parent: TransformationsList):
         super().__init__()
         self.parent = parent
+        self.parent_node = None  # This will always be an NXtransformations group.
 
     def _find_linked_component(self) -> Optional[Component]:
         for transformation in self.parent:
