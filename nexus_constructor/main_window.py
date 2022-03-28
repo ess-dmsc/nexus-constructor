@@ -43,16 +43,17 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.about_window.triggered.connect(lambda: self.onOpenAboutWindow(AboutWindow))
         # Clear the 3d view when closed
         QApplication.instance().aboutToQuit.connect(self.sceneWidget.delete)
+        self._setup_model_signals()
+        self.component_tree_view_tab.set_up_model(self.model)
+        self._update_views()
+        self.simple_tree_view.triggered.emit()
 
+    def _setup_model_signals(self):
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
         self.model.signals.component_removed.connect(self.sceneWidget.delete_component)
-        self.component_tree_view_tab.set_up_model(self.model)
         self.model.signals.transformation_changed.connect(
             self._update_transformations_3d_view
         )
-
-        self._update_views()
-        self.simple_tree_view.triggered.emit()
 
     def onOpenAboutWindow(self, instance):
         if self.checkWindowOpen(instance, self._registered_windows):
@@ -134,6 +135,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.sceneWidget.clear_all_transformations()
         self.sceneWidget.clear_all_components()
         self.component_tree_view_tab.set_up_model(self.model)
+        self._setup_model_signals()
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
