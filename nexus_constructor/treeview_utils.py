@@ -14,7 +14,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from nexus_constructor.common_attrs import TransformationType
+from nexus_constructor.common_attrs import NX_TRANSFORMATIONS, TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
@@ -115,8 +115,15 @@ def set_button_states(
             selected_object, Component
         ) or not isinstance(selected_object, (Group, FileWriterModule))
         set_enabled_and_raise(zoom_action, selected_object_is_component)
-        set_enabled_and_raise(new_component_action, selected_object_is_group)
-        set_enabled_and_raise(edit_component_action, selected_object_is_group)
+        is_transform_group = False
+        if selected_object_is_group:
+            is_transform_group = selected_object.nx_class == NX_TRANSFORMATIONS
+        set_enabled_and_raise(
+            new_component_action, selected_object_is_group and not is_transform_group
+        )
+        set_enabled_and_raise(
+            edit_component_action, selected_object_is_group and not is_transform_group
+        )
 
         selected_object_is_not_link_transform = not isinstance(
             selected_object, LinkTransformation
