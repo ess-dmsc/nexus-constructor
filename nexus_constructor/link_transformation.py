@@ -1,6 +1,7 @@
 from typing import Optional
 
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.group import Group
 from nexus_constructor.transformations_list import TransformationsList
 
 
@@ -14,7 +15,9 @@ class LinkTransformation:
     def __init__(self, parent: TransformationsList):
         super().__init__()
         self.parent = parent
-        self.parent_node = None  # This will always be an NXtransformations group.
+        self.parent_node: Group = (
+            None  # This will always be an NXtransformations group.
+        )
 
     def _find_linked_component(self) -> Optional[Component]:
         for transformation in self.parent:
