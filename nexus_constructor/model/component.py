@@ -194,6 +194,7 @@ class Component(Group):
         values: Dataset = Dataset(
             parent_node=None, name="", values=0, type=ValueTypes.DOUBLE
         ),
+        target_pos: int = -1,
     ) -> Transformation:
         """
         Note, currently assumes translation is in metres
@@ -201,6 +202,7 @@ class Component(Group):
         :param name: name of the translation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         :param values: The translation distance information.
+        :param target_pos: Target position.
         """
         values.parent_node = self
         unit_vector, _ = _normalise(vector)
@@ -212,6 +214,7 @@ class Component(Group):
             unit_vector,
             depends_on,
             values,
+            target_pos,
         )
 
     def add_rotation(
@@ -221,8 +224,12 @@ class Component(Group):
         name: str = None,
         depends_on: Transformation = None,
         values: Dataset = Dataset(
-            parent_node=None, name="", values=0, type=ValueTypes.DOUBLE
+            parent_node=None,
+            name="",
+            values=0,
+            type=ValueTypes.DOUBLE,
         ),
+        target_pos: int = -1,
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -231,6 +238,7 @@ class Component(Group):
         :param name: Name of the rotation group (Optional)
         :param depends_on: existing transformation which the new one depends on (otherwise relative to origin)
         :param values: The translation distance information.
+        :param target_pos: Target position.
         """
         values.parent_node = self
         return self._create_and_add_transform(
@@ -241,6 +249,7 @@ class Component(Group):
             axis,
             depends_on,
             values,
+            target_pos,
         )
 
     def _create_and_add_transform(
@@ -252,6 +261,7 @@ class Component(Group):
         vector: QVector3D,
         depends_on: Transformation,
         values: Union[Dataset, Group],
+        target_pos: int,
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
@@ -277,8 +287,10 @@ class Component(Group):
         transform.vector = vector
         transform.depends_on = depends_on
         transform.parent_component = self
-
-        self.get_transforms_group()[name] = transform  # type: ignore
+        if target_pos:
+            self.get_transforms_group().children.insert(target_pos, transform)  # type: ignore
+        else:
+            self.get_transforms_group()[name] = transform  # type: ignore
 
         return transform
 

@@ -76,6 +76,18 @@ def create_and_add_toolbar_action(
     return toolbar_action
 
 
+def is_transformation_action_allowed(selected_object):
+
+    if isinstance(selected_object, (Component, Transformation)):
+        return True
+    elif (
+        isinstance(selected_object, Group)
+        and selected_object.nx_class == NX_TRANSFORMATIONS
+    ):
+        return True
+    return False
+
+
 def set_button_states(
     component_tree_view: QTreeView,
     new_component_action: QAction,
@@ -111,9 +123,9 @@ def set_button_states(
         selected_object = selection_indices[0].internalPointer()
         selected_object_is_component = isinstance(selected_object, Component)
         selected_object_is_group = isinstance(selected_object, Group)
-        selected_object_is_not_group_or_fw_module = isinstance(
-            selected_object, Component
-        ) or not isinstance(selected_object, (Group, FileWriterModule))
+        allowed_transformation_action = is_transformation_action_allowed(
+            selected_object
+        )
         set_enabled_and_raise(zoom_action, selected_object_is_component)
         is_transform_group = False
         if selected_object_is_group:
@@ -131,14 +143,12 @@ def set_button_states(
 
         set_enabled_and_raise(
             new_rotation_action,
-            selected_object_is_not_link_transform
-            and selected_object_is_not_group_or_fw_module,
+            selected_object_is_not_link_transform and allowed_transformation_action,
         )
 
         set_enabled_and_raise(
             new_translation_action,
-            selected_object_is_not_link_transform
-            and selected_object_is_not_group_or_fw_module,
+            selected_object_is_not_link_transform and allowed_transformation_action,
         )
 
         not_tree_root = True

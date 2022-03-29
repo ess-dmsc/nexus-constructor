@@ -135,7 +135,7 @@ class NexusTreeModel(QAbstractItemModel):
         if transformation_list.has_link:
             return
 
-        group = self._get_transformation_group(component)
+        _, group = self._get_transformation_group(component)
         target_pos = len(transformation_list)
         self.beginInsertRows(target_index, target_pos, target_pos)
         group.children.append(transformation_list.link)
@@ -154,6 +154,7 @@ class NexusTreeModel(QAbstractItemModel):
             target_index,
             target_pos,
             transformation_list,
+            component_index,
         ) = self._get_target_position(
             parent_component,
             parent_index,
@@ -163,24 +164,26 @@ class NexusTreeModel(QAbstractItemModel):
             transformation_list,
         )
         new_transformation = self._create_new_transformation(
-            parent_component, transformation_list, transformation_type
+            parent_component, transformation_list, transformation_type, target_pos
         )
-
         new_transformation.parent_component = parent_component
+        self.model.signals.group_edited.emit(component_index, False)
+
         self.beginInsertRows(
             target_index,
-            parent_component.number_of_children(),
-            parent_component.number_of_children(),
+            target_pos,
+            target_pos,
         )
         transformation_list.insert(target_pos, new_transformation)
-        if transformation_list.has_link:
-            group = self._get_transformation_group(parent_component)
-            # Make sure link is last element of children list in NXtransformations
+        if transformation_list.has_link and not isinstance(parent_item, Transformation):
+            _, group = self._get_transformation_group(parent_component)
+            # Link should be last element of children list in NXtransformations
             group.children[-2], group.children[-1] = (
                 group.children[-1],
                 group.children[-2],
             )
         self.endInsertRows()
+
         parent_component.depends_on = transformation_list[0]
         linked_component = None
         if transformation_list.has_link:
@@ -194,6 +197,7 @@ class NexusTreeModel(QAbstractItemModel):
                     -1
                 ].depends_on = transformation_list.link.linked_component.transforms[0]
         self.model.signals.transformation_changed.emit()
+        self.model.signals.group_edited.emit(component_index, True)
 
     def add_translation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, TransformationType.TRANSLATION)
@@ -203,10 +207,10 @@ class NexusTreeModel(QAbstractItemModel):
 
     @staticmethod
     def _get_transformation_group(component):
-        for child in component.children:
+        for idx, child in enumerate(component.children):
             if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
-                return child
-        return None
+                return idx, child
+        return -1, None
 
     def _get_target_position(
         self,
@@ -230,19 +234,32 @@ class NexusTreeModel(QAbstractItemModel):
                 parent_item.stored_transforms = parent_item.transforms
             transformation_list = parent_item.stored_transforms
             parent_component = parent_item
-            target_pos = len(transformation_list)
-            target_index = self.index(1, 0, parent_index)
-        elif isinstance(parent_item, TransformationsList):
-            transformation_list = parent_item
-            parent_component = parent_item.parent_component
-            target_pos = len(transformation_list)
+            target_pos = len(transformation_list) + 1
+            idx, group = self._get_transformation_group(parent_component)
+            target_index = self.index(idx + 1, 0, parent_index)
+            component_index = parent_index
+        elif (
+            isinstance(parent_item, Group)
+            and parent_item.nx_class == NX_TRANSFORMATIONS
+        ):
+            parent_component = parent_item.parent_node
+            transformation_list = parent_component.stored_transforms
+            target_pos = len(transformation_list) + 1
             target_index = parent_index
+            component_index = self.parent(parent_index)
         elif isinstance(parent_item, Transformation):
             transformation_list = parent_item.parent_component.stored_transforms
             parent_component = transformation_list.parent_component
             target_pos = transformation_list.index(parent_item) + 1
             target_index = self.parent(parent_index)
-        return parent_component, target_index, target_pos, transformation_list
+            component_index = self.parent(target_index)
+        return (
+            parent_component,
+            target_index,
+            target_pos,
+            transformation_list,
+            component_index,
+        )
 
     def _get_transformation_list(self, node, parent_item):
         transformation_list = None
@@ -263,7 +280,7 @@ class NexusTreeModel(QAbstractItemModel):
 
     @staticmethod
     def _create_new_transformation(
-        parent_component, transformation_list, transformation_type
+        parent_component, transformation_list, transformation_type, target_pos
     ):
         values = Dataset(
             parent_node=parent_component, name="", type=ValueTypes.DOUBLE, values=""
@@ -275,6 +292,7 @@ class NexusTreeModel(QAbstractItemModel):
                 ),
                 vector=QVector3D(0, 0, 1.0),  # default to beam direction
                 values=values,
+                target_pos=target_pos,
             )
         elif transformation_type == TransformationType.ROTATION:
             new_transformation = parent_component.add_rotation(
@@ -284,6 +302,7 @@ class NexusTreeModel(QAbstractItemModel):
                 axis=QVector3D(1.0, 0, 0),
                 angle=0.0,
                 values=values,
+                target_pos=target_pos,
             )
         else:
             raise ValueError(f"Unknown transformation type: {transformation_type}")
