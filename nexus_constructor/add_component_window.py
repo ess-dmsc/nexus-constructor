@@ -548,19 +548,17 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The geometry object.
         """
         # remove the previous object from the qt3d view
-        children_copy = deepcopy(self.component_to_edit.children)
         if isinstance(self.component_to_edit, Component):
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
         if self.component_to_edit:
             self.component_to_edit.name = component_name
-            self.component_to_edit.children = []
+            for child in self.component_to_edit.children:
+                if not isinstance(child, Group):
+                    self.component_to_edit.children.remove(child)
             self.component_to_edit.nx_class = nx_class
         if description:
             self.component_to_edit.description = description
-        for child in children_copy:
-            if isinstance(child, Group):
-                self.component_to_edit[child.name] = child
         if isinstance(self.component_to_edit, Component):
             self.component_model.components.append(self.component_to_edit)
             self.generate_geometry_model(self.component_to_edit, pixel_data)

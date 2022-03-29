@@ -62,6 +62,11 @@ class Group:
     def __delitem__(self, key):
         _remove_item(self.children, key)
 
+    def __eq__(self, other):
+        if not isinstance(other, Group):
+            return False
+        return self.absolute_path() == other.absolute_path()
+
     @property
     def description(self) -> str:
         try:

@@ -14,7 +14,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from nexus_constructor.common_attrs import TransformationType
+from nexus_constructor.common_attrs import NX_TRANSFORMATIONS, TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
@@ -76,6 +76,18 @@ def create_and_add_toolbar_action(
     return toolbar_action
 
 
+def is_transformation_action_allowed(selected_object):
+
+    if isinstance(selected_object, (Component, Transformation)):
+        return True
+    elif (
+        isinstance(selected_object, Group)
+        and selected_object.nx_class == NX_TRANSFORMATIONS
+    ):
+        return True
+    return False
+
+
 def set_button_states(
     component_tree_view: QTreeView,
     new_component_action: QAction,
@@ -111,12 +123,19 @@ def set_button_states(
         selected_object = selection_indices[0].internalPointer()
         selected_object_is_component = isinstance(selected_object, Component)
         selected_object_is_group = isinstance(selected_object, Group)
-        selected_object_is_not_group_or_fw_module = isinstance(
-            selected_object, Component
-        ) or not isinstance(selected_object, (Group, FileWriterModule))
+        allowed_transformation_action = is_transformation_action_allowed(
+            selected_object
+        )
         set_enabled_and_raise(zoom_action, selected_object_is_component)
-        set_enabled_and_raise(new_component_action, selected_object_is_group)
-        set_enabled_and_raise(edit_component_action, selected_object_is_group)
+        is_transform_group = False
+        if selected_object_is_group:
+            is_transform_group = selected_object.nx_class == NX_TRANSFORMATIONS
+        set_enabled_and_raise(
+            new_component_action, selected_object_is_group and not is_transform_group
+        )
+        set_enabled_and_raise(
+            edit_component_action, selected_object_is_group and not is_transform_group
+        )
 
         selected_object_is_not_link_transform = not isinstance(
             selected_object, LinkTransformation
@@ -124,14 +143,12 @@ def set_button_states(
 
         set_enabled_and_raise(
             new_rotation_action,
-            selected_object_is_not_link_transform
-            and selected_object_is_not_group_or_fw_module,
+            selected_object_is_not_link_transform and allowed_transformation_action,
         )
 
         set_enabled_and_raise(
             new_translation_action,
-            selected_object_is_not_link_transform
-            and selected_object_is_not_group_or_fw_module,
+            selected_object_is_not_link_transform and allowed_transformation_action,
         )
 
         not_tree_root = True
@@ -142,12 +159,19 @@ def set_button_states(
         if isinstance(selected_object, Component):
             if selected_object.stored_transforms is None:
                 selected_object.stored_transforms = selected_object.transforms
-            set_enabled_and_raise(
-                create_link_action, not selected_object.stored_transforms.has_link
+            add_link_enabled = (
+                len(selected_object.stored_transforms)
+                and not selected_object.stored_transforms.has_link
             )
+            set_enabled_and_raise(create_link_action, add_link_enabled)
 
-        elif isinstance(selected_object, TransformationsList):
-            set_enabled_and_raise(create_link_action, not selected_object.has_link)
+        elif (
+            isinstance(selected_object, Group)
+            and selected_object.nx_class == "NXtransformations"
+        ):
+            set_enabled_and_raise(
+                create_link_action, not selected_object.parent_node.transforms.has_link
+            )
         elif isinstance(selected_object, Transformation):
             set_enabled_and_raise(
                 create_link_action,
