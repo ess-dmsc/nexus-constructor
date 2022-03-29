@@ -124,6 +124,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             if success:
                 self.model = reader.model
                 self._update_views()
+                self._setup_model_signals()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
@@ -135,7 +136,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.sceneWidget.clear_all_transformations()
         self.sceneWidget.clear_all_components()
         self.component_tree_view_tab.set_up_model(self.model)
-        self._setup_model_signals()
         self._update_3d_view_with_component_shapes()
 
     def _update_3d_view_with_component_shapes(self):
