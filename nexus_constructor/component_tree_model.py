@@ -134,12 +134,8 @@ class NexusTreeModel(QAbstractItemModel):
         )
         if transformation_list.has_link:
             return
-        group = None
-        for child in component.children:
-            if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
-                group = child
-                break
 
+        group = self._get_transformation_group(component)
         target_pos = len(transformation_list)
         self.beginInsertRows(target_index, target_pos, target_pos)
         group.children.append(transformation_list.link)
@@ -177,6 +173,13 @@ class NexusTreeModel(QAbstractItemModel):
             parent_component.number_of_children(),
         )
         transformation_list.insert(target_pos, new_transformation)
+        if transformation_list.has_link:
+            group = self._get_transformation_group(parent_component)
+            # Make sure link is last element of children list in NXtransformations
+            group.children[-2], group.children[-1] = (
+                group.children[-1],
+                group.children[-2],
+            )
         self.endInsertRows()
         parent_component.depends_on = transformation_list[0]
         linked_component = None
@@ -197,6 +200,13 @@ class NexusTreeModel(QAbstractItemModel):
 
     def add_rotation(self, parent_index: QModelIndex):
         self.add_transformation(parent_index, TransformationType.ROTATION)
+
+    @staticmethod
+    def _get_transformation_group(component):
+        for child in component.children:
+            if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
+                return child
+        return None
 
     def _get_target_position(
         self,
