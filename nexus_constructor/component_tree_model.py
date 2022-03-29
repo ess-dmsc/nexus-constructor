@@ -247,8 +247,9 @@ class NexusTreeModel(QAbstractItemModel):
                 parent_component.stored_transforms = parent_component.transforms
             transformation_list = parent_component.stored_transforms
             target_pos = len(transformation_list) + 1
-            target_index = parent_index
             component_index = self.parent(parent_index)
+            idx, _ = self._get_transformation_group(parent_component)
+            target_index = self.index(idx + 1, 0, component_index)
         elif isinstance(parent_item, Transformation):
             parent_component = parent_item.parent_component
             if parent_component.stored_transforms is None:
