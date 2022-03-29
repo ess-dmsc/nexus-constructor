@@ -381,6 +381,10 @@ class NexusTreeModel(QAbstractItemModel):
 
     def _remove_transformation(self, index: QModelIndex):
         remove_transform = index.internalPointer()
+        if remove_transform.parent_component.stored_transforms is None:
+            remove_transform.parent_component.stored_transforms = (
+                remove_transform.parent_component.transforms
+            )
         transformation_list = remove_transform.parent_component.stored_transforms
         transformation_list_index = self.parent(index)
         remove_pos = transformation_list.index(remove_transform)
