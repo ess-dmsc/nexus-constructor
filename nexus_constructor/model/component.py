@@ -261,7 +261,7 @@ class Component(Group):
         vector: QVector3D,
         depends_on: Transformation,
         values: Union[Dataset, Group],
-        target_pos: int,
+        target_pos: int = -1,
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
