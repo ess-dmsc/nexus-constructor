@@ -243,13 +243,17 @@ class NexusTreeModel(QAbstractItemModel):
             and parent_item.nx_class == NX_TRANSFORMATIONS
         ):
             parent_component = parent_item.parent_node
+            if parent_component.stored_transforms is None:
+                parent_component.stored_transforms = parent_component.transforms
             transformation_list = parent_component.stored_transforms
             target_pos = len(transformation_list) + 1
             target_index = parent_index
             component_index = self.parent(parent_index)
         elif isinstance(parent_item, Transformation):
-            transformation_list = parent_item.parent_component.stored_transforms
-            parent_component = transformation_list.parent_component
+            parent_component = parent_item.parent_component
+            if parent_component.stored_transforms is None:
+                parent_component.stored_transforms = parent_component.transforms
+            transformation_list = parent_component.stored_transforms
             target_pos = transformation_list.index(parent_item) + 1
             target_index = self.parent(parent_index)
             component_index = self.parent(target_index)
