@@ -1,10 +1,10 @@
+from json import loads
 from typing import Optional, Tuple, Union
 
 import PySide2.QtGui
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
-from json import loads
 
 from nexus_constructor.common_attrs import (
     NX_TRANSFORMATIONS,
@@ -15,7 +15,11 @@ from nexus_constructor.link_transformation import LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link, create_fw_module_object
+from nexus_constructor.model.module import (
+    Dataset,
+    FileWriterModule,
+    create_fw_module_object,
+)
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.ui_utils import generate_unique_name
@@ -70,18 +74,30 @@ class NexusTreeModel(QAbstractItemModel):
             return Qt.NoItemFlags
         parent_item = index.internalPointer()
         self.current_nxs_obj = (parent_item, index)
-        if isinstance(parent_item, Group) and parent_item.nx_class == NX_TRANSFORMATIONS:
+        if (
+            isinstance(parent_item, Group)
+            and parent_item.nx_class == NX_TRANSFORMATIONS
+        ):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif isinstance(parent_item, Component):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
         elif isinstance(parent_item, ComponentInfo):
             return Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
-        elif isinstance(parent_item, (Transformation, FileWriterModule, LinkTransformation)):
+        elif isinstance(
+            parent_item, (Transformation, FileWriterModule, LinkTransformation)
+        ):
             return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
-        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable | Qt.ItemIsDropEnabled
+        return (
+            Qt.ItemIsSelectable
+            | Qt.ItemIsEnabled
+            | Qt.ItemIsEditable
+            | Qt.ItemIsDropEnabled
+        )
 
     def mimeTypes(self):
-        return ['streaming/writer_module', ]
+        return [
+            "streaming/writer_module",
+        ]
 
     def supportedDropActions(self) -> PySide2.QtCore.Qt.DropActions:
         return Qt.DropAction.MoveAction | Qt.DropAction.CopyAction
@@ -91,7 +107,9 @@ class NexusTreeModel(QAbstractItemModel):
         insert_location = len(parentIndex.data().children)
         if row != -1:
             insert_location = row
-        new_module = create_fw_module_object(module_config["module"], module_config["config"], parentIndex.data())
+        new_module = create_fw_module_object(
+            module_config["module"], module_config["config"], parentIndex.data()
+        )
         self.beginInsertRows(QModelIndex(), insert_location, insert_location)
         parentIndex.data().children.insert(insert_location, new_module)
         self.endInsertRows()
