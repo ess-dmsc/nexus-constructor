@@ -140,6 +140,20 @@ class JSONReader:
                     )
                 )
 
+    def _append_transformations_to_nx_group(self):
+        """
+        Correctly adds the transformations in the components, with respect
+        to the instance of TransformationList, to transformation nexus group.
+        """
+        for component in self.model.get_components():
+            transformation_list = component.transforms
+            transformation_children = []
+            for child in component.children:
+                if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
+                    for transformation in transformation_list:
+                        transformation_children.append(transformation)
+                    child.children = transformation_children
+
     def _set_transformation_links(self):
         """
         Adds transformation links to the components where a link exists.
@@ -189,6 +203,7 @@ class JSONReader:
             child.parent_node = self.model.entry
         self._set_transforms_depends_on()
         self._set_components_depends_on()
+        self._append_transformations_to_nx_group()
         self._set_transformation_links()
         return True
 
