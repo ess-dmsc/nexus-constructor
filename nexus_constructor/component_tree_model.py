@@ -391,22 +391,19 @@ class NexusTreeModel(QAbstractItemModel):
         remove_pos = transformation_list.index(remove_transform)
         remove_transform.remove_from_dependee_chain()
         self.__update_link_rows()
-
         self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
         transformation_list.pop(remove_pos)
         self.endRemoveRows()
         self.model.signals.transformation_changed.emit()
 
     def _remove_link(self, index: QModelIndex):
-        transformation_list = index.internalPointer().parent
+        link = index.internalPointer()
+        transformation_list = link.parent
         transformation_list_index = self.parent(index)
+        parent_group = link.parent_node
         remove_pos = len(transformation_list)
-        parent_group = index.internalPointer().parent_node
-        for i, child in enumerate(parent_group.children):
-            if isinstance(child, LinkTransformation):
-                parent_group.children.pop(i)
-                break
         self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
+        parent_group.children.remove(link)
         transformation_list.has_link = False
         self.endRemoveRows()
         # Update depends on
