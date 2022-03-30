@@ -87,14 +87,12 @@ class NexusTreeModel(QAbstractItemModel):
         return Qt.DropAction.MoveAction | Qt.DropAction.CopyAction
 
     def dropMimeData(self, mimedata, action, row, column, parentIndex):
-        print(f"Action: {action}, row: {row}, column: {column}, parent: {parentIndex}, parent data: {parentIndex.data()}")
         module_config = loads(mimedata.text())
         insert_location = len(parentIndex.data().children)
         if row != -1:
             insert_location = row
-        print(f"Inserting stream at {insert_location} of (current size {len(parentIndex.data().children)}). Parent is {parentIndex.data()}")
         new_module = create_fw_module_object(module_config["module"], module_config["config"], parentIndex.data())
-        self.beginInsertRows(parentIndex, insert_location, insert_location)
+        self.beginInsertRows(QModelIndex(), insert_location, insert_location)
         parentIndex.data().children.insert(insert_location, new_module)
         self.endInsertRows()
         return True
