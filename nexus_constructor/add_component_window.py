@@ -13,6 +13,7 @@ from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
     COMPONENT_TYPES,
+    NX_CLASSES,
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
 )
@@ -167,7 +168,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
+        if isinstance(self.component_to_edit, Component):
+            sorted_components = list(COMPONENT_TYPES)
+            sorted_components.sort()
+            self.componentTypeComboBox.addItems(sorted_components)
+        elif isinstance(self.component_to_edit, Group):
+            sorted_groups = list(NX_CLASSES - COMPONENT_TYPES)
+            sorted_groups.sort()
+            self.componentTypeComboBox.addItems(sorted_groups)
+        else:
+            self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.change_pixel_options_visibility
         )
