@@ -57,7 +57,6 @@ class NexusTreeModel(QAbstractItemModel):
             return
 
     def index(self, row: int, column: int, parent: QModelIndex) -> QModelIndex:
-        print("index()")
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         if not parent.isValid():
@@ -67,7 +66,6 @@ class NexusTreeModel(QAbstractItemModel):
         return index
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
-        print("flags()")
         if not index.isValid():
             return Qt.NoItemFlags
         parent_item = index.internalPointer()
@@ -82,7 +80,6 @@ class NexusTreeModel(QAbstractItemModel):
         return Qt.DropAction.MoveAction
 
     def rowCount(self, parent: QModelIndex) -> int:
-        print("rowCount()")
         if not parent.isValid():
             return 1
         else:
@@ -210,7 +207,6 @@ class NexusTreeModel(QAbstractItemModel):
 
     @staticmethod
     def _get_transformation_group(component):
-        print("_get_transformation_group()()")
         for idx, child in enumerate(component.children):
             if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
                 return idx, child
@@ -225,7 +221,6 @@ class NexusTreeModel(QAbstractItemModel):
         target_pos,
         transformation_list,
     ):
-        print("_get_target_position()")
         """
         :param parent_component: component to add transformation to
         :param parent_index: index of the parent_item
@@ -272,7 +267,6 @@ class NexusTreeModel(QAbstractItemModel):
         )
 
     def _get_transformation_list(self, node, parent_item):
-        print("_get_transformation_list()")
         transformation_list = None
         target_index = QModelIndex()
         if isinstance(parent_item, Component):
@@ -293,7 +287,6 @@ class NexusTreeModel(QAbstractItemModel):
     def _create_new_transformation(
         parent_component, transformation_list, transformation_type, target_pos
     ):
-        print("_create_new_transformation()")
         values = Dataset(
             parent_node=parent_component, name="", type=ValueTypes.DOUBLE, values=""
         )
@@ -321,7 +314,6 @@ class NexusTreeModel(QAbstractItemModel):
         return new_transformation
 
     def remove_node(self, node: QModelIndex):
-        print("remove_node()")
         nexus_object = node.internalPointer()
         if isinstance(nexus_object, Transformation):
             self._remove_transformation(node)
@@ -338,7 +330,6 @@ class NexusTreeModel(QAbstractItemModel):
             self._remove_fw_module(node, nexus_object)
 
     def _remove_fw_module(self, node, module):
-        print("_remove_fw_module()")
         parent = self.parent(node)
         remove_index = self._get_row_of_child(module)
         self.beginRemoveRows(parent, remove_index, remove_index)
@@ -349,7 +340,6 @@ class NexusTreeModel(QAbstractItemModel):
         self.endRemoveRows()
 
     def _remove_component(self, index: QModelIndex):
-        print("_remove_component()")
         component = index.internalPointer()
         transforms = []  # type: ignore
         if isinstance(component, Component):
@@ -391,7 +381,6 @@ class NexusTreeModel(QAbstractItemModel):
             self.model.signals.component_removed.emit(component.name)
 
     def _remove_transformation(self, index: QModelIndex):
-        print("_remove_transformation()")
         remove_transform = index.internalPointer()
         if remove_transform.parent_component.stored_transforms is None:
             remove_transform.parent_component.stored_transforms = (
@@ -426,7 +415,6 @@ class NexusTreeModel(QAbstractItemModel):
     def __update_link_rows(
         self,
     ):  # TODO: this function is a bit shaky and needs an update in a future PR.
-        print("__update_link_rows()")
         try:
             component = self.current_nxs_obj[0].parent_component  # type: ignore
         except AttributeError:
