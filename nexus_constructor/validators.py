@@ -52,10 +52,10 @@ class UnitValidator(QValidator):
     """
     Validator to ensure the the text entered is a valid unit of length.
     """
+    ureg = pint.UnitRegistry()
 
     def __init__(self, expected_dimensionality=None):
         super().__init__()
-        self.ureg = pint.UnitRegistry()
         self.expected_dimensionality = expected_dimensionality
 
     def validate(self, input: str, pos: int):
