@@ -4,10 +4,12 @@ import pytest
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import NX_TRANSFORMATIONS
 from nexus_constructor.component_tree_model import ComponentInfo
 from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
@@ -206,7 +208,7 @@ def test_get_flags_component():
     index = test_component_tree_model.createIndex(0, 0, test_instrument.children[0])
 
     assert test_component_tree_model.flags(index) == (
-        Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
     )
 
 
@@ -218,7 +220,10 @@ def test_get_flags_component_info():
     item = ComponentInfo(parent=test_instrument.children[0])
     index = test_component_tree_model.createIndex(0, 0, item)
 
-    assert test_component_tree_model.flags(index) == Qt.ItemIsEnabled
+    assert (
+        test_component_tree_model.flags(index)
+        == Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
+    )
 
 
 def test_get_flags_transformation_list():
@@ -226,9 +231,9 @@ def test_get_flags_transformation_list():
         [get_component()]
     )
 
-    component = test_instrument.children[0]
-    component.stored_transforms = component.transforms
-    index = test_component_tree_model.createIndex(0, 0, component.stored_transforms)
+    transformation_group = Group(name="transformations")
+    transformation_group.nx_class = NX_TRANSFORMATIONS
+    index = test_component_tree_model.createIndex(0, 0, transformation_group)
 
     assert (
         test_component_tree_model.flags(index) == Qt.ItemIsEnabled | Qt.ItemIsSelectable
@@ -248,7 +253,10 @@ def test_get_flags_other():
 
     assert (
         test_component_tree_model.flags(index)
-        == Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        == Qt.ItemIsEnabled
+        | Qt.ItemIsSelectable
+        | Qt.ItemIsEditable
+        | Qt.ItemIsDropEnabled
     )
 
 
