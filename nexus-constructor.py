@@ -12,7 +12,7 @@ import signal
 import sys
 
 from PySide2 import QtCore
-from PySide2.QtGui import QIcon
+from PySide2.QtGui import QIcon, QCloseEvent
 from PySide2.QtWidgets import QApplication, QMainWindow
 
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
@@ -26,6 +26,37 @@ if getattr(sys, "frozen", False):
     root_dir = os.path.dirname(sys.executable)
 else:
     root_dir = os.path.dirname(os.path.realpath(__file__))
+
+
+X_LOC = "window_x_location"
+Y_LOC = "window_y_location"
+X_SIZE = "window_x_size"
+Y_SIZE = "window_y_size"
+
+
+class NexusConstructorMainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self._config = QtCore.QSettings("ESS", "nexus-constructor")
+
+    def show(self):
+        first_run = not self._config.contains(X_SIZE)
+        if first_run:
+            self.showMaximized()
+        else:
+            self.resize(self._config.value(X_SIZE, 500), self._config.value(Y_SIZE, 500))
+            self.move(self._config.value(X_LOC, 0), self._config.value(Y_LOC, 0))
+            super().show()
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        window_size = self.size()
+        self._config.setValue(X_SIZE, window_size.width())
+        self._config.setValue(Y_SIZE, window_size.height())
+        window_loc = self.pos()
+        self._config.setValue(X_LOC, window_loc.x())
+        self._config.setValue(Y_LOC, window_loc.y())
+        event.accept()
+
 
 if __name__ == "__main__":
     if locale.getlocale()[0] is None:
@@ -41,11 +72,11 @@ if __name__ == "__main__":
     QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
-    window = QMainWindow()
+    window = NexusConstructorMainWindow()
     definitions_dir = os.path.abspath(os.path.join(root_dir, "definitions"))
     _, nx_component_classes = make_dictionary_of_class_definitions(definitions_dir)
     model = Model()
     ui = MainWindow(model, nx_component_classes)
     ui.setupUi(window)
-    window.showMaximized()
+    window.show()
     sys.exit(app.exec_())
