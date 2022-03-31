@@ -36,6 +36,31 @@ def file_dialog(is_save, caption, filter):
     return filename
 
 
+def validate_combobox_edit(
+    combobox_edit,
+    is_valid: bool,
+    tooltip_on_reject="",
+    tooltip_on_accept="",
+    suggestion_callable=None,
+):
+    """
+    Sets the combobox colour to red if field is invalid or white if valid. Also sets the tooltips, if provided.
+    :param combobox_edit: The combobox object to apply the validation to.
+    :param is_valid: Whether the combobox edit field contains valid text
+    :param suggestion_callable: A callable that returns the suggested alternative if not valid.
+    :param tooltip_on_accept: Tooltip to display combobox edit is valid.
+    :param tooltip_on_reject: Tooltip to display combobox edit is invalid.
+    :return: None.
+    """
+    colour = "#FFFFFF" if is_valid else "#f6989d"
+    combobox_edit.setStyleSheet(f"QComboBox {{ background-color: {colour} }}")
+    if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
+        tooltip_on_reject += suggestion_callable()
+    combobox_edit.setToolTip(
+        tooltip_on_accept
+    ) if is_valid else combobox_edit.setToolTip(tooltip_on_reject)
+
+
 def validate_line_edit(
     line_edit,
     is_valid: bool,

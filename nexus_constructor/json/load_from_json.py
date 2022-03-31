@@ -12,6 +12,7 @@ from nexus_constructor.common_attrs import (
 )
 from nexus_constructor.component_type import (
     COMPONENT_TYPES,
+    ENTRY_CLASS_NAME,
     NX_CLASSES,
     SAMPLE_CLASS_NAME,
 )
@@ -294,7 +295,7 @@ class JSONReader:
             if (
                 parent_node
                 and isinstance(nexus_object, Dataset)
-                and parent_node.nx_class == "NXentry"
+                and parent_node.nx_class == ENTRY_CLASS_NAME
             ):
                 self.model.entry[nexus_object.name] = nexus_object
             if isinstance(nexus_object, Group) and not nexus_object.nx_class:

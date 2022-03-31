@@ -826,6 +826,9 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
     qtbot, template, add_component_dialog
 ):
 
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
+
     # Mimic the user entering a unique name in the text field
     enter_component_name(qtbot, template, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
@@ -839,6 +842,8 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_component_window_closes(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
@@ -868,6 +873,9 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_com
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_shape_THEN_add_component_window_closes(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
+
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.CylinderRadioButton)
 
@@ -895,6 +903,8 @@ def test_UI_GIVEN_no_input_WHEN_adding_component_with_no_shape_THEN_add_componen
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_component_button_is_enabled(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user entering a unique name in the text field
     enter_component_name(qtbot, template, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -963,6 +973,8 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_fil
 def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_enabled(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
@@ -1083,6 +1095,8 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_units_b
 def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_enabled(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
@@ -2221,6 +2235,9 @@ def test_UI_GIVEN_initial_component_THEN_webbrowser_url_contains_component_class
 def test_UI_GIVEN_change_of_component_type_THEN_webbrowser_url_is_updated_and_contains_component_class(
     qtbot, add_component_dialog, template
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
+
     current_nx_class = add_component_dialog.componentTypeComboBox.currentText()
 
     new_nx_class = add_component_dialog.componentTypeComboBox.itemText(3)
