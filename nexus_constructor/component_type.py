@@ -101,6 +101,7 @@ NX_CLASSES = {
 }
 
 CHOPPER_CLASS_NAME = "NXdisk_chopper"
+ENTRY_CLASS_NAME = "NXentry"
 SOURCE_CLASS_NAME = "NXsource"
 SAMPLE_CLASS_NAME = "NXsample"
 SLIT_CLASS_NAME = "NXslit"

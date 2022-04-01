@@ -13,6 +13,8 @@ from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
     COMPONENT_TYPES,
+    ENTRY_CLASS_NAME,
+    NX_CLASSES,
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
 )
@@ -26,6 +28,7 @@ from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.geometry import (
     BoxGeometry,
     CylindricalGeometry,
@@ -41,6 +44,7 @@ from nexus_constructor.ui_utils import (
     file_dialog,
     generate_unique_name,
     show_warning_dialog,
+    validate_combobox_edit,
     validate_line_edit,
 )
 from nexus_constructor.unit_utils import METRES
@@ -48,6 +52,7 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     GeometryFileValidator,
     NameValidator,
+    NXClassValidator,
     OkValidator,
     UnitValidator,
 )
@@ -167,7 +172,18 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
+        if isinstance(self.component_to_edit, Component):
+            sorted_components = list(COMPONENT_TYPES)
+            sorted_components.sort()
+            self.componentTypeComboBox.addItems(sorted_components)
+        elif isinstance(self.component_to_edit, Entry):
+            self.componentTypeComboBox.addItems([ENTRY_CLASS_NAME])
+        elif isinstance(self.component_to_edit, Group):
+            sorted_groups = list(NX_CLASSES - COMPONENT_TYPES)
+            sorted_groups.sort()
+            self.componentTypeComboBox.addItems(sorted_groups)
+        else:
+            self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.change_pixel_options_visibility
         )
@@ -182,16 +198,35 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.pixel_options.setupUi(self.pixelOptionsWidget)
         self.pixelOptionsWidget.ui = self.pixel_options
 
+        self.ok_validator = OkValidator(
+            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
+        )
+
         if self.component_to_edit:
             parent_dialog.setWindowTitle(f"Edit group: {self.component_to_edit.name}")
             self.ok_button.setText("Edit group")
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
+        else:
+            self.componentTypeComboBox.setEditable(True)
+            self.componentTypeComboBox.setCurrentText("")
+            self.componentTypeComboBox.setValidator(NXClassValidator())
+            self.componentTypeComboBox.validator().is_valid.connect(
+                partial(
+                    validate_combobox_edit,
+                    self.componentTypeComboBox,
+                    tooltip_on_reject="Nexus class not valid",
+                    tooltip_on_accept="Nexus class valid",
+                )
+            )
+            self.componentTypeComboBox.validator().is_valid.connect(
+                self.ok_validator.set_nx_class_valid
+            )
+            self.componentTypeComboBox.validator().validate(
+                self.componentTypeComboBox.currentText(), 0
+            )
 
-        self.ok_validator = OkValidator(
-            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
-        )
         self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
 
         self.nameLineEdit.validator().is_valid.connect(self.ok_validator.set_name_valid)
@@ -353,6 +388,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
     def on_nx_class_changed(self):
+        if not self.componentTypeComboBox.currentText():
+            return
         self.webEngineView.setUrl(
             QUrl(
                 f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
@@ -361,8 +398,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.possible_fields = self.nx_component_classes[
             self.componentTypeComboBox.currentText()
         ]
-        possible_field_names, _ = zip(*self.possible_fields)
-        self.nx_class_changed.emit(possible_field_names)
+        try:
+            possible_field_names, _ = zip(*self.possible_fields)
+            self.nx_class_changed.emit(possible_field_names)
+        except ValueError:
+            self.nx_class_changed.emit([])
 
     def mesh_file_picker(self):
         """

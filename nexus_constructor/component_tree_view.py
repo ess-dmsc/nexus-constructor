@@ -97,7 +97,12 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
     ) -> QWidget:
-        frame = self._dict_frames[index]
+        if index in self._dict_frames:
+            frame = self._dict_frames[index]
+        else:
+            model = index.model()
+            value = model.data(index, Qt.DisplayRole)
+            frame = self.get_frame(value)
         if hasattr(frame, TRANSFORMATION_FRAME):
             frame.transformation_frame.enable()
         if hasattr(frame, MODULE_FRAME):
