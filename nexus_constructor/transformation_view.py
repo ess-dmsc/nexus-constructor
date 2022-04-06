@@ -165,6 +165,7 @@ class EditTransformationLink(QFrame):
         self.link_frame = Ui_Link()
         self.link_frame.setupUi(self)
         self.populate_combo_box()
+        self.link_frame.go_to_link.clicked.connect(self.go_to_component)
 
     def populate_combo_box(self):
         self.link_frame.transformations_combo_box.blockSignals(True)
@@ -193,9 +194,9 @@ class EditTransformationLink(QFrame):
                 self.link.linked_component is not None
                 and self.link.linked_component == current_component
             ):
-                self.link_frame.transformations_combo_box.setCurrentIndex(
-                    self.link_frame.transformations_combo_box.count() - 1
-                )
+                new_index = self.link_frame.transformations_combo_box.count() - 1
+                self.link_frame.transformations_combo_box.setCurrentIndex(new_index)
+                self.link_frame.setLinkEvent(new_index)
         self.link_frame.transformations_combo_box.currentIndexChanged.connect(
             self.set_new_index
         )
@@ -213,3 +214,9 @@ class EditTransformationLink(QFrame):
 
     def save_all_changes(self):
         self.signals.transformation_changed.emit()
+
+    def go_to_component(self):
+        tree_view = self.parent().parent().parent()
+        tree_view.setCurrentIndex(
+            tree_view.model().index_from_component(self.link.linked_component)
+        )
