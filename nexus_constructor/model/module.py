@@ -153,7 +153,11 @@ class Dataset(FileWriterModule):
     def as_dict(self, error_collector: List[str]):
         values = self.values
         if np.isscalar(values):
-            values = self._cast_to_type(values)
+            try:
+                values = self._cast_to_type(values)
+            except ValueError as e:
+                error_collector.append(f"Error when casting the string \"{self.values}\" to type \"{self.type}\". The exception message was: {e}")
+                return {}
         elif isinstance(values, np.ndarray):
             values = values.tolist()
 
