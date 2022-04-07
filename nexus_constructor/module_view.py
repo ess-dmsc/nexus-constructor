@@ -50,7 +50,7 @@ class ModuleViewEditable(QGroupBox):
     def __init__(self, module, parent: QWidget, model: Model):
         super().__init__(module.writer_module.upper(), parent)
         layout = QVBoxLayout()
-        self.field_widget = FieldWidget(module.parent_node)
+        self.field_widget = FieldWidget(module.parent_node, parent_dataset=module)
         self.field_widget.field_type_combo.setEnabled(False)
         self.module = module
         self.model = model
