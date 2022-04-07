@@ -191,7 +191,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.componentTypeComboBox.model().item(1).setEnabled(False)
             self.componentTypeComboBox.addItems(sorted_component_list)
             self.componentTypeComboBox.addItem("- Groups", userData=None)
-            self.componentTypeComboBox.model().item(self.componentTypeComboBox.count() - 1).setEnabled(False)
+            self.componentTypeComboBox.model().item(
+                self.componentTypeComboBox.count() - 1
+            ).setEnabled(False)
             self.componentTypeComboBox.addItems(sorted_groups_list)
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.change_pixel_options_visibility
@@ -222,7 +224,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             pal = self.componentTypeComboBox.palette()
             pal.setColor(QPalette.Text, Qt.red)
             self.componentTypeComboBox.setPalette(pal)
-            self.componentTypeComboBox.currentIndexChanged.connect(self.validate_nx_class_index)
+            self.componentTypeComboBox.currentIndexChanged.connect(
+                self.validate_nx_class_index
+            )
 
         self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
 
