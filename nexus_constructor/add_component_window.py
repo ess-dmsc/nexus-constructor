@@ -5,7 +5,7 @@ from functools import partial
 from typing import List
 
 from PySide2.QtCore import QObject, Qt, QUrl, Signal
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QVector3D, QPalette, QBrush
 from PySide2.QtWidgets import QListWidget, QListWidgetItem
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
@@ -44,7 +44,6 @@ from nexus_constructor.ui_utils import (
     file_dialog,
     generate_unique_name,
     show_warning_dialog,
-    validate_combobox_edit,
     validate_line_edit,
 )
 from nexus_constructor.unit_utils import METRES
@@ -52,7 +51,6 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     GeometryFileValidator,
     NameValidator,
-    NXClassValidator,
     OkValidator,
     UnitValidator,
 )
@@ -172,18 +170,29 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
+        sorted_groups_list = list(NX_CLASSES - COMPONENT_TYPES)
+        sorted_groups_list.sort()
+        sorted_component_list = list(COMPONENT_TYPES)
+        sorted_component_list.sort()
         if isinstance(self.component_to_edit, Component):
-            sorted_components = list(COMPONENT_TYPES)
-            sorted_components.sort()
-            self.componentTypeComboBox.addItems(sorted_components)
+            self.componentTypeComboBox.addItem("- Components", userData=None)
+            self.componentTypeComboBox.model().item(0).setEnabled(False)
+            self.componentTypeComboBox.addItems(sorted_component_list)
         elif isinstance(self.component_to_edit, Entry):
             self.componentTypeComboBox.addItems([ENTRY_CLASS_NAME])
         elif isinstance(self.component_to_edit, Group):
-            sorted_groups = list(NX_CLASSES - COMPONENT_TYPES)
-            sorted_groups.sort()
-            self.componentTypeComboBox.addItems(sorted_groups)
+            self.componentTypeComboBox.addItem("- Groups", userData=None)
+            self.componentTypeComboBox.model().item(0).setEnabled(False)
+            self.componentTypeComboBox.addItems(sorted_groups_list)
         else:
-            self.componentTypeComboBox.addItems(list(self.nx_component_classes.keys()))
+            self.componentTypeComboBox.addItem("(None)", userData=None)
+            self.componentTypeComboBox.model().item(0).setBackground(QBrush(Qt.red))
+            self.componentTypeComboBox.addItem("- Components", userData=None)
+            self.componentTypeComboBox.model().item(1).setEnabled(False)
+            self.componentTypeComboBox.addItems(sorted_component_list)
+            self.componentTypeComboBox.addItem("- Groups", userData=None)
+            self.componentTypeComboBox.model().item(self.componentTypeComboBox.count() - 1).setEnabled(False)
+            self.componentTypeComboBox.addItems(sorted_groups_list)
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.change_pixel_options_visibility
         )
@@ -209,23 +218,11 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(self.component_to_edit)
         else:
-            self.componentTypeComboBox.setEditable(True)
-            self.componentTypeComboBox.setCurrentText("")
-            self.componentTypeComboBox.setValidator(NXClassValidator())
-            self.componentTypeComboBox.validator().is_valid.connect(
-                partial(
-                    validate_combobox_edit,
-                    self.componentTypeComboBox,
-                    tooltip_on_reject="Nexus class not valid",
-                    tooltip_on_accept="Nexus class valid",
-                )
-            )
-            self.componentTypeComboBox.validator().is_valid.connect(
-                self.ok_validator.set_nx_class_valid
-            )
-            self.componentTypeComboBox.validator().validate(
-                self.componentTypeComboBox.currentText(), 0
-            )
+            self.ok_validator.set_nx_class_valid(False)
+            pal = self.componentTypeComboBox.palette()
+            pal.setColor(QPalette.Text, Qt.red)
+            self.componentTypeComboBox.setPalette(pal)
+            self.componentTypeComboBox.currentIndexChanged.connect(self.validate_nx_class_index)
 
         self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
 
@@ -272,6 +269,18 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.change_pixel_options_visibility()
         parent_dialog.setAttribute(Qt.WA_DeleteOnClose)
+
+    def validate_nx_class_index(self, new_index):
+        c_nx_class = self.componentTypeComboBox.currentText()
+        is_valid_class = c_nx_class in NX_CLASSES
+        if is_valid_class:
+            used_color = Qt.black
+        else:
+            used_color = Qt.red
+        pal = self.componentTypeComboBox.palette()
+        pal.setColor(QPalette.Text, used_color)
+        self.componentTypeComboBox.setPalette(pal)
+        self.ok_validator.set_nx_class_valid(is_valid_class)
 
     def set_pixel_related_changes(self):
         """
@@ -388,16 +397,16 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
     def on_nx_class_changed(self):
-        if not self.componentTypeComboBox.currentText():
+        c_nx_class = self.componentTypeComboBox.currentText()
+        if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
         self.webEngineView.setUrl(
             QUrl(
-                f"http://download.nexusformat.org/sphinx/classes/base_classes/{self.componentTypeComboBox.currentText()}.html"
+                f"http://download.nexusformat.org/sphinx/classes/base_classes/{c_nx_class}.html"
             )
         )
-        self.possible_fields = self.nx_component_classes[
-            self.componentTypeComboBox.currentText()
-        ]
+
+        self.possible_fields = self.nx_component_classes[c_nx_class]
         try:
             possible_field_names, _ = zip(*self.possible_fields)
             self.nx_class_changed.emit(possible_field_names)
