@@ -33,6 +33,7 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
+from nexus_constructor.model.group import Group
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -178,8 +179,8 @@ class FieldWidget(QFrame):
             for i in range(self.parent().count()):
                 new_field_widget = self.parent().itemWidget(self.parent().item(i))
                 if new_field_widget is not self:
-                   existing_objects.append(new_field_widget)
-        else:
+                    existing_objects.append(new_field_widget)
+        elif isinstance(self._node_parent, Group):
             for child in self._node_parent.children:
                 if child is not parent_dataset:
                     existing_objects.append(child)
@@ -198,7 +199,9 @@ class FieldWidget(QFrame):
         # Set the layout for the default field type
         self.field_type_changed()
 
-    def _set_up_name_validator(self, existing_objects: List[Union["FieldWidget", FileWriterModule]]):
+    def _set_up_name_validator(
+        self, existing_objects: List[Union["FieldWidget", FileWriterModule]]
+    ):
         self.field_name_edit.setValidator(
             NameValidator(existing_objects, invalid_names=INVALID_FIELD_NAMES)
         )

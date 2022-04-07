@@ -156,7 +156,9 @@ class Dataset(FileWriterModule):
             try:
                 values = self._cast_to_type(values)
             except ValueError as e:
-                error_collector.append(f"Error when casting the string \"{self.values}\" to type \"{self.type}\". The exception message was: {e}")
+                error_collector.append(
+                    f'Error when casting the string "{self.values}" to type "{self.type}". The exception message was: {e}'
+                )
                 return {}
         elif isinstance(values, np.ndarray):
             values = values.tolist()
