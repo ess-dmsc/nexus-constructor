@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 from PySide2.QtCore import QObject, Qt, Signal
-from PySide2.QtWidgets import QDoubleSpinBox, QSpinBox, QTableWidgetItem
+from PySide2.QtWidgets import QDoubleSpinBox, QMessageBox, QSpinBox, QTableWidgetItem
 
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import (
@@ -92,6 +92,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         # Update the validity
         self.update_pixel_input_validity()
+
+        # Add listener to item changed event in pixel mapping table widget.
+        self.pixel_mapping_table_widget.itemChanged.connect(self.item_changed)
 
     def fill_existing_entries(self, component_to_edit: Component):
         """
@@ -525,16 +528,20 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
     def get_id_at_index(self, index: int):
         table_item = self.pixel_mapping_table_widget.item(index, 1)
-        if not table_item:
+        if not table_item or not table_item.text():
             return None
         return int(table_item.text())
 
-    #
-    # def get_id_text_at_index(self, index: int):
-    #     table_item = self.pixel_mapping_table_widget.item(index, 0)
-    #     if not table_item:
-    #         return None
-    #     return table_item
+    def item_changed(self, Qitem: QTableWidgetItem):
+        if not Qitem.text() or Qitem.column() == 0:
+            return
+        try:
+            int(Qitem.text())
+        except ValueError:
+            Msgbox = QMessageBox()
+            Msgbox.setText("Error, Pixel ID must be an integer!")
+            Msgbox.exec()
+            Qitem.setData(Qt.DisplayRole, None)
 
     def get_pixel_mapping_table_size(self):
         return self.pixel_mapping_table_widget.rowCount()
@@ -555,9 +562,9 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             item = QTableWidgetItem()
             item.setData(Qt.DisplayRole, col_text)
             self.pixel_mapping_table_widget.setItem(i, 0, item)
-            self.pixel_mapping_table_widget.itemEntered.connect(
-                self.update_pixel_mapping_validity
-            )
         self.pixel_mapping_table_widget.resizeColumnToContents(0)
+        self.pixel_mapping_table_widget.itemChanged.connect(
+            self.update_pixel_mapping_validity
+        )
 
     pixel_mapping_button_pressed = Signal()
