@@ -8,7 +8,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 
 class Ui_PixelOptionsWidget(object):
@@ -71,9 +71,11 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_mapping_label = QtWidgets.QLabel(self.pixel_mapping_page)
         self.pixel_mapping_label.setObjectName("pixelMappingLabel")
         self.pixel_mapping_page_layout.addWidget(self.pixel_mapping_label)
-        self.pixel_mapping_list_widget = QtWidgets.QListWidget(self.pixel_mapping_page)
-        self.pixel_mapping_list_widget.setObjectName("pixelMappingListWidget")
-        self.pixel_mapping_page_layout.addWidget(self.pixel_mapping_list_widget)
+        self.pixel_mapping_table_widget = QtWidgets.QTableWidget(
+            self.pixel_mapping_page
+        )
+        self.pixel_mapping_table_widget.setObjectName("pixelMappingListWidget")
+        self.pixel_mapping_page_layout.addWidget(self.pixel_mapping_table_widget)
         self.pixel_options_stack.addWidget(self.pixel_mapping_page)
 
     def _set_up_pixel_options_stack(self):
