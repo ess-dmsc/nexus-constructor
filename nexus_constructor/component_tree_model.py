@@ -316,7 +316,7 @@ class NexusTreeModel(QAbstractItemModel):
         parent_component, transformation_list, transformation_type, target_pos
     ):
         values = Dataset(
-            parent_node=parent_component, name="", type=ValueTypes.DOUBLE, values=""
+            parent_node=parent_component, name="", type=ValueTypes.DOUBLE, values="0.0"
         )
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
