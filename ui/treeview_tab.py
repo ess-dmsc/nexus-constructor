@@ -148,6 +148,7 @@ class ComponentTreeViewTab(QWidget):
         add_transformation(
             transformation_type, self.component_tree_view, self.component_model
         )
+        self._set_button_state()
 
     def on_delete_item(self):
         selected = self.component_tree_view.selectedIndexes()
