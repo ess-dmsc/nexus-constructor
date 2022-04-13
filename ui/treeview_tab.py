@@ -152,8 +152,17 @@ class ComponentTreeViewTab(QWidget):
 
     def on_delete_item(self):
         selected = self.component_tree_view.selectedIndexes()
+        if len(selected[0].data().parent_node.children) == 1:
+            new_selection_index = selected[0].parent()
+        elif selected[0].row() > 0:
+            new_selection_index = self.component_model.parent(selected[0]).child(selected[0].row() - 1, 0)
+        elif selected[-1].row() <= len(selected[-1].data().parent_node.children) - 1:
+            new_selection_index = self.component_model.parent(selected[-1]).child(selected[-1].row(), 0)
+        else:
+            new_selection_index = selected[0].parent()
         for item in selected:
             self.component_model.remove_node(item)
+        self.component_tree_view.setCurrentIndex(new_selection_index)
         self._set_button_state()
 
     def on_zoom_item(self):
