@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Dict, Union
 
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, QObject, QPoint, QSize, Qt
 from PySide2.QtGui import QPainter, QPixmap, QRegion
@@ -39,6 +39,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         super().__init__(parent)
         self.model = model
         self._use_simple_tree_view = False
+        self._dict_frames: Dict[QModelIndex, QFrame] = {}
 
     def get_frame(
         self,
@@ -48,6 +49,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             Transformation,
             LinkTransformation,
             TransformationsList,
+            FileWriterModule,
         ],
     ):
         frame = QFrame()
@@ -78,7 +80,11 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     ):
         model = index.model()
         value = model.data(index, Qt.DisplayRole)
-        frame = self.get_frame(value)
+        if index not in self._dict_frames or isinstance(value, Group):
+            frame = self.get_frame(value)
+            self._dict_frames[index] = frame
+        else:
+            frame = self._dict_frames[index]
         frame.setFixedSize(option.rect.size())
         ratio = self.parent().devicePixelRatioF()
         pixmap = QPixmap(frame.size() * ratio)
@@ -91,11 +97,16 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
     ) -> QWidget:
-        model = index.model()
-        value = model.data(index, Qt.DisplayRole)
-        frame = self.get_frame(value)
+        if index in self._dict_frames:
+            frame = self._dict_frames[index]
+        else:
+            model = index.model()
+            value = model.data(index, Qt.DisplayRole)
+            frame = self.get_frame(value)
         if hasattr(frame, TRANSFORMATION_FRAME):
             frame.transformation_frame.enable()
+        if hasattr(frame, MODULE_FRAME):
+            frame.module_frame.setEnabled(True)
         frame.setParent(parent)
         self.frameSize = frame.sizeHint()
         return frame
@@ -107,6 +118,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             editorWidget.transformation_frame.save_all_changes()
         elif hasattr(editorWidget, MODULE_FRAME):
             editorWidget.module_frame.save_module_changes()
+        if index in self._dict_frames:
+            self._dict_frames.pop(index)
 
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         model = index.model()

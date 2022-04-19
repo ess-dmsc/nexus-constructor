@@ -34,6 +34,9 @@ class ModuleView(QGroupBox):
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
 
+    def save_module_changes(self):
+        pass
+
     @staticmethod
     def _get_label(content):
         label = QLabel(content)
@@ -47,12 +50,13 @@ class ModuleViewEditable(QGroupBox):
     def __init__(self, module, parent: QWidget, model: Model):
         super().__init__(module.writer_module.upper(), parent)
         layout = QVBoxLayout()
-        self.field_widget = FieldWidget(module.parent_node)
-        layout.addWidget(self.field_widget)
-        self.setLayout(layout)
+        self.field_widget = FieldWidget(module.parent_node, parent_dataset=module)
+        self.field_widget.field_type_combo.setEnabled(False)
         self.module = module
         self.model = model
         self._set_existing_items()
+        layout.addWidget(self.field_widget)
+        self.setLayout(layout)
 
     def _set_existing_items(self):
         module = self.module
@@ -81,11 +85,14 @@ class ModuleViewEditable(QGroupBox):
         elif self.module.writer_module in [
             StreamMode.value for StreamMode in StreamModules
         ]:
+            self.module.writer_module = self.field_widget.value.writer_module
+            self.setTitle(self.module.writer_module.upper())
             self.module.source = self.field_widget.value.source  # type: ignore
             self.module.topic = self.field_widget.value.topic  # type: ignore
             self.module.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
             )
+            self._set_additional_options()
         elif self.module.writer_module == WriterModules.LINK.value:
             self.module.source = self.field_widget.value.source  # type: ignore
             self.module.name = self.field_widget.name
@@ -95,5 +102,17 @@ class ModuleViewEditable(QGroupBox):
             self.module.parent_node.attributes.set_attribute_value(
                 CommonAttrs.UNITS, self.field_widget.units
             )
-
         self.model.signals.module_changed.emit()
+
+    def _set_additional_options(self):
+        if self.module.writer_module == StreamModules.ADAR.value:
+            array_size_table = self.field_widget.streams_widget.array_size_table
+            self.module.array_size = []
+            for i in range(array_size_table.columnCount()):
+                table_value = array_size_table.item(0, i)
+                if table_value:
+                    self.module.array_size.append(int(table_value.text()))
+        elif self.module.writer_module == StreamModules.F142.value:
+            self.field_widget.streams_widget.record_advanced_f142_values(self.module)
+        elif self.module.writer_module == StreamModules.EV42.value:
+            self.field_widget.streams_widget.record_advanced_ev42_values(self.module)

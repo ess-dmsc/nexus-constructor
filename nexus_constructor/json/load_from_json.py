@@ -3,6 +3,7 @@ from json import JSONDecodeError
 from typing import Dict, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
+    NX_TRANSFORMATIONS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
     CommonAttrs,
@@ -11,6 +12,7 @@ from nexus_constructor.common_attrs import (
 )
 from nexus_constructor.component_type import (
     COMPONENT_TYPES,
+    ENTRY_CLASS_NAME,
     NX_CLASSES,
     SAMPLE_CLASS_NAME,
 )
@@ -139,6 +141,40 @@ class JSONReader:
                     )
                 )
 
+    def _append_transformations_to_nx_group(self):
+        """
+        Correctly adds the transformations in the components, with respect
+        to the instance of TransformationList, to transformation nexus group.
+        """
+        for component in self.model.get_components():
+            transformation_list = component.transforms
+            transformation_children = []
+            for child in component.children:
+                if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
+                    for transformation in transformation_list:
+                        transformation_children.append(transformation)
+                    child.children = transformation_children
+
+    def _set_transformation_links(self):
+        """
+        Adds transformation links to the components where a link exists.
+        """
+        for component in self.model.get_components():
+            nx_transformation_group = None
+            for child in component.children:
+                if isinstance(child, Group) and child.nx_class == NX_TRANSFORMATIONS:
+                    for childs_child in child.children:
+                        attrs = childs_child.attributes
+                        if attrs.get_attribute_value(CommonAttrs.DEPENDS_ON):
+                            nx_transformation_group = child
+                            component.transforms.has_link = True
+                            break
+                    break
+            if nx_transformation_group:
+                transformation_list = component.transforms
+                transformation_list.link.parent_node = nx_transformation_group
+                nx_transformation_group.children.append(transformation_list.link)
+
     def load_model_from_json(self, filename: str) -> bool:
         """
         Tries to load a model from a JSON file.
@@ -168,6 +204,8 @@ class JSONReader:
             child.parent_node = self.model.entry
         self._set_transforms_depends_on()
         self._set_components_depends_on()
+        self._append_transformations_to_nx_group()
+        self._set_transformation_links()
         return True
 
     def _read_json_object(self, json_object: Dict, parent_node: Group = None):
@@ -210,7 +248,13 @@ class JSONReader:
                         nexus_object[node.name] = node
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]
-            if module_type in [x.value for x in WriterModules]:
+            if (
+                module_type == WriterModules.DATASET.value
+                and json_object[NodeType.CONFIG][CommonKeys.NAME]
+                == CommonAttrs.DEPENDS_ON
+            ):
+                nexus_object = None
+            elif module_type in [x.value for x in WriterModules]:
                 nexus_object = create_fw_module_object(
                     module_type, json_object[NodeType.CONFIG], parent_node
                 )
@@ -251,7 +295,7 @@ class JSONReader:
             if (
                 parent_node
                 and isinstance(nexus_object, Dataset)
-                and parent_node.nx_class == "NXentry"
+                and parent_node.nx_class == ENTRY_CLASS_NAME
             ):
                 self.model.entry[nexus_object.name] = nexus_object
             if isinstance(nexus_object, Group) and not nexus_object.nx_class:

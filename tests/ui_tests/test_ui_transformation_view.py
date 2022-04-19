@@ -8,7 +8,6 @@ from pytestqt.qtbot import QtBot  # noqa: F401
 
 from nexus_constructor.field_attrs import _get_human_readable_type
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset, F142Stream, Link
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
@@ -127,16 +126,12 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
 
-    stream_group = Group("stream_group")
-
     topic = "test_topic"
     source = "source1"
     type = "double"
-    stream = F142Stream(parent_node=stream_group, topic=topic, source=source, type=type)
+    stream = F142Stream(parent_node=transform, topic=topic, source=source, type=type)
 
-    stream_group["stream"] = stream
-
-    transform.values = stream_group
+    transform.values = stream
 
     view = EditRotation(parent=None, transformation=transform, model=None)
     qtbot.addWidget(view)

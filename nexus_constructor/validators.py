@@ -12,6 +12,7 @@ from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget
 from stl import mesh
 
 from nexus_constructor.common_attrs import SCALAR
+from nexus_constructor.component_type import NX_CLASSES
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
@@ -53,9 +54,10 @@ class UnitValidator(QValidator):
     Validator to ensure the the text entered is a valid unit of length.
     """
 
+    ureg = pint.UnitRegistry()
+
     def __init__(self, expected_dimensionality=None):
         super().__init__()
-        self.ureg = pint.UnitRegistry()
         self.expected_dimensionality = expected_dimensionality
 
     def validate(self, input: str, pos: int):
@@ -130,6 +132,17 @@ class NameValidator(QValidator):
             self.is_valid.emit(False)
             return QValidator.Intermediate
 
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)
+
+
+class NXClassValidator(QValidator):
+    def validate(self, input: str, pos: int):
+        if not input or input not in NX_CLASSES:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
         self.is_valid.emit(True)
         return QValidator.Acceptable
 
@@ -288,6 +301,7 @@ class OkValidator(QObject):
         self.name_is_valid = False
         self.file_is_valid = False
         self.units_are_valid = False
+        self.nx_class_is_valid = True
         self.no_geometry_button = no_geometry_button
         self.mesh_button = mesh_button
         self.pixel_validator = pixel_validator
@@ -305,12 +319,17 @@ class OkValidator(QObject):
         self.units_are_valid = is_valid
         self.validate_ok()
 
+    def set_nx_class_valid(self, is_valid):
+        self.nx_class_is_valid = is_valid
+        self.validate_ok()
+
     def validate_ok(self):
         """
         Validates the fields in order to dictate whether the OK button should be disabled or enabled.
         :return: None, but emits the isValid signal.
         """
         unacceptable = [
+            not self.nx_class_is_valid,
             not self.name_is_valid,
             not self.no_geometry_button.isChecked() and not self.units_are_valid,
             self.mesh_button.isChecked() and not self.file_is_valid,
@@ -326,7 +345,6 @@ class FieldType(Enum):
     array_dataset = "Array dataset"
     kafka_stream = "Kafka stream"
     link = "Link"
-    nx_class = "NX class/group"
 
 
 class FieldValueValidator(QValidator):

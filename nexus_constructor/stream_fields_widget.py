@@ -17,6 +17,7 @@ from PySide2.QtWidgets import (
     QRadioButton,
     QSpinBox,
     QTableWidget,
+    QTableWidgetItem,
 )
 
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
@@ -33,6 +34,7 @@ from nexus_constructor.model.module import (
     NS10Stream,
     SENVStream,
     StreamModule,
+    StreamModules,
     TDCTStream,
     WriterModules,
 )
@@ -138,9 +140,9 @@ class StreamFieldsWidget(QDialog):
 
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
         if self._show_only_f142_stream:
-            self.schema_combo.addItems([WriterModules.F142.value])
+            self.schema_combo.addItems([StreamModules.F142.value])
         else:
-            self.schema_combo.addItems([e.value for e in WriterModules])
+            self.schema_combo.addItems([e.value for e in StreamModules])
 
         self.ok_button = QPushButton("OK")
         self.ok_button.clicked.connect(self.parent().close)
@@ -309,8 +311,8 @@ class StreamFieldsWidget(QDialog):
 
     def get_stream_module(self, parent) -> StreamModule:
         """
-        Create the stream group
-        :return: The created StreamGroup
+        Create the stream module
+        :return: The created stream module
         """
 
         source = self.source_line_edit.text()
@@ -332,7 +334,7 @@ class StreamFieldsWidget(QDialog):
             if array_size:
                 stream.array_size = array_size
             if self.advanced_options_enabled:
-                self._record_advanced_f142_values(stream)
+                self.record_advanced_f142_values(stream)
         elif current_schema == WriterModules.ADAR.value:
             array_size = []
             for i in range(self.array_size_table.columnCount()):
@@ -344,7 +346,7 @@ class StreamFieldsWidget(QDialog):
         elif current_schema == WriterModules.EV42.value:
             stream = EV42Stream(parent_node=parent, source=source, topic=topic)
             if self.advanced_options_enabled:
-                self._record_advanced_ev42_values(stream)
+                self.record_advanced_ev42_values(stream)
         elif current_schema == WriterModules.NS10.value:
             stream = NS10Stream(parent_node=parent, source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
@@ -364,7 +366,7 @@ class StreamFieldsWidget(QDialog):
 
         return stream
 
-    def _record_advanced_f142_values(self, stream: F142Stream):
+    def record_advanced_f142_values(self, stream: F142Stream):
         """
         Save the advanced f142 properties to the stream data object.
         :param stream: The stream data object to be modified.
@@ -372,7 +374,7 @@ class StreamFieldsWidget(QDialog):
         stream.chunk_size = self.f142_chunk_size_spinner.value()
         stream.cue_interval = self.f142_cue_interval_spinner.value()
 
-    def _record_advanced_ev42_values(self, stream: EV42Stream):
+    def record_advanced_ev42_values(self, stream: EV42Stream):
         """
         Save the advanced ev42 properties to the stream data object.
         :param stream: The stream data object to be modified.
@@ -446,3 +448,6 @@ class StreamFieldsWidget(QDialog):
             self.fill_in_existing_f142_fields(field)
         elif schema == WriterModules.EV42.value:
             self.fill_in_existing_ev42_fields(field)
+        elif schema == WriterModules.ADAR.value:
+            for i, val in enumerate(field.array_size):
+                self.array_size_table.setItem(0, i, QTableWidgetItem(str(val)))

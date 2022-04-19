@@ -97,17 +97,6 @@ def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Call
             return update_existing_array_field
     elif isinstance(item, StreamModule):
         return update_existing_stream_field
-    elif isinstance(item, Group):
-        if item.children:
-            if isinstance(item.children[0], StreamModule):
-                return update_existing_stream_field
-            elif isinstance(item, Link):
-                return update_existing_link_field
-            elif isinstance(item, FileWriterModule):
-                if np.isscalar(item.values):
-                    return update_existing_scalar_field
-                else:
-                    return update_existing_array_field
     elif isinstance(item, Link):
         return update_existing_link_field
     else:

@@ -105,6 +105,18 @@ FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(VALUE_TYPE_TO_NP)}
 FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
 
 
+def get_component_combobox_index(
+    add_component_dialog: AddComponentDialog, nx_class: str
+):
+    all_items = [
+        add_component_dialog.componentTypeComboBox.itemText(i)
+        for i in range(add_component_dialog.componentTypeComboBox.count())
+    ]
+    for i, item in enumerate(all_items):
+        if item == nx_class:
+            return i
+
+
 @pytest.fixture(scope="function")
 def parent_mock():
 
@@ -259,7 +271,7 @@ def make_pixel_options_appear(
     button: QRadioButton,
     dialog: AddComponentDialog,
     template: QDialog,
-    pixel_options_index: int = PIXEL_OPTIONS["NXdetector"],
+    pixel_options_index: int = None,
 ):
     """
     Create the conditions to allow the appearance of the pixel options by choosing NXdetector or NXdetector_module as
@@ -270,6 +282,8 @@ def make_pixel_options_appear(
     :param template: The window/widget that holds the AddComponentDialog.
     :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
     """
+    if not pixel_options_index:
+        pixel_options_index = get_component_combobox_index(dialog, "NXdetector")
     systematic_button_press(qtbot, template, button)
     dialog.componentTypeComboBox.setCurrentIndex(pixel_options_index)
     show_and_close_window(qtbot, template)
@@ -600,13 +614,14 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
     any_component_type,
     pixel_shape_name,
 ):
+    get_component_combobox_index(add_component_dialog, pixels_class)
     # Change the pixel options to visible by selecting a cylinder/mesh shape and a NXclass with pixel fields
     make_pixel_options_appear(
         qtbot,
         get_shape_type_button(add_component_dialog, pixel_shape_name),
         add_component_dialog,
         template,
-        PIXEL_OPTIONS[pixels_class],
+        get_component_combobox_index(add_component_dialog, pixels_class),
     )
     # Check that this has caused the pixel options to become visible
     assert add_component_dialog.pixelOptionsWidget.isVisible()
@@ -639,7 +654,7 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
         get_shape_type_button(add_component_dialog, shape_name),
         add_component_dialog,
         template,
-        PIXEL_OPTIONS[pixels_class],
+        get_component_combobox_index(add_component_dialog, pixels_class),
     )
     assert add_component_dialog.pixelOptionsWidget.isVisible()
 
@@ -826,6 +841,9 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
     qtbot, template, add_component_dialog
 ):
 
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
+
     # Mimic the user entering a unique name in the text field
     enter_component_name(qtbot, template, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
@@ -839,6 +857,8 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_component_window_closes(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
@@ -868,6 +888,9 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_com
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_shape_THEN_add_component_window_closes(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
+
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.CylinderRadioButton)
 
@@ -895,6 +918,8 @@ def test_UI_GIVEN_no_input_WHEN_adding_component_with_no_shape_THEN_add_componen
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_component_button_is_enabled(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user entering a unique name in the text field
     enter_component_name(qtbot, template, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -963,6 +988,8 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_fil
 def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_enabled(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
@@ -1083,6 +1110,8 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_units_b
 def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_enabled(
     qtbot, template, add_component_dialog
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
     systematic_button_press(qtbot, template, add_component_dialog.meshRadioButton)
@@ -1412,7 +1441,7 @@ def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_
         qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, template
     )
 
-    mock_pixel_options.reset_pixel_mapping_list.assert_called_once()
+    mock_pixel_options.reset_pixel_mapping_table.assert_called_once()
     mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_called_once_with(
         1
     )
@@ -1440,7 +1469,7 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
         VALID_CUBE_OFF_FILE,
     )
 
-    mock_pixel_options.reset_pixel_mapping_list.assert_called_once()
+    mock_pixel_options.reset_pixel_mapping_table.assert_called_once()
     mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_called_once_with(
         VALID_CUBE_MESH_FILE_PATH
     )
@@ -1799,7 +1828,7 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     assert widget2.value.values == str(field_value2)
 
 
-def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
+def test_UI_GIVEN_group_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
     qtbot,
 ):
     component, model, treeview_model = create_group_with_component(
@@ -1819,13 +1848,10 @@ def test_UI_GIVEN_component_with_basic_f142_field_WHEN_editing_component_THEN_to
 
     stream_group.children.append(stream)
 
-    field_name1 = "stream1"
-    component[field_name1] = stream_group
-
     dialog = AddComponentDialog(
         model,
         treeview_model,
-        component_to_edit=component,
+        component_to_edit=stream_group,
         nx_classes=NX_CLASS_DEFINITIONS,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
@@ -2217,6 +2243,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
 def test_UI_GIVEN_initial_component_THEN_webbrowser_url_contains_component_class(
     qtbot, add_component_dialog, template
 ):
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXaperture")
     current_nx_class = add_component_dialog.componentTypeComboBox.currentText()
     assert current_nx_class in add_component_dialog.webEngineView.url().toString()
 
@@ -2224,6 +2251,9 @@ def test_UI_GIVEN_initial_component_THEN_webbrowser_url_contains_component_class
 def test_UI_GIVEN_change_of_component_type_THEN_webbrowser_url_is_updated_and_contains_component_class(
     qtbot, add_component_dialog, template
 ):
+    # Setting a valid nexus class.
+    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
+
     current_nx_class = add_component_dialog.componentTypeComboBox.currentText()
 
     new_nx_class = add_component_dialog.componentTypeComboBox.itemText(3)

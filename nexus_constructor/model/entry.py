@@ -1,6 +1,7 @@
 from copy import copy
 from typing import Any, Dict, List, Tuple
 
+from nexus_constructor.component_type import ENTRY_CLASS_NAME
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
@@ -29,7 +30,7 @@ USERS_PLACEHOLDER = "$USERS$"
 class Entry(Group):
     def __init__(self):
         super().__init__(name="entry", parent_node=None)
-        self.nx_class = "NXentry"
+        self.nx_class = ENTRY_CLASS_NAME
         self._users_placeholder = False
 
     @property
