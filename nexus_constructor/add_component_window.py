@@ -5,7 +5,7 @@ from functools import partial
 from typing import List
 
 from PySide2.QtCore import QObject, Qt, QUrl, Signal
-from PySide2.QtGui import QVector3D, QPalette, QBrush
+from PySide2.QtGui import QBrush, QPalette, QVector3D
 from PySide2.QtWidgets import QListWidget, QListWidgetItem
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
@@ -289,24 +289,24 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     def set_pixel_related_changes(self):
         """
         Manages the pixel-related changes that are induced by changing the shape type. This entails changing the
-        visibility of the pixel options widget, clearing the previous pixel mapping widget list (if necessary),
-        generating a new pixel mapping widget list (if necessary), and reassessing the validity of the pixel input.
+        visibility of the pixel options widget, clearing the previous pixel mapping table widget(if necessary),
+        generating a new pixel mapping widget table (if necessary), and reassessing the validity of the pixel input.
         """
         self.change_pixel_options_visibility()
 
         if not self.noShapeRadioButton.isChecked():
-            self.clear_previous_mapping_list()
+            self.clear_previous_mapping_table()
             self.populate_pixel_mapping_if_necessary()
 
         self.update_pixel_input_validity()
 
-    def clear_previous_mapping_list(self):
+    def clear_previous_mapping_table(self):
         """
-        Wipes the previous list of pixel mapping widgets. Required if the file has changed, or if the shape type has
+        Wipes the previous table of pixel mapping table widgets. Required if the file has changed, or if the shape type has
         changed.
         """
         if self.pixel_options:
-            self.pixel_options.reset_pixel_mapping_list()
+            self.pixel_options.reset_pixel_mapping_table()
 
     def _fill_existing_entries(self):
         """

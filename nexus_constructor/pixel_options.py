@@ -1,8 +1,8 @@
 from typing import List, Optional, Tuple
 
 import numpy as np
-from PySide2.QtCore import QObject, Signal
-from PySide2.QtWidgets import QDoubleSpinBox, QListWidgetItem, QSpinBox
+from PySide2.QtCore import QObject, Qt, Signal
+from PySide2.QtWidgets import QDoubleSpinBox, QMessageBox, QSpinBox, QTableWidgetItem
 
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import (
@@ -20,7 +20,6 @@ from nexus_constructor.model.geometry import (
     BoxGeometry,
     OFFGeometryNexus,
 )
-from nexus_constructor.pixel_mapping_widget import PixelMappingWidget
 from nexus_constructor.validators import PixelValidator
 from ui.pixel_options import Ui_PixelOptionsWidget
 
@@ -61,11 +60,7 @@ def data_is_an_array_with_more_than_one_element(data) -> bool:
 
 class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def __init__(self):
-
         QObject.__init__(self)
-
-        self.pixel_mapping_widgets = []
-
         self._pixel_validator = None
         self.current_mapping_filename = None
 
@@ -98,11 +93,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Update the validity
         self.update_pixel_input_validity()
 
+        # Add listener to item changed event in pixel mapping table widget.
+        self.pixel_mapping_table_widget.itemChanged.connect(self.item_changed)
+
     def fill_existing_entries(self, component_to_edit: Component):
         """
         Populate the pixel fields based on what is already stored in the NeXus file.
         """
-        self.reset_pixel_mapping_list()
+        self.reset_pixel_mapping_table()
 
         try:
             component_to_edit.get_field_value(X_PIXEL_OFFSET)
@@ -268,12 +266,14 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             n_cylinders = shape.cylinders.size // 3
 
             if n_cylinders > 1:
-                self.create_pixel_mapping_list(n_cylinders, "cylinder")
+                self.create_pixel_mapping_table(n_cylinders, "cylinder")
                 # TODO: Restore pixel mapping in the case of multiple cylinders
 
             else:
-                self.create_pixel_mapping_list(n_cylinders, "cylinder")
-                self.pixel_mapping_widgets[0].id = detector_number[0]
+                self.create_pixel_mapping_table(n_cylinders, "cylinder")
+                item = QTableWidgetItem()
+                item.setData(Qt.DisplayRole, detector_number[0])
+                self.pixel_mapping_table_widget.setItem(0, 1, item)
 
     def _fill_off_geometry_pixel_mapping(self, shape: OFFGeometryNexus):
         """
@@ -283,11 +283,15 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         # Retrieve the detector face information from the shape and use this to create the required number of pixel
         # mapping widgets
         n_faces, detector_faces = self._get_detector_face_information(shape)
-        self.create_pixel_mapping_list(n_faces, "face")
+        self.create_pixel_mapping_table(n_faces, "face")
 
         # Populate the pixel mapping widgets based on the contents of the detector_faces array
         for detector_face in detector_faces:
-            self.pixel_mapping_widgets[detector_face[0]].id = detector_face[1]
+            item = QTableWidgetItem()
+            item.setData(Qt.DisplayRole, detector_face[1])
+            self.pixel_mapping_table_widget.setItem(
+                detector_face[0], 1, QTableWidgetItem(item)
+            )
 
     @staticmethod
     def _get_detector_face_information(
@@ -354,10 +358,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         Informs the AddComponentDialog that the "Entire Shape" button has been pressed. This then causes the
         AddComponentDialog to check if a new and valid file has been given. If these conditions are met then the
-        AddComponentDialog will call the method for populating the pixel mapping list. If these conditions are not meant
+        AddComponentDialog will call the method for populating the pixel mapping table. If these conditions are not met
         then the list will remain empty.
         """
-        if self.pixel_mapping_list_widget.count() == 0:
+        if self.pixel_mapping_table_widget.rowCount() == 0:
             self.pixel_mapping_button_pressed.emit()
 
     @staticmethod
@@ -408,25 +412,25 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         n_faces = self.get_number_of_faces_from_mesh_file(filename)
 
-        self.reset_pixel_mapping_list()
+        self.reset_pixel_mapping_table()
 
         # Use the faces information from the geometry file to add fields to the pixel mapping list
-        self.create_pixel_mapping_list(n_faces, "face")
+        self.create_pixel_mapping_table(n_faces, "face")
 
         # Record the filename of the current mapping to prevent the widgets from being created twice
         self.current_mapping_filename = filename
 
     def populate_pixel_mapping_list_with_cylinder_number(self, cylinder_number: int):
         """
-        Populates the pixel mapping list based on a number of cylinders for the NXcylindrical_geometry.
+        Populates the pixel mapping table based on a number of cylinders for the NXcylindrical_geometry.
         :param cylinder_number: The number of cylinders.
         """
         if self.pixel_mapping_not_visible():
             return
 
         # Set the mapping filename to None as cylinder mappings are not based on a mesh file.
-        self.reset_pixel_mapping_list()
-        self.create_pixel_mapping_list(cylinder_number, "cylinder")
+        self.reset_pixel_mapping_table()
+        self.create_pixel_mapping_table(cylinder_number, "cylinder")
 
     @staticmethod
     def get_number_of_faces_from_mesh_file(filename: str) -> int:
@@ -449,16 +453,19 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         """
         :return: A list of the IDs for the current PixelMappingWidgets.
         """
-        return [
-            pixel_mapping_widget.id
-            for pixel_mapping_widget in self.pixel_mapping_widgets
-        ]
+        ret_list = []
+        for i in range(self.pixel_mapping_table_widget.rowCount()):
+            ret_list.append(self.get_id_at_index(i))
+        return ret_list
 
     def update_pixel_mapping_validity(self):
         """
         Checks that at least one ID has been given in the Pixel Mapping and then updates the PixelValidator.
         """
-        nonempty_ids = [widget.id is not None for widget in self.pixel_mapping_widgets]
+        nonempty_ids = []
+        for i in range(self.pixel_mapping_table_widget.rowCount()):
+            val = self.get_id_at_index(i)
+            nonempty_ids.append(val is not None)
         self._pixel_validator.set_pixel_mapping_valid(any(nonempty_ids))
 
     def generate_pixel_data(self) -> PixelData:
@@ -505,47 +512,59 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
     def pixel_mapping_not_visible(self) -> bool:
         """
         Checks if the pixel mapping options are visible. This is used to determine if it is necessary to generate a
-        pixel mapping list.
+        pixel mapping table.
         :return: A bool indicating the current index of the PixelOptions stack.
         """
         return self.pixel_options_stack.currentIndex() != PIXEL_MAPPING_STACK_INDEX
 
-    def reset_pixel_mapping_list(self):
+    def reset_pixel_mapping_table(self):
         """
-        Clear the current pixel mapping list and widget. Used when the mesh file changes in the case of NXoff_geometry,
+        Clear the current pixel mapping table and widget. Used when the mesh file changes in the case of NXoff_geometry,
         when the number of cylinders change in the case of NXcylindrical_geometry, or when the user switches between
         mesh and cylinder.
         """
-        self.pixel_mapping_widgets = []
-        self.pixel_mapping_list_widget.clear()
+        self.pixel_mapping_table_widget.clear()
         self.current_mapping_filename = None
 
-    def create_pixel_mapping_list(self, n_items: int, text: str):
+    def get_id_at_index(self, index: int):
+        table_item = self.pixel_mapping_table_widget.item(index, 1)
+        if not table_item or not table_item.text():
+            return None
+        return int(table_item.text())
+
+    def item_changed(self, Qitem: QTableWidgetItem):
+        if not Qitem.text() or Qitem.column() == 0:
+            return
+        try:
+            int(Qitem.text())
+        except ValueError:
+            Msgbox = QMessageBox()
+            Msgbox.setText("Error, Pixel ID must be an integer!")
+            Msgbox.exec()
+            Qitem.setData(Qt.DisplayRole, None)
+
+    def get_pixel_mapping_table_size(self):
+        return self.pixel_mapping_table_widget.rowCount()
+
+    def create_pixel_mapping_table(self, n_items: int, text: str):
         """
-        Creates a list of pixel mapping widgets.
+        Creates a table of pixel mapping widgets.
         :param n_items: The number of widgets to create.
-        :param text: The label to be displayed next to the line edit. This is either faces or cylinders.
+        :param text: The label to be displayed next to the id cel.
+        This is either faces or cylinders.
         """
-        self.reset_pixel_mapping_list()
+        self.reset_pixel_mapping_table()
+        self.pixel_mapping_table_widget.setColumnCount(2)
+        self.pixel_mapping_table_widget.setRowCount(n_items)
 
         for i in range(n_items):
-            pixel_mapping_widget = PixelMappingWidget(
-                self.pixel_mapping_list_widget, i, text
-            )
-            pixel_mapping_widget.pixelIDLineEdit.textEdited.connect(
-                self.update_pixel_mapping_validity
-            )
-
-            # Make sure the list item is as large as the widget
-            list_item = QListWidgetItem()
-            list_item.setSizeHint(pixel_mapping_widget.sizeHint())
-
-            self.pixel_mapping_list_widget.addItem(list_item)
-            self.pixel_mapping_list_widget.setItemWidget(
-                list_item, pixel_mapping_widget
-            )
-
-            # Keep the PixelMappingWidget so that its ID can be retrieved easily when making a PixelMapping object.
-            self.pixel_mapping_widgets.append(pixel_mapping_widget)
+            col_text = f"Pixel ID for {text} #{i}:"
+            item = QTableWidgetItem()
+            item.setData(Qt.DisplayRole, col_text)
+            self.pixel_mapping_table_widget.setItem(i, 0, item)
+        self.pixel_mapping_table_widget.resizeColumnToContents(0)
+        self.pixel_mapping_table_widget.itemChanged.connect(
+            self.update_pixel_mapping_validity
+        )
 
     pixel_mapping_button_pressed = Signal()
