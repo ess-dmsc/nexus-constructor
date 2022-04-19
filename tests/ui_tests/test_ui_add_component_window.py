@@ -1441,7 +1441,7 @@ def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_
         qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, template
     )
 
-    mock_pixel_options.reset_pixel_mapping_list.assert_called_once()
+    mock_pixel_options.reset_pixel_mapping_table.assert_called_once()
     mock_pixel_options.populate_pixel_mapping_list_with_cylinder_number.assert_called_once_with(
         1
     )
@@ -1469,7 +1469,7 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
         VALID_CUBE_OFF_FILE,
     )
 
-    mock_pixel_options.reset_pixel_mapping_list.assert_called_once()
+    mock_pixel_options.reset_pixel_mapping_table.assert_called_once()
     mock_pixel_options.populate_pixel_mapping_list_with_mesh.assert_called_once_with(
         VALID_CUBE_MESH_FILE_PATH
     )
