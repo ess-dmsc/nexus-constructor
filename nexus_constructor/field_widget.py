@@ -44,9 +44,10 @@ class FieldNameLineEdit(QLineEdit):
         ]
         self.update_possible_fields(possible_field_names)
         self.setPlaceholderText("Name of new field")
-        self.setMinimumWidth(160)
+        self.setMinimumWidth(60)
         fix_horizontal_size = QSizePolicy()
-        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
+        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Expanding)
+        fix_horizontal_size.setHorizontalStretch(3)
         self.setSizePolicy(fix_horizontal_size)
 
     def focusInEvent(self, event):
@@ -114,6 +115,12 @@ class FieldWidget(QFrame):
         self.units_line_edit = QLineEdit()
         self.unit_validator = UnitValidator()
         self.units_line_edit.setValidator(self.unit_validator)
+        self.units_line_edit.setMinimumWidth(20)
+        self.units_line_edit.setMaximumWidth(50)
+        unit_size_policy = QSizePolicy()
+        unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
+        unit_size_policy.setHorizontalStretch(1)
+        self.units_line_edit.setSizePolicy(unit_size_policy)
 
         self.unit_validator.is_valid.connect(
             partial(validate_line_edit, self.units_line_edit)
@@ -138,6 +145,11 @@ class FieldWidget(QFrame):
 
         self.value_line_edit: QLineEdit = QLineEdit()
         self.value_line_edit.setPlaceholderText("value")
+
+        value_size_policy = QSizePolicy()
+        value_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
+        value_size_policy.setHorizontalStretch(2)
+        self.value_line_edit.setSizePolicy(value_size_policy)
 
         self._set_up_value_validator(False)
         self.dataset_type_changed(0)
@@ -178,11 +190,11 @@ class FieldWidget(QFrame):
         if isinstance(parent, QListWidget):
             for i in range(self.parent().count()):
                 new_field_widget = self.parent().itemWidget(self.parent().item(i))
-                if new_field_widget is not self:
+                if new_field_widget is not self and hasattr(new_field_widget, "name"):
                     existing_objects.append(new_field_widget)
         elif isinstance(self._node_parent, Group):
             for child in self._node_parent.children:
-                if child is not parent_dataset:
+                if child is not parent_dataset and hasattr(child, "name"):
                     existing_objects.append(child)
             emit = True
         self._set_up_name_validator(existing_objects=existing_objects)

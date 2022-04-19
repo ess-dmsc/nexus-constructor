@@ -48,7 +48,7 @@ class NexusTreeModel(QAbstractItemModel):
         if index.isValid():
             parent_item = index.internalPointer().parent_node
             if parent_item:
-                return self.createIndex(index.row(), 0, parent_item)
+                return self.createIndex(parent_item.row(), 0, parent_item)
         return QModelIndex()
 
     def data(self, index: QModelIndex, role: Qt.DisplayRole):
@@ -316,7 +316,7 @@ class NexusTreeModel(QAbstractItemModel):
         parent_component, transformation_list, transformation_type, target_pos
     ):
         values = Dataset(
-            parent_node=parent_component, name="", type=ValueTypes.DOUBLE, values=""
+            parent_node=parent_component, name="", type=ValueTypes.DOUBLE, values="0.0"
         )
         if transformation_type == TransformationType.TRANSLATION:
             new_transformation = parent_component.add_translation(
