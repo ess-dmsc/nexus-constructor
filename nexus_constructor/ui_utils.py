@@ -3,7 +3,13 @@ from typing import Optional
 
 import numpy as np
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFileDialog, QMessageBox
+from PySide2.QtWidgets import (
+    QDialog,
+    QFileDialog,
+    QGridLayout,
+    QMessageBox,
+    QProgressBar,
+)
 
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
 
@@ -123,3 +129,27 @@ def show_warning_dialog(
     )
     msg.setInformativeText(additional_info)
     msg.show()
+
+
+class ProgressBarDialog(QDialog):
+    def __init__(
+        self, progress_max_value: int, dialog_text: str = "Progress...", parent=None
+    ):
+        super().__init__(parent)
+        self.setLayout(QGridLayout())
+        self.setWindowTitle(dialog_text)
+        self._one_percent_value = int(progress_max_value / 100)
+        self._percentage_complete: int = 0
+        self._progress_bar = QProgressBar(self)
+        self._progress_bar.setMaximum(100)
+        self._internal_counter = 0
+        self._progress_bar.setGeometry(200, 150, 200, 30)
+        self.layout().addWidget(self._progress_bar)
+
+    def update_progress_bar(self):
+        if self._internal_counter == self._one_percent_value:
+            self._percentage_complete += 1
+            self._progress_bar.setValue(self._percentage_complete)
+            self._internal_counter = 0
+        else:
+            self._internal_counter += 1

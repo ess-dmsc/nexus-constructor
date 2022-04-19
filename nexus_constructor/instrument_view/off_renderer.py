@@ -15,6 +15,7 @@ from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.model.geometry import OFFGeometry
+from nexus_constructor.ui_utils import ProgressBarDialog
 
 
 def flatten(list_to_flatten):
@@ -42,11 +43,15 @@ def convert_faces_into_triangles(faces):
     :return: A list of the triangles that make a face
     """
     triangles = []
-    for face in faces:
+    progress_bar = ProgressBarDialog(len(faces))
+    progress_bar.show()
+    for c, face in enumerate(faces):
+        progress_bar.update_progress_bar()
         triangles_in_face = len(face) - 2
         triangles.extend(
             [[face[0], face[i + 1], face[i + 2]] for i in range(triangles_in_face)]
         )
+    progress_bar.close()
     return triangles
 
 
@@ -77,7 +82,10 @@ def create_normal_buffer(vertices, triangles):
     :return: A list of the normal points for the faces
     """
     normal_buffer_values = []
-    for triangle in triangles:
+    progress_bar = ProgressBarDialog(len(triangles))
+    progress_bar.show()
+    for c, triangle in enumerate(triangles):
+        progress_bar.update_progress_bar()
         # Get the vertices of each triangle
         points = [vertices[p] for p in triangle]
         # Convert our vector objects into Qt Vectors
@@ -85,6 +93,7 @@ def create_normal_buffer(vertices, triangles):
         normal = QVector3D.normal(*points)
         # Need to have a normal for each vector
         normal_buffer_values.extend(normal.toTuple() * 3)
+    progress_bar.close()
     return normal_buffer_values
 
 
