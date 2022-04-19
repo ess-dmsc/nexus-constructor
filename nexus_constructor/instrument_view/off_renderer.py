@@ -142,7 +142,9 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
 
         triangles = convert_faces_into_triangles(
             faces,
-            ProgressBar(len(faces), "Shape conversion") if use_progress_bar else None,
+            ProgressBar(len(faces), "Shape conversion progress")
+            if use_progress_bar
+            else None,
         )
         vertex_buffer_values = list(create_vertex_buffer(vertices, triangles))
         normal_buffer_values = create_normal_buffer(
