@@ -44,7 +44,9 @@ class NexusConstructorMainWindow(QMainWindow):
         if first_run:
             self.showMaximized()
         else:
-            self.resize(self._config.value(X_SIZE, 500), self._config.value(Y_SIZE, 500))
+            self.resize(
+                self._config.value(X_SIZE, 500), self._config.value(Y_SIZE, 500)
+            )
             self.move(self._config.value(X_LOC, 0), self._config.value(Y_LOC, 0))
             super().show()
 

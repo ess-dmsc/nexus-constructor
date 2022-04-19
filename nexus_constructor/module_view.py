@@ -9,9 +9,15 @@ from nexus_constructor.model.module import StreamModules, WriterModules
 
 STATIC_DATASETS = "dataset"
 
+
 class ModuleView(QGroupBox):
     def __init__(self, module, parent: QWidget):
-        super().__init__(module.writer_module.upper() if module.writer_module == STATIC_DATASETS else module.writer_module, parent)
+        super().__init__(
+            module.writer_module.upper()
+            if module.writer_module == STATIC_DATASETS
+            else module.writer_module,
+            parent,
+        )
         self.setFixedHeight(65)
         self._setup_frame(module)
 
@@ -49,7 +55,12 @@ class ModuleView(QGroupBox):
 
 class ModuleViewEditable(QGroupBox):
     def __init__(self, module, parent: QWidget, model: Model):
-        super().__init__(module.writer_module.upper() if module.writer_module == STATIC_DATASETS else module.writer_module, parent)
+        super().__init__(
+            module.writer_module.upper()
+            if module.writer_module == STATIC_DATASETS
+            else module.writer_module,
+            parent,
+        )
         layout = QVBoxLayout()
         self.field_widget = FieldWidget(module.parent_node, parent_dataset=module)
         self.field_widget.field_type_combo.setEnabled(False)
@@ -87,7 +98,11 @@ class ModuleViewEditable(QGroupBox):
             StreamMode.value for StreamMode in StreamModules
         ]:
             self.module.writer_module = self.field_widget.value.writer_module
-            self.setTitle(self.module.writer_module.upper() if self.module.writer_module == STATIC_DATASETS else self.module.writer_module)
+            self.setTitle(
+                self.module.writer_module.upper()
+                if self.module.writer_module == STATIC_DATASETS
+                else self.module.writer_module
+            )
             self.module.source = self.field_widget.value.source  # type: ignore
             self.module.topic = self.field_widget.value.topic  # type: ignore
             self.module.attributes.set_attribute_value(
