@@ -40,6 +40,11 @@ class Group:
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
 
+    def row(self) -> int:
+        if self.parent_node is None:
+            return 0
+        return self.parent_node.children.index(self)
+
     def __setitem__(
         self,
         key: str,
