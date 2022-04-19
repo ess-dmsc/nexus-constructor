@@ -209,7 +209,9 @@ class InstrumentView(QWidget):
                 self.component_root_entity, nx_class
             )
         else:
-            mesh = OffMesh(geometry.off_geometry, self.component_root_entity, positions)
+            mesh = OffMesh(
+                geometry.off_geometry, self.component_root_entity, positions, True
+            )
             q_component = OffMeshEntityCollection(
                 mesh, self.component_root_entity, nx_class
             )
