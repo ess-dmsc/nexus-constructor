@@ -136,6 +136,7 @@ class ProgressBar:
         self._progress_bar.setAlignment(Qt.AlignCenter)
         self._progress_bar.setMinimumWidth(300)
         self._progress_bar.setMinimumHeight(100)
+        self._progress_bar.setTextVisible(True)
         self._progress_bar.show()
 
     def update_progress_bar(self):

@@ -141,13 +141,16 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         faces, vertices = repeat_shape_over_positions(model, positions)
 
         triangles = convert_faces_into_triangles(
-            faces, ProgressBar(len(faces)) if use_progress_bar else None
+            faces,
+            ProgressBar(len(faces), "Shape conversion") if use_progress_bar else None,
         )
         vertex_buffer_values = list(create_vertex_buffer(vertices, triangles))
         normal_buffer_values = create_normal_buffer(
             vertices,
             triangles,
-            ProgressBar(len(triangles)) if use_progress_bar else None,
+            ProgressBar(len(triangles), "Vector buffer creation")
+            if use_progress_bar
+            else None,
         )
 
         positionAttribute = self.create_attribute(
