@@ -157,6 +157,7 @@ class FieldWidget(QFrame):
         self.nx_class_combo = QComboBox()
 
         self.edit_button = QPushButton("Edit")
+
         edit_button_size = 50
         self.edit_button.setMaximumSize(edit_button_size, edit_button_size)
         self.edit_button.setSizePolicy(fix_horizontal_size)
@@ -339,6 +340,7 @@ class FieldWidget(QFrame):
 
     def field_type_changed(self):
         self.edit_dialog = QDialog(parent=self)
+        self.edit_dialog.setModal(True)
         self._set_up_value_validator(False)
         self.enable_3d_value_spinbox.emit(not self.field_type_is_scalar())
 

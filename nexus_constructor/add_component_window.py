@@ -210,7 +210,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         self.ok_validator = OkValidator(
-            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
+            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator, None
         )
 
         if self.component_to_edit:
@@ -227,6 +227,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.componentTypeComboBox.currentIndexChanged.connect(
                 self.validate_nx_class_index
             )
+
+        # self.fieldsListWidget.items()
 
         self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
 

@@ -145,6 +145,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def show_add_component_window(self, component: Optional[Component] = None):
         self.add_component_window = QDialogCustom()
+        self.add_component_window.setModal(True)
         self.add_component_window.ui = AddComponentDialog(
             self.model,
             self.component_tree_view_tab.component_model,

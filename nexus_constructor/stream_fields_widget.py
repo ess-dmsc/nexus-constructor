@@ -39,6 +39,14 @@ from nexus_constructor.model.module import (
     WriterModules,
 )
 
+from nexus_constructor.ui_utils import (
+    validate_line_edit,
+    validate_general_widget
+)
+
+from nexus_constructor.validators import NoEmptyStringValidator, SchemaSelectionValidator
+from nexus_constructor.dropdown import DropDownList
+
 F142_TYPES = [
     "byte",
     "ubyte",
@@ -84,13 +92,33 @@ class StreamFieldsWidget(QDialog):
         )
 
         self.schema_label = QLabel("Schema: ")
-        self.schema_combo = QComboBox()
+        self.schema_combo = DropDownList()
+        self.schema_validator = SchemaSelectionValidator()
+        self.schema_combo.setValidator(self.schema_validator)
+        self.schema_validator.is_valid.connect(
+            partial(validate_general_widget, self.schema_combo)
+        )
 
         self.topic_label = QLabel("Topic: ")
         self.topic_line_edit = QLineEdit()
+        self.topic_validator = NoEmptyStringValidator()
+        self.topic_line_edit.setValidator(self.topic_validator)
+        self.topic_validator.is_valid.connect(
+            partial(validate_line_edit, self.topic_line_edit,
+                    tooltip_on_reject="Topic name can not be empty.")
+        )
+        validate_line_edit(self.topic_line_edit, False)
 
         self.source_label = QLabel("Source: ")
         self.source_line_edit = QLineEdit()
+        self.source_validator = NoEmptyStringValidator()
+        self.source_line_edit.setValidator(self.source_validator)
+        self.source_validator.is_valid.connect(
+            partial(validate_line_edit, self.source_line_edit,
+                    tooltip_on_reject="Source name can not be empty.")
+        )
+        validate_line_edit(self.source_line_edit, False)
+
 
         self.array_size_label = QLabel("Array size: ")
         self.array_size_spinbox = QSpinBox()
@@ -440,10 +468,17 @@ class StreamFieldsWidget(QDialog):
         """
         if isinstance(field, Group):
             field = field.children[0]
+        if hasattr(field, "parent_node") and isinstance(field.parent_node, Group):
+            self.schema_validator.set_group(field.parent_node)
+        else:
+            self.schema_validator.set_group(None)
         schema = field.writer_module
         self.schema_combo.setCurrentText(schema)
+        self.schema_validator.validate(schema, 0)
         self.topic_line_edit.setText(field.topic)
+        self.topic_validator.validate(field.topic, 0)
         self.source_line_edit.setText(field.source)
+        self.source_validator.validate(field.source, 0)
         if schema == WriterModules.F142.value:
             self.fill_in_existing_f142_fields(field)
         elif schema == WriterModules.EV42.value:

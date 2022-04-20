@@ -1,14 +1,14 @@
 import os
 import re
 from enum import Enum
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 import numpy as np
 import pint
 from nexusutils.readwriteoff import parse_off_file
 from PySide2.QtCore import QObject, Signal
 from PySide2.QtGui import QIntValidator, QValidator
-from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget
+from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget, QListWidget
 from stl import mesh
 
 from nexus_constructor.common_attrs import SCALAR
@@ -296,6 +296,7 @@ class OkValidator(QObject):
         no_geometry_button: QRadioButton,
         mesh_button: QRadioButton,
         pixel_validator: PixelValidator,
+        fields: QListWidget,
     ):
         super().__init__()
         self.name_is_valid = False
@@ -473,5 +474,51 @@ class BrokerAndTopicValidator(QValidator):
             return QValidator.Acceptable
         self.is_valid.emit(False)
         return QValidator.Intermediate
+
+    is_valid = Signal(bool)
+
+
+class NoEmptyStringValidator(QValidator):
+    """
+    Ensure that the provided string is not empty.
+    """
+    def __init__(self):
+        super().__init__()
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if input == "":
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)
+
+
+from nexus_constructor.model.group import Group
+
+
+class SchemaSelectionValidator(QValidator):
+    """
+    Multiple schemas of the same type or some combinations of schemas in the same group are not allowed. Check/verify this.
+    """
+
+    def __init__(self, ):
+        super().__init__()
+        self.parent_group: Optional[Group] = None
+
+    def set_group(self, group: Optional[Group] = None):
+        self.parent_group = group
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not self.parent_group:
+            self.is_valid.emit(True)
+            return QValidator.Acceptable
+        list_of_writer_modules = [m.writer_module for m in self.parent_group.children]
+        if list_of_writer_modules.count(input) > 1:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
 
     is_valid = Signal(bool)

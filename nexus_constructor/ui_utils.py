@@ -3,7 +3,10 @@ from typing import Optional
 
 import numpy as np
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFileDialog, QMessageBox
+from PySide2.QtWidgets import QFileDialog, QMessageBox, QPushButton
+from nexus_constructor.dropdown import DropDownList
+from PySide2.QtGui import QPalette
+from PySide2.QtCore import Qt
 
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
 
@@ -84,6 +87,22 @@ def validate_line_edit(
     line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
         tooltip_on_reject
     )
+
+
+def validate_general_widget(
+    dropdown_list: DropDownList,
+    is_valid: bool,
+):
+    """
+    Sets the drop-down list to red if selection is invalid or white if valid. Also sets the tooltips if provided.
+    :param dropdown_list: The dropdown lost.
+    :param is_valid: Whether the line edit field contains valid text
+    :return: None.
+    """
+    colour = Qt.black if is_valid else Qt.red
+    pal = dropdown_list.palette()
+    pal.setColor(QPalette.Text, colour)
+    dropdown_list.setPalette(pal)
 
 
 def qvector3d_to_numpy_array(input_vector: QVector3D) -> np.ndarray:
