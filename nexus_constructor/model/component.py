@@ -385,9 +385,10 @@ class Component(Group):
         radius: float = 1.0,
         units: Union[str, bytes] = "m",
         pixel_data=None,
-    ) -> CylindricalGeometry:
+    ) -> Optional[CylindricalGeometry]:
+        if validate_nonzero_qvector(axis_direction):
+            return None
         self.remove_shape()
-        validate_nonzero_qvector(axis_direction)
         shape_group = _get_shape_group_for_pixel_data(pixel_data)
         geometry = CylindricalGeometry(shape_group)
         geometry.nx_class = CYLINDRICAL_GEOMETRY_NX_CLASS

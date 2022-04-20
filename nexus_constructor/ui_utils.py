@@ -131,6 +131,7 @@ def show_warning_dialog(
     )
     msg.setInformativeText(additional_info)
     msg.show()
+    msg.exec_()
 
 
 class ProgressBar(QDialog):
