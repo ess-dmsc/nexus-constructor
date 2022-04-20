@@ -153,13 +153,13 @@ class ProgressBar(QDialog):
         self.show()
 
     def update_progress_bar(self):
-        if self._internal_counter == self._one_percent_value:
-            QApplication.processEvents()
+        if self._internal_counter >= self._one_percent_value:
             self._percentage_complete += 1
             self._progress_bar.setValue(self._percentage_complete)
             self._text_label.setText(
                 f"Process is {self._percentage_complete}% complete"
             )
+            QApplication.processEvents()
             self._internal_counter = 0
         else:
             self._internal_counter += 1
