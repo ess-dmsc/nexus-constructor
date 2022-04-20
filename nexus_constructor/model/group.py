@@ -72,6 +72,9 @@ class Group:
             return False
         return self.absolute_path() == other.absolute_path()
 
+    def has_pixel_shape(self):
+        return False
+
     @property
     def description(self) -> str:
         try:

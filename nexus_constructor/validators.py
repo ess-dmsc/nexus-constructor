@@ -150,6 +150,7 @@ class NXClassValidator(QValidator):
 
 
 GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
+SKIP_VALIDATION = "skip_validation"
 
 
 class GeometryFileValidator(QValidator):
@@ -166,6 +167,8 @@ class GeometryFileValidator(QValidator):
         self.file_types = file_types
 
     def validate(self, input: str, pos: int) -> QValidator.State:
+        if input == SKIP_VALIDATION:
+            return self._emit_and_return(True)
         if not input:
             return self._emit_and_return(False)
         if not self.is_file(input):
