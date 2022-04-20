@@ -417,6 +417,9 @@ class Component(Group):
             except AttributeError:
                 pass
 
+    def has_pixel_shape(self):
+        return PIXEL_SHAPE_GROUP_NAME in self
+
     def record_pixel_grid(self, pixel_grid: PixelGrid):
         """
         Records the pixel grid data to the NeXus file.
