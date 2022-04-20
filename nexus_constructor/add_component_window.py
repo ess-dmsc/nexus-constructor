@@ -49,6 +49,7 @@ from nexus_constructor.ui_utils import (
 from nexus_constructor.unit_utils import METRES
 from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
+    SKIP_VALIDATION,
     GeometryFileValidator,
     NameValidator,
     OkValidator,
@@ -245,14 +246,22 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.unitsLineEdit.validator().is_valid.connect(
             self.ok_validator.set_units_valid
         )
-
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
         self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
-        self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
+        if not self.component_to_edit:
+            self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
+        else:
+            text = (
+                SKIP_VALIDATION
+                if self.component_to_edit.has_pixel_shape()
+                and not self.fileLineEdit.text()
+                else self.fileLineEdit.text()
+            )
+            self.fileLineEdit.validator().validate(text, 0)
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
@@ -478,7 +487,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.boxHeightLineEdit.value(),
                 self.unitsLineEdit.text(),
             )
-        elif self.meshRadioButton.isChecked():
+        elif self.meshRadioButton.isChecked() and self.cad_file_name:
             mesh_geometry = OFFGeometryNoNexus()
             geometry_model = load_geometry(
                 self.cad_file_name, self.unitsLineEdit.text(), mesh_geometry
