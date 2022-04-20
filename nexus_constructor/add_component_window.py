@@ -468,8 +468,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
-
-            component.set_cylinder_shape(
+            geometry = component.set_cylinder_shape(
                 QVector3D(
                     self.cylinderXLineEdit.value(),
                     self.cylinderYLineEdit.value(),
@@ -480,6 +479,10 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                 self.unitsLineEdit.text(),
                 pixel_data=pixel_data,
             )
+            if not geometry:
+                show_warning_dialog(
+                    "3D vector is zero length in cylinder geometry.", ""
+                )
         elif self.boxRadioButton.isChecked():
             component.set_box_shape(
                 self.boxLengthLineEdit.value(),

@@ -1,6 +1,6 @@
 import pytest
 from PySide2.QtGui import QVector3D
-from pytest import approx, fail, raises
+from pytest import approx
 
 from nexus_constructor.geometry.utils import (
     get_an_orthogonal_unit_vector,
@@ -10,8 +10,7 @@ from nexus_constructor.geometry.utils import (
 
 def test_zero_qvector_raises_error_when_validated():
     test_vector = QVector3D(0, 0, 0)
-    with raises(ValueError):
-        validate_nonzero_qvector(test_vector)
+    assert validate_nonzero_qvector(test_vector)
 
 
 @pytest.mark.parametrize(
@@ -19,10 +18,7 @@ def test_zero_qvector_raises_error_when_validated():
     [(QVector3D(1, 0, 0),), (QVector3D(2, 3, 8),), (QVector3D(0, -1, 0),)],
 )
 def test_non_zero_qvector_does_not_raise_error_when_validated(nonzero_input_vector):
-    try:
-        validate_nonzero_qvector(nonzero_input_vector[0])
-    except ValueError:
-        fail("Expected non-zero vector to pass validation")
+    assert not validate_nonzero_qvector(nonzero_input_vector[0])
 
 
 @pytest.mark.parametrize(

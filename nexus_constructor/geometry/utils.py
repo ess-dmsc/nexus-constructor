@@ -3,8 +3,7 @@ from PySide2.QtGui import QVector3D
 
 
 def validate_nonzero_qvector(value: QVector3D):
-    if value.x() == 0 and value.y() == 0 and value.z() == 0:
-        raise ValueError("Vector is zero length")
+    return value.x() == 0 and value.y() == 0 and value.z() == 0
 
 
 def get_an_orthogonal_unit_vector(input_vector: QVector3D) -> QVector3D:
