@@ -85,7 +85,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self,
         model: Model,
         component_model: NexusTreeModel,
-        component_to_edit: Component = None,
+        group_to_edit: Group,
+        initial_edit: bool,
         nx_classes=None,
         parent=None,
     ):
@@ -101,7 +102,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
-        self.component_to_edit = component_to_edit
+        self.group_to_edit = group_to_edit
+        self.group_parent = group_to_edit.parent_node
+        self.initial_edit = initial_edit
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
 

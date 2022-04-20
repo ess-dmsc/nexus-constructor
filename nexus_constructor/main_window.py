@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
-from nexus_constructor.model.component import Component
+from nexus_constructor.model.component import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
@@ -86,6 +86,16 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view_tab.reset_model()
         self.component_tree_view_tab.component_delegate.use_simple_tree_view(value)
 
+    def show_add_component_dialog(self):
+        selected_component = (
+            self.component_tree_view_tab.component_tree_view.selectedIndexes()[
+                0
+            ].internalPointer()
+        )
+        new_group = Group("", parent_node=selected_component)
+        selected_component.children.append(new_group)
+        self.show_add_component_window(new_group, new_group=True)
+
     def show_edit_component_dialog(self):
         selected_component = (
             self.component_tree_view_tab.component_tree_view.selectedIndexes()[
@@ -143,13 +153,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_component(component)
             self.sceneWidget.add_transformation(component)
 
-    def show_add_component_window(self, component: Optional[Component] = None):
+    def show_add_component_window(self, group: Group, new_group: bool):
         self.add_component_window = QDialogCustom()
+        self.add_component_window.setWindowModality(Qt.WindowModal)
         self.add_component_window.setModal(True)
         self.add_component_window.ui = AddComponentDialog(
             self.model,
             self.component_tree_view_tab.component_model,
-            component,
+            group,
+            initial_edit=new_group,
             nx_classes=self.nx_classes,
             parent=self,
         )

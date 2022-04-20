@@ -514,7 +514,7 @@ class SchemaSelectionValidator(QValidator):
         if not self.parent_group:
             self.is_valid.emit(True)
             return QValidator.Acceptable
-        list_of_writer_modules = [m.writer_module for m in self.parent_group.children]
+        list_of_writer_modules = [m.writer_module for m in self.parent_group.children if hasattr(m, "writer_module")]
         if list_of_writer_modules.count(input) > 1:
             self.is_valid.emit(False)
             return QValidator.Intermediate
