@@ -3,8 +3,8 @@ from typing import Optional
 
 import numpy as np
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFileDialog, QMessageBox, QPushButton
-from nexus_constructor.dropdown import DropDownList
+from PySide2.QtWidgets import QFileDialog, QMessageBox
+from nexus_constructor.widgets.dropdown_list import DropDownList
 from PySide2.QtGui import QPalette
 from PySide2.QtCore import Qt
 
@@ -94,7 +94,7 @@ def validate_general_widget(
     is_valid: bool,
 ):
     """
-    Sets the drop-down list to red if selection is invalid or white if valid. Also sets the tooltips if provided.
+    Sets the text of a general widget to red if it is invalid or black if valid.
     :param dropdown_list: The dropdown lost.
     :param is_valid: Whether the line edit field contains valid text
     :return: None.

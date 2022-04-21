@@ -12,7 +12,6 @@ from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget, QListWidget
 from stl import mesh
 
 from nexus_constructor.common_attrs import SCALAR
-from nexus_constructor.component_type import NX_CLASSES
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
@@ -132,17 +131,6 @@ class NameValidator(QValidator):
             self.is_valid.emit(False)
             return QValidator.Intermediate
 
-        self.is_valid.emit(True)
-        return QValidator.Acceptable
-
-    is_valid = Signal(bool)
-
-
-class NXClassValidator(QValidator):
-    def validate(self, input: str, pos: int):
-        if not input or input not in NX_CLASSES:
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
         self.is_valid.emit(True)
         return QValidator.Acceptable
 
@@ -296,7 +284,6 @@ class OkValidator(QObject):
         no_geometry_button: QRadioButton,
         mesh_button: QRadioButton,
         pixel_validator: PixelValidator,
-        fields: QListWidget,
     ):
         super().__init__()
         self.name_is_valid = False

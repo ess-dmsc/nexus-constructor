@@ -45,7 +45,7 @@ from nexus_constructor.ui_utils import (
 )
 
 from nexus_constructor.validators import NoEmptyStringValidator, SchemaSelectionValidator
-from nexus_constructor.dropdown import DropDownList
+from nexus_constructor.widgets.dropdown_list import DropDownList
 
 F142_TYPES = [
     "byte",

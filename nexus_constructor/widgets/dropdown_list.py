@@ -5,7 +5,7 @@ from typing import Optional
 
 class DropDownList(QComboBox):
     def __init__(self, parent: Optional[QWidget] = None):
-        super(DropDownList, self).__init__(parent)
+        super().__init__(parent)
         self._validator: Optional[QValidator] = None
         self.currentIndexChanged.connect(self._validate)
 

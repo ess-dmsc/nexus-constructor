@@ -1,0 +1,4 @@
+from nexus_constructor.widgets.group_name_edit import GroupNameEdit
+from nexus_constructor.widgets.description_edit import DescriptionEdit
+from nexus_constructor.widgets.dropdown_list import DropDownList
+from nexus_constructor.widgets.class_dropdown_list import ClassDropDownList

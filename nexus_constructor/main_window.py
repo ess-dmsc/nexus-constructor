@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 from weakref import WeakKeyDictionary
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
+from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
@@ -154,18 +154,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_transformation(component)
 
     def show_add_component_window(self, group: Group, new_group: bool):
-        self.add_component_window = QDialogCustom()
-        self.add_component_window.setWindowModality(Qt.WindowModal)
-        self.add_component_window.setModal(True)
-        self.add_component_window.ui = AddComponentDialog(
+        self.add_component_window = AddComponentDialog(
+            self.central_widget,
             self.model,
             self.component_tree_view_tab.component_model,
             group,
             initial_edit=new_group,
             nx_classes=self.nx_classes,
-            parent=self,
         )
-        self.add_component_window.ui.setupUi(self.add_component_window)
         self.add_component_window.show()
 
 
@@ -176,47 +172,3 @@ def show_errors_message(errors: List[str]):
     msgBox.setStandardButtons(QMessageBox.Ok)
     msgBox.setDetailedText("\n\n".join([f"- {err}" for err in errors]))
     msgBox.exec_()
-
-
-class QDialogCustom(QDialog):
-    """
-    Custom QDialog class that enables the possibility to properly produce
-    a message box in the component editor to the users,
-    asking if they are sure to quit editing component when exiting.
-    """
-
-    def __init__(self):
-        super().__init__()
-        self._is_accepting_component = True
-
-    def disable_msg_box(self):
-        self._is_accepting_component = False
-
-    def close_without_msg_box(self):
-        """
-        Close widget without producing the message box in closeEvent method.
-        """
-        self.disable_msg_box()
-        self.close()
-
-    def closeEvent(self, event):
-        """
-        Overriding closeEvent function in the superclass to produce a message box prompting
-        the user to exit the add/edit component window. This message box pops up
-        when the user exits by pressing the window close (X) button.
-        """
-        if not self._is_accepting_component:
-            event.accept()
-            return
-        quit_msg = "Do you want to close the group editor?"
-        reply = QMessageBox.question(
-            self,
-            "Really quit?",
-            quit_msg,
-            QMessageBox.Close | QMessageBox.Ignore,
-            QMessageBox.Close,
-        )
-        if reply == QMessageBox.Close:
-            event.accept()
-        else:
-            event.ignore()

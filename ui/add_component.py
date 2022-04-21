@@ -1,23 +1,34 @@
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView
+from nexus_constructor.custom_dialog import CustomDialog
+from nexus_constructor.model.group import GroupContainer
+from nexus_constructor.widgets import GroupNameEdit, DescriptionEdit, ClassDropDownList
 
 
-class Ui_AddComponentDialog(object):
-    def setupUi(self, AddComponentDialog):
-        AddComponentDialog.setObjectName("AddComponentDialog")
-        AddComponentDialog.resize(1600, 900)
+class Ui_AddComponentDialog(CustomDialog):
+    def __init__(self, parent: QtWidgets.QWidget, container: GroupContainer):
+        super().__init__(parent)
+        self._group_container = container
+
+    def setupUi(self):
+        self.setObjectName("AddComponentDialog")
+        self.resize(1600, 900)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            AddComponentDialog.sizePolicy().hasHeightForWidth()
+            self.sizePolicy().hasHeightForWidth()
         )
-        AddComponentDialog.setSizePolicy(sizePolicy)
-        self.gridLayout_3 = QtWidgets.QGridLayout(AddComponentDialog)
+        self.setSizePolicy(sizePolicy)
+        self.gridLayout_3 = QtWidgets.QGridLayout(self)
         self.gridLayout_3.setObjectName("gridLayout_3")
-        self.ok_button = QtWidgets.QPushButton(AddComponentDialog)
+        self.buttonLayout = QtWidgets.QHBoxLayout()
+        self.buttonLayout.setObjectName("buttonLayout")
+        self.buttonLayout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, hData=QtWidgets.QSizePolicy.Expanding))
+        self.ok_button = QtWidgets.QPushButton(self)
+        self.ok_button.setText("Done")
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
         )
@@ -29,10 +40,31 @@ class Ui_AddComponentDialog(object):
         self.ok_button.setMaximumSize(QtCore.QSize(200, 16777215))
         self.ok_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.ok_button.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.ok_button.setAutoDefault(False)
+        self.ok_button.setAutoDefault(True)
+        self.ok_button.setDefault(True)
         self.ok_button.setObjectName("buttonBox")
-        self.gridLayout_3.addWidget(self.ok_button, 1, 0, 1, 1)
-        self.widget = QtWidgets.QWidget(AddComponentDialog)
+        self.buttonLayout.addWidget(self.ok_button)
+
+        self.cancel_button = QtWidgets.QPushButton(self)
+        self.cancel_button.setText("Cancel")
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ok_button.sizePolicy().hasHeightForWidth())
+        self.cancel_button.setSizePolicy(sizePolicy)
+        self.cancel_button.setMinimumSize(QtCore.QSize(104, 23))
+        self.cancel_button.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.cancel_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.cancel_button.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.cancel_button.setAutoDefault(False)
+        self.cancel_button.setObjectName("cancelButton")
+        self.buttonLayout.addWidget(self.cancel_button)
+        self.cancel_button.setVisible(False)
+        self.gridLayout_3.addLayout(self.buttonLayout, 1, 0, 1, 1)
+
+        self.widget = QtWidgets.QWidget(self)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
@@ -52,7 +84,7 @@ class Ui_AddComponentDialog(object):
         self.label = QtWidgets.QLabel(self.widget)
         self.label.setObjectName("label")
         self.horizontalLayout_5.addWidget(self.label)
-        self.nameLineEdit = QtWidgets.QLineEdit(self.widget)
+        self.nameLineEdit = GroupNameEdit(self.widget, self._group_container)
         self.nameLineEdit.setObjectName("nameLineEdit")
         self.horizontalLayout_5.addWidget(self.nameLineEdit)
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
@@ -61,7 +93,7 @@ class Ui_AddComponentDialog(object):
         self.label_2 = QtWidgets.QLabel(self.widget)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_6.addWidget(self.label_2)
-        self.descriptionPlainTextEdit = QtWidgets.QLineEdit(self.widget)
+        self.descriptionPlainTextEdit = DescriptionEdit(self.widget, self._group_container)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
@@ -79,7 +111,7 @@ class Ui_AddComponentDialog(object):
         self.label_3 = QtWidgets.QLabel(self.widget)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_4.addWidget(self.label_3)
-        self.componentTypeComboBox = QtWidgets.QComboBox(self.widget)
+        self.componentTypeComboBox = ClassDropDownList(self.widget, self._group_container)
         self.componentTypeComboBox.setObjectName("componentTypeComboBox")
         self.horizontalLayout_4.addWidget(self.componentTypeComboBox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
@@ -263,16 +295,16 @@ class Ui_AddComponentDialog(object):
         self.gridLayout_4.setColumnStretch(1, 1)
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
 
-        self.retranslateUi(AddComponentDialog)
+        self.retranslateUi()
         QtCore.QObject.connect(
             self.ok_button,
             QtCore.SIGNAL("clicked()"),
-            AddComponentDialog.close_without_msg_box,
+            self.close_without_msg_box,
         )
-        QtCore.QMetaObject.connectSlotsByName(AddComponentDialog)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
-    def retranslateUi(self, AddComponentDialog):
-        AddComponentDialog.setWindowTitle(
+    def retranslateUi(self):
+        self.setWindowTitle(
             QtWidgets.QApplication.translate(
                 "AddComponentDialog", "Add group", None, -1
             )

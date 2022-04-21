@@ -35,7 +35,6 @@ class Group:
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
-    child_dict: Dict = None  # TODO: Remove this attribute once new UI is in place.
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
@@ -159,3 +158,17 @@ def name_not_in_excludelist(child: Any):
     if hasattr(child, CommonKeys.NAME) and child.name in CHILD_EXCLUDELIST:
         return False
     return True
+
+
+class GroupContainer:
+    def __init__(self, group: Group):
+        self._group = group
+
+    @property
+    def group(self) -> Group:
+        return self._group
+
+    @group.setter
+    def group(self, new_group: Group):
+        self._group = new_group
+

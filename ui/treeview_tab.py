@@ -59,7 +59,7 @@ class ComponentTreeViewTab(QWidget):
             self.parent().show_add_component_dialog,
             self.component_tool_bar,
             self,
-            True,
+            False,
         )
         self.new_translation_action = create_and_add_toolbar_action(
             "new_translation.png",
