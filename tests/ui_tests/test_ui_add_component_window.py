@@ -18,7 +18,7 @@ from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTr
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
-from nexus_constructor.main_window import QDialogCustom as QDialog
+from nexus_constructor.widgets import CustomDialog as QDialog
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.geometry import (
@@ -65,6 +65,9 @@ CHOPPER_GEOMETRY_CREATOR_PATH = "nexus_constructor.geometry.disk_chopper.disk_ch
 
 model = Model()
 component = ComponentTreeModel(model)
+entry = Entry()
+group = Group(name="some_name", parent_node=entry)
+entry.children.append(group)
 
 PIXEL_OPTIONS = dict()
 NO_PIXEL_OPTIONS = dict()
@@ -73,7 +76,7 @@ ALL_COMPONENT_TYPES = dict()
 for i, component_class in enumerate(
     list(
         AddComponentDialog(
-            model, component, nx_classes=NX_CLASS_DEFINITIONS
+            None, model, component, group_to_edit=group, initial_edit=False, nx_classes=NX_CLASS_DEFINITIONS
         ).nx_component_classes.keys()
     )
 ):

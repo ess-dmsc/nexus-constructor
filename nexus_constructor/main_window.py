@@ -102,7 +102,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 0
             ].internalPointer()
         )
-        self.show_add_component_window(selected_component)
+        self.show_add_component_window(selected_component, False)
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)

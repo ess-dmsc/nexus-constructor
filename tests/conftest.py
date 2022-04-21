@@ -2,12 +2,15 @@ from unittest.mock import Mock
 
 import pytest
 
-from nexus_constructor.main_window import QDialogCustom as QDialog
+from nexus_constructor.widgets import CustomDialog as QDialog
 from nexus_constructor.model.model import Entry, Model
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import PixelValidator
 from tests.geometry.chopper_test_helpers import chopper_details  # noqa: F401
+from PySide2.QtWidgets import QApplication
+import sys
 
+app = QApplication(sys.argv)
 
 @pytest.fixture(scope="function")
 def template(qtbot) -> QDialog:
