@@ -426,6 +426,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()
         self.placeholder_checkbox.setVisible(c_nx_class in NX_CLASSES_WITH_PLACEHOLDERS)
+        self.placeholder_checkbox.setChecked(False)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
         self.webEngineView.setUrl(
