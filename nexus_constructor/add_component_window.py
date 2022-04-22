@@ -184,14 +184,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        component_list = self.model.get_components()
-        if self.group_to_edit:
-            for item in component_list:
-                if item.name == self.group_to_edit.name:
-                    component_list.remove(item)
-
-
-
         validate_line_edit(self.fileLineEdit, False)
 
         self.unitsLineEdit.setValidator(UnitValidator(expected_dimensionality=METRES))
