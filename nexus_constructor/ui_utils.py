@@ -3,10 +3,18 @@ from typing import Optional
 
 import numpy as np
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFileDialog, QMessageBox
 from nexus_constructor.widgets.dropdown_list import DropDownList
 from PySide2.QtGui import QPalette
 from PySide2.QtCore import Qt
+from PySide2.QtWidgets import (
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QLabel,
+    QMessageBox,
+    QProgressBar,
+    QVBoxLayout,
+)
 
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
 
@@ -142,3 +150,36 @@ def show_warning_dialog(
     )
     msg.setInformativeText(additional_info)
     msg.show()
+    msg.exec_()
+
+
+class ProgressBar(QDialog):
+    def __init__(self, progress_max_value: int, text: str = "Progress of process..."):
+        super().__init__()
+        self._one_percent_value = int(progress_max_value / 100)
+        self._percentage_complete: int = 0
+        self._internal_counter = 0
+        self._setup_ui(text)
+
+    def _setup_ui(self, text: str):
+        self.setWindowTitle(text)
+        self.setLayout(QVBoxLayout())
+        self.setMinimumWidth(300)
+        self._progress_bar = QProgressBar(self)
+        self._progress_bar.setTextVisible(False)
+        self.layout().addWidget(self._progress_bar)
+        self._text_label = QLabel()
+        self.layout().addWidget(self._text_label)
+        self.show()
+
+    def update_progress_bar(self):
+        if self._internal_counter >= self._one_percent_value:
+            self._percentage_complete += 1
+            self._progress_bar.setValue(self._percentage_complete)
+            self._text_label.setText(
+                f"Process is {self._percentage_complete}% complete"
+            )
+            QApplication.processEvents()
+            self._internal_counter = 0
+        else:
+            self._internal_counter += 1

@@ -29,7 +29,6 @@ from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.geometry import (
     BoxGeometry,
     CylindricalGeometry,
@@ -49,6 +48,7 @@ from nexus_constructor.ui_utils import (
 from nexus_constructor.unit_utils import METRES
 from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
+    SKIP_VALIDATION,
     GeometryFileValidator,
     OkValidator,
     UnitValidator,
@@ -241,13 +241,22 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.unitsLineEdit.validator().is_valid.connect(
             self.ok_validator.set_units_valid
         )
-
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
         self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
-        self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
+        self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
+        if not self.group_to_edit:
+            self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
+        else:
+            text = (
+                SKIP_VALIDATION
+                if self.group_to_edit.has_pixel_shape()
+                and not self.fileLineEdit.text()
+                else self.fileLineEdit.text()
+            )
+            self.fileLineEdit.validator().validate(text, 0)
         self.addFieldPushButton.clicked.connect(self.add_field)
         self.removeFieldPushButton.clicked.connect(self.remove_field)
 
@@ -432,8 +441,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: The generated model.
         """
         if self.CylinderRadioButton.isChecked():
-
-            component.set_cylinder_shape(
+            geometry = component.set_cylinder_shape(
                 QVector3D(
                     self.cylinderXLineEdit.value(),
                     self.cylinderYLineEdit.value(),
@@ -444,6 +452,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.unitsLineEdit.text(),
                 pixel_data=pixel_data,
             )
+            if not geometry:
+                show_warning_dialog(
+                    "3D vector is zero length in cylinder geometry.", ""
+                )
         elif self.boxRadioButton.isChecked():
             component.set_box_shape(
                 self.boxLengthLineEdit.value(),
@@ -451,7 +463,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.boxHeightLineEdit.value(),
                 self.unitsLineEdit.text(),
             )
-        elif self.meshRadioButton.isChecked():
+        elif self.meshRadioButton.isChecked() and self.cad_file_name:
             mesh_geometry = OFFGeometryNoNexus()
             geometry_model = load_geometry(
                 self.cad_file_name, self.unitsLineEdit.text(), mesh_geometry
@@ -576,6 +588,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # remove the previous object from the qt3d view
         if isinstance(self.group_to_edit, Component):
             self.parent().sceneWidget.delete_component(self.group_to_edit.name)
+
         # remove previous fields
         if self.group_to_edit:
             self.group_to_edit.name = component_name
@@ -583,8 +596,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 if not isinstance(child, Group):
                     self.group_to_edit.children.remove(child)
             self.group_to_edit.nx_class = nx_class
+
         if description:
             self.group_to_edit.description = description
+
         if isinstance(self.group_to_edit, Component):
             self.component_model.components.append(self.group_to_edit)
             self.generate_geometry_model(self.group_to_edit, pixel_data)

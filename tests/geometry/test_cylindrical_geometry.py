@@ -1,6 +1,6 @@
 import pytest
 from PySide2.QtGui import QVector3D
-from pytest import approx, raises
+from pytest import approx
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import CylindricalGeometry
@@ -25,10 +25,9 @@ def test_axis_direction_must_be_non_zero():
     component = Component("test")
     height = 3
     radius = 4
-    with raises(ValueError):
-        component.set_cylinder_shape(
-            axis_direction=QVector3D(0, 0, 0), height=height, radius=radius, units="m"
-        )
+    assert not component.set_cylinder_shape(
+        axis_direction=QVector3D(0, 0, 0), height=height, radius=radius, units="m"
+    )
 
 
 @pytest.mark.parametrize(

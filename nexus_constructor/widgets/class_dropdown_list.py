@@ -29,7 +29,6 @@ class ClassDropDownList(DropDownList):
     def __init__(self, parent: QtWidgets.QWidget, container: GroupContainer):
         super().__init__(parent)
         self._container = container
-        self.currentIndexChanged.connect(self._set_nx_class)
         self.setValidator(NXClassValidator())
         self.validator().is_valid.connect(
             partial(validate_general_widget,
@@ -63,8 +62,8 @@ class ClassDropDownList(DropDownList):
                 self.count() - 1
             ).setEnabled(False)
             self.addItems(sorted_groups_list)
+        self.currentIndexChanged.connect(self._set_nx_class)
 
     def _set_nx_class(self):
         self._container.group.nx_class = self.currentText()
-
 
