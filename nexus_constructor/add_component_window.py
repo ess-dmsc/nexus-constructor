@@ -8,7 +8,11 @@ from PySide2.QtCore import QObject, Qt, QUrl, Signal
 from PySide2.QtGui import QBrush, QPalette, QVector3D
 from PySide2.QtWidgets import QListWidget, QListWidgetItem
 
-from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
+from nexus_constructor.common_attrs import (
+    NX_CLASSES_WITH_PLACEHOLDERS,
+    SHAPE_GROUP_NAME,
+    CommonAttrs,
+)
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
@@ -123,6 +127,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
+        self.placeholder_checkbox.stateChanged.connect(self._disable_fields_and_buttons)
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.boxRadioButton.clicked.connect(self.show_box_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
@@ -203,6 +208,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
 
+        if (
+            self.component_to_edit
+            and self.component_to_edit.nx_class in NX_CLASSES_WITH_PLACEHOLDERS
+        ):
+            self.placeholder_checkbox.setVisible(True)
+
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         self.pixel_options = pixel_options
@@ -215,6 +226,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         )
 
         if self.component_to_edit:
+            self.placeholder_checkbox.setChecked(
+                self.component_to_edit.group_placeholder
+            )
             parent_dialog.setWindowTitle(f"Edit group: {self.component_to_edit.name}")
             self.ok_button.setText("Edit group")
             self._fill_existing_entries()
@@ -411,6 +425,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()
+        self.placeholder_checkbox.setVisible(c_nx_class in NX_CLASSES_WITH_PLACEHOLDERS)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
         self.webEngineView.setUrl(
@@ -458,6 +473,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
         self.boxOptionsBox.setVisible(False)
+
+    def _disable_fields_and_buttons(self, placeholder_state: bool):
+        self.noShapeRadioButton.setEnabled(not placeholder_state)
+        self.boxRadioButton.setEnabled(not placeholder_state)
+        self.meshRadioButton.setEnabled(not placeholder_state)
+        self.CylinderRadioButton.setEnabled(not placeholder_state)
+        self.shapeOptionsBox.setEnabled(not placeholder_state)
+        self.addFieldPushButton.setEnabled(not placeholder_state)
+        self.removeFieldPushButton.setEnabled(not placeholder_state)
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
@@ -555,6 +579,8 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             component = self.create_new_component(
                 component_name, description, nx_class, pixel_data
             )
+
+        component.group_placeholder = self.placeholder_checkbox.isChecked()
 
         if isinstance(component, Component):
             self.signals.component_added.emit(component)
