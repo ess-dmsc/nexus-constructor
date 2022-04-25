@@ -642,6 +642,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         # remove the previous object from the qt3d view
         if isinstance(self.component_to_edit, Component):
+            self.component_to_edit.remove_shape()
             self.parent().sceneWidget.delete_component(self.component_to_edit.name)
         # remove previous fields
         if self.component_to_edit:
