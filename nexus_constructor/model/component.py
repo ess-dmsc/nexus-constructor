@@ -338,10 +338,7 @@ class Component(Group):
             SHAPE_GROUP_NAME,
         ]:
             if group_name in self:
-                if group_name == GEOMETRY_GROUP_NAME:
-                    del self[GEOMETRY_GROUP_NAME]
-                else:
-                    del self[SHAPE_GROUP_NAME]
+                del self[group_name]
 
     def set_off_shape(
         self,
