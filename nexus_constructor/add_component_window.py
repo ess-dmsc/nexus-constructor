@@ -681,7 +681,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         if isinstance(pixel_data, PixelMapping):
             component.record_pixel_mapping(pixel_data)
         if isinstance(pixel_data, PixelGrid) and self.get_pixel_visibility_condition():
-            component.record_pixel_grid(pixel_data)
+            component.record_pixel_grid(pixel_data, self.unitsLineEdit.text())
 
     def change_pixel_options_visibility(self):
         """
