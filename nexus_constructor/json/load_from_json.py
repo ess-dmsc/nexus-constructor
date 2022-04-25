@@ -3,6 +3,7 @@ from json import JSONDecodeError
 from typing import Dict, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
+    NX_CLASSES_WITH_PLACEHOLDERS,
     NX_TRANSFORMATIONS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
@@ -63,6 +64,8 @@ CHILD_EXCLUDELIST = [
     TRANSFORMS_GROUP_NAME,
     CommonAttrs.DEPENDS_ON,
 ]
+
+PLACEHOLDER_WITH_NX_CLASSES = {v: k for k, v in NX_CLASSES_WITH_PLACEHOLDERS.items()}
 
 
 class JSONReader:
@@ -208,6 +211,24 @@ class JSONReader:
         self._set_transformation_links()
         return True
 
+    def _replace_placeholder(self, placeholder: str):
+        if placeholder in PLACEHOLDER_WITH_NX_CLASSES:
+            nx_class = PLACEHOLDER_WITH_NX_CLASSES[placeholder]
+            name = placeholder.replace("$", "").lower()
+            return {
+                CommonKeys.NAME: name,
+                CommonKeys.TYPE: NodeType.GROUP,
+                CommonKeys.ATTRIBUTES: [
+                    {
+                        CommonKeys.NAME: CommonAttrs.NX_CLASS,
+                        CommonKeys.DATA_TYPE: "string",
+                        CommonKeys.VALUES: nx_class,
+                    }
+                ],
+                CommonKeys.CHILDREN: [],
+            }
+        return None
+
     def _read_json_object(self, json_object: Dict, parent_node: Group = None):
         """
         Tries to create a component based on the contents of the JSON file.
@@ -215,6 +236,12 @@ class JSONReader:
         :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
         nexus_object: Union[Group, FileWriterModule] = None
+        use_placeholder = False
+        if isinstance(json_object, str) and json_object in PLACEHOLDER_WITH_NX_CLASSES:
+            json_object = self._replace_placeholder(json_object)
+            if not json_object:
+                return
+            use_placeholder = True
         if (
             CommonKeys.TYPE in json_object
             and json_object[CommonKeys.TYPE] == NodeType.GROUP
@@ -305,6 +332,8 @@ class JSONReader:
                 )
             elif isinstance(nexus_object, Group) and nexus_object.nx_class == "NXuser":
                 self.model.entry[nexus_object.name] = nexus_object
+            if isinstance(nexus_object, Group):
+                nexus_object.group_placeholder = use_placeholder
 
         return nexus_object
 

@@ -5,6 +5,7 @@ import pytest
 from mock import mock_open, patch
 from PySide2.QtGui import QVector3D
 
+from nexus_constructor.common_attrs import NX_USER
 from nexus_constructor.json.json_warnings import (
     JsonWarning,
     JsonWarningsContainer,
@@ -692,7 +693,7 @@ def test_when_users_are_in_json_then_they_are_added_to_entry(json_reader):
     results = []
     for child in entry.children:
         try:
-            if child.attributes[0].values == "NXuser":
+            if child.attributes[0].values == NX_USER:
                 results.append({ds.name: ds.values for ds in child.children})
         except RuntimeError:
             pass

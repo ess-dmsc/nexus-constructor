@@ -1,4 +1,4 @@
-from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.common_attrs import NX_USER, CommonAttrs
 from nexus_constructor.model.entry import (
     EXP_ID_PLACEHOLDER_VALUE,
     NEXUS_EXP_ID_NAME,
@@ -179,7 +179,7 @@ def test_users_are_in_dictionary():
     test_entry.users = [user_john, user_betty]
 
     dictionary = test_entry.as_dict([])
-    result = extract_based_on_nx_class(dictionary, "NXuser")
+    result = extract_based_on_nx_class(dictionary, NX_USER)
 
     assert_matching_datasets_exist(result[0], user_john)
     assert_matching_datasets_exist(result[1], user_betty)
@@ -199,5 +199,5 @@ def test_if_placeholder_used_then_users_replaced_by_placeholder():
     test_entry.users_placeholder = True
     dictionary = test_entry.as_dict([])
 
-    assert len(extract_based_on_nx_class(dictionary, "NXuser")) == 0
+    assert len(extract_based_on_nx_class(dictionary, NX_USER)) == 0
     assert USERS_PLACEHOLDER in dictionary["children"]
