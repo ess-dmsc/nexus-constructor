@@ -145,8 +145,10 @@ class Group:
     def nx_class(self, new_nx_class: str):
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def set_field_value(self, name: str, value: Any, dtype: str):
+    def set_field_value(self, name: str, value: Any, dtype: str, unit: str = ""):
         self[name] = Dataset(parent_node=self, name=name, type=dtype, values=value)
+        if unit:
+            self[name].attributes.set_attribute_value(CommonAttrs.UNITS, unit)
 
     def get_field_value(self, name: str):
         return self[name].values
