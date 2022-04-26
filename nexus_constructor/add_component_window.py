@@ -8,7 +8,11 @@ from PySide2.QtCore import Qt, QUrl, Signal
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QListWidget, QListWidgetItem, QWidget, QMessageBox
 
-from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
+from nexus_constructor.common_attrs import (
+    NX_CLASSES_WITH_PLACEHOLDERS,
+    SHAPE_GROUP_NAME,
+    CommonAttrs,
+)
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
@@ -171,6 +175,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             )
         )
 
+        self.placeholder_checkbox.stateChanged.connect(self._disable_fields_and_buttons)
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.boxRadioButton.clicked.connect(self.show_box_fields)
         self.CylinderRadioButton.clicked.connect(self.show_cylinder_fields)
@@ -208,6 +213,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
 
+        if (
+            self.component_to_edit
+            and self.component_to_edit.nx_class in NX_CLASSES_WITH_PLACEHOLDERS
+        ):
+            self.placeholder_checkbox.setVisible(True)
+
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         self.pixel_options = pixel_options
@@ -222,6 +233,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         if not self.initial_edit:
             self.setWindowTitle(f"Edit group: {c_group.name}")
+            self.placeholder_checkbox.setChecked(
+                self.component_to_edit.group_placeholder
+            )
+
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(c_group.group)
@@ -391,6 +406,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()
+        self.placeholder_checkbox.setVisible(c_nx_class in NX_CLASSES_WITH_PLACEHOLDERS)
+        if c_nx_class not in NX_CLASSES_WITH_PLACEHOLDERS:
+            self.placeholder_checkbox.setChecked(False)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
         self.webEngineView.setUrl(
@@ -438,6 +456,15 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
         self.boxOptionsBox.setVisible(False)
+
+    def _disable_fields_and_buttons(self, placeholder_state: bool):
+        self.noShapeRadioButton.setEnabled(not placeholder_state)
+        self.boxRadioButton.setEnabled(not placeholder_state)
+        self.meshRadioButton.setEnabled(not placeholder_state)
+        self.CylinderRadioButton.setEnabled(not placeholder_state)
+        self.shapeOptionsBox.setEnabled(not placeholder_state)
+        self.addFieldPushButton.setEnabled(not placeholder_state)
+        self.removeFieldPushButton.setEnabled(not placeholder_state)
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
@@ -525,6 +552,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         component = self.finalise_group(pixel_data)
 
         if self.initial_edit and isinstance(component, Component):
+            component.group_placeholder = self.placeholder_checkbox.isChecked()
             self.signals.component_added.emit(component)
 
         self.signals.transformation_changed.emit()
@@ -572,7 +600,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if isinstance(pixel_data, PixelMapping):
             component.record_pixel_mapping(pixel_data)
         if isinstance(pixel_data, PixelGrid) and self.get_pixel_visibility_condition():
-            component.record_pixel_grid(pixel_data)
+            component.record_pixel_grid(pixel_data, self.unitsLineEdit.text())
 
     def change_pixel_options_visibility(self):
         """

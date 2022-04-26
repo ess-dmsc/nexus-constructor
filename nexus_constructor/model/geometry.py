@@ -174,6 +174,7 @@ class BoxGeometry(Group):
     def _create_datasets_and_add_to_shape_group(self):
         group = Group(name=SHAPE_GROUP_NAME)
         group.nx_class = SHAPE_NX_CLASS
+        group.parent_node = self
         new_child = create_fw_module_object(
             WriterModules.DATASET.value,
             self._get_dataset_config(self._size, SIZE),
@@ -183,15 +184,14 @@ class BoxGeometry(Group):
         attributes = Attributes()
         attributes.set_attribute_value(CommonAttrs.UNITS, self._units)
         new_child.attributes = attributes
+        new_child.parent_node = group
         group.children.append(new_child)
-        group.children.append(
-            create_fw_module_object(
-                WriterModules.DATASET.value,
-                self._get_dataset_config(NX_BOX, SHAPE_GROUP_NAME),
-                self,
-            )
+        group[SHAPE_GROUP_NAME] = create_fw_module_object(
+            WriterModules.DATASET.value,
+            self._get_dataset_config(NX_BOX, SHAPE_GROUP_NAME),
+            group,
         )
-        self.children.append(group)
+        self[SHAPE_GROUP_NAME] = group
 
     def _get_dataset_config(self, value: Any, name: str) -> Dict:
         return {

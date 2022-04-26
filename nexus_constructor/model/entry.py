@@ -1,6 +1,7 @@
 from copy import copy
 from typing import Any, Dict, List, Tuple
 
+from nexus_constructor.common_attrs import NX_USER, USERS_PLACEHOLDER
 from nexus_constructor.component_type import ENTRY_CLASS_NAME
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset
@@ -23,8 +24,6 @@ EXP_ID_PLACEHOLDER = Dataset(
     values=EXP_ID_PLACEHOLDER_VALUE,
     type=ValueTypes.STRING,
 )
-
-USERS_PLACEHOLDER = "$USERS$"
 
 
 class Entry(Group):
@@ -80,7 +79,7 @@ class Entry(Group):
 
     def _create_user(self, group: Group, user_data: Dict[str, str]) -> Group:
         group.name = f"user_{user_data['name'].replace(' ', '')}"
-        group.nx_class = "NXuser"
+        group.nx_class = NX_USER
         for name, value in user_data.items():
             group.children.append(
                 Dataset(
@@ -92,7 +91,7 @@ class Entry(Group):
     def _clear_all_users(self):
         old_users = []
         for child in self.children:
-            if isinstance(child, Group) and child.nx_class == "NXuser":
+            if isinstance(child, Group) and child.nx_class == NX_USER:
                 old_users.append(child)
         for user in old_users:
             self.children.remove(user)

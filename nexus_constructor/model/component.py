@@ -338,10 +338,7 @@ class Component(Group):
             SHAPE_GROUP_NAME,
         ]:
             if group_name in self:
-                if group_name == GEOMETRY_GROUP_NAME:
-                    del self[GEOMETRY_GROUP_NAME]
-                else:
-                    del self[SHAPE_GROUP_NAME]
+                del self[group_name]
 
     def set_off_shape(
         self,
@@ -421,19 +418,29 @@ class Component(Group):
     def has_pixel_shape(self):
         return PIXEL_SHAPE_GROUP_NAME in self
 
-    def record_pixel_grid(self, pixel_grid: PixelGrid):
+    def record_pixel_grid(self, pixel_grid: PixelGrid, unit: str = ""):
         """
         Records the pixel grid data to the NeXus file.
         :param pixel_grid: The PixelGrid created from the input provided to the Add/Edit Component Window.
+        :param unit: length unit used in offset.
         """
         self.set_field_value(
-            X_PIXEL_OFFSET, get_x_offsets_from_pixel_grid(pixel_grid), ValueTypes.FLOAT
+            X_PIXEL_OFFSET,
+            get_x_offsets_from_pixel_grid(pixel_grid),
+            ValueTypes.FLOAT,
+            unit,
         )
         self.set_field_value(
-            Y_PIXEL_OFFSET, get_y_offsets_from_pixel_grid(pixel_grid), ValueTypes.FLOAT
+            Y_PIXEL_OFFSET,
+            get_y_offsets_from_pixel_grid(pixel_grid),
+            ValueTypes.FLOAT,
+            unit,
         )
         self.set_field_value(
-            Z_PIXEL_OFFSET, get_z_offsets_from_pixel_grid(pixel_grid), ValueTypes.FLOAT
+            Z_PIXEL_OFFSET,
+            get_z_offsets_from_pixel_grid(pixel_grid),
+            ValueTypes.FLOAT,
+            unit,
         )
         self.set_field_value(
             DETECTOR_NUMBER,

@@ -2,7 +2,12 @@ from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 import attr
 
-from nexus_constructor.common_attrs import CommonAttrs, CommonKeys, NodeType
+from nexus_constructor.common_attrs import (
+    NX_CLASSES_WITH_PLACEHOLDERS,
+    CommonAttrs,
+    CommonKeys,
+    NodeType,
+)
 from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.helpers import (
     _get_item,
@@ -35,6 +40,7 @@ class Group:
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
+    _group_placeholder: bool = False
 
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
@@ -123,6 +129,14 @@ class Group:
         return get_absolute_path(self)
 
     @property
+    def group_placeholder(self) -> bool:
+        return self._group_placeholder
+
+    @group_placeholder.setter
+    def group_placeholder(self, enable: bool):
+        self._group_placeholder = enable
+
+    @property
     def nx_class(self):
         return self.attributes.get_attribute_value(CommonAttrs.NX_CLASS)
 
@@ -130,13 +144,17 @@ class Group:
     def nx_class(self, new_nx_class: str):
         self.attributes.set_attribute_value(CommonAttrs.NX_CLASS, new_nx_class)
 
-    def set_field_value(self, name: str, value: Any, dtype: str):
+    def set_field_value(self, name: str, value: Any, dtype: str, unit: str = ""):
         self[name] = Dataset(parent_node=self, name=name, type=dtype, values=value)
+        if unit:
+            self[name].attributes.set_attribute_value(CommonAttrs.UNITS, unit)
 
     def get_field_value(self, name: str):
         return self[name].values
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
+        if self._group_placeholder and self.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
+            return NX_CLASSES_WITH_PLACEHOLDERS[self.nx_class]  # type: ignore
         return_dict: Dict = {
             CommonKeys.NAME: self.name,
             CommonKeys.TYPE: NodeType.GROUP,
