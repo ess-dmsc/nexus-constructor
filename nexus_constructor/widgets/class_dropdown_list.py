@@ -1,6 +1,10 @@
 from PySide2 import QtWidgets
 from PySide2.QtGui import QValidator, QBrush
-from nexus_constructor.component_type import NX_CLASSES, COMPONENT_TYPES, ENTRY_CLASS_NAME
+from nexus_constructor.component_type import (
+    NX_CLASSES,
+    COMPONENT_TYPES,
+    ENTRY_CLASS_NAME,
+)
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.widgets.dropdown_list import DropDownList
@@ -30,10 +34,7 @@ class ClassDropDownList(DropDownList):
         super().__init__(parent)
         self._container = container
         self.setValidator(NXClassValidator())
-        self.validator().is_valid.connect(
-            partial(validate_general_widget,
-                    self)
-        )
+        self.validator().is_valid.connect(partial(validate_general_widget, self))
 
         sorted_groups_list = list(NX_CLASSES - COMPONENT_TYPES)
         sorted_groups_list.sort()
@@ -43,14 +44,20 @@ class ClassDropDownList(DropDownList):
             self.addItem("- Components", userData=None)
             self.model().item(0).setEnabled(False)
             self.addItems(sorted_component_list)
-            self.setCurrentIndex(sorted_component_list.index(self._container.group.nx_class) + 1)
+            self.setCurrentIndex(
+                sorted_component_list.index(self._container.group.nx_class) + 1
+            )
         elif isinstance(self._container.group, Entry):
             self.addItems([ENTRY_CLASS_NAME])
-        elif isinstance(self._container.group, Group) and self._container.group.nx_class:
+        elif (
+            isinstance(self._container.group, Group) and self._container.group.nx_class
+        ):
             self.addItem("- Groups", userData=None)
             self.model().item(0).setEnabled(False)
             self.addItems(sorted_groups_list)
-            self.setCurrentIndex(sorted_groups_list.index(self._container.group.nx_class) + 1)
+            self.setCurrentIndex(
+                sorted_groups_list.index(self._container.group.nx_class) + 1
+            )
         else:
             self.addItem("(None)", userData=None)
             self.model().item(0).setBackground(QBrush(Qt.red))
@@ -58,9 +65,7 @@ class ClassDropDownList(DropDownList):
             self.model().item(1).setEnabled(False)
             self.addItems(sorted_component_list)
             self.addItem("- Groups", userData=None)
-            self.model().item(
-                self.count() - 1
-            ).setEnabled(False)
+            self.model().item(self.count() - 1).setEnabled(False)
             self.addItems(sorted_groups_list)
         self.currentIndexChanged.connect(self._set_nx_class)
 

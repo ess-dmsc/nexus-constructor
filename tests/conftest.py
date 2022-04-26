@@ -12,6 +12,7 @@ import sys
 
 app = QApplication(sys.argv)
 
+
 @pytest.fixture(scope="function")
 def template(qtbot) -> QDialog:
     q_dialog = QDialog()

@@ -1,3 +1,3 @@
-from nexus_constructor.model.group import Group
-from nexus_constructor.model.entry import Entry
-from nexus_constructor.model.component import Component
+from .group import Group  # noqa: F401
+from .entry import Entry  # noqa: F401
+from .component import Component  # noqa: F401

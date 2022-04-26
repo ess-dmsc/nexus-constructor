@@ -39,12 +39,12 @@ from nexus_constructor.model.module import (
     WriterModules,
 )
 
-from nexus_constructor.ui_utils import (
-    validate_line_edit,
-    validate_general_widget
-)
+from nexus_constructor.ui_utils import validate_line_edit, validate_general_widget
 
-from nexus_constructor.validators import NoEmptyStringValidator, SchemaSelectionValidator
+from nexus_constructor.validators import (
+    NoEmptyStringValidator,
+    SchemaSelectionValidator,
+)
 from nexus_constructor.widgets.dropdown_list import DropDownList
 
 F142_TYPES = [
@@ -104,8 +104,11 @@ class StreamFieldsWidget(QDialog):
         self.topic_validator = NoEmptyStringValidator()
         self.topic_line_edit.setValidator(self.topic_validator)
         self.topic_validator.is_valid.connect(
-            partial(validate_line_edit, self.topic_line_edit,
-                    tooltip_on_reject="Topic name can not be empty.")
+            partial(
+                validate_line_edit,
+                self.topic_line_edit,
+                tooltip_on_reject="Topic name can not be empty.",
+            )
         )
         validate_line_edit(self.topic_line_edit, False)
 
@@ -114,11 +117,13 @@ class StreamFieldsWidget(QDialog):
         self.source_validator = NoEmptyStringValidator()
         self.source_line_edit.setValidator(self.source_validator)
         self.source_validator.is_valid.connect(
-            partial(validate_line_edit, self.source_line_edit,
-                    tooltip_on_reject="Source name can not be empty.")
+            partial(
+                validate_line_edit,
+                self.source_line_edit,
+                tooltip_on_reject="Source name can not be empty.",
+            )
         )
         validate_line_edit(self.source_line_edit, False)
-
 
         self.array_size_label = QLabel("Array size: ")
         self.array_size_spinbox = QSpinBox()

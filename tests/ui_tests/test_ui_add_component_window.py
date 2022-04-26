@@ -77,7 +77,13 @@ ALL_COMPONENT_TYPES = dict()
 for i, component_class in enumerate(
     list(
         AddComponentDialog(
-            None, t_model, t_component, group_to_edit=t_group, initial_edit=False, nx_classes=NX_CLASS_DEFINITIONS, scene_widget=None
+            None,
+            t_model,
+            t_component,
+            group_to_edit=t_group,
+            initial_edit=False,
+            nx_classes=NX_CLASS_DEFINITIONS,
+            scene_widget=None,
         ).nx_component_classes.keys()
     )
 ):
@@ -139,7 +145,15 @@ def add_component_dialog(qtbot, model, mock_pixel_options):
     c_entry = Entry()
     c_group = Group(name="some_name", parent_node=c_entry)
     c_entry.children.append(c_group)
-    dialog = AddComponentDialog(None, model=model, component_model=ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS, group_to_edit=c_group, scene_widget=Mock(), initial_edit=True)
+    dialog = AddComponentDialog(
+        None,
+        model=model,
+        component_model=ComponentTreeModel(model),
+        nx_classes=NX_CLASS_DEFINITIONS,
+        group_to_edit=c_group,
+        scene_widget=Mock(),
+        initial_edit=True,
+    )
     qtbot.addWidget(dialog)
 
     return dialog
@@ -164,7 +178,8 @@ def edit_component_dialog(
     parent_mock,
 ):
     component_tree = ComponentTreeModel(model)
-    dialog = AddComponentDialog(None,
+    dialog = AddComponentDialog(
+        None,
         model=model,
         component_model=component_tree,
         group_to_edit=component_with_cylindrical_geometry,
@@ -400,6 +415,7 @@ def get_new_component_from_dialog(dialog: AddComponentDialog) -> Component:
 
     return dialog._group_container.group
 
+
 def enter_component_with_pixel_fields(
     add_component_dialog: AddComponentDialog,
     button: QRadioButton,
@@ -525,7 +541,9 @@ def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_
 def test_UI_GIVEN_no_shape_WHEN_selecting_shape_type_THEN_shape_options_are_hidden(
     qtbot, add_component_dialog
 ):
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.noShapeRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.noShapeRadioButton
+    )
     assert not add_component_dialog.shapeOptionsBox.isVisible()
 
 
@@ -534,7 +552,9 @@ def test_UI_GIVEN_nothing_WHEN_changing_component_shape_type_THEN_add_component_
     qtbot, add_component_dialog, shape_button_name
 ):
     systematic_button_press(
-        qtbot, add_component_dialog, get_shape_type_button(add_component_dialog, shape_button_name)
+        qtbot,
+        add_component_dialog,
+        get_shape_type_button(add_component_dialog, shape_button_name),
     )
 
     assert not add_component_dialog.ok_button.isEnabled()
@@ -544,7 +564,9 @@ def test_UI_GIVEN_nothing_WHEN_selecting_cylinder_type_THEN_relevant_fields_are_
     qtbot, add_component_dialog
 ):
     # Click on the cylinder shape button
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
+    )
 
     # Check that this has caused the relevant fields to become visible
     assert add_component_dialog.shapeOptionsBox.isVisible()
@@ -561,7 +583,9 @@ def test_UI_GIVEN_nothing_WHEN_selecting_mesh_shape_THEN_relevant_fields_are_sho
     qtbot, add_component_dialog
 ):
     # Click on the mesh shape button
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Check that this has caused the relevant fields to become visible
     assert add_component_dialog.shapeOptionsBox.isVisible()
@@ -580,7 +604,9 @@ def test_UI_GIVEN_nothing_WHEN_selecting_shape_with_units_THEN_default_units_are
 ):
     # Click on the button of a shape type with units
     systematic_button_press(
-        qtbot, add_component_dialog, get_shape_type_button(add_component_dialog, shape_with_units)
+        qtbot,
+        add_component_dialog,
+        get_shape_type_button(add_component_dialog, shape_with_units),
     )
 
     # Check that the units line edit is visible and has metres by default
@@ -652,11 +678,15 @@ def test_UI_GIVEN_user_changes_shape_WHEN_adding_component_THEN_validity_is_reas
     qtbot, add_component_dialog, mock_pixel_options
 ):
 
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
+    )
     mock_pixel_options.update_pixel_input_validity.assert_called_once()
     mock_pixel_options.reset_mock()
 
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
     mock_pixel_options.update_pixel_input_validity.assert_called_once()
 
 
@@ -688,7 +718,10 @@ def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN
 ):
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, add_component_dialog
+        qtbot,
+        add_component_dialog.CylinderRadioButton,
+        add_component_dialog,
+        add_component_dialog,
     )
 
     cylinder_count = 4
@@ -736,7 +769,9 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mappi
     qtbot, add_component_dialog, mock_pixel_options
 ):
 
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     enter_file_path(
         qtbot,
@@ -752,7 +787,9 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_changing_cylinder_count_THE
     qtbot, add_component_dialog, mock_pixel_options
 ):
 
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
+    )
 
     qtbot.keyClick(add_component_dialog.cylinderCountSpinBox, Qt.Key_Up)
 
@@ -841,7 +878,9 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_com
     add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user entering a unique name in the text field
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -871,7 +910,9 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_shape_THEN_add
     add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
+    )
 
     # Mimic the user entering a unique name in the text field
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -912,7 +953,9 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_file_p
     qtbot, add_component_dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # No file name was given so we expect the file input box background to be red
     assert add_component_dialog.fileLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
@@ -922,7 +965,9 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_shape_T
     qtbot, add_component_dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user entering a bad file path
     enter_file_path(qtbot, add_component_dialog, NONEXISTENT_FILE_PATH, "OFF")
@@ -935,12 +980,12 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving the path for a file that exists but has the wrong extension
-    enter_file_path(
-        qtbot, add_component_dialog, WRONG_EXTENSION_FILE_PATH, "OFF"
-    )
+    enter_file_path(qtbot, add_component_dialog, WRONG_EXTENSION_FILE_PATH, "OFF")
 
     assert add_component_dialog.fileLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
@@ -949,7 +994,9 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_fil
     qtbot, add_component_dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user entering a valid file name
     enter_file_path(
@@ -970,7 +1017,9 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add
     add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving a valid component name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -990,7 +1039,9 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_co
     qtbot, add_component_dialog
 ):
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user entering a unique name in the text field
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1004,7 +1055,9 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_TH
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving a valid component name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1025,7 +1078,9 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving a valid component name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1046,7 +1101,9 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user clearing the unit input box
     enter_units(qtbot, add_component_dialog, "")
@@ -1059,7 +1116,9 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_units
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving invalid units input
     enter_units(qtbot, add_component_dialog, INVALID_UNITS)
@@ -1072,7 +1131,9 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_units_b
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the replacing the default value with "km"
     enter_units(qtbot, add_component_dialog, VALID_UNITS)
@@ -1089,7 +1150,9 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_com
     add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving a valid component name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1113,7 +1176,9 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_compon
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving a valid component name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1137,7 +1202,9 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_c
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user giving a valid component name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1161,7 +1228,9 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_a
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
+    )
 
     # Mimic the user giving valid component name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1177,7 +1246,9 @@ def test_UI_GIVEN_mesh_shape_selected_WHEN_choosing_shape_THEN_relevant_fields_a
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     assert add_component_dialog.shapeOptionsBox.isVisible()
     assert add_component_dialog.unitsbox.isVisible()
@@ -1191,7 +1262,9 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fiel
 ):
 
     # Mimic the user selecting a cylinder shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
+    )
 
     assert add_component_dialog.shapeOptionsBox.isVisible()
     assert add_component_dialog.unitsbox.isVisible()
@@ -1206,7 +1279,9 @@ def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_
 ):
 
     # Mimic the user selecting a mesh shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.meshRadioButton
+    )
 
     # Mimic the user selecting a component type that doesn't have pixel fields
     add_component_dialog.componentTypeComboBox.setCurrentIndex(
@@ -1246,7 +1321,9 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_val
 ):
 
     # Mimic the user selecting a cylinder shape
-    systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
+    systematic_button_press(
+        qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
+    )
 
     assert add_component_dialog.cylinderOptionsBox.isVisible()
     assert add_component_dialog.cylinderHeightLineEdit.value() == 0.0
@@ -1490,7 +1567,9 @@ def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
         PIXEL_OPTIONS["NXdetector"],
     )
 
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(
+        qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME
+    )
 
     enter_file_path(
         qtbot,
@@ -1525,7 +1604,9 @@ def test_UI_GIVEN_no_pixel_data_is_entered_WHEN_adding_nxdetector_THEN_pixel_dat
         PIXEL_OPTIONS["NXdetector"],
     )
 
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(
+        qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME
+    )
 
     enter_file_path(
         qtbot,
@@ -1576,7 +1657,7 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
                 nx_classes=NX_CLASS_DEFINITIONS,
                 parent=None,
                 scene_widget=None,
-                initial_edit=False
+                initial_edit=False,
             )
 
             qtbot.addWidget(dialog)
@@ -1606,7 +1687,7 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
                 nx_classes=NX_CLASS_DEFINITIONS,
                 parent=None,
                 scene_widget=None,
-                initial_edit=False
+                initial_edit=False,
             )
             qtbot.addWidget(dialog)
 
@@ -1640,7 +1721,7 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
                 nx_classes=NX_CLASS_DEFINITIONS,
                 parent=None,
                 scene_widget=None,
-                initial_edit=False
+                initial_edit=False,
             )
             dialog.pixel_options = Mock(spec=PixelOptions)
             qtbot.addWidget(dialog)
@@ -1668,7 +1749,7 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
         nx_classes=NX_CLASS_DEFINITIONS,
         parent=None,
         scene_widget=None,
-        initial_edit=False
+        initial_edit=False,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
@@ -1712,7 +1793,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
         nx_classes=NX_CLASS_DEFINITIONS,
         parent=None,
         scene_widget=None,
-        initial_edit=False
+        initial_edit=False,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
@@ -1745,7 +1826,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
         nx_classes=NX_CLASS_DEFINITIONS,
         parent=None,
         scene_widget=None,
-        initial_edit=False
+        initial_edit=False,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
@@ -1778,7 +1859,7 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
         nx_classes=NX_CLASS_DEFINITIONS,
         parent=None,
         scene_widget=None,
-        initial_edit=False
+        initial_edit=False,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
@@ -1822,7 +1903,7 @@ def test_UI_GIVEN_group_with_basic_f142_field_WHEN_editing_component_THEN_topic_
         nx_classes=NX_CLASS_DEFINITIONS,
         parent=None,
         scene_widget=None,
-        initial_edit=False
+        initial_edit=False,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
@@ -1865,14 +1946,15 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shap
         filename=os.path.join(os.path.pardir, "cube.off"),
     )
 
-    dialog = AddComponentDialog(None,
-                                model=model,
-                                component_model=component_model,
-                                group_to_edit=component,
-                                nx_classes=NX_CLASS_DEFINITIONS,
-                                initial_edit=False,
-                                scene_widget=None,
-                                )
+    dialog = AddComponentDialog(
+        None,
+        model=model,
+        component_model=component_model,
+        group_to_edit=component,
+        nx_classes=NX_CLASS_DEFINITIONS,
+        initial_edit=False,
+        scene_widget=None,
+    )
     dialog.pixel_options = Mock(spec=PixelOptions)
 
     qtbot.addWidget(dialog)
@@ -1909,13 +1991,14 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data
         filename=filepath,
     )
 
-    dialog = AddComponentDialog(None,
+    dialog = AddComponentDialog(
+        None,
         model=model,
         component_model=component_model,
         group_to_edit=component,
         nx_classes=NX_CLASS_DEFINITIONS,
-                                initial_edit=False,
-                                scene_widget=None,
+        initial_edit=False,
+        scene_widget=None,
     )
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
@@ -2303,9 +2386,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_grid_THEN_new_pixe
     )
 
     # Retrieve the newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     # Check that the change in pixel data is now stored in the component
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
@@ -2343,9 +2424,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_grid_THEN_new_
     )
 
     # Retrieve the newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     # Check that the change in pixel data is now stored in the component
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
@@ -2383,9 +2462,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_mapping_THE
     )
 
     # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     shape = component_to_edit.shape[0]
 
@@ -2418,9 +2495,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_pixel_mapping_THEN
     )
 
     # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     # Check that the change in pixel data is now stored in the component
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
@@ -2459,9 +2534,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_pixel_mapping_
     )
 
     # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     # Check that the change in pixel data is now stored in the component
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
@@ -2493,9 +2566,7 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_mapping_T
     )
 
     # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     shape = component_to_edit.shape[0]
 
@@ -2525,9 +2596,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_no_pixel_data_THEN
     )
 
     # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     # Check that the change in pixel data is now stored in the component
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
@@ -2555,9 +2624,7 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_no_pixel_data_
     )
 
     # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    component_to_edit = get_new_component_from_dialog(add_component_dialog)
 
     # Check that the change in pixel data is now stored in the component
     for field in PIXEL_GRID_FIELDS[:-1] + ["detector_number"]:
@@ -2572,7 +2639,8 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_da
     # Create a component with no pixel data
     component_name = "NoPixelsToMapping"
     expected_geometry = enter_and_create_component_with_pixel_data(
-        add_component_dialog, component_name, True, mock_pixel_options, qtbot)
+        add_component_dialog, component_name, True, mock_pixel_options, qtbot
+    )
 
     # Make the Add Component dialog behave like an Edit Component dialog and create a pixel mapping
     detector_number = [4]
@@ -2582,9 +2650,7 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_da
         mock_pixel_options,
         PixelMapping(detector_number),
     )
-    c_component = get_new_component_from_dialog(
-        add_component_dialog
-    )
+    c_component = get_new_component_from_dialog(add_component_dialog)
 
     shape = c_component.shape[0]
 

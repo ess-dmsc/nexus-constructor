@@ -114,7 +114,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if self.initial_edit:
             self.ok_button.setText("Add group")
             self.cancel_button.setVisible(True)
-            self.componentTypeComboBox.currentIndexChanged.connect(self._handle_class_change)
+            self.componentTypeComboBox.currentIndexChanged.connect(
+                self._handle_class_change
+            )
             self.cancel_button.clicked.connect(self._cancel_new_group)
             self.rejected.connect(self._rejected)
 
@@ -145,18 +147,25 @@ class AddComponentDialog(Ui_AddComponentDialog):
         c_name = self._group_container.group.name
         c_children = self._group_container.group.children
         group_constructor = None
-        if isinstance(self._group_container.group, Component) and c_nx_class not in COMPONENT_TYPES:
+        if (
+            isinstance(self._group_container.group, Component)
+            and c_nx_class not in COMPONENT_TYPES
+        ):
             group_constructor = Group
-        elif not isinstance(self._group_container.group, Component) and c_nx_class in COMPONENT_TYPES:
+        elif (
+            not isinstance(self._group_container.group, Component)
+            and c_nx_class in COMPONENT_TYPES
+        ):
             group_constructor = Component
         if group_constructor:
             self._group_parent.children.remove(self._group_container.group)
-            self._group_container.group = group_constructor(name=c_name, parent_node=self._group_parent)
+            self._group_container.group = group_constructor(
+                name=c_name, parent_node=self._group_parent
+            )
             self._group_container.group.attributes = c_attributes
             self._group_container.group.children = c_children
             self._group_container.group.nx_class = c_nx_class
             self._group_parent.children.append(self._group_container.group)
-
 
     def setupUi(self, pixel_options: PixelOptions = PixelOptions()):
         """Sets up push buttons and validators for the add component window."""
@@ -220,7 +229,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         self.ok_validator = OkValidator(
-            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator)
+            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
+        )
 
         c_group = self._group_container.group
 
@@ -236,8 +246,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         else:
             self.ok_validator.set_nx_class_valid(False)
 
-        self.componentTypeComboBox.validator().is_valid.connect(self.ok_validator.set_nx_class_valid)
-        self.componentTypeComboBox.validator().validate(self.componentTypeComboBox.currentText(), 0)
+        self.componentTypeComboBox.validator().is_valid.connect(
+            self.ok_validator.set_nx_class_valid
+        )
+        self.componentTypeComboBox.validator().validate(
+            self.componentTypeComboBox.currentText(), 0
+        )
 
         self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
 
@@ -267,8 +281,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         else:
             text = (
                 SKIP_VALIDATION
-                if c_group.has_pixel_shape()
-                and not self.fileLineEdit.text()
+                if c_group.has_pixel_shape() and not self.fileLineEdit.text()
                 else self.fileLineEdit.text()
             )
             self.fileLineEdit.validator().validate(text, 0)
@@ -328,7 +341,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
-        items_and_update_methods = get_fields_and_update_functions_for_component(self._group_container.group)
+        items_and_update_methods = get_fields_and_update_functions_for_component(
+            self._group_container.group
+        )
         for field, update_method in items_and_update_methods:
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
@@ -535,9 +550,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         _, index = self.component_model.current_nxs_obj
         self.model.signals.group_edited.emit(index, False)
         if self.pixel_options:
-            pixel_data = (
-                self.pixel_options.generate_pixel_data()
-            )
+            pixel_data = self.pixel_options.generate_pixel_data()
         else:
             pixel_data = None
 
@@ -567,12 +580,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self._scene_widget.delete_component(c_group.name)
             self.component_model.components.append(c_group)
             self.generate_geometry_model(c_group, pixel_data)
-            self.write_pixel_data_to_component(
-                c_group, pixel_data
-            )
-        add_fields_to_component(
-            c_group, self.fieldsListWidget, self.component_model
-        )
+            self.write_pixel_data_to_component(c_group, pixel_data)
+        add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         return c_group
 
     def write_pixel_data_to_component(

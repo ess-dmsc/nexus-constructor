@@ -192,4 +192,3 @@ class GroupContainer:
     @group.setter
     def group(self, new_group: Group):
         self._group = new_group
-

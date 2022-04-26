@@ -23,8 +23,14 @@ def stream_fields_widget(qtbot, model, template):
     group = Group(name="some_name", parent_node=entry)
     entry.children.append(group)
 
-    add_component_dialog = AddComponentDialog(None,
-        model=model, component_model=ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS, group_to_edit=group, scene_widget=None, initial_edit=False,
+    add_component_dialog = AddComponentDialog(
+        None,
+        model=model,
+        component_model=ComponentTreeModel(model),
+        nx_classes=NX_CLASS_DEFINITIONS,
+        group_to_edit=group,
+        scene_widget=None,
+        initial_edit=False,
     )
     field = add_component_dialog.create_new_ui_field(DummyField())
     widget = StreamFieldsWidget(field.attrs_dialog)

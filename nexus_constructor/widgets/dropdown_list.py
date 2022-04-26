@@ -21,4 +21,3 @@ class DropDownList(QComboBox):
 
     def validator(self) -> QValidator:
         return self._validator
-

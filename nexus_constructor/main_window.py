@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List
 from weakref import WeakKeyDictionary
 
 from PySide2.QtCore import Qt

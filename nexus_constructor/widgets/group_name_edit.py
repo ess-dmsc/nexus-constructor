@@ -13,7 +13,11 @@ class GroupNameValidator(QValidator):
         self._container = container
 
     def validate(self, input: str, pos: int) -> QValidator.State:
-        list_of_group_names = [g.name for g in self._container.group.parent_node.children if isinstance(g, Group) and g is not self._container.group]
+        list_of_group_names = [
+            g.name
+            for g in self._container.group.parent_node.children
+            if isinstance(g, Group) and g is not self._container.group
+        ]
         if input == "" or input in list_of_group_names:
             self.is_valid.emit(False)
             return QValidator.Intermediate
@@ -51,6 +55,9 @@ class GroupNameEdit(QtWidgets.QLineEdit):
         """
         return generate_unique_name(
             self.text().lstrip("NX"),
-            [g for g in self._container.group.parent_node.children if isinstance(g, Group)],
+            [
+                g
+                for g in self._container.group.parent_node.children
+                if isinstance(g, Group)
+            ],
         )
-
