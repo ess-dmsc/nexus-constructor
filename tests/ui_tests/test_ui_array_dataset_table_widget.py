@@ -10,11 +10,6 @@ from nexus_constructor.validators import VALUE_TYPE_TO_NP
 
 
 @pytest.fixture(scope="function")
-def template(qtbot):
-    return QWidget()
-
-
-@pytest.fixture(scope="function")
 def array_dataset_table_widget(qtbot, template):
     array_dataset_table_widget = ArrayDatasetTableWidget()
     template.ui = array_dataset_table_widget
