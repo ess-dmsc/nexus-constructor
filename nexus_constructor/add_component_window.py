@@ -230,7 +230,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition() and self.pixel_options:
-                self.pixel_options.fill_existing_entries(c_group.group)
+                self.pixel_options.fill_existing_entries(c_group)
             if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
                 self.placeholder_checkbox.setVisible(True)
         else:

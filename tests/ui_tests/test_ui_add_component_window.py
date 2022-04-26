@@ -10,6 +10,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMainWindow, QRadioButton
 from pytestqt.qtbot import QtBot
+from typing import Optional
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -63,11 +64,11 @@ PIXEL_GRID_FIELDS = [
 COMPONENT_CLASS_PATH = "nexus_constructor.add_component_window.Component"
 CHOPPER_GEOMETRY_CREATOR_PATH = "nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator.DiskChopperGeometryCreator.create_disk_chopper_geometry"
 
-model = Model()
-component = ComponentTreeModel(model)
-entry = Entry()
-group = Group(name="some_name", parent_node=entry)
-entry.children.append(group)
+t_model = Model()
+t_component = ComponentTreeModel(t_model)
+t_entry = Entry()
+t_group = Group(name="some_name", parent_node=t_entry)
+t_entry.children.append(t_group)
 
 PIXEL_OPTIONS = dict()
 NO_PIXEL_OPTIONS = dict()
@@ -76,7 +77,7 @@ ALL_COMPONENT_TYPES = dict()
 for i, component_class in enumerate(
     list(
         AddComponentDialog(
-            None, model, component, group_to_edit=group, initial_edit=False, nx_classes=NX_CLASS_DEFINITIONS, scene_widget=None
+            None, t_model, t_component, group_to_edit=t_group, initial_edit=False, nx_classes=NX_CLASS_DEFINITIONS, scene_widget=None
         ).nx_component_classes.keys()
     )
 ):
@@ -135,11 +136,10 @@ def instrument():
 
 @pytest.fixture(scope="function")
 def add_component_dialog(qtbot, model, mock_pixel_options):
-    entry = Entry()
-    group = Group(name="some_name", parent_node=entry)
-    entry.children.append(group)
-
-    dialog = AddComponentDialog(None, model=model, component_model=ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS, group_to_edit=group, scene_widget=None, initial_edit=False)
+    c_entry = Entry()
+    c_group = Group(name="some_name", parent_node=c_entry)
+    c_entry.children.append(c_group)
+    dialog = AddComponentDialog(None, model=model, component_model=ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS, group_to_edit=c_group, scene_widget=Mock(), initial_edit=True)
     qtbot.addWidget(dialog)
 
     return dialog
@@ -147,10 +147,12 @@ def add_component_dialog(qtbot, model, mock_pixel_options):
 
 @pytest.fixture(scope="function")
 def component_with_cylindrical_geometry():
-    component = Component(name="cylindrical_component")
-    component.nx_class = "NXdetector"
-    component.set_cylinder_shape()
-    return component
+    c_entry = Entry()
+    c_component = Component(parent_node=c_entry, name="cylindrical_component")
+    c_entry.children.append(c_component)
+    c_component.nx_class = "NXdetector"
+    c_component.set_cylinder_shape()
+    return c_component
 
 
 @pytest.fixture(scope="function")
@@ -166,7 +168,7 @@ def edit_component_dialog(
         model=model,
         component_model=component_tree,
         group_to_edit=component_with_cylindrical_geometry,
-        scene_widget=None,
+        scene_widget=Mock(),
         initial_edit=False,
         nx_classes=NX_CLASS_DEFINITIONS,
     )
@@ -206,7 +208,6 @@ def mock_component():
 
 def enter_component_name(
     qtbot: pytestqt.qtbot.QtBot,
-    template: QDialog,
     dialog: AddComponentDialog,
     component_name: str,
 ):
@@ -214,11 +215,11 @@ def enter_component_name(
     Mimics the user entering a component name in the Add Component dialog. Clicks on the text field and enters a given
     name.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param component_name: The desired component name.
     """
-    qtbot.mouseClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.mouseDClick(dialog.nameLineEdit, Qt.LeftButton)
+    qtbot.keyClick(dialog.nameLineEdit, Qt.Key_Backspace)
     qtbot.keyClicks(dialog.nameLineEdit, component_name)
     show_and_close_window(qtbot, dialog)
 
@@ -240,7 +241,6 @@ def cleanup(request):
 def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
     """
     Finds the shape type button that contains the given text.
-    :param dialog: An instance of an AddComponentDialog.
     :param button_name: The name of the desired button.
     :return: The QRadioButton for the given shape type.
     """
@@ -252,13 +252,11 @@ def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
 def make_pixel_options_disappear(
     qtbot: pytestqt.qtbot.QtBot,
     dialog: AddComponentDialog,
-    template: QDialog,
     component_index: int,
 ):
     """
     Create the conditions to allow the disappearance of the pixel options by pressing the NoShape button.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param component_index: The index of a component type.
     """
@@ -271,18 +269,17 @@ def make_pixel_options_appear(
     qtbot: pytestqt.qtbot.QtBot,
     button: QRadioButton,
     dialog: AddComponentDialog,
-    template: QDialog,
-    pixel_options_index: int = None,
+    pixel_options_index: Optional[int] = None,
 ):
     """
     Create the conditions to allow the appearance of the pixel options by choosing NXdetector or NXdetector_module as
     the component type and NXcylindrical_geometry or NXoff_geometry as the shape type.
     :param qtbot: The qtbot testing tool.
     :param button: The Mesh or Cylinder radio button.
-    :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param pixel_options_index: The index of a component type for the combo box that has pixel fields.
     """
+    assert isinstance(pixel_options_index, int) or pixel_options_index is None
     if not pixel_options_index:
         pixel_options_index = get_component_combobox_index(dialog, "NXdetector")
     systematic_button_press(qtbot, dialog, button)
@@ -295,7 +292,6 @@ def enter_units(qtbot: pytestqt.qtbot.QtBot, dialog: AddComponentDialog, units: 
     Mimics the user entering unit information. Clicks on the text field and removes the default value then enters a
     given string.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog object.
     :param units: The desired units input.
     """
     word_length = len(dialog.unitsLineEdit.text())
@@ -316,7 +312,6 @@ def enter_file_path(
     Mimics the user entering a file path. Mimics a button click and patches the methods that deal with loading a
     geometry file.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param file_path: The desired file path.
     :param file_contents: The file contents that are returned by the open mock.
@@ -337,7 +332,6 @@ def enter_disk_chopper_fields(
     """
     Mimics a user creating an NXdisk_chopper by filling in the related fields/attributes.
     :param qtbot: The qtbot testing tool.
-    :param dialog: An instance of an AddComponentDialog.
     :param template: The window/widget that holds the AddComponentDialog.
     :param component_name: The name of the Disk Chopper.
     """
@@ -397,17 +391,14 @@ def enter_disk_chopper_fields(
     show_and_close_window(qtbot, add_component_dialog)
 
 
-def get_new_component_from_dialog(dialog: AddComponentDialog, name: str) -> Component:
+def get_new_component_from_dialog(dialog: AddComponentDialog) -> Component:
     """
     Get the stored component from an AddComponentDialog after the "Add Component" button has been pressed.
     :param dialog: The AddComponentDialog.
-    :param name: The name of the component that is being searched for.
     :return: The component.
     """
-    for component in dialog.model.get_components():
-        if component.name == name:
-            return component
 
+    return dialog._group_container.group
 
 def enter_component_with_pixel_fields(
     add_component_dialog: AddComponentDialog,
@@ -430,8 +421,8 @@ def enter_component_with_pixel_fields(
     :param template: The window/widget that holds the AddComponentDialog.
     :param pixel_data: The pixel data that is returned by the mock PixelOptions.
     """
-    make_pixel_options_appear(qtbot, button, add_component_dialog, add_component_dialog)
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, component_name)
+    make_pixel_options_appear(qtbot, button, add_component_dialog)
+    enter_component_name(qtbot, add_component_dialog, component_name)
     mock_pixel_options.generate_pixel_data = Mock(return_value=pixel_data)
 
 
@@ -441,7 +432,6 @@ def enter_and_create_component_with_pixel_data(
     cylinders: bool,
     mock_pixel_options: Mock,
     qtbot: pytestqt.qtbot.QtBot,
-    template: QDialog,
     pixel_data: PixelData = None,
 ):
     """
@@ -484,7 +474,6 @@ def enter_and_create_component_with_pixel_data(
 
 def edit_component_with_pixel_fields(
     add_component_dialog: AddComponentDialog,
-    component_to_edit: Component,
     parent_mock: Mock,
     mock_pixel_options: Mock,
     new_pixel_data: PixelData = None,
@@ -499,7 +488,6 @@ def edit_component_with_pixel_fields(
         testing the scenario in which a user removes the existing pixel data.
     """
     # Give the AddComponentDialog a component_to_edit value so it behaves like an Edit Component window
-    add_component_dialog.component_to_edit = component_to_edit
     add_component_dialog.parent = Mock(return_value=parent_mock)
 
     # Instruct the pixel options mock to generate different pixel data
@@ -617,7 +605,6 @@ def test_UI_GIVEN_class_and_shape_with_pixel_fields_WHEN_adding_component_THEN_p
         qtbot,
         get_shape_type_button(add_component_dialog, pixel_shape_name),
         add_component_dialog,
-        add_component_dialog,
         get_component_combobox_index(add_component_dialog, pixels_class),
     )
     # Check that this has caused the pixel options to become visible
@@ -629,12 +616,12 @@ def test_UI_GIVEN_any_nxclass_WHEN_adding_component_with_no_shape_THEN_pixel_opt
     qtbot, add_component_dialog, any_component_type
 ):
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
 
     # Change the pixel options to invisible
     make_pixel_options_disappear(
-        qtbot, add_component_dialog, add_component_dialog, ALL_COMPONENT_TYPES[any_component_type]
+        qtbot, add_component_dialog, ALL_COMPONENT_TYPES[any_component_type]
     )
     assert not add_component_dialog.pixelOptionsWidget.isVisible()
 
@@ -649,7 +636,6 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
     make_pixel_options_appear(
         qtbot,
         get_shape_type_button(add_component_dialog, shape_name),
-        add_component_dialog,
         add_component_dialog,
         get_component_combobox_index(add_component_dialog, pixels_class),
     )
@@ -679,7 +665,7 @@ def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapp
 ):
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog
     )
 
     enter_file_path(
@@ -722,7 +708,7 @@ def test_UI_GIVEN_same_mesh_file_twice_WHEN_user_selects_file_THEN_mapping_list_
 ):
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
 
     enter_file_path(
@@ -778,7 +764,7 @@ def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_ge
 ):
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
 
     enter_file_path(qtbot, add_component_dialog, VALID_CUBE_OFF_FILE, "OFF")
@@ -790,7 +776,7 @@ def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_ma
     qtbot, add_component_dialog, mock_pixel_options
 ):
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
 
     # Provide a path and file for a cube mesh
@@ -818,11 +804,14 @@ def test_UI_GIVEN_different_mesh_file_WHEN_user_selects_face_mapped_mesh_THEN_ma
 def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_becomes_white(
     qtbot, add_component_dialog
 ):
+    # Mimic the user entering a name in the text field
+    enter_component_name(qtbot, add_component_dialog, "")
+
     # Check that the background color of the ext field starts as red
     assert add_component_dialog.nameLineEdit.styleSheet() == RED_LINE_EDIT_STYLE_SHEET
 
     # Mimic the user entering a name in the text field
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Check that the background color of the test field has changed to white
     assert add_component_dialog.nameLineEdit.styleSheet() == WHITE_LINE_EDIT_STYLE_SHEET
@@ -836,7 +825,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
     add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user pressing the Add Component button
     qtbot.mouseClick(add_component_dialog.ok_button, Qt.LeftButton)
@@ -855,7 +844,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_mesh_shape_THEN_add_com
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     enter_file_path(
@@ -885,7 +874,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_shape_THEN_add
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering valid units
     enter_units(qtbot, add_component_dialog, VALID_UNITS)
@@ -912,7 +901,7 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_compo
     add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # The Add Component button is enabled because all the information required to create a no shape component is
     # there
@@ -984,7 +973,7 @@ def test_UI_GIVEN_valid_file_path_WHEN_adding_component_with_mesh_shape_THEN_add
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     enter_file_path(
@@ -1004,7 +993,7 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_co
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user entering a unique name in the text field
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Although the component name is valid, no file path has been given so the button should be disabled
     assert not add_component_dialog.ok_button.isEnabled()
@@ -1018,7 +1007,7 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_TH
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a nonexistent file path
     enter_file_path(
@@ -1039,7 +1028,7 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a path for a file that exists but has the wrong extension
     enter_file_path(
@@ -1103,7 +1092,7 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_com
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     enter_file_path(
@@ -1127,7 +1116,7 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_compon
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     enter_file_path(
@@ -1151,7 +1140,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_c
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.meshRadioButton)
 
     # Mimic the user giving a valid component name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user entering a valid file name
     enter_file_path(
@@ -1175,7 +1164,7 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_a
     systematic_button_press(qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton)
 
     # Mimic the user giving valid component name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Mimic the user giving invalid units input
     enter_units(qtbot, add_component_dialog, INVALID_UNITS)
@@ -1241,7 +1230,7 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
 ):
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
 
     # Give an invalid file
@@ -1329,12 +1318,12 @@ def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_da
 
     # Deceive the AddComponentDialog into thinking valid pixel info was given
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, False])
 
     # Enter a valid name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Enter a valid file path
     enter_file_path(
@@ -1354,12 +1343,12 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_WHEN_entering_pixel_data_THEN
 
     # Deceive the AddComponentDialog into thinking an invalid Pixel Grid was given
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[True, False])
 
     # Enter a valid name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Enter a valid file path
     enter_file_path(
@@ -1379,12 +1368,12 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_WHEN_entering_pixel_data_T
 
     # Deceive the AddComponentDialog into thinking an invalid Pixel Mapping was given
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
     mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, True])
 
     # Enter a valid name
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     # Enter a valid file path
     enter_file_path(
@@ -1403,7 +1392,7 @@ def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_
 ):
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
 
     mock_pixel_options.reset_mock()
@@ -1416,7 +1405,7 @@ def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_
     )
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog
     )
 
     mock_pixel_options.reset_pixel_mapping_table.assert_called_once()
@@ -1430,13 +1419,13 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
 ):
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog
     )
 
     mock_pixel_options.reset_mock()
 
     make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog, add_component_dialog
+        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
 
     enter_file_path(
@@ -1465,7 +1454,7 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
         PIXEL_OPTIONS["NXdetector"],
     )
 
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, UNIQUE_COMPONENT_NAME)
+    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
 
     enter_file_path(
         qtbot,
@@ -1568,7 +1557,9 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
     nx_class = "NXmonitor"
     desc = "description"
 
-    component = Component(name)
+    entry = Entry()
+    component = Component(parent_node=entry, name=name)
+    entry.children.append(component)
     component.nx_class = nx_class
     component.description = desc
 
@@ -1609,7 +1600,7 @@ def test_UI_GIVEN_component_with_no_shape_WHEN_editing_component_THEN_no_shape_r
         ) as mock_pixel_options:
             mock_pixel_options.pixel_validator = mock_pixel_validator
             dialog = AddComponentDialog(
-                model=model,
+                model=instrument,
                 component_model=treeview_model,
                 group_to_edit=component,
                 nx_classes=NX_CLASS_DEFINITIONS,
@@ -1628,9 +1619,11 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
 ):
     component_model = ComponentTreeModel(model)
 
+    entry = Entry()
     component_name = "test"
-    component = Component(component_name)
+    component = Component(parent_node=entry, name=component_name)
     component.nx_class = "NXpinhole"
+    entry.children.append(component)
 
     component.set_cylinder_shape(QVector3D(1, 1, 1), height=3, radius=4)
 
@@ -1694,7 +1687,8 @@ def create_group_with_component(component_name: str, file_name: str):
     """
     model = Model()
     treeview_model = ComponentTreeModel(model)
-    component = Component(component_name)
+    entry = Entry()
+    component = Component(parent_node=entry, name=component_name)
     component.nx_class = "NXdisk_chopper"
     return component, model, treeview_model
 
@@ -1806,9 +1800,10 @@ def test_UI_GIVEN_group_with_basic_f142_field_WHEN_editing_component_THEN_topic_
     component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_f142_stream_field"
     )
-
+    entry = Entry()
     field_name = "stream1"
-    stream_group = Group(field_name)
+    stream_group = Group(parent_node=entry, name=field_name)
+    entry.children.append(entry)
 
     topic = "topic1"
     pvname = "source1"
@@ -2278,7 +2273,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
 def test_UI_GIVEN_component_with_pixel_data_WHEN_editing_a_component_THEN_pixel_options_become_visible(
     qtbot, edit_component_dialog, mock_pixel_options
 ):
-    show_and_close_window(qtbot, add_component_dialog)
+    show_and_close_window(qtbot, edit_component_dialog)
     mock_pixel_options.fill_existing_entries.assert_called_once()
 
 
@@ -2296,22 +2291,20 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_grid_THEN_new_pixe
         False,
         mock_pixel_options,
         qtbot,
-        add_component_dialog,
         PixelGrid(rows=prev_pixel_grid_size, columns=prev_pixel_grid_size),
-    )
-
-    # Retrieve the newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=new_pixel_grid_size, columns=new_pixel_grid_size),
+    )
+
+    # Retrieve the newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     # Check that the change in pixel data is now stored in the component
@@ -2338,22 +2331,20 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_grid_THEN_new_
         True,
         mock_pixel_options,
         qtbot,
-        add_component_dialog,
         PixelGrid(rows=prev_pixel_grid_size, columns=prev_pixel_grid_size),
-    )
-
-    # Retrieve the newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=new_pixel_grid_size, columns=new_pixel_grid_size),
+    )
+
+    # Retrieve the newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     # Check that the change in pixel data is now stored in the component
@@ -2380,22 +2371,20 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_mapping_THE
         True,
         mock_pixel_options,
         qtbot,
-        add_component_dialog,
         PixelMapping(prev_detector_numbers),
-    )
-
-    # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelMapping(new_detector_numbers),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     shape = component_to_edit.shape[0]
@@ -2416,23 +2405,21 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_pixel_mapping_THEN
         False,
         mock_pixel_options,
         qtbot,
-        add_component_dialog,
         PixelMapping([5]),
-    )
-
-    # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     grid_size = 5
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=grid_size, columns=grid_size),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     # Check that the change in pixel data is now stored in the component
@@ -2459,23 +2446,21 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_pixel_mapping_
         True,
         mock_pixel_options,
         qtbot,
-        add_component_dialog,
         PixelMapping([5]),
-    )
-
-    # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     grid_size = 5
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=grid_size, columns=grid_size),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     # Check that the change in pixel data is now stored in the component
@@ -2499,18 +2484,17 @@ def test_UI_GIVEN_no_pixels_WHEN_editing_cylinder_component_with_pixel_mapping_T
         True,
         mock_pixel_options,
         qtbot,
-        add_component_dialog,
         PixelMapping([5]),
-    )
-
-    # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     edit_component_with_pixel_fields(
-        add_component_dialog, component_to_edit, parent_mock, mock_pixel_options, None
+        add_component_dialog, parent_mock, mock_pixel_options, None
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     shape = component_to_edit.shape[0]
@@ -2528,22 +2512,21 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_mesh_component_with_no_pixel_data_THEN
     # Create a component with no pixel data
     component_name = "NoPixelsToGrid"
     expected_geometry = enter_and_create_component_with_pixel_data(
-        add_component_dialog, component_name, False, mock_pixel_options, qtbot, add_component_dialog
-    )
-
-    # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
+        add_component_dialog, component_name, False, mock_pixel_options, qtbot
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     grid_size = 6
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=grid_size, columns=grid_size),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     # Check that the change in pixel data is now stored in the component
@@ -2559,22 +2542,21 @@ def test_UI_GIVEN_pixel_grid_WHEN_editing_cylinder_component_with_no_pixel_data_
     # Create a component with no pixel data
     component_name = "NoPixelsToGrid"
     expected_geometry = enter_and_create_component_with_pixel_data(
-        add_component_dialog, component_name, True, mock_pixel_options, qtbot, add_component_dialog
-    )
-
-    # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
+        add_component_dialog, component_name, True, mock_pixel_options, qtbot
     )
 
     # Make the Add Component dialog behave like an Edit Component dialog
     grid_size = 6
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelGrid(rows=grid_size, columns=grid_size),
+    )
+
+    # Retrieve newly created component
+    component_to_edit = get_new_component_from_dialog(
+        add_component_dialog
     )
 
     # Check that the change in pixel data is now stored in the component
@@ -2590,28 +2572,24 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_da
     # Create a component with no pixel data
     component_name = "NoPixelsToMapping"
     expected_geometry = enter_and_create_component_with_pixel_data(
-        add_component_dialog, component_name, True, mock_pixel_options, qtbot, add_component_dialog
-    )
-
-    # Retrieve newly created component
-    component_to_edit = get_new_component_from_dialog(
-        add_component_dialog, component_name
-    )
+        add_component_dialog, component_name, True, mock_pixel_options, qtbot)
 
     # Make the Add Component dialog behave like an Edit Component dialog and create a pixel mapping
     detector_number = [4]
     edit_component_with_pixel_fields(
         add_component_dialog,
-        component_to_edit,
         parent_mock,
         mock_pixel_options,
         PixelMapping(detector_number),
     )
+    c_component = get_new_component_from_dialog(
+        add_component_dialog
+    )
 
-    shape = component_to_edit.shape[0]
+    shape = c_component.shape[0]
 
     # Check that the change in pixel data is now stored in the component
-    assert component_to_edit.get_field_value("detector_number") == detector_number
+    assert c_component.get_field_value("detector_number") == detector_number
 
     assert isinstance(shape, expected_geometry)
 
@@ -2633,7 +2611,7 @@ def test_UI_GIVEN_creating_component_WHEN_pressing_ok_THEN_transformation_change
     transformation_mock = Mock()
     add_component_dialog.signals.transformation_changed = transformation_mock
 
-    enter_component_name(qtbot, add_component_dialog, add_component_dialog, "component name")
+    enter_component_name(qtbot, add_component_dialog, "component name")
 
     add_component_dialog.on_ok()
 
