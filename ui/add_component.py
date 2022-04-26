@@ -1,11 +1,10 @@
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView
-from nexus_constructor.widgets.custom_dialog import CustomDialog
 from nexus_constructor.model.group import GroupContainer
 from nexus_constructor.widgets import GroupNameEdit, DescriptionEdit, ClassDropDownList
+from PySide2.QtWidgets import QDialog
 
-
-class Ui_AddComponentDialog(CustomDialog):
+class Ui_AddComponentDialog(QDialog):
     def __init__(self, parent: QtWidgets.QWidget, container: GroupContainer):
         super().__init__(parent)
         self._group_container = container
@@ -296,20 +295,10 @@ class Ui_AddComponentDialog(CustomDialog):
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
 
         self.retranslateUi()
-        QtCore.QObject.connect(
-            self.ok_button,
-            QtCore.SIGNAL("clicked()"),
-            self.close_without_msg_box,
-        )
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         self.setWindowTitle(
-            QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Add group", None, -1
-            )
-        )
-        self.ok_button.setText(
             QtWidgets.QApplication.translate(
                 "AddComponentDialog", "Add group", None, -1
             )

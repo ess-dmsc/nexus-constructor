@@ -22,7 +22,7 @@ from nexus_constructor.model.module import (
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
-from nexus_constructor.ui_utils import generate_unique_name
+from nexus_constructor.unique_name import generate_unique_name
 
 
 class ComponentInfo(object):

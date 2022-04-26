@@ -66,4 +66,3 @@ class ClassDropDownList(DropDownList):
 
     def _set_nx_class(self):
         self._container.group.nx_class = self.currentText()
-

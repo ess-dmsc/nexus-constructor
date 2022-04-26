@@ -3,7 +3,8 @@ import os
 from mock import Mock
 
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
-from nexus_constructor.ui_utils import generate_unique_name, validate_line_edit
+from nexus_constructor.unique_name import generate_unique_name
+from nexus_constructor.ui_utils import validate_line_edit
 
 
 class DummyLineEdit:

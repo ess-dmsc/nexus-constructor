@@ -4,18 +4,15 @@ from copy import deepcopy
 from functools import partial
 from typing import List
 
-from ui.add_component import Ui_AddComponentDialog
 from PySide2.QtCore import Qt, QUrl, Signal
-from PySide2.QtGui import QBrush, QPalette, QVector3D
-from PySide2.QtWidgets import QListWidget, QListWidgetItem, QWidget
+from PySide2.QtGui import QVector3D
+from PySide2.QtWidgets import QListWidget, QListWidgetItem, QWidget, QMessageBox
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
     COMPONENT_TYPES,
-    ENTRY_CLASS_NAME,
-    NX_CLASSES,
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
 )
@@ -86,11 +83,14 @@ class AddComponentDialog(Ui_AddComponentDialog):
         model: Model,
         component_model: NexusTreeModel,
         group_to_edit: Group,
+        scene_widget: QWidget,
         initial_edit: bool,
         nx_classes=None,
     ):
+        self._scene_widget = scene_widget
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
+        self.group_to_edit = group_to_edit  # To be removed
         super().__init__(parent, self._group_container)
         super().setupUi()
         if nx_classes is None:
@@ -102,8 +102,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
-        self.group_to_edit = group_to_edit
-        self.group_parent = group_to_edit.parent_node
         self.initial_edit = initial_edit
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
@@ -115,21 +113,28 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.cancel_button.setVisible(True)
             self.componentTypeComboBox.currentIndexChanged.connect(self._handle_class_change)
             self.cancel_button.clicked.connect(self._cancel_new_group)
+            self.rejected.connect(self._rejected)
 
-    def _cancel_new_group(self):
-        self.close()
-
-    def close_without_msg_box(self):
-        self.initial_edit = False
-        super().close_without_msg_box()
-
-    def closeEvent(self, event):
-        super().closeEvent(event)
-        if event.isAccepted() and self.initial_edit:
+    def _rejected(self):
+        if self.initial_edit:
             self._group_parent.children.remove(self._group_container.group)
 
-    def reject(self) -> None:
-        self.close()
+    def _confirm_cancel(self) -> bool:
+        quit_msg = "Do you want to close the group editor?"
+        reply = QMessageBox.question(
+            self,
+            "Really quit?",
+            quit_msg,
+            QMessageBox.Close | QMessageBox.Ignore,
+            QMessageBox.Close,
+        )
+        if reply == QMessageBox.Close:
+            return True
+        return False
+
+    def _cancel_new_group(self):
+        if self._confirm_cancel():
+            self.close()
 
     def _handle_class_change(self):
         c_nx_class = self.componentTypeComboBox.currentText()
@@ -213,11 +218,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.ok_validator = OkValidator(
             self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator)
 
-        if self.group_to_edit:
-            self.setWindowTitle(f"Edit group: {self.group_to_edit.name}")
+        c_group = self._group_container.group
+
+        if not self.initial_edit:
+            self.setWindowTitle(f"Edit group: {c_group.name}")
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition() and self.pixel_options:
-                self.pixel_options.fill_existing_entries(self.group_to_edit)
+                self.pixel_options.fill_existing_entries(c_group.group)
         else:
             self.ok_validator.set_nx_class_valid(False)
 
@@ -247,12 +254,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
-        if not self.group_to_edit:
+        if not c_group:
             self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
         else:
             text = (
                 SKIP_VALIDATION
-                if self.group_to_edit.has_pixel_shape()
+                if c_group.has_pixel_shape()
                 and not self.fileLineEdit.text()
                 else self.fileLineEdit.text()
             )
@@ -508,111 +515,48 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         _, index = self.component_model.current_nxs_obj
         self.model.signals.group_edited.emit(index, False)
-        nx_class = self.componentTypeComboBox.currentText()
-        component_name = self.nameLineEdit.text()
-        description = self.descriptionPlainTextEdit.text()
         if self.pixel_options:
             pixel_data = (
                 self.pixel_options.generate_pixel_data()
-                if nx_class in PIXEL_COMPONENT_TYPES
-                else None
             )
         else:
             pixel_data = None
 
-        if self.group_to_edit:
-            component = self.edit_existing_component(
-                component_name, description, nx_class, pixel_data
-            )
-        else:
-            component = self.create_new_component(
-                component_name, description, nx_class, pixel_data
-            )
+        component = self.finalise_group(pixel_data)
 
-        if isinstance(component, Component):
+        if self.initial_edit and isinstance(component, Component):
             self.signals.component_added.emit(component)
 
-        if self.group_to_edit:
-            self.signals.transformation_changed.emit()
+        self.signals.transformation_changed.emit()
         self.model.signals.group_edited.emit(index, True)
+        self.hide()
 
-    def create_new_component(
+    def finalise_group(
         self,
-        nexus_obj_name: str,
-        description: str,
-        nx_class: str,
-        pixel_data: PixelData,
-    ):
-        """
-        Creates a new component.
-        :param nexus_obj_name: The name of the component.
-        :param description: The component description.
-        :param nx_class: The component class.
-        :param pixel_data: The PixelData for the component. Will be None if it was not given of if the component type
-            doesn't have pixel-related fields.
-        :return: The geometry object.
-        """
-        nexus_object: Group
-        if nx_class in COMPONENT_TYPES:
-            nexus_object = Component(name=nexus_obj_name, parent_node=None)
-        else:
-            nexus_object = Group(name=nexus_obj_name, parent_node=None)
-        nexus_object.nx_class = nx_class
-        if description:
-            nexus_object.description = description
-        # Add shape information
-        if isinstance(nexus_object, Component):
-            self.generate_geometry_model(nexus_object, pixel_data)
-            self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
-        self.component_model.add_group(nexus_object)
-        add_fields_to_component(
-            nexus_object, self.fieldsListWidget, self.component_model
-        )
-        return nexus_object
-
-    def edit_existing_component(
-        self,
-        component_name: str,
-        description: str,
-        nx_class: str,
         pixel_data: PixelData,
     ):
         """
         Edits an existing component.
-        :param component_name: The component name.
-        :param description: The component description.
-        :param nx_class: The component class.
         :param pixel_data: The component PixelData. Can be None.
         :return: The geometry object.
         """
-        # remove the previous object from the qt3d view
-        if isinstance(self.group_to_edit, Component):
-            self.parent().sceneWidget.delete_component(self.group_to_edit.name)
+        c_group = self._group_container.group
 
-        # remove previous fields
-        if self.group_to_edit:
-            self.group_to_edit.name = component_name
-            for child in self.group_to_edit.children:
-                if not isinstance(child, Group):
-                    self.group_to_edit.children.remove(child)
-            self.group_to_edit.nx_class = nx_class
-
-        if description:
-            self.group_to_edit.description = description
-
-        if isinstance(self.group_to_edit, Component):
-            self.component_model.components.append(self.group_to_edit)
-            self.generate_geometry_model(self.group_to_edit, pixel_data)
+        if isinstance(c_group, Component):
+            # remove the previous object from the qt3d view
+            self._scene_widget.delete_component(c_group.name)
+            self.component_model.components.append(c_group)
+            self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(
-                self.group_to_edit, nx_class, pixel_data
+                c_group, pixel_data
             )
         add_fields_to_component(
-            self.group_to_edit, self.fieldsListWidget, self.component_model
+            c_group, self.fieldsListWidget, self.component_model
         )
-        return self.group_to_edit if self.group_to_edit else None
+        return c_group
 
     def write_pixel_data_to_component(
-        self, component: Component, nx_class: str, pixel_data: PixelData
+        self, component: Component, pixel_data: PixelData
     ):
         """
         Writes the detector number/pixel grid data to a component.
@@ -622,7 +566,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         component.clear_pixel_data()
 
-        if pixel_data is None or nx_class not in PIXEL_COMPONENT_TYPES:
+        if pixel_data is None or component.nx_class not in PIXEL_COMPONENT_TYPES:
             return
 
         if isinstance(pixel_data, PixelMapping):

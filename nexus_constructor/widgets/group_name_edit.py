@@ -1,9 +1,7 @@
 from PySide2 import QtWidgets
 from functools import partial
-from nexus_constructor.ui_utils import (
-    generate_unique_name,
-    validate_line_edit,
-)
+from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.unique_name import generate_unique_name
 from PySide2.QtGui import QValidator
 from PySide2.QtCore import Signal
 from nexus_constructor.model.group import Group, GroupContainer

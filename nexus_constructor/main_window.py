@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
-from nexus_constructor.model.component import Group
+from nexus_constructor.model.component import Group, Component
 from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
@@ -159,6 +159,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.model,
             self.component_tree_view_tab.component_model,
             group,
+            scene_widget=self.sceneWidget,
             initial_edit=new_group,
             nx_classes=self.nx_classes,
         )
