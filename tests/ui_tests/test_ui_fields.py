@@ -7,6 +7,7 @@ from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTr
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from tests.test_utils import NX_CLASS_DEFINITIONS
+from nexus_constructor.model import Entry, Group
 
 POSSIBLE_FIELDS = [("test", "string")]
 
@@ -18,10 +19,13 @@ def stream_fields_widget(qtbot, model, template):
         def name(self):
             return "test"
 
-    add_component_dialog = AddComponentDialog(
-        model, ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS
+    entry = Entry()
+    group = Group(name="some_name", parent_node=entry)
+    entry.children.append(group)
+
+    add_component_dialog = AddComponentDialog(None,
+        model=model, component_model=ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS, group_to_edit=group, scene_widget=None, initial_edit=False,
     )
-    add_component_dialog.setupUi(template)
     field = add_component_dialog.create_new_ui_field(DummyField())
     widget = StreamFieldsWidget(field.attrs_dialog)
     qtbot.addWidget(widget)

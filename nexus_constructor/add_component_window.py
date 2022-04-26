@@ -94,7 +94,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self._scene_widget = scene_widget
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
-        self.group_to_edit = group_to_edit  # To be removed
         super().__init__(parent, self._group_container)
         super().setupUi()
         if nx_classes is None:
@@ -213,12 +212,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
 
-        if (
-            self.component_to_edit
-            and self.component_to_edit.nx_class in NX_CLASSES_WITH_PLACEHOLDERS
-        ):
-            self.placeholder_checkbox.setVisible(True)
-
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         self.pixel_options = pixel_options
@@ -233,13 +226,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         if not self.initial_edit:
             self.setWindowTitle(f"Edit group: {c_group.name}")
-            self.placeholder_checkbox.setChecked(
-                self.component_to_edit.group_placeholder
-            )
+            self.placeholder_checkbox.setChecked(c_group.group_placeholder)
 
             self._fill_existing_entries()
             if self.get_pixel_visibility_condition() and self.pixel_options:
                 self.pixel_options.fill_existing_entries(c_group.group)
+            if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
+                self.placeholder_checkbox.setVisible(True)
         else:
             self.ok_validator.set_nx_class_valid(False)
 
@@ -326,17 +319,16 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         Fill in component details in the UI if editing a component
         """
-        self.nameLineEdit.setText(self.group_to_edit.name)
-        self.descriptionPlainTextEdit.setText(self.group_to_edit.description)
-        self.componentTypeComboBox.setCurrentText(self.group_to_edit.nx_class)
-        if isinstance(self.group_to_edit, Component):
+        c_group = self._group_container.group
+        self.nameLineEdit.setText(c_group.name)
+        self.descriptionPlainTextEdit.setText(c_group.description)
+        self.componentTypeComboBox.setCurrentText(c_group.nx_class)
+        if isinstance(c_group, Component):
             self.__fill_existing_shape_info()
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
-        items_and_update_methods = get_fields_and_update_functions_for_component(
-            self.group_to_edit
-        )
+        items_and_update_methods = get_fields_and_update_functions_for_component(self._group_container.group)
         for field, update_method in items_and_update_methods:
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
@@ -350,7 +342,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                         new_ui_field.units = ""
 
     def __fill_existing_shape_info(self):
-        component_shape, _ = self.group_to_edit.shape
+        component_shape, _ = self._group_container.group.shape
         if not component_shape or isinstance(component_shape, NoShapeGeometry):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
@@ -387,7 +379,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
         field = FieldWidget(
-            self.group_to_edit, self.possible_fields, self.fieldsListWidget
+            self._group_container.group, self.possible_fields, self.fieldsListWidget
         )
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)

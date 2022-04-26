@@ -76,7 +76,7 @@ ALL_COMPONENT_TYPES = dict()
 for i, component_class in enumerate(
     list(
         AddComponentDialog(
-            None, model, component, group_to_edit=group, initial_edit=False, nx_classes=NX_CLASS_DEFINITIONS
+            None, model, component, group_to_edit=group, initial_edit=False, nx_classes=NX_CLASS_DEFINITIONS, scene_widget=None
         ).nx_component_classes.keys()
     )
 ):
@@ -135,12 +135,11 @@ def instrument():
 
 @pytest.fixture(scope="function")
 def add_component_dialog(qtbot, template, model, mock_pixel_options):
+    entry = Entry()
+    group = Group(name="some_name", parent_node=entry)
+    entry.children.append(group)
 
-    dialog = AddComponentDialog(
-        model, ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS
-    )
-    template.ui = dialog
-    template.ui.setupUi(template, mock_pixel_options)
+    dialog = AddComponentDialog(None, model=model, component_model=ComponentTreeModel(model), nx_classes=NX_CLASS_DEFINITIONS, group_to_edit=group, scene_widget=None, initial_edit=False)
     qtbot.addWidget(template)
 
     return dialog
