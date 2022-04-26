@@ -350,17 +350,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
             items_and_update_methods = get_fields_and_update_functions_for_component(
                 c_group
             )
-        for field, update_method in items_and_update_methods:
-            if update_method is not None:
-                new_ui_field = self.create_new_ui_field(field)
-                update_method(field, new_ui_field)
-                if not isinstance(field, Link):
-                    try:
-                        new_ui_field.units = field.attributes.get_attribute_value(
-                            CommonAttrs.UNITS
-                        )
-                    except AttributeError:
-                        new_ui_field.units = ""
+            for field, update_method in items_and_update_methods:
+                if update_method is not None:
+                    new_ui_field = self.create_new_ui_field(field)
+                    update_method(field, new_ui_field)
+                    if not isinstance(field, Link):
+                        try:
+                            new_ui_field.units = field.attributes.get_attribute_value(
+                                CommonAttrs.UNITS
+                            )
+                        except AttributeError:
+                            new_ui_field.units = ""
 
     def __fill_existing_shape_info(self):
         if not isinstance(self._group_container.group, Component):
