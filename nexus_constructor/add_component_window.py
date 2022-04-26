@@ -37,7 +37,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
-from nexus_constructor.model.group import Group, GroupContainer
+from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset, Link
 from nexus_constructor.pixel_options import PixelOptions
@@ -239,7 +239,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.placeholder_checkbox.setChecked(c_group.group_placeholder)
 
             self._fill_existing_entries()
-            if self.get_pixel_visibility_condition() and self.pixel_options:
+            if (
+                self.get_pixel_visibility_condition()
+                and self.pixel_options
+                and isinstance(c_group, Component)
+            ):
                 self.pixel_options.fill_existing_entries(c_group)
             if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
                 self.placeholder_checkbox.setVisible(True)
@@ -341,9 +345,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
-        items_and_update_methods = get_fields_and_update_functions_for_component(
-            self._group_container.group
-        )
+        c_group = self._group_container.group
+        if isinstance(c_group, Component):
+            items_and_update_methods = get_fields_and_update_functions_for_component(
+                c_group
+            )
         for field, update_method in items_and_update_methods:
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
@@ -357,6 +363,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
                         new_ui_field.units = ""
 
     def __fill_existing_shape_info(self):
+        if not isinstance(self._group_container.group, Component):
+            return
         component_shape, _ = self._group_container.group.shape
         if not component_shape or isinstance(component_shape, NoShapeGeometry):
             self.noShapeRadioButton.setChecked(True)

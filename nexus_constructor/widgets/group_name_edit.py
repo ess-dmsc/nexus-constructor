@@ -4,7 +4,7 @@ from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.unique_name import generate_unique_name
 from PySide2.QtGui import QValidator
 from PySide2.QtCore import Signal
-from nexus_constructor.model.group import Group, GroupContainer
+from nexus_constructor.model import Group, GroupContainer
 
 
 class GroupNameValidator(QValidator):

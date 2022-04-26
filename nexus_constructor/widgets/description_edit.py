@@ -1,5 +1,5 @@
 from PySide2 import QtWidgets
-from nexus_constructor.model.group import GroupContainer
+from nexus_constructor.model import GroupContainer
 
 
 class DescriptionEdit(QtWidgets.QLineEdit):

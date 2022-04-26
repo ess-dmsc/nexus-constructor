@@ -9,7 +9,7 @@ from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.widgets.dropdown_list import DropDownList
 from PySide2.QtCore import Signal
-from nexus_constructor.model.group import GroupContainer, Group
+from nexus_constructor.model import GroupContainer, Group
 from PySide2.QtCore import Qt
 from nexus_constructor.ui_utils import validate_general_widget
 from functools import partial
