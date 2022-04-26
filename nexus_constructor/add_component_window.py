@@ -79,7 +79,11 @@ def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget)
 
 
 def _set_slit_geometry(component: Component):
-    slit_geometry = SlitGeometry()
+    gaps: tuple = (
+        float(component["x_gap"].values) if "x_gap" in component else None,
+        float(component["y_gap"].values) if "y_gap" in component else None,
+    )
+    slit_geometry = SlitGeometry(gaps)
     component[SHAPE_GROUP_NAME] = slit_geometry.create_slit_geometry()
 
 
@@ -615,14 +619,14 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         nexus_object.nx_class = nx_class
         if description:
             nexus_object.description = description
-        # Add shape information
-        if isinstance(nexus_object, Component):
-            self.generate_geometry_model(nexus_object, pixel_data)
-            self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
         self.component_model.add_group(nexus_object)
         add_fields_to_component(
             nexus_object, self.fieldsListWidget, self.component_model
         )
+        # Add shape information
+        if isinstance(nexus_object, Component):
+            self.generate_geometry_model(nexus_object, pixel_data)
+            self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
         return nexus_object
 
     def edit_existing_component(
@@ -653,15 +657,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.component_to_edit.nx_class = nx_class
         if description:
             self.component_to_edit.description = description
+        add_fields_to_component(
+            self.component_to_edit, self.fieldsListWidget, self.component_model
+        )
         if isinstance(self.component_to_edit, Component):
             self.component_model.components.append(self.component_to_edit)
             self.generate_geometry_model(self.component_to_edit, pixel_data)
             self.write_pixel_data_to_component(
                 self.component_to_edit, nx_class, pixel_data
             )
-        add_fields_to_component(
-            self.component_to_edit, self.fieldsListWidget, self.component_model
-        )
         return self.component_to_edit if self.component_to_edit else None
 
     def write_pixel_data_to_component(
