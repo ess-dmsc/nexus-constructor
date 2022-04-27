@@ -154,6 +154,7 @@ def add_component_dialog(qtbot, model, mock_pixel_options):
         scene_widget=Mock(),
         initial_edit=True,
     )
+    dialog.pixel_options = mock_pixel_options
     qtbot.addWidget(dialog)
 
     return dialog
