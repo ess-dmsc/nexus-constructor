@@ -564,8 +564,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
         if isinstance(component, Component):
             self.signals.component_added.emit(component)
-
-        self.signals.transformation_changed.emit()
+        if not self.initial_edit:
+            self.signals.transformation_changed.emit()
         self.model.signals.group_edited.emit(index, True)
         self.hide()
 
