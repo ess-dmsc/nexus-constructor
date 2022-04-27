@@ -16,19 +16,19 @@ class SlitGeometry:
 
     def _create_vertices(self):
         half_side_length = 0.05
-        half_slit_height = half_side_length
         x_gap, y_gap = self._gaps
+        dy = half_side_length
 
         if x_gap:
             x_1 = 0.0
             x_2 = -1.0
-            x_gap += half_side_length
+            dx = x_gap / 2 + half_side_length
         else:
             x_1 = -0.1
             x_2 = -0.5
-            x_gap = 0
+            dx = 0
         if y_gap:
-            half_slit_height = y_gap / 2
+            dy = y_gap / 2
 
         slit_matrix = [
             [x_2, -1, 0.1],
@@ -45,8 +45,8 @@ class SlitGeometry:
         for column in slit_matrix:
             dimension_matrix.append(
                 [
-                    column[0] * half_side_length + x_gap / 2,
-                    column[1] * half_slit_height,
+                    column[0] * half_side_length + dx,
+                    column[1] * dy,
                     column[2] * half_side_length,
                 ]
             )
@@ -58,21 +58,21 @@ class SlitGeometry:
 
         # Lower and upper rectangle.
         slit_thickness = 0.02
-        x_max = max([x[0] for x in dimension_matrix])
+        x_dist = dx if x_gap else half_side_length / 2
         slit_matrix = [
-            [1, half_slit_height, 0.1],
-            [-1, half_slit_height, 0.1],
-            [1, slit_thickness + half_slit_height, 0.1],
-            [-1, slit_thickness + half_slit_height, 0.1],
-            [1, slit_thickness + half_slit_height, -0.1],
-            [-1, slit_thickness + half_slit_height, -0.1],
-            [1, half_slit_height, -0.1],
-            [-1, half_slit_height, -0.1],
+            [1, dy, 0.1],
+            [-1, dy, 0.1],
+            [1, slit_thickness + dy, 0.1],
+            [-1, slit_thickness + dy, 0.1],
+            [1, slit_thickness + dy, -0.1],
+            [-1, slit_thickness + dy, -0.1],
+            [1, dy, -0.1],
+            [-1, dy, -0.1],
         ]
         dimension_matrix = []
         for column in slit_matrix:
             dimension_matrix.append(
-                [column[0] * x_max, column[1], column[2] * half_side_length]
+                [column[0] * x_dist, column[1], column[2] * half_side_length]
             )
         vertices_lower_bank: List[QVector3D] = []
         vertices_upper_bank: List[QVector3D] = []
