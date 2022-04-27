@@ -11,6 +11,7 @@ from PySide2.QtWidgets import QListWidget, QListWidgetItem
 from nexus_constructor.common_attrs import (
     NX_CLASSES_WITH_PLACEHOLDERS,
     SHAPE_GROUP_NAME,
+    SHAPE_NX_CLASS,
     CommonAttrs,
 )
 from nexus_constructor.component_tree_model import NexusTreeModel
@@ -85,6 +86,7 @@ def _set_slit_geometry(component: Component):
     )
     slit_geometry = SlitGeometry(gaps)
     component[SHAPE_GROUP_NAME] = slit_geometry.create_slit_geometry()
+    component[SHAPE_GROUP_NAME].nx_class = SHAPE_NX_CLASS
 
 
 class AddComponentDialog(Ui_AddComponentDialog, QObject):
