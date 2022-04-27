@@ -337,30 +337,26 @@ class AddComponentDialog(Ui_AddComponentDialog):
         Fill in component details in the UI if editing a component
         """
         c_group = self._group_container.group
-        self.nameLineEdit.setText(c_group.name)
-        self.descriptionPlainTextEdit.setText(c_group.description)
-        self.componentTypeComboBox.setCurrentText(c_group.nx_class)
         if isinstance(c_group, Component):
             self.__fill_existing_shape_info()
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
         c_group = self._group_container.group
-        if isinstance(c_group, Component):
-            items_and_update_methods = get_fields_and_update_functions_for_component(
-                c_group
-            )
-            for field, update_method in items_and_update_methods:
-                if update_method is not None:
-                    new_ui_field = self.create_new_ui_field(field)
-                    update_method(field, new_ui_field)
-                    if not isinstance(field, Link):
-                        try:
-                            new_ui_field.units = field.attributes.get_attribute_value(
-                                CommonAttrs.UNITS
-                            )
-                        except AttributeError:
-                            new_ui_field.units = ""
+        items_and_update_methods = get_fields_and_update_functions_for_component(
+            c_group
+        )
+        for field, update_method in items_and_update_methods:
+            if update_method is not None:
+                new_ui_field = self.create_new_ui_field(field)
+                update_method(field, new_ui_field)
+                if not isinstance(field, Link):
+                    try:
+                        new_ui_field.units = field.attributes.get_attribute_value(
+                            CommonAttrs.UNITS
+                        )
+                    except AttributeError:
+                        new_ui_field.units = ""
 
     def __fill_existing_shape_info(self):
         if not isinstance(self._group_container.group, Component):
@@ -566,6 +562,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         if self.initial_edit and isinstance(component, Component):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
+        if isinstance(component, Component):
             self.signals.component_added.emit(component)
 
         self.signals.transformation_changed.emit()
@@ -589,6 +586,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.component_model.components.append(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)
+        for child in self._group_container.group.children:
+            if not isinstance(child, Group):
+                self._group_container.group.children.remove(child)
         add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         return c_group
 
@@ -670,7 +670,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.pixel_options.update_pixel_input_validity()
 
 
-def get_fields_and_update_functions_for_component(component: Component):
+def get_fields_and_update_functions_for_component(component: Group):
     return get_fields_with_update_functions(component)
 
 
