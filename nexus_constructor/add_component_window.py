@@ -580,15 +580,16 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         c_group = self._group_container.group
 
+        for child in self._group_container.group.children:
+            if not isinstance(child, Group):
+                self._group_container.group.children.remove(child)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
             self._scene_widget.delete_component(c_group.name)
             self.component_model.components.append(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)
-        for child in self._group_container.group.children:
-            if not isinstance(child, Group):
-                self._group_container.group.children.remove(child)
+
         add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         return c_group
 
