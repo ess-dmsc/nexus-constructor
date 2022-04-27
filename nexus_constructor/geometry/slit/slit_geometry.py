@@ -2,17 +2,31 @@ from typing import List
 
 from PySide2.QtGui import QVector3D
 
-from nexus_constructor.common_attrs import SHAPE_GROUP_NAME
+from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
+from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNoNexus
 
 
 class SlitGeometry:
-    def __init__(self, gaps: tuple):
+    def __init__(self, component: Component):
+        gaps: tuple = (
+            float(component["x_gap"].values) if "x_gap" in component else None,
+            float(component["y_gap"].values) if "y_gap" in component else None,
+        )
+        self._units = self._get_units(component)
         self.vertices: List[QVector3D] = []
         self.faces: List[List[int]]
         self._gaps: tuple = gaps
         self._create_vertices()
         self._create_faces()
+
+    def _get_units(self, component: Component):
+        if "x_gap" in component:
+            return component["x_gap"].attributes.get_attribute_value(CommonAttrs.UNITS)
+        elif "y_gap" in component:
+            return component["y_gap"].attributes.get_attribute_value(CommonAttrs.UNITS)
+        else:
+            return ""
 
     def _create_vertices(self):
         half_side_length = 0.05
@@ -107,4 +121,6 @@ class SlitGeometry:
         self.faces = left_faces + right_faces + lower_faces + upper_faces
 
     def create_slit_geometry(self) -> OFFGeometryNoNexus:
-        return OFFGeometryNoNexus(self.vertices, self.faces, SHAPE_GROUP_NAME)
+        geometry = OFFGeometryNoNexus(self.vertices, self.faces, SHAPE_GROUP_NAME)
+        geometry.units = self._units
+        return geometry

@@ -80,11 +80,7 @@ def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget)
 
 
 def _set_slit_geometry(component: Component):
-    gaps: tuple = (
-        float(component["x_gap"].values) if "x_gap" in component else None,
-        float(component["y_gap"].values) if "y_gap" in component else None,
-    )
-    slit_geometry = SlitGeometry(gaps)
+    slit_geometry = SlitGeometry(component)
     component[SHAPE_GROUP_NAME] = slit_geometry.create_slit_geometry()
     component[SHAPE_GROUP_NAME].nx_class = SHAPE_NX_CLASS
 
