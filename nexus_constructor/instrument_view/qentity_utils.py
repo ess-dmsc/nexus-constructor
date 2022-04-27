@@ -5,22 +5,29 @@ from PySide2.Qt3DExtras import Qt3DExtras
 from PySide2.Qt3DRender import Qt3DRender
 from PySide2.QtGui import QColor
 
-from nexus_constructor.component_type import SAMPLE_CLASS_NAME, SOURCE_CLASS_NAME
+from nexus_constructor.component_type import (
+    SAMPLE_CLASS_NAME,
+    SLIT_CLASS_NAME,
+    SOURCE_CLASS_NAME,
+)
 
 MATERIAL_COLORS = {
     SAMPLE_CLASS_NAME: QColor("red"),
+    SLIT_CLASS_NAME: QColor("green"),
     SOURCE_CLASS_NAME: QColor("blue"),
 }
 
 
 MATERIAL_DIFFUSE_COLORS = {
     SAMPLE_CLASS_NAME: QColor("grey"),
+    SLIT_CLASS_NAME: QColor("darkgreen"),
     SOURCE_CLASS_NAME: QColor("lightblue"),
 }
 
 
 MATERIAL_ALPHA = {
     SAMPLE_CLASS_NAME: 0.5,
+    SLIT_CLASS_NAME: 0.75,
     SOURCE_CLASS_NAME: 0.5,
 }
 
