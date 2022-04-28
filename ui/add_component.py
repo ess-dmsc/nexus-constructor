@@ -1,8 +1,10 @@
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView
-from nexus_constructor.model import GroupContainer
-from nexus_constructor.widgets import GroupNameEdit, DescriptionEdit, ClassDropDownList, FieldList
 from PySide2.QtWidgets import QDialog
+
+from nexus_constructor.model import GroupContainer
+from nexus_constructor.widgets import ClassDropDownList, DescriptionEdit, GroupNameEdit, FieldList
+
 
 class Ui_AddComponentDialog(QDialog):
     def __init__(self, parent: QtWidgets.QWidget, container: GroupContainer):
@@ -17,15 +19,15 @@ class Ui_AddComponentDialog(QDialog):
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.sizePolicy().hasHeightForWidth()
-        )
+        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(sizePolicy)
         self.gridLayout_3 = QtWidgets.QGridLayout(self)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.buttonLayout = QtWidgets.QHBoxLayout()
         self.buttonLayout.setObjectName("buttonLayout")
-        self.buttonLayout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, hData=QtWidgets.QSizePolicy.Expanding))
+        self.buttonLayout.addSpacerItem(
+            QtWidgets.QSpacerItem(0, 0, hData=QtWidgets.QSizePolicy.Expanding)
+        )
         self.ok_button = QtWidgets.QPushButton(self)
         self.ok_button.setText("Done")
         sizePolicy = QtWidgets.QSizePolicy(
@@ -92,7 +94,9 @@ class Ui_AddComponentDialog(QDialog):
         self.label_2 = QtWidgets.QLabel(self.widget)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_6.addWidget(self.label_2)
-        self.descriptionPlainTextEdit = DescriptionEdit(self.widget, self._group_container)
+        self.descriptionPlainTextEdit = DescriptionEdit(
+            self.widget, self._group_container
+        )
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
@@ -115,7 +119,9 @@ class Ui_AddComponentDialog(QDialog):
         self.horizontalLayout_4.addWidget(self.placeholder_checkbox)
         self.placeholder_checkbox.setVisible(False)
         self.placeholder_checkbox.setChecked(False)
-        self.componentTypeComboBox = ClassDropDownList(self.widget, self._group_container)
+        self.componentTypeComboBox = ClassDropDownList(
+            self.widget, self._group_container
+        )
         self.componentTypeComboBox.setObjectName("componentTypeComboBox")
         self.horizontalLayout_4.addWidget(self.componentTypeComboBox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
