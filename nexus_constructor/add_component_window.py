@@ -94,6 +94,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_classes=None,
     ):
         self._scene_widget = scene_widget
+        self._group_to_edit_backup = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
         super().__init__(parent, self._group_container)
@@ -119,11 +120,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.componentTypeComboBox.currentIndexChanged.connect(
                 self._handle_class_change
             )
-            self.cancel_button.clicked.connect(self._cancel_new_or_edit_group)
+            self.cancel_button.clicked.connect(self._cancel_new_group)
             self.rejected.connect(self._rejected)
         else:
             self.cancel_button.setVisible(True)
-            self.cancel_button.clicked.connect(self._cancel_new_or_edit_group)
+            self.cancel_button.clicked.connect(self._cancel_edit_group)
 
     def _rejected(self):
         if self.initial_edit:
@@ -142,8 +143,20 @@ class AddComponentDialog(Ui_AddComponentDialog):
             return True
         return False
 
-    def _cancel_new_or_edit_group(self):
+    def _cancel_new_group(self):
         if self._confirm_cancel():
+            self.close()
+
+    def _cancel_edit_group(self):
+        if self._confirm_cancel():
+            if self._group_parent:
+                self._group_parent.children.remove(self._group_container.group)
+                self._group_parent[
+                    self._group_to_edit_backup.name
+                ] = self._group_to_edit_backup
+            else:
+                self.model.entry = self._group_to_edit_backup  # type: ignore
+                self.component_model.tree_root = self.model.entry
             self.close()
 
     def _handle_class_change(self):
@@ -462,7 +475,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.boxOptionsBox.setVisible(True)
 
     def show_no_geometry_fields(self):
-
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.ok_button.setEnabled(True)
