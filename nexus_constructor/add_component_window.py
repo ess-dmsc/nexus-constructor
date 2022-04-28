@@ -223,7 +223,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
 
-        self.fieldsListWidget.itemClicked.connect(self.select_field)
+        # self.fieldsListWidget.itemClicked.connect(self.select_field)
 
         self.pixel_options = pixel_options
         if self.pixel_options:
@@ -240,7 +240,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.setWindowTitle(f"Edit group: {c_group.name}")
             self.placeholder_checkbox.setChecked(c_group.group_placeholder)
 
-            self._fill_existing_entries()
+            # self._fill_existing_entries()
             if (
                 self.get_pixel_visibility_condition()
                 and self.pixel_options
@@ -291,8 +291,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 else self.fileLineEdit.text()
             )
             self.fileLineEdit.validator().validate(text, 0)
-        self.addFieldPushButton.clicked.connect(self.add_field)
-        self.removeFieldPushButton.clicked.connect(self.remove_field)
+        self.addFieldPushButton.clicked.connect(self.fieldsListWidget.add_field)
+        # self.removeFieldPushButton.clicked.connect(self.remove_field)
 
         # Connect the pixel mapping press signal the populate pixel mapping method
         if self.pixel_options:
@@ -334,31 +334,31 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if self.pixel_options:
             self.pixel_options.reset_pixel_mapping_table()
 
-    def _fill_existing_entries(self):
-        """
-        Fill in component details in the UI if editing a component
-        """
-        c_group = self._group_container.group
-        if isinstance(c_group, Component):
-            self.__fill_existing_shape_info()
-        self.__fill_existing_fields()
+    # def _fill_existing_entries(self):
+    #     """
+    #     Fill in component details in the UI if editing a component
+    #     """
+    #     c_group = self._group_container.group
+    #     if isinstance(c_group, Component):
+    #         self.__fill_existing_shape_info()
+    #     self.__fill_existing_fields()
 
-    def __fill_existing_fields(self):
-        c_group = self._group_container.group
-        items_and_update_methods = get_fields_and_update_functions_for_component(
-            c_group
-        )
-        for field, update_method in items_and_update_methods:
-            if update_method is not None:
-                new_ui_field = self.create_new_ui_field(field)
-                update_method(field, new_ui_field)
-                if not isinstance(field, Link):
-                    try:
-                        new_ui_field.units = field.attributes.get_attribute_value(
-                            CommonAttrs.UNITS
-                        )
-                    except AttributeError:
-                        new_ui_field.units = ""
+    # def __fill_existing_fields(self):
+    #     c_group = self._group_container.group
+    #     items_and_update_methods = get_fields_and_update_functions_for_component(
+    #         c_group
+    #     )
+    #     for field, update_method in items_and_update_methods:
+    #         if update_method is not None:
+    #             new_ui_field = self.create_new_ui_field(field)
+    #             update_method(field, new_ui_field)
+    #             if not isinstance(field, Link):
+    #                 try:
+    #                     new_ui_field.units = field.attributes.get_attribute_value(
+    #                         CommonAttrs.UNITS
+    #                     )
+    #                 except AttributeError:
+    #                     new_ui_field.units = ""
 
     def __fill_existing_shape_info(self):
         if not isinstance(self._group_container.group, Component):
@@ -391,31 +391,31 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.boxHeightLineEdit.setValue(component_shape.size[2])
                 self.unitsLineEdit.setText(component_shape.units)
 
-    def create_new_ui_field(self, field):
-        new_ui_field = self.add_field()
-        if isinstance(field, Dataset):
-            new_ui_field.name = field.name
-        return new_ui_field
+    # def create_new_ui_field(self, field):
+    #     new_ui_field = self.add_field()
+    #     if isinstance(field, Dataset):
+    #         new_ui_field.name = field.name
+    #     return new_ui_field
 
-    def add_field(self) -> FieldWidget:
-        item = QListWidgetItem()
-        field = FieldWidget(
-            self._group_container.group, self.possible_fields, self.fieldsListWidget
-        )
-        field.something_clicked.connect(partial(self.select_field, item))
-        self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
-        item.setSizeHint(field.sizeHint())
+    # def add_field(self) -> FieldWidget:
+    #     item = QListWidgetItem()
+    #     field = FieldWidget(
+    #         self._group_container.group, self.possible_fields, self.fieldsListWidget
+    #     )
+    #     field.something_clicked.connect(partial(self.select_field, item))
+    #     self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
+    #     item.setSizeHint(field.sizeHint())
+    #
+    #     self.fieldsListWidget.addItem(item)
+    #     self.fieldsListWidget.setItemWidget(item, field)
+    #     return field
 
-        self.fieldsListWidget.addItem(item)
-        self.fieldsListWidget.setItemWidget(item, field)
-        return field
+    # def select_field(self, widget):
+    #     self.fieldsListWidget.setItemSelected(widget, True)
 
-    def select_field(self, widget):
-        self.fieldsListWidget.setItemSelected(widget, True)
-
-    def remove_field(self):
-        for item in self.fieldsListWidget.selectedItems():
-            self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
+    # def remove_field(self):
+    #     for item in self.fieldsListWidget.selectedItems():
+    #         self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()
@@ -582,9 +582,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         c_group = self._group_container.group
 
-        for child in self._group_container.group.children:
-            if not isinstance(child, Group):
-                self._group_container.group.children.remove(child)
+        # for child in self._group_container.group.children:
+        #     if not isinstance(child, Group):
+        #         self._group_container.group.children.remove(child)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
             self._scene_widget.delete_component(c_group.name)
@@ -592,7 +592,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)
 
-        add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
+        # add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         return c_group
 
     def write_pixel_data_to_component(

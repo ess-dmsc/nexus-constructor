@@ -1,7 +1,7 @@
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtWebEngineWidgets import QWebEngineView
 from nexus_constructor.model import GroupContainer
-from nexus_constructor.widgets import GroupNameEdit, DescriptionEdit, ClassDropDownList
+from nexus_constructor.widgets import GroupNameEdit, DescriptionEdit, ClassDropDownList, FieldList
 from PySide2.QtWidgets import QDialog
 
 class Ui_AddComponentDialog(QDialog):
@@ -276,7 +276,7 @@ class Ui_AddComponentDialog(QDialog):
         self.removeFieldPushButton = QtWidgets.QPushButton(self.fieldsBox)
         self.removeFieldPushButton.setObjectName("removeFieldPushButton")
         self.gridLayout_5.addWidget(self.removeFieldPushButton, 0, 1, 1, 1)
-        self.fieldsListWidget = QtWidgets.QListWidget(self.fieldsBox)
+        self.fieldsListWidget = FieldList(self.fieldsBox, self._group_container)
         self.fieldsListWidget.setObjectName("fieldsListWidget")
         self.gridLayout_5.addWidget(self.fieldsListWidget, 1, 0, 1, 2)
         self.verticalLayout_2.addWidget(self.fieldsBox)
