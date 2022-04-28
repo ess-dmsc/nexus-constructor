@@ -6,7 +6,7 @@ from typing import List
 
 from PySide2.QtCore import Qt, QUrl, Signal
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QListWidget, QListWidgetItem, QWidget, QMessageBox
+from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 
 from nexus_constructor.common_attrs import (
     NX_CLASSES_WITH_PLACEHOLDERS,
@@ -30,6 +30,7 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
+from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import (
     BoxGeometry,
@@ -38,7 +39,6 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
-from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset, Link
 from nexus_constructor.pixel_options import PixelOptions
@@ -119,8 +119,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.componentTypeComboBox.currentIndexChanged.connect(
                 self._handle_class_change
             )
-            self.cancel_button.clicked.connect(self._cancel_new_group)
+            self.cancel_button.clicked.connect(self._cancel_new_or_edit_group)
             self.rejected.connect(self._rejected)
+        else:
+            self.cancel_button.setVisible(True)
+            self.cancel_button.clicked.connect(self._cancel_new_or_edit_group)
 
     def _rejected(self):
         if self.initial_edit:
@@ -139,7 +142,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             return True
         return False
 
-    def _cancel_new_group(self):
+    def _cancel_new_or_edit_group(self):
         if self._confirm_cancel():
             self.close()
 
@@ -585,14 +588,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
         # for child in self._group_container.group.children:
         #     if not isinstance(child, Group):
         #         self._group_container.group.children.remove(child)
+        # add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
             self._scene_widget.delete_component(c_group.name)
             self.component_model.components.append(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)
-
-        # add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         return c_group
 
     def write_pixel_data_to_component(

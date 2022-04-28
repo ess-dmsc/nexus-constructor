@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QListView, QWidget, QLabel
-from PySide2.QtCore import QAbstractListModel, QModelIndex
+from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
 from nexus_constructor.model import GroupContainer, Group, Component, Dataset
 import PySide2
 import typing
@@ -15,11 +15,16 @@ class FieldListModel(QAbstractListModel):
 
     def data(self, index: PySide2.QtCore.QModelIndex, role=QModelIndex()) -> typing.Any:
         if not index.isValid():
+            print("Return none")
             return None
         if index.row() >= self.rowCount(None) or index.row() < 0:
+            print("Return none")
             return None
-        print("Return data.")
-        return QLabel(f"Row {index.row()}")
+        if role == Qt.DisplayRole or role == Qt.EditRole:
+            used_string = f"Row {index.row()}"
+            print(used_string)
+            return QLabel(text=used_string)
+        print("Return none")
 
 
 class FieldList(QListView):
