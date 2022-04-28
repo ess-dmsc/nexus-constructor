@@ -5,7 +5,7 @@ from functools import partial
 from typing import List
 
 from PySide2.QtCore import Qt, QUrl, Signal
-from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QKeyEvent, QVector3D
 from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 
 from nexus_constructor.common_attrs import (
@@ -585,6 +585,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.signals.transformation_changed.emit()
         self.model.signals.group_edited.emit(index, True)
         self.hide()
+
+    def keyPressEvent(self, arg__1: QKeyEvent) -> None:
+        if arg__1.key() == Qt.Key_Escape:
+            self._cancel_edit_group()
+        else:
+            super().keyPressEvent(arg__1)
 
     def finalise_group(
         self,
