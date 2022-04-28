@@ -1,10 +1,13 @@
-from PySide2 import QtWidgets
 from functools import partial
+from typing import List
+
+from PySide2 import QtWidgets
+from PySide2.QtCore import Signal
+from PySide2.QtGui import QValidator
+
+from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.unique_name import generate_unique_name
-from PySide2.QtGui import QValidator
-from PySide2.QtCore import Signal
-from nexus_constructor.model import Group, GroupContainer
 
 
 class GroupNameValidator(QValidator):
@@ -13,11 +16,13 @@ class GroupNameValidator(QValidator):
         self._container = container
 
     def validate(self, input: str, pos: int) -> QValidator.State:
-        list_of_group_names = [
-            g.name
-            for g in self._container.group.parent_node.children
-            if isinstance(g, Group) and g is not self._container.group
-        ]
+        list_of_group_names: List[str] = []
+        if self._container.group.parent_node:
+            list_of_group_names = [
+                g.name
+                for g in self._container.group.parent_node.children
+                if isinstance(g, Group) and g is not self._container.group
+            ]
         if input == "" or input in list_of_group_names:
             self.is_valid.emit(False)
             return QValidator.Intermediate
@@ -53,6 +58,8 @@ class GroupNameEdit(QtWidgets.QLineEdit):
         Generates a component name suggestion for use in the tooltip when a component is invalid.
         :return: The component name suggestion, based on the current nx_class.
         """
+        if not self._container.group.parent_node:
+            return generate_unique_name(self.text().lstrip("NX"), [])
         return generate_unique_name(
             self.text().lstrip("NX"),
             [
