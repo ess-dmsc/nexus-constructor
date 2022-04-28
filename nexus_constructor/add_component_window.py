@@ -119,8 +119,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.componentTypeComboBox.currentIndexChanged.connect(
                 self._handle_class_change
             )
-            self.cancel_button.clicked.connect(self._cancel_new_group)
+            self.cancel_button.clicked.connect(self._cancel_new_or_edit_group)
             self.rejected.connect(self._rejected)
+        else:
+            self.cancel_button.setVisible(True)
+            self.cancel_button.clicked.connect(self._cancel_new_or_edit_group)
 
     def _rejected(self):
         if self.initial_edit:
@@ -139,7 +142,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             return True
         return False
 
-    def _cancel_new_group(self):
+    def _cancel_new_or_edit_group(self):
         if self._confirm_cancel():
             self.close()
 
