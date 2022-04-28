@@ -22,13 +22,12 @@ class FieldListModel(QAbstractListModel):
         return QLabel(f"Row {index.row()}")
 
 
-class FieldList(QWidget):
+class FieldList(QListView):
     def __init__(self, parent: QWidget, group_container: GroupContainer):
         super().__init__(parent)
         self._group_container = group_container
         self._model = FieldListModel(parent, group_container)
-        self.view = QListView()
-        self.view.setModel(self._model)
+        self.setModel(self._model)
 
     def add_field(self):
         c_group = self._group_container.group
