@@ -577,7 +577,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         component = self.finalise_group(pixel_data)
 
-        if self.initial_edit and isinstance(component, Component):
+        if isinstance(component, Group):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
         if isinstance(component, Component):
             self.signals.component_added.emit(component)
