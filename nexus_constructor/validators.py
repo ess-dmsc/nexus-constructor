@@ -451,7 +451,7 @@ class BrokerAndTopicValidator(QValidator):
     @staticmethod
     def extract_addr_and_topic(in_string):
         correct_string_re = re.compile(
-            "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"  # noqa: W605
+            r"(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"
         )
         match_res = re.match(correct_string_re, in_string)
         if match_res is not None:
