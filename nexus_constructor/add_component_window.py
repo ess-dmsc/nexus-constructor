@@ -11,7 +11,6 @@ from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 from nexus_constructor.common_attrs import (
     NX_CLASSES_WITH_PLACEHOLDERS,
     SHAPE_GROUP_NAME,
-    SHAPE_NX_CLASS,
     CommonAttrs,
 )
 from nexus_constructor.component_tree_model import NexusTreeModel
@@ -76,8 +75,7 @@ def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget)
 
 def _set_slit_geometry(component: Component):
     slit_geometry = SlitGeometry(component)
-    component[SHAPE_GROUP_NAME] = slit_geometry.create_slit_geometry()
-    component[SHAPE_GROUP_NAME].nx_class = SHAPE_NX_CLASS
+    component.set_off_shape(slit_geometry.create_slit_geometry())
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
@@ -577,7 +575,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         component = self.finalise_group(pixel_data)
 
-        if self.initial_edit and isinstance(component, Component):
+        if isinstance(component, Group):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
         if isinstance(component, Component):
             self.signals.component_added.emit(component)
