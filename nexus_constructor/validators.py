@@ -5,7 +5,6 @@ from typing import Callable, List, Optional
 
 import numpy as np
 import pint
-from nexusutils.readwriteoff import parse_off_file
 from PySide2.QtCore import QObject, Signal
 from PySide2.QtGui import QIntValidator, QValidator
 from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget
@@ -18,6 +17,7 @@ from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_have_magnitude_of_one,
 )
+from nexus_constructor.utils.readwriteoff import parse_off_file
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 

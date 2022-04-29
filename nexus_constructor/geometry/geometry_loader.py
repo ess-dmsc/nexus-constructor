@@ -1,12 +1,12 @@
 import logging
 from typing import BinaryIO, TextIO, Union
 
-from nexusutils.readwriteoff import parse_off_file
 from PySide2.QtGui import QVector3D
 from stl import mesh
 
 from nexus_constructor.model.geometry import OFFGeometry, OFFGeometryNoNexus
 from nexus_constructor.unit_utils import METRES, calculate_unit_conversion_factor
+from nexus_constructor.utils.readwriteoff import parse_off_file
 
 
 def load_geometry(
