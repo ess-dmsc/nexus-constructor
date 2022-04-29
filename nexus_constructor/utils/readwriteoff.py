@@ -133,7 +133,18 @@ def parse_off_file(off_file):
         for face_line in faces_lines
         if face_line[0] != "#"
     ]
-    return off_vertices, all_faces
+    all_faces = []
+    face_colors = []
+    for face_line in faces_lines:
+        if face_line[0] != "#":
+            face_split = face_line.split()
+            idx = int(face_split[0]) + 1
+            face = face_split[:idx]
+            color = face_split[idx : idx + 3]
+            all_faces.append(np.array(face).astype(int))
+            face_colors.append(np.array(color).astype(int))
+
+    return off_vertices, all_faces, face_colors
 
 
 def write_off_file(filename, vertices, faces, winding_order):

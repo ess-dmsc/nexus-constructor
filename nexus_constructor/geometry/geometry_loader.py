@@ -83,13 +83,14 @@ def _load_off_geometry(
     returned.
     :return: An OFFGeometry instance containing that file's geometry.
     """
-    vertices, faces = parse_off_file(file)
+    vertices, faces, face_colors = parse_off_file(file)
 
     geometry.vertices = [
         QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
         for x, y, z in (vertex for vertex in vertices)
     ]
     geometry.faces = [face.tolist()[1:] for face in faces]
+    geometry.colors = [face_color.tolist() for face_color in face_colors]
     logging.info("OFF loaded")
     return geometry
 

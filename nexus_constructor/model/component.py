@@ -355,6 +355,7 @@ class Component(Group):
         geometry.nx_class = OFF_GEOMETRY_NX_CLASS
         geometry.record_faces(loaded_geometry.faces)
         geometry.record_vertices(loaded_geometry.vertices)
+        geometry.colors = loaded_geometry.colors
         geometry.units = units
         geometry.file_path = filename
 
