@@ -40,7 +40,6 @@ class Group:
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
-    child_dict: Dict = None  # TODO: Remove this attribute once new UI is in place.
     _group_placeholder: bool = False
 
     def __getitem__(self, key: str):
@@ -152,6 +151,9 @@ class Group:
 
     def get_field_value(self, name: str):
         return self[name].values
+
+    def get_field_attribute(self, name: str, attribute: str):
+        return self[name].attributes.get_attribute_value(attribute)
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         if self._group_placeholder and self.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:

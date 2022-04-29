@@ -263,8 +263,6 @@ class JSONReader:
                 self.model.append_component(nexus_object)
             else:
                 nexus_object = Group(name=name, parent_node=parent_node)
-            if CommonKeys.CHILDREN in json_object:
-                nexus_object.child_dict = json_object[CommonKeys.CHILDREN]
             nexus_object.nx_class = nx_class
             if CommonKeys.CHILDREN in json_object:
                 for child in json_object[CommonKeys.CHILDREN]:

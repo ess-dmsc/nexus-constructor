@@ -608,6 +608,10 @@ class ShapeReader:
         if not pixel_offset:
             return
 
+        units = self.__get_units([offset_dataset])
         self.component.set_field_value(
-            offset_name, np.array(pixel_offset), pixel_offset_dtype
+            offset_name,
+            np.array(pixel_offset),
+            pixel_offset_dtype,
+            units if units else "m",
         )

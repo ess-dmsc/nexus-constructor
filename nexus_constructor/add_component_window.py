@@ -4,22 +4,19 @@ from copy import deepcopy
 from functools import partial
 from typing import List
 
-from PySide2.QtCore import QObject, Qt, QUrl, Signal
-from PySide2.QtGui import QBrush, QPalette, QVector3D
-from PySide2.QtWidgets import QListWidget, QListWidgetItem
+from PySide2.QtCore import Qt, QUrl, Signal
+from PySide2.QtGui import QKeyEvent, QVector3D
+from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 
 from nexus_constructor.common_attrs import (
     NX_CLASSES_WITH_PLACEHOLDERS,
     SHAPE_GROUP_NAME,
-    SHAPE_NX_CLASS,
     CommonAttrs,
 )
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
     CHOPPER_CLASS_NAME,
     COMPONENT_TYPES,
-    ENTRY_CLASS_NAME,
-    NX_CLASSES,
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
 )
@@ -32,8 +29,8 @@ from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator impor
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
+from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.geometry import (
     BoxGeometry,
     CylindricalGeometry,
@@ -41,13 +38,11 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNexus,
     OFFGeometryNoNexus,
 )
-from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset, Link
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,
-    generate_unique_name,
     show_warning_dialog,
     validate_line_edit,
 )
@@ -56,7 +51,6 @@ from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     SKIP_VALIDATION,
     GeometryFileValidator,
-    NameValidator,
     OkValidator,
     UnitValidator,
 )
@@ -81,26 +75,30 @@ def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget)
 
 def _set_slit_geometry(component: Component):
     slit_geometry = SlitGeometry(component)
-    component[SHAPE_GROUP_NAME] = slit_geometry.create_slit_geometry()
-    component[SHAPE_GROUP_NAME].nx_class = SHAPE_NX_CLASS
+    component.set_off_shape(slit_geometry.create_slit_geometry())
 
 
-class AddComponentDialog(Ui_AddComponentDialog, QObject):
+class AddComponentDialog(Ui_AddComponentDialog):
     nx_class_changed = Signal("QVariant")
 
     def __init__(
         self,
+        parent: QWidget,
         model: Model,
         component_model: NexusTreeModel,
-        component_to_edit: Component = None,
+        group_to_edit: Group,
+        scene_widget: QWidget,
+        initial_edit: bool,
         nx_classes=None,
-        parent=None,
     ):
-        super(AddComponentDialog, self).__init__()
+        self._scene_widget = scene_widget
+        self._group_to_edit_backup = deepcopy(group_to_edit)
+        self._group_container = GroupContainer(group_to_edit)
+        self._group_parent = group_to_edit.parent_node
+        super().__init__(parent, self._group_container)
+        super().setupUi()
         if nx_classes is None:
             nx_classes = {}
-        if parent:
-            self.setParent(parent)
         self.signals = model.signals
         self.model = model
         self.component_model = component_model
@@ -108,13 +106,85 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
-        self.component_to_edit = component_to_edit
+        self.initial_edit = initial_edit
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
+        self.setupUi()
+        self.setModal(True)
+        self.setWindowModality(Qt.WindowModal)
+        if self.initial_edit:
+            self.ok_button.setText("Add group")
+            self.cancel_button.setVisible(True)
+            self.componentTypeComboBox.currentIndexChanged.connect(
+                self._handle_class_change
+            )
+            self.cancel_button.clicked.connect(self._cancel_new_group)
+            self.rejected.connect(self._rejected)
+        else:
+            self.cancel_button.setVisible(True)
+            self.cancel_button.clicked.connect(self._cancel_edit_group)
 
-    def setupUi(self, parent_dialog, pixel_options: PixelOptions = PixelOptions()):
+    def _rejected(self):
+        if self.initial_edit:
+            self._group_parent.children.remove(self._group_container.group)
+
+    def _confirm_cancel(self) -> bool:
+        quit_msg = "Do you want to close the group editor?"
+        reply = QMessageBox.question(
+            self,
+            "Really quit?",
+            quit_msg,
+            QMessageBox.Close | QMessageBox.Ignore,
+            QMessageBox.Close,
+        )
+        if reply == QMessageBox.Close:
+            return True
+        return False
+
+    def _cancel_new_group(self):
+        if self._confirm_cancel():
+            self.close()
+
+    def _cancel_edit_group(self):
+        if self._confirm_cancel():
+            if self._group_parent:
+                self._group_parent.children.remove(self._group_container.group)
+                self._group_parent[
+                    self._group_to_edit_backup.name
+                ] = self._group_to_edit_backup
+            else:
+                self.model.entry = self._group_to_edit_backup  # type: ignore
+                self.component_model.tree_root = self.model.entry
+            self.close()
+
+    def _handle_class_change(self):
+        c_nx_class = self.componentTypeComboBox.currentText()
+        c_attributes = self._group_container.group.attributes
+        c_name = self._group_container.group.name
+        c_children = self._group_container.group.children
+        group_constructor = None
+        if (
+            isinstance(self._group_container.group, Component)
+            and c_nx_class not in COMPONENT_TYPES
+        ):
+            group_constructor = Group
+        elif (
+            not isinstance(self._group_container.group, Component)
+            and c_nx_class in COMPONENT_TYPES
+        ):
+            group_constructor = Component
+        if group_constructor:
+            self._group_parent.children.remove(self._group_container.group)
+            self._group_container.group = group_constructor(
+                name=c_name, parent_node=self._group_parent
+            )
+            self._group_container.group.attributes = c_attributes
+            self._group_container.group.children = c_children
+            self._group_container.group.nx_class = c_nx_class
+            self._group_parent.children.append(self._group_container.group)
+
+    def setupUi(self, pixel_options: PixelOptions = PixelOptions()):
         """Sets up push buttons and validators for the add component window."""
-        super().setupUi(parent_dialog)
 
         # Connect the button calls with functions
         self.ok_button.clicked.connect(self.on_ok)
@@ -148,24 +218,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.noShapeRadioButton.setChecked(True)
         self.show_no_geometry_fields()
 
-        component_list = self.model.get_components()
-        if self.component_to_edit:
-            for item in component_list:
-                if item.name == self.component_to_edit.name:
-                    component_list.remove(item)
-
-        name_validator = NameValidator(component_list)
-        self.nameLineEdit.setValidator(name_validator)
-        self.nameLineEdit.validator().is_valid.connect(
-            partial(
-                validate_line_edit,
-                self.nameLineEdit,
-                tooltip_on_accept="Group name is valid.",
-                tooltip_on_reject="Group name is not valid. Suggestion: ",
-                suggestion_callable=self.generate_name_suggestion,
-            )
-        )
-
         validate_line_edit(self.fileLineEdit, False)
 
         self.unitsLineEdit.setValidator(UnitValidator(expected_dimensionality=METRES))
@@ -178,43 +230,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             )
         )
 
-        sorted_groups_list = list(NX_CLASSES - COMPONENT_TYPES)
-        sorted_groups_list.sort()
-        sorted_component_list = list(COMPONENT_TYPES)
-        sorted_component_list.sort()
-        if isinstance(self.component_to_edit, Component):
-            self.componentTypeComboBox.addItem("- Components", userData=None)
-            self.componentTypeComboBox.model().item(0).setEnabled(False)
-            self.componentTypeComboBox.addItems(sorted_component_list)
-        elif isinstance(self.component_to_edit, Entry):
-            self.componentTypeComboBox.addItems([ENTRY_CLASS_NAME])
-        elif isinstance(self.component_to_edit, Group):
-            self.componentTypeComboBox.addItem("- Groups", userData=None)
-            self.componentTypeComboBox.model().item(0).setEnabled(False)
-            self.componentTypeComboBox.addItems(sorted_groups_list)
-        else:
-            self.componentTypeComboBox.addItem("(None)", userData=None)
-            self.componentTypeComboBox.model().item(0).setBackground(QBrush(Qt.red))
-            self.componentTypeComboBox.addItem("- Components", userData=None)
-            self.componentTypeComboBox.model().item(1).setEnabled(False)
-            self.componentTypeComboBox.addItems(sorted_component_list)
-            self.componentTypeComboBox.addItem("- Groups", userData=None)
-            self.componentTypeComboBox.model().item(
-                self.componentTypeComboBox.count() - 1
-            ).setEnabled(False)
-            self.componentTypeComboBox.addItems(sorted_groups_list)
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.change_pixel_options_visibility
         )
 
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
         self.on_nx_class_changed()
-
-        if (
-            self.component_to_edit
-            and self.component_to_edit.nx_class in NX_CLASSES_WITH_PLACEHOLDERS
-        ):
-            self.placeholder_checkbox.setVisible(True)
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
 
@@ -227,23 +248,30 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
         )
 
-        if self.component_to_edit:
-            self.placeholder_checkbox.setChecked(
-                self.component_to_edit.group_placeholder
-            )
-            parent_dialog.setWindowTitle(f"Edit group: {self.component_to_edit.name}")
-            self.ok_button.setText("Edit group")
+        c_group = self._group_container.group
+
+        if not self.initial_edit:
+            self.setWindowTitle(f"Edit group: {c_group.name}")
+            self.placeholder_checkbox.setChecked(c_group.group_placeholder)
+
             self._fill_existing_entries()
-            if self.get_pixel_visibility_condition() and self.pixel_options:
-                self.pixel_options.fill_existing_entries(self.component_to_edit)
+            if (
+                self.get_pixel_visibility_condition()
+                and self.pixel_options
+                and isinstance(c_group, Component)
+            ):
+                self.pixel_options.fill_existing_entries(c_group)
+            if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
+                self.placeholder_checkbox.setVisible(True)
         else:
             self.ok_validator.set_nx_class_valid(False)
-            pal = self.componentTypeComboBox.palette()
-            pal.setColor(QPalette.Text, Qt.red)
-            self.componentTypeComboBox.setPalette(pal)
-            self.componentTypeComboBox.currentIndexChanged.connect(
-                self.validate_nx_class_index
-            )
+
+        self.componentTypeComboBox.validator().is_valid.connect(
+            self.ok_validator.set_nx_class_valid
+        )
+        self.componentTypeComboBox.validator().validate(
+            self.componentTypeComboBox.currentText(), 0
+        )
 
         self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
 
@@ -268,13 +296,12 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
-        if not self.component_to_edit:
+        if not c_group:
             self.fileLineEdit.validator().validate(self.fileLineEdit.text(), 0)
         else:
             text = (
                 SKIP_VALIDATION
-                if self.component_to_edit.has_pixel_shape()
-                and not self.fileLineEdit.text()
+                if c_group.has_pixel_shape() and not self.fileLineEdit.text()
                 else self.fileLineEdit.text()
             )
             self.fileLineEdit.validator().validate(text, 0)
@@ -297,19 +324,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.boxRadioButton.clicked.connect(self.set_pixel_related_changes)
 
         self.change_pixel_options_visibility()
-        parent_dialog.setAttribute(Qt.WA_DeleteOnClose)
-
-    def validate_nx_class_index(self, new_index):
-        c_nx_class = self.componentTypeComboBox.currentText()
-        is_valid_class = c_nx_class in NX_CLASSES
-        if is_valid_class:
-            used_color = Qt.black
-        else:
-            used_color = Qt.red
-        pal = self.componentTypeComboBox.palette()
-        pal.setColor(QPalette.Text, used_color)
-        self.componentTypeComboBox.setPalette(pal)
-        self.ok_validator.set_nx_class_valid(is_valid_class)
+        self.setAttribute(Qt.WA_DeleteOnClose)
 
     def set_pixel_related_changes(self):
         """
@@ -337,16 +352,15 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         Fill in component details in the UI if editing a component
         """
-        self.nameLineEdit.setText(self.component_to_edit.name)
-        self.descriptionPlainTextEdit.setText(self.component_to_edit.description)
-        self.componentTypeComboBox.setCurrentText(self.component_to_edit.nx_class)
-        if isinstance(self.component_to_edit, Component):
+        c_group = self._group_container.group
+        if isinstance(c_group, Component):
             self.__fill_existing_shape_info()
         self.__fill_existing_fields()
 
     def __fill_existing_fields(self):
+        c_group = self._group_container.group
         items_and_update_methods = get_fields_and_update_functions_for_component(
-            self.component_to_edit
+            c_group
         )
         for field, update_method in items_and_update_methods:
             if update_method is not None:
@@ -361,7 +375,9 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
                         new_ui_field.units = ""
 
     def __fill_existing_shape_info(self):
-        component_shape, _ = self.component_to_edit.shape
+        if not isinstance(self._group_container.group, Component):
+            return
+        component_shape, _ = self._group_container.group.shape
         if not component_shape or isinstance(component_shape, NoShapeGeometry):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
@@ -398,7 +414,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
         field = FieldWidget(
-            self.component_to_edit, self.possible_fields, self.fieldsListWidget
+            self._group_container.group, self.possible_fields, self.fieldsListWidget
         )
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
@@ -414,16 +430,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
     def remove_field(self):
         for item in self.fieldsListWidget.selectedItems():
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
-
-    def generate_name_suggestion(self):
-        """
-        Generates a component name suggestion for use in the tooltip when a component is invalid.
-        :return: The component name suggestion, based on the current nx_class.
-        """
-        return generate_unique_name(
-            self.componentTypeComboBox.currentText().lstrip("NX"),
-            self.model.get_components(),
-        )
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()
@@ -467,7 +473,6 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         self.boxOptionsBox.setVisible(True)
 
     def show_no_geometry_fields(self):
-
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.ok_button.setEnabled(True)
@@ -563,111 +568,55 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         _, index = self.component_model.current_nxs_obj
         self.model.signals.group_edited.emit(index, False)
-        nx_class = self.componentTypeComboBox.currentText()
-        component_name = self.nameLineEdit.text()
-        description = self.descriptionPlainTextEdit.text()
         if self.pixel_options:
-            pixel_data = (
-                self.pixel_options.generate_pixel_data()
-                if nx_class in PIXEL_COMPONENT_TYPES
-                else None
-            )
+            pixel_data = self.pixel_options.generate_pixel_data()
         else:
             pixel_data = None
 
-        if self.component_to_edit:
-            component = self.edit_existing_component(
-                component_name, description, nx_class, pixel_data
-            )
-        else:
-            component = self.create_new_component(
-                component_name, description, nx_class, pixel_data
-            )
+        component = self.finalise_group(pixel_data)
 
-        component.group_placeholder = self.placeholder_checkbox.isChecked()
-
+        if isinstance(component, Group):
+            component.group_placeholder = self.placeholder_checkbox.isChecked()
         if isinstance(component, Component):
             self.signals.component_added.emit(component)
-
-        if self.component_to_edit:
+        if not self.initial_edit:
             self.signals.transformation_changed.emit()
         self.model.signals.group_edited.emit(index, True)
+        self.hide()
 
-    def create_new_component(
-        self,
-        nexus_obj_name: str,
-        description: str,
-        nx_class: str,
-        pixel_data: PixelData,
-    ):
-        """
-        Creates a new component.
-        :param nexus_obj_name: The name of the component.
-        :param description: The component description.
-        :param nx_class: The component class.
-        :param pixel_data: The PixelData for the component. Will be None if it was not given of if the component type
-            doesn't have pixel-related fields.
-        :return: The geometry object.
-        """
-        nexus_object: Group
-        if nx_class in COMPONENT_TYPES:
-            nexus_object = Component(name=nexus_obj_name, parent_node=None)
+    def keyPressEvent(self, arg__1: QKeyEvent) -> None:
+        if arg__1.key() == Qt.Key_Escape:
+            self._cancel_edit_group()
         else:
-            nexus_object = Group(name=nexus_obj_name, parent_node=None)
-        nexus_object.nx_class = nx_class
-        if description:
-            nexus_object.description = description
-        self.component_model.add_group(nexus_object)
-        add_fields_to_component(
-            nexus_object, self.fieldsListWidget, self.component_model
-        )
-        # Add shape information
-        if isinstance(nexus_object, Component):
-            self.generate_geometry_model(nexus_object, pixel_data)
-            self.write_pixel_data_to_component(nexus_object, nx_class, pixel_data)
-        return nexus_object
+            super().keyPressEvent(arg__1)
 
-    def edit_existing_component(
+    def finalise_group(
         self,
-        component_name: str,
-        description: str,
-        nx_class: str,
         pixel_data: PixelData,
     ):
         """
         Edits an existing component.
-        :param component_name: The component name.
-        :param description: The component description.
-        :param nx_class: The component class.
         :param pixel_data: The component PixelData. Can be None.
         :return: The geometry object.
         """
-        # remove the previous object from the qt3d view
-        if isinstance(self.component_to_edit, Component):
-            self.component_to_edit.remove_shape()
-            self.parent().sceneWidget.delete_component(self.component_to_edit.name)
-        # remove previous fields
-        if self.component_to_edit:
-            self.component_to_edit.name = component_name
-            for child in self.component_to_edit.children:
-                if not isinstance(child, Group):
-                    self.component_to_edit.children.remove(child)
-            self.component_to_edit.nx_class = nx_class
-        if description:
-            self.component_to_edit.description = description
-        add_fields_to_component(
-            self.component_to_edit, self.fieldsListWidget, self.component_model
-        )
-        if isinstance(self.component_to_edit, Component):
-            self.component_model.components.append(self.component_to_edit)
-            self.generate_geometry_model(self.component_to_edit, pixel_data)
-            self.write_pixel_data_to_component(
-                self.component_to_edit, nx_class, pixel_data
-            )
-        return self.component_to_edit if self.component_to_edit else None
+        c_group = self._group_container.group
+
+        for child in self._group_container.group.children:
+            if not isinstance(child, Group):
+                self._group_container.group.children.remove(child)
+
+        add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
+        if isinstance(c_group, Component):
+            # remove the previous object from the qt3d view
+            self._scene_widget.delete_component(c_group.name)
+            self.component_model.components.append(c_group)
+            self.generate_geometry_model(c_group, pixel_data)
+            self.write_pixel_data_to_component(c_group, pixel_data)
+
+        return c_group
 
     def write_pixel_data_to_component(
-        self, component: Component, nx_class: str, pixel_data: PixelData
+        self, component: Component, pixel_data: PixelData
     ):
         """
         Writes the detector number/pixel grid data to a component.
@@ -677,7 +626,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
         """
         component.clear_pixel_data()
 
-        if pixel_data is None or nx_class not in PIXEL_COMPONENT_TYPES:
+        if pixel_data is None or component.nx_class not in PIXEL_COMPONENT_TYPES:
             return
 
         if isinstance(pixel_data, PixelMapping):
@@ -744,7 +693,7 @@ class AddComponentDialog(Ui_AddComponentDialog, QObject):
             self.pixel_options.update_pixel_input_validity()
 
 
-def get_fields_and_update_functions_for_component(component: Component):
+def get_fields_and_update_functions_for_component(component: Group):
     return get_fields_with_update_functions(component)
 
 

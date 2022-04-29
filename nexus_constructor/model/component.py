@@ -47,6 +47,7 @@ from nexus_constructor.model.module import DATASET, Dataset
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
+from nexus_constructor.unit_utils import METRES, calculate_unit_conversion_factor
 
 if TYPE_CHECKING:
     from nexus_constructor.component_tree_model import ComponentInfo  # noqa: F401
@@ -466,8 +467,10 @@ class Component(Group):
         Construct a transformation (as a QVector3D) for each pixel offset
         """
         try:
-            x_offsets = self.get_field_value(X_PIXEL_OFFSET)
-            y_offsets = self.get_field_value(Y_PIXEL_OFFSET)
+            units = self.get_field_attribute(X_PIXEL_OFFSET, CommonAttrs.UNITS)
+            unit_conversion_factor = calculate_unit_conversion_factor(units, METRES)
+            x_offsets = self.get_field_value(X_PIXEL_OFFSET) * unit_conversion_factor
+            y_offsets = self.get_field_value(Y_PIXEL_OFFSET) * unit_conversion_factor
         except AttributeError:
             logging.info(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"

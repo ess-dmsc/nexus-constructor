@@ -1,8 +1,9 @@
-import re
 from typing import Optional
 
 import numpy as np
 from PySide2.QtGui import QVector3D
+from PySide2.QtGui import QPalette
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QApplication,
     QDialog,
@@ -11,6 +12,7 @@ from PySide2.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QVBoxLayout,
+    QWidget
 )
 
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
@@ -94,6 +96,22 @@ def validate_line_edit(
     )
 
 
+def validate_general_widget(
+    widget: QWidget,
+    is_valid: bool,
+):
+    """
+    Sets the text of a general widget to red if it is invalid or black if valid.
+    :param dropdown_list: The dropdown lost.
+    :param is_valid: Whether the line edit field contains valid text
+    :return: None.
+    """
+    colour = Qt.black if is_valid else Qt.red
+    pal = widget.palette()
+    pal.setColor(QPalette.Text, colour)
+    widget.setPalette(pal)
+
+
 def qvector3d_to_numpy_array(input_vector: QVector3D) -> np.ndarray:
     return np.array([input_vector.x(), input_vector.y(), input_vector.z()]).astype(
         float
@@ -102,25 +120,6 @@ def qvector3d_to_numpy_array(input_vector: QVector3D) -> np.ndarray:
 
 def numpy_array_to_qvector3d(input_array: np.ndarray) -> QVector3D:
     return QVector3D(input_array[0], input_array[1], input_array[2])
-
-
-def generate_unique_name(base: str, items: list):
-    """
-    Generates a unique name for a new item using a common base string
-
-    :param base: The generated name will be the base string, followed by a number if required
-    :param items: The named items to avoid generating a matching name with. Each must have a 'name' attribute
-    """
-    regex = f"^{re.escape(base)}\\d*$"
-    similar_names = [item.name for item in items if re.match(regex, item.name)]
-
-    if len(similar_names) == 0 or base not in similar_names:
-        return base
-    if similar_names == [base]:
-        return base + "1"
-    # find the highest number in use, and go one higher
-    tailing_numbers = [int(name[len(base) :]) for name in similar_names if name != base]
-    return base + str(max(tailing_numbers) + 1)
 
 
 def show_warning_dialog(

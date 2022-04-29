@@ -168,12 +168,14 @@ class Ui_PixelOptionsWidget(object):
         self.row_height_spin_box.setSingleStep(0.1)
         self.row_height_spin_box.setProperty("value", 0.5)
         self.row_height_spin_box.setObjectName("rowHeightSpinBox")
+        self.row_height_spin_box.setMaximum(1000000)
         self.pixel_grid_group_box_layout.addWidget(self.row_height_spin_box, 0, 3, 1, 1)
         self.column_width_spin_box = QtWidgets.QDoubleSpinBox(self.pixel_grid_group_box)
         self.column_width_spin_box.setMinimum(0.1)
         self.column_width_spin_box.setSingleStep(0.1)
         self.column_width_spin_box.setProperty("value", 0.5)
         self.column_width_spin_box.setObjectName("columnWidthSpinBox")
+        self.column_width_spin_box.setMaximum(1000000)
         self.pixel_grid_group_box_layout.addWidget(
             self.column_width_spin_box, 1, 3, 1, 1
         )

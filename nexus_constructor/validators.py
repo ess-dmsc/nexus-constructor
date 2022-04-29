@@ -1,7 +1,7 @@
 import os
 import re
 from enum import Enum
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 import numpy as np
 import pint
@@ -12,7 +12,6 @@ from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget
 from stl import mesh
 
 from nexus_constructor.common_attrs import SCALAR
-from nexus_constructor.component_type import NX_CLASSES
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
@@ -132,17 +131,6 @@ class NameValidator(QValidator):
             self.is_valid.emit(False)
             return QValidator.Intermediate
 
-        self.is_valid.emit(True)
-        return QValidator.Acceptable
-
-    is_valid = Signal(bool)
-
-
-class NXClassValidator(QValidator):
-    def validate(self, input: str, pos: int):
-        if not input or input not in NX_CLASSES:
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
         self.is_valid.emit(True)
         return QValidator.Acceptable
 
@@ -463,7 +451,7 @@ class BrokerAndTopicValidator(QValidator):
     @staticmethod
     def extract_addr_and_topic(in_string):
         correct_string_re = re.compile(
-            "(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"  # noqa: W605
+            r"(\s*((([^/?#:]+)+)(:(\d+))?)/([a-zA-Z0-9._-]+)\s*)"
         )
         match_res = re.match(correct_string_re, in_string)
         if match_res is not None:
@@ -476,5 +464,59 @@ class BrokerAndTopicValidator(QValidator):
             return QValidator.Acceptable
         self.is_valid.emit(False)
         return QValidator.Intermediate
+
+    is_valid = Signal(bool)
+
+
+class NoEmptyStringValidator(QValidator):
+    """
+    Ensure that the provided string is not empty.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if input == "":
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
+
+    is_valid = Signal(bool)
+
+
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import FileWriterModule
+
+
+class SchemaSelectionValidator(QValidator):
+    """
+    Multiple schemas of the same type or some combinations of schemas in the same group are not allowed. Check/verify this.
+    """
+
+    def __init__(
+        self,
+    ):
+        super().__init__()
+        self.parent_group: Optional[Group] = None
+
+    def set_group(self, group: Optional[Group] = None):
+        self.parent_group = group
+
+    def validate(self, input: str, pos: int) -> QValidator.State:
+        if not self.parent_group:
+            self.is_valid.emit(True)
+            return QValidator.Acceptable
+        list_of_writer_modules = [
+            m.writer_module
+            for m in self.parent_group.children
+            if isinstance(m, FileWriterModule)
+        ]
+        if list_of_writer_modules.count(input) > 1:
+            self.is_valid.emit(False)
+            return QValidator.Intermediate
+        self.is_valid.emit(True)
+        return QValidator.Acceptable
 
     is_valid = Signal(bool)
