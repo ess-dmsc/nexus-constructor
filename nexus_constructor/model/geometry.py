@@ -38,7 +38,7 @@ DETECTOR_FACES = "detector_faces"
 class OFFGeometry(ABC):
     _units: str = ""
     _file_path: str = ""
-    _colors: List[List[int]] = None
+    _colors: List[List[int]] = []
 
     @property
     def units(self) -> str:
@@ -121,7 +121,7 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
         vertices: List[QVector3D] = None,
         faces: List[List[int]] = None,
         name: str = "",
-        colors: List[List[int]] = None,
+        colors: List[List[int]] = [],
     ):
         """
         :param vertices: list of Vector objects used as corners of polygons in the geometry
