@@ -64,6 +64,7 @@ def load_geometry_from_file_object(
     else:
         geometry.faces = []
         geometry.vertices = []
+        geometry.colors = []
         logging.error("geometry file extension not supported")
 
     return geometry

@@ -38,6 +38,7 @@ DETECTOR_FACES = "detector_faces"
 class OFFGeometry(ABC):
     _units: str = ""
     _file_path: str = ""
+    _colors: List[List[int]] = None
 
     @property
     def units(self) -> str:
@@ -415,8 +416,6 @@ class OFFGeometryNexus(OFFGeometry, Group):
     http://download.nexusformat.org/sphinx/classes/base_classes/NXoff_geometry.html
     """
 
-    _colors: Optional[List[List[int]]] = None
-
     @property
     def detector_faces(self) -> List[Tuple[int, int]]:
         return self.get_field_value(DETECTOR_FACES).tolist()
@@ -440,7 +439,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
 
     @property
     def off_geometry(self) -> OFFGeometry:
-        return OFFGeometryNoNexus(self.vertices, self.faces)
+        return OFFGeometryNoNexus(self.vertices, self.faces, colors=self.colors)
 
     @property
     def vertices(self) -> List[QVector3D]:

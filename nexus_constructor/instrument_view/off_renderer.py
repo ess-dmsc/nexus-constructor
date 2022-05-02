@@ -95,6 +95,22 @@ def create_normal_buffer(vertices, triangles, progress_bar: ProgressBar = None):
     return normal_buffer_values
 
 
+def create_color_buffer(colors, progress_bar: ProgressBar = None):
+    """
+    Creates a color for each face in the mesh.
+    :param colors: The colors for the mesh
+    :param progress_bar: optional parameter progress bar.
+    :return: A list of the colors for the faces
+    """
+    color_buffer_values = []
+
+    for color in colors:
+        if progress_bar:
+            progress_bar.update_progress_bar()
+        color_buffer_values.extend(QVector3D(*color).toTuple())
+    return color_buffer_values
+
+
 def repeat_shape_over_positions(
     model: OFFGeometry, positions: List[QVector3D]
 ) -> Tuple[List[List[int]], List[QVector3D]]:
@@ -161,9 +177,14 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         normalAttribute = self.create_attribute(
             normal_buffer_values, self.q_attribute.defaultNormalAttributeName()
         )
+        color_buffer = create_color_buffer(model.colors)
+        colorAttribute = self.create_attribute(
+            color_buffer, self.q_attribute.defaultColorAttributeName()
+        )
 
         self.addAttribute(positionAttribute)
         self.addAttribute(normalAttribute)
+        self.addAttribute(colorAttribute)
         self.vertex_count = len(vertex_buffer_values) // 3
 
         logging.info("Qt mesh built")
