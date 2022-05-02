@@ -38,6 +38,7 @@ DETECTOR_FACES = "detector_faces"
 class OFFGeometry(ABC):
     _units: str = ""
     _file_path: str = ""
+    _colors: List[List[int]] = []
 
     @property
     def units(self) -> str:
@@ -97,6 +98,16 @@ class OFFGeometry(ABC):
     def faces(self, new_faces: List[List[int]]):
         pass
 
+    @property  # type: ignore
+    @abstractmethod
+    def colors(self) -> List[List[int]]:
+        pass
+
+    @colors.setter  # type: ignore
+    @abstractmethod
+    def colors(self, new_colors: List[List[int]]):
+        pass
+
 
 class OFFGeometryNoNexus(OFFGeometry, Group):
     """
@@ -110,6 +121,7 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
         vertices: List[QVector3D] = None,
         faces: List[List[int]] = None,
         name: str = "",
+        colors: List[List[int]] = [],
     ):
         """
         :param vertices: list of Vector objects used as corners of polygons in the geometry
@@ -121,6 +133,7 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
         self.name = name
         self._vertices = vertices
         self._faces = faces
+        self._colors = colors
 
     @property
     def winding_order(self) -> List[int]:
@@ -150,6 +163,14 @@ class OFFGeometryNoNexus(OFFGeometry, Group):
     @faces.setter
     def faces(self, new_faces: List[List[int]]):
         self._faces = new_faces
+
+    @property
+    def colors(self) -> List[List[int]]:
+        return self._colors
+
+    @colors.setter
+    def colors(self, new_colors: List[List[int]]):
+        self._colors = new_colors
 
 
 class BoxGeometry(Group):
@@ -418,7 +439,7 @@ class OFFGeometryNexus(OFFGeometry, Group):
 
     @property
     def off_geometry(self) -> OFFGeometry:
-        return OFFGeometryNoNexus(self.vertices, self.faces)
+        return OFFGeometryNoNexus(self.vertices, self.faces, colors=self.colors)
 
     @property
     def vertices(self) -> List[QVector3D]:
@@ -455,6 +476,14 @@ class OFFGeometryNexus(OFFGeometry, Group):
     @faces.setter
     def faces(self, new_faces: List[List[int]]):
         self.record_faces(new_faces)
+
+    @property
+    def colors(self) -> List[List[int]]:
+        return self._colors
+
+    @colors.setter
+    def colors(self, new_colors: List[List[int]]):
+        self._colors = new_colors
 
     def record_faces(self, new_faces: List[List[int]]):
         """

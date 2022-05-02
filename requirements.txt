@@ -1,7 +1,6 @@
 # In general libraries should not be pinned to specific versions
 attrs
 h5py
-git+https://github.com/ess-dmsc/python-nexus-utilities@4c355cecee3e191788b83531c1ffcc518d0ebc6e#egg=nexusutils
 nexusformat
 numpy-stl
 pint

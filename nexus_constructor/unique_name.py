@@ -17,4 +17,4 @@ def generate_unique_name(base: str, items: list):
         return base + "1"
     # find the highest number in use, and go one higher
     tailing_numbers = [int(name[len(base) :]) for name in similar_names if name != base]
-    return base + str(max(tailing_numbers) + 1)
+    return base + str(max(tailing_numbers) + 1) if tailing_numbers else base + "1"
