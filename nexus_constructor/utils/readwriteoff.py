@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-logger = logging.getLogger("NeXus_Utils")
+logger = logging.getLogger("NeXus_Constructor_Utils")
 
 
 def is_close(a, b, rel_tol=1e-09, abs_tol=0.0):
