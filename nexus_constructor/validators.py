@@ -331,6 +331,46 @@ class OkValidator(QObject):
     is_valid = Signal(bool)
 
 
+class StreamWidgetValidator(QObject):
+    """
+    Aggregated validator for the whole StreamWidget to enable OK button.
+    Several criteria have to be met before Stream can be added to a group by pressing OK button.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.topic_is_valid = False
+        self.source_is_valid = False
+        self.schema_is_valid = False
+
+    def set_topic_valid(self, is_valid):
+        self.topic_is_valid = is_valid
+        self.validate_ok()
+
+    def set_source_valid(self, is_valid):
+        self.source_is_valid = is_valid
+        self.validate_ok()
+
+    def set_schema_valid(self, is_valid):
+        self.schema_is_valid = is_valid
+        self.validate_ok()
+
+    def validate_ok(self):
+        """
+        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
+        :return: None, but emits the isValid signal.
+        """
+        unacceptable = [
+            not self.topic_is_valid,
+            not self.source_is_valid,
+            not self.schema_is_valid,
+        ]
+        self.is_valid.emit(not any(unacceptable))
+
+    # Signal to indicate that the fields are valid or invalid. False: invalid.
+    is_valid = Signal(bool)
+
+
 class FieldType(Enum):
     scalar_dataset = "Scalar dataset"
     array_dataset = "Array dataset"
