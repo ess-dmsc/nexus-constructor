@@ -3,3 +3,5 @@ from .entry import Entry  # noqa: F401
 from .component import Component  # noqa: F401
 from .group_container import GroupContainer  # noqa: F401
 from .module import Dataset  # noqa: F401
+from .module import FileWriterModule  # noqa: F401
+from .module import Link  # noqa: F401

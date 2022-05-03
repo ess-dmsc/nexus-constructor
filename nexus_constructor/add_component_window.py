@@ -6,12 +6,11 @@ from typing import List
 
 from PySide2.QtCore import Qt, QUrl, Signal
 from PySide2.QtGui import QKeyEvent, QVector3D
-from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
+from PySide2.QtWidgets import QListWidget, QMessageBox, QWidget
 
 from nexus_constructor.common_attrs import (
     NX_CLASSES_WITH_PLACEHOLDERS,
     SHAPE_GROUP_NAME,
-    CommonAttrs,
 )
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
@@ -20,8 +19,7 @@ from nexus_constructor.component_type import (
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
 )
-from nexus_constructor.field_utils import get_fields_with_update_functions
-from nexus_constructor.field_widget import FieldWidget
+
 from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import ChopperChecker
 from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
     DiskChopperGeometryCreator,
@@ -39,7 +37,6 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNoNexus,
 )
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import Dataset, Link
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,
@@ -254,7 +251,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.setWindowTitle(f"Edit group: {c_group.name}")
             self.placeholder_checkbox.setChecked(c_group.group_placeholder)
 
-            # self._fill_existing_entries()
             if (
                 self.get_pixel_visibility_condition()
                 and self.pixel_options
@@ -306,7 +302,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             )
             self.fileLineEdit.validator().validate(text, 0)
         self.addFieldPushButton.clicked.connect(self.fieldsListWidget.add_field)
-        # self.removeFieldPushButton.clicked.connect(self.remove_field)
+        self.removeFieldPushButton.clicked.connect(self.fieldsListWidget.remove_selected_field)
 
         # Connect the pixel mapping press signal the populate pixel mapping method
         if self.pixel_options:
@@ -348,32 +344,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if self.pixel_options:
             self.pixel_options.reset_pixel_mapping_table()
 
-    # def _fill_existing_entries(self):
-    #     """
-    #     Fill in component details in the UI if editing a component
-    #     """
-    #     c_group = self._group_container.group
-    #     if isinstance(c_group, Component):
-    #         self.__fill_existing_shape_info()
-    #     self.__fill_existing_fields()
-
-    # def __fill_existing_fields(self):
-    #     c_group = self._group_container.group
-    #     items_and_update_methods = get_fields_and_update_functions_for_component(
-    #         c_group
-    #     )
-    #     for field, update_method in items_and_update_methods:
-    #         if update_method is not None:
-    #             new_ui_field = self.create_new_ui_field(field)
-    #             update_method(field, new_ui_field)
-    #             if not isinstance(field, Link):
-    #                 try:
-    #                     new_ui_field.units = field.attributes.get_attribute_value(
-    #                         CommonAttrs.UNITS
-    #                     )
-    #                 except AttributeError:
-    #                     new_ui_field.units = ""
-
     def __fill_existing_shape_info(self):
         if not isinstance(self._group_container.group, Component):
             return
@@ -404,32 +374,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.boxWidthLineEdit.setValue(component_shape.size[1])
                 self.boxHeightLineEdit.setValue(component_shape.size[2])
                 self.unitsLineEdit.setText(component_shape.units)
-
-    # def create_new_ui_field(self, field):
-    #     new_ui_field = self.add_field()
-    #     if isinstance(field, Dataset):
-    #         new_ui_field.name = field.name
-    #     return new_ui_field
-
-    # def add_field(self) -> FieldWidget:
-    #     item = QListWidgetItem()
-    #     field = FieldWidget(
-    #         self._group_container.group, self.possible_fields, self.fieldsListWidget
-    #     )
-    #     field.something_clicked.connect(partial(self.select_field, item))
-    #     self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
-    #     item.setSizeHint(field.sizeHint())
-    #
-    #     self.fieldsListWidget.addItem(item)
-    #     self.fieldsListWidget.setItemWidget(item, field)
-    #     return field
-
-    # def select_field(self, widget):
-    #     self.fieldsListWidget.setItemSelected(widget, True)
-
-    # def remove_field(self):
-    #     for item in self.fieldsListWidget.selectedItems():
-    #         self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()
@@ -601,10 +545,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         c_group = self._group_container.group
 
-        # for child in self._group_container.group.children:
-        #     if not isinstance(child, Group):
-        #         self._group_container.group.children.remove(child)
-        # add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
             self._scene_widget.delete_component(c_group.name)
@@ -690,35 +630,3 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if self.pixel_options:
             self.pixel_options.update_pixel_input_validity()
 
-
-def get_fields_and_update_functions_for_component(component: Group):
-    return get_fields_with_update_functions(component)
-
-
-def add_fields_to_component(
-    component: Group, fields_widget: QListWidget, component_model: NexusTreeModel = None
-):
-    """
-    Adds fields from a list widget to a component.
-    :param component: Component to add the field to.
-    :param fields_widget: The field list widget to extract field information such the name and value of each field.
-    """
-    for i in range(fields_widget.count()):
-        widget = fields_widget.itemWidget(fields_widget.item(i))
-        try:
-            if not isinstance(widget.value, (Link, Dataset)):
-                stream_module = deepcopy(widget.value)
-                stream_module.parent_node = component
-                component.children.append(stream_module)
-            else:
-                component[widget.name] = widget.value
-        except ValueError as error:
-            show_warning_dialog(
-                f"Warning: field {widget.name} not added",
-                title="Field invalid",
-                additional_info=str(error),
-                parent=fields_widget.parent().parent(),
-            )
-    if component_model and component_model.current_nxs_obj[1]:
-        row = component_model.rowCount(component_model.current_nxs_obj[1])
-        component_model.createIndex(row, 0, component_model.current_nxs_obj[1])

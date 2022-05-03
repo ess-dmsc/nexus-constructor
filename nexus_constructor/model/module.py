@@ -54,6 +54,9 @@ class FileWriterModule(ABC):
     def as_dict(self, error_collector: List[str]):
         raise NotImplementedError
 
+    def get_name(self) -> str:
+        return self.writer_module
+
 
 @attr.s
 class StreamModule(FileWriterModule):
@@ -178,6 +181,9 @@ class Dataset(FileWriterModule):
 
     def _cast_to_type(self, data):
         return JsonSerialisableType.from_type(self.type)(data)
+
+    def get_name(self) -> str:
+        return self.name
 
 
 @attr.s

@@ -293,6 +293,7 @@ class OkValidator(QObject):
         self.file_is_valid = False
         self.units_are_valid = False
         self.nx_class_is_valid = True
+        self.fields_are_valid = False
         self.no_geometry_button = no_geometry_button
         self.mesh_button = mesh_button
         self.pixel_validator = pixel_validator
@@ -314,12 +315,17 @@ class OkValidator(QObject):
         self.nx_class_is_valid = is_valid
         self.validate_ok()
 
+    def set_fields_valid(self, is_valid):
+        self.fields_are_valid = is_valid
+        self.validate_ok()
+
     def validate_ok(self):
         """
         Validates the fields in order to dictate whether the OK button should be disabled or enabled.
         :return: None, but emits the isValid signal.
         """
         unacceptable = [
+            not self.fields_are_valid,
             not self.nx_class_is_valid,
             not self.name_is_valid,
             not self.no_geometry_button.isChecked() and not self.units_are_valid,

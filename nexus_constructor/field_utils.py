@@ -74,21 +74,6 @@ def update_existing_stream_field(
     new_ui_field.units = units
 
 
-def get_fields_with_update_functions(
-    component: Group,
-) -> List[Tuple[Union["FileWriterModule", "Group"], Callable]]:
-    """
-    Return a list of fields in a given component group.
-    :param component: The component to check for fields
-    :return: A list of a fields, regardless of field type
-    """
-    items_with_update_functions = []
-    for item in component.children:
-        update_function = find_field_type(item)
-        items_with_update_functions.append((item, update_function))
-    return items_with_update_functions
-
-
 def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Callable:
     if isinstance(item, Dataset) and item.name not in ignore_names:
         if np.isscalar(item.values):
