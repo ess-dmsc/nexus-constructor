@@ -23,6 +23,7 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset, FileWriterModule, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
@@ -33,7 +34,6 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
-from nexus_constructor.model.group import Group
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -91,6 +91,7 @@ class FieldWidget(QFrame):
         possible_field_names = []
         self.default_field_types_dict = {}
         self.streams_widget: StreamFieldsWidget = None
+        self.valid_stream_widget_input: bool = True
         if possible_fields:
             possible_field_names, default_field_types = zip(*possible_fields)
             self.default_field_types_dict = dict(
@@ -354,6 +355,10 @@ class FieldWidget(QFrame):
             self.streams_widget = StreamFieldsWidget(
                 self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
             )
+            self.streams_widget.ok_validator.is_valid.connect(
+                self._set_stream_edit_button_state
+            )
+            self.streams_widget.ok_validator.validate_ok()
         elif self.field_type == FieldType.link:
             self.set_visibility(
                 True,
@@ -364,6 +369,13 @@ class FieldWidget(QFrame):
                 show_attrs_edit=False,
             )
             self._set_up_value_validator(False)
+
+    def _set_stream_edit_button_state(self, value: bool):
+        if value:
+            self.edit_button.setStyleSheet("QPushButton {color: black;}")
+        else:
+            self.edit_button.setStyleSheet("QPushButton {color: red;}")
+        self.valid_stream_widget_input = value
 
     def _set_up_value_validator(self, is_link: bool):
         self.value_line_edit.setValidator(None)
