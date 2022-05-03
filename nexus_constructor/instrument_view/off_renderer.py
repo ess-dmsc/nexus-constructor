@@ -95,6 +95,25 @@ def create_normal_buffer(vertices, triangles, progress_bar: ProgressBar = None):
     return normal_buffer_values
 
 
+def create_color_buffer(vertex_count, colors, progress_bar: ProgressBar = None):
+    """
+    Creates a color for each face in the mesh.
+    :param vertex_count: The vertex count.
+    :param colors: The colors for the mesh
+    :param progress_bar: optional parameter progress bar.
+    :return: A list of the colors for the faces
+    """
+    color_buffer_values: List[int] = []
+    if not colors:
+        return color_buffer_values
+    repeat_color = int(vertex_count / len(colors))
+    for color in colors:
+        if progress_bar:
+            progress_bar.update_progress_bar()
+        color_buffer_values.extend(color * repeat_color)
+    return color_buffer_values
+
+
 def repeat_shape_over_positions(
     model: OFFGeometry, positions: List[QVector3D]
 ) -> Tuple[List[List[int]], List[QVector3D]]:
@@ -147,6 +166,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
             else None,
         )
         vertex_buffer_values = list(create_vertex_buffer(vertices, triangles))
+        self.vertex_count = len(vertex_buffer_values) // 3
         normal_buffer_values = create_normal_buffer(
             vertices,
             triangles,
@@ -154,17 +174,26 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
             if use_progress_bar
             else None,
         )
-
+        color_buffer_values = create_color_buffer(
+            self.vertex_count,
+            model.colors,
+            ProgressBar(len(model.colors), "Material creation")
+            if use_progress_bar
+            else None,
+        )
         positionAttribute = self.create_attribute(
             vertex_buffer_values, self.q_attribute.defaultPositionAttributeName()
         )
+        self.addAttribute(positionAttribute)
         normalAttribute = self.create_attribute(
             normal_buffer_values, self.q_attribute.defaultNormalAttributeName()
         )
-
-        self.addAttribute(positionAttribute)
         self.addAttribute(normalAttribute)
-        self.vertex_count = len(vertex_buffer_values) // 3
+        if model.colors:
+            colorAttribute = self.create_attribute(
+                color_buffer_values, self.q_attribute.defaultColorAttributeName()
+            )
+            self.addAttribute(colorAttribute)
 
         logging.info("Qt mesh built")
 

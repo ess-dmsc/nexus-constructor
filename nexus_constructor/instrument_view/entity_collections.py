@@ -56,6 +56,8 @@ class OffMeshEntityCollection(EntityCollection):
         super().__init__(root_entity, nx_class)
         self.entities: List[Qt3DCore.QEntity] = []
         self._mesh = mesh
+        if nx_class not in MATERIAL_COLORS:
+            self.default_material = Qt3DExtras.QPerVertexColorMaterial()
 
     def create_entities(self):
         self.entities.append(
