@@ -13,11 +13,14 @@ from PySide2.QtWidgets import (
     QFrame,
     QGridLayout,
     QHBoxLayout,
+    QVBoxLayout,
     QLineEdit,
     QListWidget,
     QPushButton,
     QSizePolicy,
-    QWidget
+    QWidget,
+    QLabel,
+    QGroupBox
 )
 
 # from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
@@ -44,10 +47,11 @@ class ScalarFieldWidget(QWidget):
         super().__init__(parent)
         self._module = module
         self._field_name = FieldNameEdit(parent, module)
-        self.layout = QHBoxLayout()
-        self.layout.addWidget(self._field_name)
-        self.layout.setAlignment(Qt.AlignLeft)
-        self.setLayout(self.layout)
+        self._label = QLabel(parent=parent, text=" : ")
+        self.setLayout(QHBoxLayout())
+        self.layout().addWidget(self._field_name)
+        self.layout().addWidget(self._label)
+        self.layout().setAlignment(Qt.AlignLeft)
 
 # class FieldNameLineEdit(QLineEdit):
 #     def __init__(self, possible_field_names: List[str]):
@@ -102,6 +106,7 @@ def get_module_type(item: FileWriterModule) -> FieldType:
             f"Object {item} not handled as field - could be used for other parts of UI instead"
         )
     return None
+
 
 class FieldItem(QFrame):
     # Used for deletion of field
@@ -201,9 +206,9 @@ class FieldItem(QFrame):
     #     self.attrs_button.setSizePolicy(fix_horizontal_size)
     #     self.attrs_button.clicked.connect(self.show_attrs_dialog)
     #
-        self.layout = QHBoxLayout()
+        self.setLayout(QHBoxLayout())
     #     self.layout.addWidget(self.field_name_edit)
-        self.layout.addWidget(self.field_type_combo)
+        self.layout().addWidget(self.field_type_combo)
     #     self.layout.addWidget(self.value_line_edit)
     #     self.layout.addWidget(self.nx_class_combo)
     #     self.layout.addWidget(self.edit_button)
@@ -211,8 +216,7 @@ class FieldItem(QFrame):
     #     self.layout.addWidget(self.units_line_edit)
     #     self.layout.addWidget(self.attrs_button)
     #
-        self.layout.setAlignment(Qt.AlignLeft)
-        self.setLayout(self.layout)
+        self.layout().setAlignment(Qt.AlignLeft)
     #
         self.setFrameShadow(QFrame.Raised)
         self.setFrameShape(QFrame.StyledPanel)
@@ -329,11 +333,12 @@ class FieldItem(QFrame):
 
     def _remove_existing_widget(self):
         if self._field_widget is not None:
-            self.layout.removeWidget(self._field_widget)
+            self.layout().removeWidget(self._field_widget)
 
     def _instantiate_scalar_widgets(self):
         self._remove_existing_widget()
         self._field_widget = ScalarFieldWidget(self.parent(), self._file_writer_module)
+        self.layout().addWidget(self._field_widget)
 
     def _instantiate_array_widgets(self):
         self._remove_existing_widget()

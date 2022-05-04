@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QListView, QWidget, QLabel, QStyledItemDelegate, QFrame, QSizePolicy, QLineEdit, QStyleOptionViewItem, QVBoxLayout, QAbstractItemView
-from PySide2.QtCore import QAbstractListModel, QModelIndex, QAbstractItemModel, Signal, Qt, QPoint
+from PySide2.QtCore import QAbstractListModel, QModelIndex, QAbstractItemModel, Signal, Qt, QPoint, QSize
 from PySide2 import QtWidgets
 from PySide2.QtGui import QPainter, QPixmap, QRegion
 from nexus_constructor.model import GroupContainer, Group, Component, Dataset
@@ -34,6 +34,8 @@ class FieldListModel(QAbstractListModel):
 
 
 class FieldItemDelegate(QStyledItemDelegate):
+    frameSize = QSize(30, 10)
+
     def __init__(self, parent):
         super().__init__(parent)
         self._dict_frames: Dict[QModelIndex, QFrame] = {}
@@ -43,16 +45,18 @@ class FieldItemDelegate(QStyledItemDelegate):
             parent = self.parent()
         frame = FieldItem(parent=parent, file_writer_module=index.model().data(index, Qt.DisplayRole))
         frame.setAutoFillBackground(True)
-        SizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        SizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         SizePolicy.setHorizontalStretch(0)
         SizePolicy.setVerticalStretch(0)
         frame.setSizePolicy(SizePolicy)
         frame.setLayout(QVBoxLayout())
-        frame.layout.setContentsMargins(0, 0, 0, 0)
+        frame.layout().setContentsMargins(0, 0, 0, 0)
         return frame
 
     def createEditor(self, parent: PySide2.QtWidgets.QWidget, option: PySide2.QtWidgets.QStyleOptionViewItem, index: PySide2.QtCore.QModelIndex) -> PySide2.QtWidgets.QWidget:
-        return self.get_frame(index, parent=parent)
+        frame = self.get_frame(index, parent=parent)
+        self.frameSize = frame.sizeHint()
+        return frame
 
     def updateEditorGeometry(self, editor: PySide2.QtWidgets.QWidget, option: PySide2.QtWidgets.QStyleOptionViewItem, index: PySide2.QtCore.QModelIndex) -> None:
         editor.setGeometry(option.rect)
@@ -65,6 +69,10 @@ class FieldItemDelegate(QStyledItemDelegate):
         pixmap.setDevicePixelRatio(ratio)
         frame.render(pixmap, QPoint(), QRegion())
         painter.drawPixmap(option.rect, pixmap)
+
+    def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
+        frame = self.get_frame(index)
+        return frame.sizeHint()
 
 
 class FileListModel(QAbstractListModel):
@@ -109,7 +117,7 @@ class FieldList(QListView):
     def add_field(self):
         self._model.beginInsertRows(QModelIndex(), self._model.rowCount(), self._model.rowCount())
         c_group = self._group_container.group
-        new_dataset = Dataset(parent_node=c_group, name="test_name", values=123)
+        new_dataset = Dataset(parent_node=c_group, name="")
         c_group.children.append(new_dataset)
         self._model.endInsertRows()
 

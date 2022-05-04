@@ -21,7 +21,7 @@ class FieldNameValidator(QValidator):
             list_of_group_names = [
                 g.name
                 for g in self._dataset.parent_node.children
-                if isinstance(g, Dataset) and g is not self._dataset.parent_node.children
+                if isinstance(g, Dataset) and g is not self._dataset
             ]
         if input == "" or input in list_of_group_names:
             self.is_valid.emit(False)
@@ -51,7 +51,7 @@ class FieldNameEdit(QtWidgets.QLineEdit):
         self.validator().validate(self.text(), 0)
 
     def _set_new_group_name(self, new_name: str):
-        self._container.name = new_name
+        self._dataset.name = new_name
 
     def generate_name_suggestion(self):
         """
