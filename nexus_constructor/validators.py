@@ -1,7 +1,7 @@
 import os
 import re
 from enum import Enum
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Dict
 
 import numpy as np
 import pint
@@ -138,7 +138,6 @@ class NameValidator(QValidator):
 
 
 GEOMETRY_FILE_TYPES = {"OFF Files": ["off", "OFF"], "STL Files": ["stl", "STL"]}
-SKIP_VALIDATION = "skip_validation"
 
 
 class GeometryFileValidator(QValidator):
@@ -146,16 +145,17 @@ class GeometryFileValidator(QValidator):
     Validator to ensure file exists and is the correct file type.
     """
 
-    def __init__(self, file_types):
+    def __init__(self, file_types, skip_check: Callable = lambda: False):
         """
 
         :param file_types: dict of file extensions that are valid.
         """
         super().__init__()
         self.file_types = file_types
+        self._skip_check = skip_check
 
     def validate(self, input: str, pos: int) -> QValidator.State:
-        if input == SKIP_VALIDATION:
+        if self._skip_check():
             return self._emit_and_return(True)
         if not input:
             return self._emit_and_return(False)
@@ -277,63 +277,17 @@ class PixelValidator(QObject):
     reassess_validity = Signal()
 
 
-class OkValidator(QObject):
-    """
-    Validator to enable the OK button. Several criteria have to be met before this can occur depending on the geometry type.
-    """
-
-    def __init__(
-        self,
-        no_geometry_button: QRadioButton,
-        mesh_button: QRadioButton,
-        pixel_validator: PixelValidator,
-    ):
+class MultiWidgetValidator(QObject):
+    def __init__(self):
         super().__init__()
-        self.name_is_valid = False
-        self.file_is_valid = False
-        self.units_are_valid = False
-        self.nx_class_is_valid = True
-        self.fields_are_valid = False
-        self.no_geometry_button = no_geometry_button
-        self.mesh_button = mesh_button
-        self.pixel_validator = pixel_validator
-        self.pixel_validator.reassess_validity.connect(self.validate_ok)
+        self._valid_widget_map: Dict[QWidget, bool] = {}
+        self._current_validity = True
 
-    def set_name_valid(self, is_valid):
-        self.name_is_valid = is_valid
-        self.validate_ok()
+    def set_is_valid(self, widget: QWidget, is_valid: bool):
+        self._valid_widget_map[widget] = is_valid
+        self._current_validity = all(self._valid_widget_map.values())
+        self.is_valid.emit(self._current_validity)
 
-    def set_file_valid(self, is_valid):
-        self.file_is_valid = is_valid
-        self.validate_ok()
-
-    def set_units_valid(self, is_valid):
-        self.units_are_valid = is_valid
-        self.validate_ok()
-
-    def set_nx_class_valid(self, is_valid):
-        self.nx_class_is_valid = is_valid
-        self.validate_ok()
-
-    def set_fields_valid(self, is_valid):
-        self.fields_are_valid = is_valid
-        self.validate_ok()
-
-    def validate_ok(self):
-        """
-        Validates the fields in order to dictate whether the OK button should be disabled or enabled.
-        :return: None, but emits the isValid signal.
-        """
-        unacceptable = [
-            not self.fields_are_valid,
-            not self.nx_class_is_valid,
-            not self.name_is_valid,
-            not self.no_geometry_button.isChecked() and not self.units_are_valid,
-            self.mesh_button.isChecked() and not self.file_is_valid,
-        ] + self.pixel_validator.unacceptable_pixel_states()
-        self.is_valid.emit(not any(unacceptable))
-
-    # Signal to indicate that the fields are valid or invalid. False: invalid.
     is_valid = Signal(bool)
 
 

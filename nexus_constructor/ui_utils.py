@@ -12,7 +12,8 @@ from PySide2.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QVBoxLayout,
-    QWidget
+    QWidget,
+    QLineEdit
 )
 
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
@@ -87,6 +88,22 @@ def validate_line_edit(
     :param tooltip_on_reject: Tooltip to display if line edit is invalid.
     :return: None.
     """
+    colour = "#FFFFFF" if is_valid else "#f6989d"
+    line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
+    if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
+        tooltip_on_reject += suggestion_callable()
+    line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
+        tooltip_on_reject
+    )
+
+
+def line_edit_validation_result_handler(
+    line_edit: QLineEdit,
+    is_valid: bool,
+    tooltip_on_reject="",
+    tooltip_on_accept="",
+    suggestion_callable=None,
+):
     colour = "#FFFFFF" if is_valid else "#f6989d"
     line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
     if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):

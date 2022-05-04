@@ -4,7 +4,7 @@ import attr
 import numpy as np
 
 from nexus_constructor.common_attrs import CommonKeys
-from nexus_constructor.model.helpers import _get_item, _set_item
+from nexus_constructor.model.helpers import _get_item, _set_item, _remove_item
 from nexus_constructor.model.value_type import ValueType, ValueTypes
 
 
@@ -34,9 +34,12 @@ class Attributes(list):
             return _get_item(self, attribute_name).values
         return None
 
-    def contains_attribute(self, attribute_name):
+    def contains_attribute(self, attribute_name: str):
         result = _get_item(self, attribute_name)
         return True if result is not None else False
+
+    def remove_attribute(self, attribute_name: str):
+        _remove_item(self, attribute_name)
 
     def as_dict(self, error_collector: List[str]):
         return [attribute.as_dict(error_collector) for attribute in self]

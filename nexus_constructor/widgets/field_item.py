@@ -29,14 +29,11 @@ from PySide2.QtWidgets import (
 # from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model import FileWriterModule, Link
 from nexus_constructor.widgets.field_name_edit import FieldNameEdit
+from nexus_constructor.widgets.scalar_value_edit import ScalarValueEdit
 # from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 # from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 # from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import (
-    FieldValueValidator,
-    NameValidator,
-    UnitValidator,
-)
+
 from enum import Enum
 from nexus_constructor.model import Dataset
 from nexus_constructor.model.module import StreamModule
@@ -47,10 +44,11 @@ class ScalarFieldWidget(QWidget):
         super().__init__(parent)
         self._module = module
         self._field_name = FieldNameEdit(parent, module)
-        self._label = QLabel(parent=parent, text=" : ")
+        self._scalar_value = ScalarValueEdit(parent, module)
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self._field_name)
-        self.layout().addWidget(self._label)
+        self.layout().addWidget(QLabel(parent=parent, text=" : "))
+        self.layout().addWidget(self._scalar_value)
         self.layout().setAlignment(Qt.AlignLeft)
 
 # class FieldNameLineEdit(QLineEdit):

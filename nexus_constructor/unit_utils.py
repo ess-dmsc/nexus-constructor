@@ -26,10 +26,7 @@ def units_are_recognised_by_pint(input: str, emit_logging_msg: bool = True) -> b
         AttributeError,
         pint.compat.tokenize.TokenError,
     ):
-        if emit_logging_msg:
-            logging.info(f"Unit input {input} is not recognised.")
         return False
-
     return True
 
 

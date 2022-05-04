@@ -117,7 +117,7 @@ class FieldList(QListView):
     def add_field(self):
         self._model.beginInsertRows(QModelIndex(), self._model.rowCount(), self._model.rowCount())
         c_group = self._group_container.group
-        new_dataset = Dataset(parent_node=c_group, name="")
+        new_dataset = Dataset(parent_node=c_group, name="", values=0, type="double")
         c_group.children.append(new_dataset)
         self._model.endInsertRows()
 
