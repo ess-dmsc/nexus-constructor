@@ -21,7 +21,6 @@ from nexus_constructor.validators import (
     NameValidator,
     NullableIntValidator,
     NumpyDTypeValidator,
-    OkValidator,
     UnitValidator,
 )
 
@@ -215,28 +214,6 @@ def test_GIVEN_file_not_ending_with_correct_suffix_WHEN_validating_geometry_file
     validator.is_file = lambda x: True
     assert validator.validate("something.json", 0) == QValidator.Intermediate
     validator.is_valid.emit.assert_called_once_with(False)
-
-
-def create_content_ok_validator():
-    """
-    Create an OkValidator and button mocks that mimic the conditions for valid input.
-    :return: An OkValidator that emits True when `validate_ok` is called and mocks for the no geometry and mesh buttons.
-    """
-    mock_no_geometry_button = Mock()
-    mock_mesh_button = Mock()
-
-    pixel_validator = Mock()
-    pixel_validator.unacceptable_pixel_states = Mock(return_value=[])
-
-    mock_no_geometry_button.isChecked = Mock(return_value=False)
-    mock_mesh_button.isChecked = Mock(return_value=True)
-
-    validator = OkValidator(mock_no_geometry_button, mock_mesh_button, pixel_validator)
-    validator.set_units_valid(True)
-    validator.set_name_valid(True)
-    validator.set_file_valid(True)
-
-    return (validator, mock_mesh_button, mock_no_geometry_button)
 
 
 def inspect_signal(result, expected):
