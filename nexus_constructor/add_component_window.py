@@ -178,7 +178,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self._group_container.group.children = c_children
             self._group_container.group.nx_class = c_nx_class
             self._group_parent.children.append(self._group_container.group)
-    
+
     def setupUi(self, pixel_options: PixelOptions = PixelOptions()):
         """Sets up push buttons and validators for the add component window."""
         self._main_validator.is_valid.connect(self.ok_button.setEnabled)

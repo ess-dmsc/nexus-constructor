@@ -11,12 +11,14 @@ from PySide2.QtWidgets import (
     QSizePolicy,
     QWidget,
     QLabel,
+    QPushButton
 )
 
 from nexus_constructor.model import FileWriterModule, Link
 from nexus_constructor.widgets.field_name_edit import FieldNameEdit
 from nexus_constructor.widgets.scalar_value_edit import ScalarValueEdit
 from nexus_constructor.validators import MultiItemValidator
+from nexus_constructor.field_attrs import FieldAttrsDialog
 
 from enum import Enum
 from nexus_constructor.model import Dataset
@@ -29,15 +31,38 @@ class ScalarFieldWidget(QWidget):
         self._module = module
         self._field_name = FieldNameEdit(parent, module)
         self._scalar_value = ScalarValueEdit(parent, module)
+        self._attrs_dialog = FieldAttrsDialog(parent=parent)
+        self._attrs_dialog.accepted.connect(self._done_with_attributes)
+        edit_button_size = 50
+
+        self._attrs_button = QPushButton("Attrs")
+        self._attrs_button.setMaximumSize(edit_button_size, edit_button_size)
+        self._attrs_button.clicked.connect(self._show_attrs_dialog)
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self._field_name)
         self.layout().addWidget(QLabel(parent=parent, text=" : "))
         self.layout().addWidget(self._scalar_value)
+        self.layout().addWidget(self._attrs_button)
         self.layout().setAlignment(Qt.AlignLeft)
         self._validator = MultiItemValidator()
         self._field_name.is_valid.connect(partial(self._validator.set_is_valid, self._field_name))
         self._scalar_value.is_valid.connect(partial(self._validator.set_is_valid, self._scalar_value))
         self._validator.is_valid.connect(self.is_valid.emit)
+
+    def _done_with_attributes(self):
+        for name, value, dtype in self._attrs_dialog.get_attrs():
+            if self._module.attributes.contains_attribute(name):
+                self._module.attributes.remove_attribute(name)
+            self._module.attributes.set_attribute_value(
+                attribute_name=name,
+                attribute_value=value,
+                attribute_type=dtype,
+            )
+
+    def _show_attrs_dialog(self):
+        self._attrs_dialog._remove_attrs()
+        self._attrs_dialog.fill_existing_attrs(self._module)
+        self._attrs_dialog.show()
 
     def check_validity(self):
         self._field_name.check_validity()
