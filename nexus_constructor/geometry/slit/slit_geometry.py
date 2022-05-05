@@ -29,20 +29,24 @@ class SlitGeometry:
             return ""
 
     def _create_vertices(self):
-        half_side_length = 0.05
         x_gap, y_gap = self._gaps
-        dy = half_side_length
 
         if x_gap:
             x_1 = 0.0
             x_2 = -1.0
+            half_side_length = x_gap * 2
             dx = x_gap / 2 + half_side_length
         else:
             x_1 = -0.1
             x_2 = -0.5
             dx = 0
+            half_side_length = 0.05
         if y_gap:
             dy = y_gap / 2
+            slit_thickness = y_gap * 2
+        else:
+            slit_thickness = 0.02
+            dy = half_side_length
 
         slit_matrix = [
             [x_2, -1, 0.1],
@@ -71,7 +75,6 @@ class SlitGeometry:
             vertices_right_bank.append(QVector3D(-column[0], -column[1], column[2]))
 
         # Lower and upper rectangle.
-        slit_thickness = 0.02
         x_dist = dx if x_gap else half_side_length / 2
         slit_matrix = [
             [1, dy, 0.1],

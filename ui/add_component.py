@@ -333,7 +333,7 @@ class Ui_AddComponentDialog(QDialog):
             )
         )
         self.noShapeRadioButton.setText(
-            QtWidgets.QApplication.translate("AddComponentDialog", "No Shape", None, -1)
+            QtWidgets.QApplication.translate("AddComponentDialog", "Auto", None, -1)
         )
         self.boxRadioButton.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Box", None, -1)

@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import h5py
 import numpy as np
@@ -10,7 +11,6 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMainWindow, QRadioButton
 from pytestqt.qtbot import QtBot
-from typing import Optional
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
@@ -19,7 +19,6 @@ from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTr
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
-from nexus_constructor.widgets import CustomDialog as QDialog
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
 from nexus_constructor.model.geometry import (
@@ -33,6 +32,7 @@ from nexus_constructor.model.module import F142Stream, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
+from nexus_constructor.widgets import CustomDialog as QDialog
 from tests.test_utils import NX_CLASS_DEFINITIONS
 from tests.ui_tests.ui_test_utils import (
     RED_LINE_EDIT_STYLE_SHEET,
@@ -109,7 +109,7 @@ NO_PIXEL_OPTIONS_SUBSET = {
     if class_name in _components_subset
 }
 
-SHAPE_TYPE_BUTTONS = ["No Shape", "Mesh", "Cylinder"]
+SHAPE_TYPE_BUTTONS = ["Auto", "Mesh", "Cylinder"]
 
 FIELDS_VALUE_TYPES = {key: i for i, key in enumerate(VALUE_TYPE_TO_NP)}
 FIELD_TYPES = {item.value: i for i, item in enumerate(FieldType)}
