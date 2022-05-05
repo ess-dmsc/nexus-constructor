@@ -50,7 +50,7 @@ def units_are_recognised(unit_string: str) -> bool:
 
 class UnitValidator(QValidator):
     """
-    Validator to ensure the the text entered is a valid unit of length.
+    Validator to ensure the text entered is a valid unit of length.
     """
 
     ureg = pint.UnitRegistry()

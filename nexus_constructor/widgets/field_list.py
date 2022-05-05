@@ -35,8 +35,6 @@ class FieldListModel(QAbstractListModel):
 
 
 class FieldItemDelegate(QStyledItemDelegate):
-    frameSize = QSize(30, 10)
-
     def __init__(self, parent, validator: MultiItemValidator):
         super().__init__(parent)
         self._validator = validator
@@ -48,7 +46,7 @@ class FieldItemDelegate(QStyledItemDelegate):
         c_module = index.model().data(index, Qt.DisplayRole)
         frame = FieldItem(parent=parent, file_writer_module=c_module)
         frame.is_valid.connect(partial(self._validator.set_is_valid, c_module))
-        frame.is_valid.emit(None)
+        frame.check_validity()
         frame.setAutoFillBackground(True)
         SizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         SizePolicy.setHorizontalStretch(0)
@@ -60,7 +58,6 @@ class FieldItemDelegate(QStyledItemDelegate):
 
     def createEditor(self, parent: PySide2.QtWidgets.QWidget, option: PySide2.QtWidgets.QStyleOptionViewItem, index: PySide2.QtCore.QModelIndex) -> PySide2.QtWidgets.QWidget:
         frame = self.get_frame(index, parent=parent)
-        self.frameSize = frame.sizeHint()
         return frame
 
     def updateEditorGeometry(self, editor: PySide2.QtWidgets.QWidget, option: PySide2.QtWidgets.QStyleOptionViewItem, index: PySide2.QtCore.QModelIndex) -> None:

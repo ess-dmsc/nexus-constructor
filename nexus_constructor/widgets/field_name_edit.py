@@ -36,8 +36,8 @@ class FieldNameEdit(QtWidgets.QLineEdit):
     def __init__(self, parent: QtWidgets.QWidget, dataset: Dataset):
         super().__init__(parent)
         self._dataset = dataset
-        self.setValidator(FieldNameValidator(dataset))
         self.setText(self._dataset.name)
+        self.setValidator(FieldNameValidator(dataset))
         self.validator().is_valid.connect(
             partial(
                 validate_line_edit,
@@ -50,6 +50,9 @@ class FieldNameEdit(QtWidgets.QLineEdit):
         self.textEdited.connect(self._set_new_group_name)
         self.validator().validate(self.text(), 0)
         self.validator().is_valid.connect(self.is_valid.emit)
+
+    def check_validity(self):
+        self.validator().validate(self._dataset.name, 0)
 
     def _set_new_group_name(self, new_name: str):
         self._dataset.name = new_name

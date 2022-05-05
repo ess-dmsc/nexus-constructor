@@ -80,22 +80,23 @@ class ScalarValueEdit(QWidget):
         self.layout().addWidget(self._units_line_edit)
 
         self.layout().setAlignment(Qt.AlignLeft)
-        self._dataset_type_changed()
+        self._value_line_edit.setText(str(self._dataset.values))
 
         self._value_type_combo.currentIndexChanged.connect(self._dataset_type_changed)
         self._value_line_edit.textEdited.connect(self._value_changed)
         self._units_line_edit.textEdited.connect(self._unit_changed)
-        self._value_line_edit.setText(str(self._dataset.values))
+
         if self._dataset.attributes.contains_attribute(CommonAttrs.UNITS):
             self._units_line_edit.setText(self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS))
         self._value_type_combo.setCurrentText(ValueTypes.STRING if not self._dataset.type else self._dataset.type)
         self._units_line_edit.setText(self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS))
+        self._dataset_type_changed()
 
     def _value_changed(self, new_value: str):
         try:
             self._dataset.values = VALUE_TYPE_TO_NP[self._value_type_combo.currentText()](new_value)
         except ValueError:
-            pass
+            self._dataset.values = new_value
 
     def _unit_changed(self, new_unit: str):
         if not new_unit:
@@ -108,6 +109,10 @@ class ScalarValueEdit(QWidget):
         self._value_line_edit.validator().validate(
             self._value_line_edit.text(), 0
         )
+
+    def check_validity(self):
+        self._dataset_type_changed()
+        self._units_line_edit.validator().validate(self._units_line_edit.text(), 0)
 
     is_valid = Signal(bool)
 

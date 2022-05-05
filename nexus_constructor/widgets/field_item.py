@@ -38,8 +38,10 @@ class ScalarFieldWidget(QWidget):
         self._field_name.is_valid.connect(partial(self._validator.set_is_valid, self._field_name))
         self._scalar_value.is_valid.connect(partial(self._validator.set_is_valid, self._scalar_value))
         self._validator.is_valid.connect(self.is_valid.emit)
-        self._field_name.is_valid.emit(None)
-        self._scalar_value.is_valid.emit(None)
+
+    def check_validity(self):
+        self._field_name.check_validity()
+        self._scalar_value.check_validity()
 
     is_valid = Signal(bool)
 
@@ -284,6 +286,10 @@ class FieldItem(QFrame):
     #     return self.field_type == FieldType.scalar_dataset
     #
 
+    def check_validity(self):
+        if self._field_widget is not None:
+            self._field_widget.check_validity()
+
     def _remove_existing_widget(self):
         if self._field_widget is not None:
             self._field_widget.is_valid.disconnect()
@@ -294,7 +300,7 @@ class FieldItem(QFrame):
         self._remove_existing_widget()
         self._field_widget = ScalarFieldWidget(self.parent(), self._file_writer_module)
         self._field_widget.is_valid.connect(self.is_valid.emit)
-        self._field_widget.is_valid.emit(None)
+        self.check_validity()
         self.layout().addWidget(self._field_widget)
 
     def _instantiate_array_widgets(self):
