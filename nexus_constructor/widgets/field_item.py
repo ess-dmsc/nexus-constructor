@@ -17,6 +17,7 @@ from PySide2.QtWidgets import (
 from nexus_constructor.model import FileWriterModule, Link
 from nexus_constructor.widgets.field_name_edit import FieldNameEdit
 from nexus_constructor.widgets.scalar_value_edit import ScalarValueEdit
+from nexus_constructor.widgets.scalar_array_edit import ScalarArrayEdit
 from nexus_constructor.validators import MultiItemValidator
 from nexus_constructor.field_attrs import FieldAttrsDialog
 
@@ -85,9 +86,15 @@ class ScalarFieldWidget(BaseFieldWidget):
 class ScalarArrayFieldWidget(BaseFieldWidget):
     def __init__(self, parent: QWidget, module: Dataset):
         super().__init__(parent, module)
+        self._scalar_array = ScalarArrayEdit(parent, module)
+        self.layout().insertWidget(2, self._scalar_array)
+        self._scalar_array.is_valid.connect(
+            partial(self._validator.set_is_valid, self._scalar_array)
+        )
 
     def check_validity(self):
         super().check_validity()
+        self._scalar_array.check_validity()
         
 
 class FieldType(Enum):
@@ -155,15 +162,6 @@ class FieldItem(QFrame):
         #     if hide_name_field:
         #         self.name = str(uuid.uuid4())
         #
-        #     self.units_line_edit = QLineEdit()
-        #     self.unit_validator = UnitValidator()
-        #     self.units_line_edit.setValidator(self.unit_validator)
-        #     self.units_line_edit.setMinimumWidth(20)
-        #     self.units_line_edit.setMaximumWidth(50)
-        #     unit_size_policy = QSizePolicy()
-        #     unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
-        #     unit_size_policy.setHorizontalStretch(1)
-        #     self.units_line_edit.setSizePolicy(unit_size_policy)
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.setCurrentText(
@@ -267,38 +265,6 @@ class FieldItem(QFrame):
     #         )
     #     )
     #
-    # @property
-    # def field_type(self) -> FieldType:
-    #     return FieldType(self.field_type_combo.currentText())
-    #
-    # @field_type.setter
-    # def field_type(self, field_type: FieldType):
-    #     self.field_type_combo.setCurrentText(field_type.value)
-    #     self.field_type_changed()
-    #
-    # @property
-    # def name(self) -> str:
-    #     return self.field_name_edit.text()
-    #
-    # @name.setter
-    # def name(self, name: str):
-    #     self.field_name_edit.setText(name)
-    #
-    # @property
-    # def dtype(self) -> str:
-    #     return self.value_type_combo.currentText()
-    #
-    # @dtype.setter
-    # def dtype(self, dtype: str):
-    #     self.value_type_combo.setCurrentText(dtype)
-    #
-    # @property
-    # def attrs(self):
-    #     return self.value.attributes
-    #
-    # @attrs.setter
-    # def attrs(self, field: Dataset):
-    #     self.attrs_dialog.fill_existing_attrs(field)
     #
     # @value.setter
     # def value(self, value):
@@ -339,6 +305,7 @@ class FieldItem(QFrame):
 
     def _remove_existing_widget(self):
         if self._field_widget is not None:
+            self._field_widget.hide()
             self._field_widget.is_valid.disconnect()
             self.layout().removeWidget(self._field_widget)
             self._field_widget = None
@@ -352,6 +319,10 @@ class FieldItem(QFrame):
 
     def _instantiate_array_widgets(self):
         self._remove_existing_widget()
+        self._field_widget = ScalarArrayFieldWidget(self.parent(), self._file_writer_module)
+        self._field_widget.is_valid.connect(self.is_valid.emit)
+        self.check_validity()
+        self.layout().addWidget(self._field_widget)
 
     def _instantiate_stream_widgets(self):
         self._remove_existing_widget()
