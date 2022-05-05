@@ -25,12 +25,11 @@ from nexus_constructor.model import Dataset
 from nexus_constructor.model.module import StreamModule
 
 
-class ScalarFieldWidget(QWidget):
+class BaseFieldWidget(QWidget):
     def __init__(self, parent: QWidget, module: Dataset):
         super().__init__(parent)
         self._module = module
         self._field_name = FieldNameEdit(parent, module)
-        self._scalar_value = ScalarValueEdit(parent, module)
         self._attrs_dialog = FieldAttrsDialog(parent=parent)
         self._attrs_dialog.accepted.connect(self._done_with_attributes)
         edit_button_size = 50
@@ -41,15 +40,11 @@ class ScalarFieldWidget(QWidget):
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self._field_name)
         self.layout().addWidget(QLabel(parent=parent, text=" : "))
-        self.layout().addWidget(self._scalar_value)
         self.layout().addWidget(self._attrs_button)
         self.layout().setAlignment(Qt.AlignLeft)
         self._validator = MultiItemValidator()
         self._field_name.is_valid.connect(
             partial(self._validator.set_is_valid, self._field_name)
-        )
-        self._scalar_value.is_valid.connect(
-            partial(self._validator.set_is_valid, self._scalar_value)
         )
         self._validator.is_valid.connect(self.is_valid.emit)
 
@@ -70,10 +65,30 @@ class ScalarFieldWidget(QWidget):
 
     def check_validity(self):
         self._field_name.check_validity()
-        self._scalar_value.check_validity()
 
     is_valid = Signal(bool)
 
+
+class ScalarFieldWidget(BaseFieldWidget):
+    def __init__(self, parent: QWidget, module: Dataset):
+        super().__init__(parent, module)
+        self._scalar_value = ScalarValueEdit(parent, module)
+        self.layout().insertWidget(2, self._scalar_value)
+        self._scalar_value.is_valid.connect(
+            partial(self._validator.set_is_valid, self._scalar_value)
+        )
+
+    def check_validity(self):
+        super().check_validity()
+        self._scalar_value.check_validity()
+
+class ScalarArrayFieldWidget(BaseFieldWidget):
+    def __init__(self, parent: QWidget, module: Dataset):
+        super().__init__(parent, module)
+
+    def check_validity(self):
+        super().check_validity()
+        
 
 class FieldType(Enum):
     scalar_dataset = "Scalar dataset"
