@@ -11,7 +11,7 @@ from PySide2.QtWidgets import (
     QSizePolicy,
     QWidget,
     QLabel,
-    QPushButton
+    QPushButton,
 )
 
 from nexus_constructor.model import FileWriterModule, Link
@@ -45,8 +45,12 @@ class ScalarFieldWidget(QWidget):
         self.layout().addWidget(self._attrs_button)
         self.layout().setAlignment(Qt.AlignLeft)
         self._validator = MultiItemValidator()
-        self._field_name.is_valid.connect(partial(self._validator.set_is_valid, self._field_name))
-        self._scalar_value.is_valid.connect(partial(self._validator.set_is_valid, self._scalar_value))
+        self._field_name.is_valid.connect(
+            partial(self._validator.set_is_valid, self._field_name)
+        )
+        self._scalar_value.is_valid.connect(
+            partial(self._validator.set_is_valid, self._scalar_value)
+        )
         self._validator.is_valid.connect(self.is_valid.emit)
 
     def _done_with_attributes(self):
@@ -114,121 +118,124 @@ class FieldItem(QFrame):
         self._field_widget: Optional[QWidget] = None
         self._file_writer_module = file_writer_module
 
-    #     self.streams_widget: StreamFieldsWidget = None
-    #     if possible_fields:
-    #         possible_field_names, default_field_types = zip(*possible_fields)
-    #         self.default_field_types_dict = dict(
-    #             zip(possible_field_names, default_field_types)
-    #         )
-    #     self._show_only_f142_stream = show_only_f142_stream
-    #     self._node_parent = node_parent
-    #
-    #     self.edit_dialog = QDialog(parent=self)
-    #     self.attrs_dialog = FieldAttrsDialog(parent=self)
-    #     if self.parent() is not None and self.parent().parent() is not None:
-    #         self.parent().parent().destroyed.connect(self.edit_dialog.close)
-    #         self.parent().parent().destroyed.connect(self.attrs_dialog.close)
-    #
-    #     self.field_name_edit = FieldNameLineEdit(possible_field_names)
-    #     if self.default_field_types_dict:
-    #         self.field_name_edit.textChanged.connect(self.update_default_type)
-    #     self.hide_name_field = hide_name_field
-    #     if hide_name_field:
-    #         self.name = str(uuid.uuid4())
-    #
-    #     self.units_line_edit = QLineEdit()
-    #     self.unit_validator = UnitValidator()
-    #     self.units_line_edit.setValidator(self.unit_validator)
-    #     self.units_line_edit.setMinimumWidth(20)
-    #     self.units_line_edit.setMaximumWidth(50)
-    #     unit_size_policy = QSizePolicy()
-    #     unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
-    #     unit_size_policy.setHorizontalStretch(1)
-    #     self.units_line_edit.setSizePolicy(unit_size_policy)
+        #     self.streams_widget: StreamFieldsWidget = None
+        #     if possible_fields:
+        #         possible_field_names, default_field_types = zip(*possible_fields)
+        #         self.default_field_types_dict = dict(
+        #             zip(possible_field_names, default_field_types)
+        #         )
+        #     self._show_only_f142_stream = show_only_f142_stream
+        #     self._node_parent = node_parent
+        #
+        #     self.edit_dialog = QDialog(parent=self)
+        #     self.attrs_dialog = FieldAttrsDialog(parent=self)
+        #     if self.parent() is not None and self.parent().parent() is not None:
+        #         self.parent().parent().destroyed.connect(self.edit_dialog.close)
+        #         self.parent().parent().destroyed.connect(self.attrs_dialog.close)
+        #
+        #     self.field_name_edit = FieldNameLineEdit(possible_field_names)
+        #     if self.default_field_types_dict:
+        #         self.field_name_edit.textChanged.connect(self.update_default_type)
+        #     self.hide_name_field = hide_name_field
+        #     if hide_name_field:
+        #         self.name = str(uuid.uuid4())
+        #
+        #     self.units_line_edit = QLineEdit()
+        #     self.unit_validator = UnitValidator()
+        #     self.units_line_edit.setValidator(self.unit_validator)
+        #     self.units_line_edit.setMinimumWidth(20)
+        #     self.units_line_edit.setMaximumWidth(50)
+        #     unit_size_policy = QSizePolicy()
+        #     unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
+        #     unit_size_policy.setHorizontalStretch(1)
+        #     self.units_line_edit.setSizePolicy(unit_size_policy)
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
-        self.field_type_combo.setCurrentText(get_module_type(self._file_writer_module).value)
+        self.field_type_combo.setCurrentText(
+            get_module_type(self._file_writer_module).value
+        )
         self.field_type_combo.currentIndexChanged.connect(self._field_type_changed)
 
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
-    #
-    #     self.value_type_combo: QComboBox = QComboBox()
-    #     self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
-    #     for i, item in enumerate(VALUE_TYPE_TO_NP.keys()):
-    #         if item == ValueTypes.DOUBLE:
-    #             self.value_type_combo.setCurrentIndex(i)
-    #             break
-    #     self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
-    #
-    #     self.value_line_edit: QLineEdit = QLineEdit()
-    #     self.value_line_edit.setPlaceholderText("value")
-    #
-    #     value_size_policy = QSizePolicy()
-    #     value_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
-    #     value_size_policy.setHorizontalStretch(2)
-    #     self.value_line_edit.setSizePolicy(value_size_policy)
-    #
-    #     self._set_up_value_validator(False)
-    #     self.dataset_type_changed(0)
-    #
-    #     self.nx_class_combo = QComboBox()
-    #
-    #     self.edit_button = QPushButton("Edit")
-    #
-    #     edit_button_size = 50
-    #     self.edit_button.setMaximumSize(edit_button_size, edit_button_size)
-    #     self.edit_button.setSizePolicy(fix_horizontal_size)
-    #     self.edit_button.clicked.connect(self.show_edit_dialog)
-    #
-    #     self.attrs_button = QPushButton("Attrs")
-    #     self.attrs_button.setMaximumSize(edit_button_size, edit_button_size)
-    #     self.attrs_button.setSizePolicy(fix_horizontal_size)
-    #     self.attrs_button.clicked.connect(self.show_attrs_dialog)
-    #
+        #
+        #     self.value_type_combo: QComboBox = QComboBox()
+        #     self.value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
+        #     for i, item in enumerate(VALUE_TYPE_TO_NP.keys()):
+        #         if item == ValueTypes.DOUBLE:
+        #             self.value_type_combo.setCurrentIndex(i)
+        #             break
+        #     self.value_type_combo.currentIndexChanged.connect(self.dataset_type_changed)
+        #
+        #     self.value_line_edit: QLineEdit = QLineEdit()
+        #     self.value_line_edit.setPlaceholderText("value")
+        #
+        #     value_size_policy = QSizePolicy()
+        #     value_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
+        #     value_size_policy.setHorizontalStretch(2)
+        #     self.value_line_edit.setSizePolicy(value_size_policy)
+        #
+        #     self._set_up_value_validator(False)
+        #     self.dataset_type_changed(0)
+        #
+        #     self.nx_class_combo = QComboBox()
+        #
+        #     self.edit_button = QPushButton("Edit")
+        #
+        #     edit_button_size = 50
+        #     self.edit_button.setMaximumSize(edit_button_size, edit_button_size)
+        #     self.edit_button.setSizePolicy(fix_horizontal_size)
+        #     self.edit_button.clicked.connect(self.show_edit_dialog)
+        #
+        #     self.attrs_button = QPushButton("Attrs")
+        #     self.attrs_button.setMaximumSize(edit_button_size, edit_button_size)
+        #     self.attrs_button.setSizePolicy(fix_horizontal_size)
+        #     self.attrs_button.clicked.connect(self.show_attrs_dialog)
+        #
         self.setLayout(QHBoxLayout())
-    #     self.layout.addWidget(self.field_name_edit)
+        #     self.layout.addWidget(self.field_name_edit)
         self.layout().addWidget(self.field_type_combo)
-    #     self.layout.addWidget(self.value_line_edit)
-    #     self.layout.addWidget(self.nx_class_combo)
-    #     self.layout.addWidget(self.edit_button)
-    #     self.layout.addWidget(self.value_type_combo)
-    #     self.layout.addWidget(self.units_line_edit)
-    #     self.layout.addWidget(self.attrs_button)
-    #
+        #     self.layout.addWidget(self.value_line_edit)
+        #     self.layout.addWidget(self.nx_class_combo)
+        #     self.layout.addWidget(self.edit_button)
+        #     self.layout.addWidget(self.value_type_combo)
+        #     self.layout.addWidget(self.units_line_edit)
+        #     self.layout.addWidget(self.attrs_button)
+        #
         self.layout().setAlignment(Qt.AlignLeft)
-    #
+        #
         self.setFrameShadow(QFrame.Raised)
         self.setFrameShape(QFrame.StyledPanel)
-    #
-    #     # Allow selecting this field widget in a list by clicking on it's contents
-    #     self.field_name_edit.installEventFilter(self)
-    #     existing_objects = []
-    #     emit = False
-    #     if isinstance(parent, QListWidget):
-    #         for i in range(self.parent().count()):
-    #             new_field_widget = self.parent().itemWidget(self.parent().item(i))
-    #             if new_field_widget is not self and hasattr(new_field_widget, "name"):
-    #                 existing_objects.append(new_field_widget)
-    #     elif isinstance(self._node_parent, Group):
-    #         for child in self._node_parent.children:
-    #             if child is not parent_dataset and hasattr(child, "name"):
-    #                 existing_objects.append(child)
-    #         emit = True
-    #     self._set_up_name_validator(existing_objects=existing_objects)
-    #     self.field_name_edit.validator().is_valid.emit(emit)
-    #
-    #     self.value_line_edit.installEventFilter(self)
-    #     self.nx_class_combo.installEventFilter(self)
-    #
-    #     # These cause odd double-clicking behaviour when using an event filter so just connecting to the clicked() signals instead.
-    #     self.edit_button.clicked.connect(self.something_clicked)
-    #     self.value_type_combo.highlighted.connect(self.something_clicked)
-    #     self.field_type_combo.highlighted.connect(self.something_clicked)
-    #
-    #     # Set the layout for the default field type
+        #
+        #     # Allow selecting this field widget in a list by clicking on it's contents
+        #     self.field_name_edit.installEventFilter(self)
+        #     existing_objects = []
+        #     emit = False
+        #     if isinstance(parent, QListWidget):
+        #         for i in range(self.parent().count()):
+        #             new_field_widget = self.parent().itemWidget(self.parent().item(i))
+        #             if new_field_widget is not self and hasattr(new_field_widget, "name"):
+        #                 existing_objects.append(new_field_widget)
+        #     elif isinstance(self._node_parent, Group):
+        #         for child in self._node_parent.children:
+        #             if child is not parent_dataset and hasattr(child, "name"):
+        #                 existing_objects.append(child)
+        #         emit = True
+        #     self._set_up_name_validator(existing_objects=existing_objects)
+        #     self.field_name_edit.validator().is_valid.emit(emit)
+        #
+        #     self.value_line_edit.installEventFilter(self)
+        #     self.nx_class_combo.installEventFilter(self)
+        #
+        #     # These cause odd double-clicking behaviour when using an event filter so just connecting to the clicked() signals instead.
+        #     self.edit_button.clicked.connect(self.something_clicked)
+        #     self.value_type_combo.highlighted.connect(self.something_clicked)
+        #     self.field_type_combo.highlighted.connect(self.something_clicked)
+        #
+        #     # Set the layout for the default field type
         self._field_type_changed()
+
     #
     # def _set_up_name_validator(
     #     self, existing_objects: List[Union["FieldWidget", FileWriterModule]]
@@ -338,9 +345,15 @@ class FieldItem(QFrame):
         self._remove_existing_widget()
 
     def _field_type_changed(self):
-        populate_widget_map = {FieldType.scalar_dataset.value: self._instantiate_scalar_widgets, FieldType.array_dataset.value: self._instantiate_array_widgets, FieldType.kafka_stream.value: self._instantiate_stream_widgets, FieldType.link.value: self._instantiate_link_widgets}
+        populate_widget_map = {
+            FieldType.scalar_dataset.value: self._instantiate_scalar_widgets,
+            FieldType.array_dataset.value: self._instantiate_array_widgets,
+            FieldType.kafka_stream.value: self._instantiate_stream_widgets,
+            FieldType.link.value: self._instantiate_link_widgets,
+        }
 
         populate_widget_map[self.field_type_combo.currentText()]()
+
     #     self.edit_dialog = QDialog(parent=self)
     #     self.edit_dialog.setModal(True)
     #     self._set_up_value_validator(False)

@@ -54,8 +54,12 @@ class ScalarValueEdit(QWidget):
         self._units_line_edit.setValidator(UnitValidator())
 
         self._validator = MultiItemValidator()
-        self._value_line_edit.validator().is_valid.connect(partial(self._validator.set_is_valid, self._value_line_edit))
-        self._units_line_edit.validator().is_valid.connect(partial(self._validator.set_is_valid, self._units_line_edit))
+        self._value_line_edit.validator().is_valid.connect(
+            partial(self._validator.set_is_valid, self._value_line_edit)
+        )
+        self._units_line_edit.validator().is_valid.connect(
+            partial(self._validator.set_is_valid, self._units_line_edit)
+        )
         self._validator.is_valid.connect(self.is_valid.emit)
 
         self._units_line_edit.validator().is_valid.connect(
@@ -66,7 +70,7 @@ class ScalarValueEdit(QWidget):
                 line_edit_validation_result_handler,
                 self._value_line_edit,
                 tooltip_on_accept="Value is cast-able to numpy type.",
-                tooltip_on_reject="Value is not cast-able to selected numpy type."
+                tooltip_on_reject="Value is not cast-able to selected numpy type.",
             )
         )
 
@@ -87,14 +91,22 @@ class ScalarValueEdit(QWidget):
         self._units_line_edit.textEdited.connect(self._unit_changed)
 
         if self._dataset.attributes.contains_attribute(CommonAttrs.UNITS):
-            self._units_line_edit.setText(self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS))
-        self._value_type_combo.setCurrentText(ValueTypes.STRING if not self._dataset.type else self._dataset.type)
-        self._units_line_edit.setText(self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS))
+            self._units_line_edit.setText(
+                self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS)
+            )
+        self._value_type_combo.setCurrentText(
+            ValueTypes.STRING if not self._dataset.type else self._dataset.type
+        )
+        self._units_line_edit.setText(
+            self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS)
+        )
         self._dataset_type_changed()
 
     def _value_changed(self, new_value: str):
         try:
-            self._dataset.values = VALUE_TYPE_TO_NP[self._value_type_combo.currentText()](new_value)
+            self._dataset.values = VALUE_TYPE_TO_NP[
+                self._value_type_combo.currentText()
+            ](new_value)
         except ValueError:
             self._dataset.values = new_value
 
@@ -106,13 +118,10 @@ class ScalarValueEdit(QWidget):
         self._dataset.attributes.set_attribute_value(CommonAttrs.UNITS, new_unit)
 
     def _dataset_type_changed(self):
-        self._value_line_edit.validator().validate(
-            self._value_line_edit.text(), 0
-        )
+        self._value_line_edit.validator().validate(self._value_line_edit.text(), 0)
 
     def check_validity(self):
         self._dataset_type_changed()
         self._units_line_edit.validator().validate(self._units_line_edit.text(), 0)
 
     is_valid = Signal(bool)
-

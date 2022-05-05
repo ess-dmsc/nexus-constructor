@@ -66,10 +66,7 @@ class FieldNameEdit(QtWidgets.QLineEdit):
             return generate_unique_name(self.text().lstrip("NX"), [])
         return generate_unique_name(
             self.text().lstrip("NX"),
-            [
-                g
-                for g in self._dataset.parent_node.children
-                if isinstance(g, Dataset)
-            ],
+            [g for g in self._dataset.parent_node.children if isinstance(g, Dataset)],
         )
+
     is_valid = Signal(bool)

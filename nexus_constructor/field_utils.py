@@ -1,13 +1,12 @@
 import logging
-from typing import TYPE_CHECKING, Callable, List, Tuple, Union
+from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.module import Dataset, Link, StreamModule
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.validators import FieldType
 

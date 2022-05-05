@@ -182,10 +182,15 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def setupUi(self, pixel_options: PixelOptions = PixelOptions()):
         """Sets up push buttons and validators for the add component window."""
         self._main_validator.is_valid.connect(self.ok_button.setEnabled)
-        self.nameLineEdit.validator().is_valid.connect(partial(self._main_validator.set_is_valid, self.nameLineEdit))
-        self.componentTypeComboBox.validator().is_valid.connect(partial(self._main_validator.set_is_valid, self.componentTypeComboBox))
-        self.fieldsListWidget.is_valid.connect(partial(self._main_validator.set_is_valid, self.fieldsListWidget))
-
+        self.nameLineEdit.validator().is_valid.connect(
+            partial(self._main_validator.set_is_valid, self.nameLineEdit)
+        )
+        self.componentTypeComboBox.validator().is_valid.connect(
+            partial(self._main_validator.set_is_valid, self.componentTypeComboBox)
+        )
+        self.fieldsListWidget.is_valid.connect(
+            partial(self._main_validator.set_is_valid, self.fieldsListWidget)
+        )
 
         # Connect the button calls with functions
         self.ok_button.clicked.connect(self.on_ok)
@@ -207,11 +212,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.noShapeRadioButton.clicked.connect(self.show_no_geometry_fields)
         self.fileBrowseButton.clicked.connect(self.mesh_file_picker)
 
-        self.fileLineEdit.setValidator(GeometryFileValidator(GEOMETRY_FILE_TYPES, lambda: not self.meshRadioButton.isChecked()))
+        self.fileLineEdit.setValidator(
+            GeometryFileValidator(
+                GEOMETRY_FILE_TYPES, lambda: not self.meshRadioButton.isChecked()
+            )
+        )
         self.fileLineEdit.validator().is_valid.connect(
             partial(validate_line_edit, self.fileLineEdit)
         )
-        self.fileLineEdit.validator().is_valid.connect(partial(self._main_validator.set_is_valid, self.fileLineEdit))
+        self.fileLineEdit.validator().is_valid.connect(
+            partial(self._main_validator.set_is_valid, self.fileLineEdit)
+        )
         self.fileLineEdit.textChanged.connect(self.populate_pixel_mapping_if_necessary)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
@@ -231,7 +242,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 tooltip_on_accept="Units Valid",
             )
         )
-        self.unitsLineEdit.validator().is_valid.connect(partial(self._main_validator.set_is_valid, self.unitsLineEdit))
+        self.unitsLineEdit.validator().is_valid.connect(
+            partial(self._main_validator.set_is_valid, self.unitsLineEdit)
+        )
 
         self.componentTypeComboBox.currentIndexChanged.connect(
             self.change_pixel_options_visibility
@@ -269,7 +282,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
         # self.fileLineEdit.validator().validate(text, 0)
         self.addFieldPushButton.clicked.connect(self.fieldsListWidget.add_field)
-        self.removeFieldPushButton.clicked.connect(self.fieldsListWidget.remove_selected_field)
+        self.removeFieldPushButton.clicked.connect(
+            self.fieldsListWidget.remove_selected_field
+        )
 
         # Connect the pixel mapping press signal the populate pixel mapping method
         if self.pixel_options:
@@ -549,7 +564,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         self.pixelOptionsWidget.setVisible(self.get_pixel_visibility_condition())
 
-
     def populate_pixel_mapping_if_necessary(self):
         """
         Tells the pixel options widget to populate the pixel mapping widget provided certain conditions are met. Checks
@@ -593,4 +607,3 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         if self.pixel_options:
             self.pixel_options.update_pixel_input_validity()
-

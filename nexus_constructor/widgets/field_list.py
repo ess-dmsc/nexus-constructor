@@ -1,4 +1,14 @@
-from PySide2.QtWidgets import QListView, QWidget, QLabel, QStyledItemDelegate, QFrame, QSizePolicy, QStyleOptionViewItem, QVBoxLayout, QAbstractItemView
+from PySide2.QtWidgets import (
+    QListView,
+    QWidget,
+    QLabel,
+    QStyledItemDelegate,
+    QFrame,
+    QSizePolicy,
+    QStyleOptionViewItem,
+    QVBoxLayout,
+    QAbstractItemView,
+)
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Signal, Qt, QPoint, QSize
 from PySide2.QtGui import QPainter, QPixmap, QRegion
 from nexus_constructor.model import GroupContainer, Group, Dataset
@@ -16,7 +26,11 @@ class FieldListModel(QAbstractListModel):
         self._group_container = group_container
 
     def fieldItems(self):
-        return [item for item in self._group_container.group.children if not isinstance(item, Group)]
+        return [
+            item
+            for item in self._group_container.group.children
+            if not isinstance(item, Group)
+        ]
 
     def rowCount(self, parent: PySide2.QtCore.QModelIndex = QModelIndex()) -> int:
         return len(self.fieldItems())
@@ -30,7 +44,7 @@ class FieldListModel(QAbstractListModel):
             return self.fieldItems()[index.row()]
         return None
 
-    def flags(self, index:PySide2.QtCore.QModelIndex) -> PySide2.QtCore.Qt.ItemFlags:
+    def flags(self, index: PySide2.QtCore.QModelIndex) -> PySide2.QtCore.Qt.ItemFlags:
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
 
@@ -56,14 +70,26 @@ class FieldItemDelegate(QStyledItemDelegate):
         frame.layout().setContentsMargins(0, 0, 0, 0)
         return frame
 
-    def createEditor(self, parent: PySide2.QtWidgets.QWidget, option: PySide2.QtWidgets.QStyleOptionViewItem, index: PySide2.QtCore.QModelIndex) -> PySide2.QtWidgets.QWidget:
+    def createEditor(
+        self,
+        parent: PySide2.QtWidgets.QWidget,
+        option: PySide2.QtWidgets.QStyleOptionViewItem,
+        index: PySide2.QtCore.QModelIndex,
+    ) -> PySide2.QtWidgets.QWidget:
         frame = self.get_frame(index, parent=parent)
         return frame
 
-    def updateEditorGeometry(self, editor: PySide2.QtWidgets.QWidget, option: PySide2.QtWidgets.QStyleOptionViewItem, index: PySide2.QtCore.QModelIndex) -> None:
+    def updateEditorGeometry(
+        self,
+        editor: PySide2.QtWidgets.QWidget,
+        option: PySide2.QtWidgets.QStyleOptionViewItem,
+        index: PySide2.QtCore.QModelIndex,
+    ) -> None:
         editor.setGeometry(option.rect)
 
-    def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
+    def paint(
+        self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
+    ):
         frame = self.get_frame(index)
         frame.setFixedSize(option.rect.size())
         ratio = self.parent().devicePixelRatioF()
@@ -129,7 +155,9 @@ class FieldList(QListView):
                 self._field_validator.remove_item(item, no_emit=True)
 
     def add_field(self):
-        self._model.beginInsertRows(QModelIndex(), self._model.rowCount(), self._model.rowCount())
+        self._model.beginInsertRows(
+            QModelIndex(), self._model.rowCount(), self._model.rowCount()
+        )
         c_group = self._group_container.group
         new_dataset = Dataset(parent_node=c_group, name="", values=0, type="double")
         c_group.children.append(new_dataset)
@@ -144,4 +172,3 @@ class FieldList(QListView):
         self._field_validator.remove_item(c_index.data())
 
     is_valid = Signal(bool)
-

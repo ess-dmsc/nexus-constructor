@@ -90,7 +90,7 @@ class Component(Group):
     stored_transforms: list = None
 
     def __str__(self) -> str:
-        return f"Component(name=\"{self.name}\", parent= \"{self.parent_node.name}\", #of_children={len(self.children)})"
+        return f'Component(name="{self.name}", parent= "{self.parent_node.name}", #of_children={len(self.children)})'
 
     @property
     def stored_items(self) -> List:

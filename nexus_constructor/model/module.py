@@ -154,8 +154,7 @@ class Dataset(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
 
     def __str__(self) -> str:
-        return f"Dataset(name=\"{self.name}\", parent=\"{self.parent_node.name}\", type={self.type})"
-
+        return f'Dataset(name="{self.name}", parent="{self.parent_node.name}", type={self.type})'
 
     def as_dict(self, error_collector: List[str]):
         values = self.values
