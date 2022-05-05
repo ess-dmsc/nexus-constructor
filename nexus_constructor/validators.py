@@ -1,7 +1,7 @@
 import os
 import re
 from enum import Enum
-from typing import Callable, List, Optional, Dict
+from typing import Callable, List, Optional, Dict, Any
 
 import numpy as np
 import pint
@@ -277,16 +277,30 @@ class PixelValidator(QObject):
     reassess_validity = Signal()
 
 
-class MultiWidgetValidator(QObject):
+class MultiItemValidator(QObject):
     def __init__(self):
         super().__init__()
-        self._valid_widget_map: Dict[QWidget, bool] = {}
-        self._current_validity = True
+        self._valid_item_map: Dict[Any, bool] = {}
 
-    def set_is_valid(self, widget: QWidget, is_valid: bool):
-        self._valid_widget_map[widget] = is_valid
-        self._current_validity = all(self._valid_widget_map.values())
-        self.is_valid.emit(self._current_validity)
+    def set_is_valid(self, item: Any, is_valid: bool):
+        self._valid_item_map[item] = is_valid
+        self.check_validity()
+
+    def known_items_are_valid(self) -> bool:
+        return all(self._valid_item_map.values())
+
+    def check_validity(self):
+        self.is_valid.emit(self.known_items_are_valid())
+
+    def remove_item(self, item, no_emit=False):
+        if item in self._valid_item_map:
+            self._valid_item_map.pop(item)
+        if not no_emit:
+            self.check_validity()
+
+    @property
+    def items(self):
+        return self._valid_item_map.keys()
 
     is_valid = Signal(bool)
 

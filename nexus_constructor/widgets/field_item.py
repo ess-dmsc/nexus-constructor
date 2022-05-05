@@ -1,38 +1,22 @@
 import logging
-import uuid
+from typing import Any, Optional
 from functools import partial
-from typing import Any, Optional, List, Union
 
 import numpy as np
-from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
+from PySide2.QtCore import Qt, Signal
 from PySide2.QtWidgets import (
     QComboBox,
-    QCompleter,
-    QDialog,
-    QFormLayout,
     QFrame,
-    QGridLayout,
     QHBoxLayout,
-    QVBoxLayout,
-    QLineEdit,
-    QListWidget,
-    QPushButton,
     QSizePolicy,
     QWidget,
     QLabel,
-    QGroupBox
 )
 
-# from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
-# from nexus_constructor.common_attrs import CommonAttrs
-# from nexus_constructor.field_attrs import FieldAttrsDialog
-# from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model import FileWriterModule, Link
 from nexus_constructor.widgets.field_name_edit import FieldNameEdit
 from nexus_constructor.widgets.scalar_value_edit import ScalarValueEdit
-# from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
-# from nexus_constructor.stream_fields_widget import StreamFieldsWidget
-# from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import MultiItemValidator
 
 from enum import Enum
 from nexus_constructor.model import Dataset
@@ -50,36 +34,14 @@ class ScalarFieldWidget(QWidget):
         self.layout().addWidget(QLabel(parent=parent, text=" : "))
         self.layout().addWidget(self._scalar_value)
         self.layout().setAlignment(Qt.AlignLeft)
+        self._validator = MultiItemValidator()
+        self._field_name.is_valid.connect(partial(self._validator.set_is_valid, self._field_name))
+        self._scalar_value.is_valid.connect(partial(self._validator.set_is_valid, self._scalar_value))
+        self._validator.is_valid.connect(self.is_valid.emit)
+        self._field_name.is_valid.emit(None)
+        self._scalar_value.is_valid.emit(None)
 
-# class FieldNameLineEdit(QLineEdit):
-#     def __init__(self, possible_field_names: List[str]):
-#         super().__init__()
-#         possible_field_names = [
-#             x for x in possible_field_names if x not in INVALID_FIELD_NAMES
-#         ]
-#         self.update_possible_fields(possible_field_names)
-#         self.setPlaceholderText("Name of new field")
-#         self.setMinimumWidth(60)
-#         fix_horizontal_size = QSizePolicy()
-#         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Expanding)
-#         fix_horizontal_size.setHorizontalStretch(3)
-#         self.setSizePolicy(fix_horizontal_size)
-#
-#     def focusInEvent(self, event):
-#         self.completer().complete()
-#         super(FieldNameLineEdit, self).focusInEvent(event)
-#
-#     def keyPressEvent(self, event):
-#         if event.key() == Qt.Key_Down:
-#             self.completer().complete()
-#         else:
-#             super().keyPressEvent(event)
-#
-#     def update_possible_fields(self, possible_fields: List[str]):
-#         self.setCompleter(QCompleter())
-#         model = QStringListModel()
-#         model.setStringList(sorted(possible_fields))
-#         self.completer().setModel(model)
+    is_valid = Signal(bool)
 
 
 class FieldType(Enum):
@@ -156,12 +118,6 @@ class FieldItem(QFrame):
     #     unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
     #     unit_size_policy.setHorizontalStretch(1)
     #     self.units_line_edit.setSizePolicy(unit_size_policy)
-    #
-    #     self.unit_validator.is_valid.connect(
-    #         partial(validate_line_edit, self.units_line_edit)
-    #     )
-    #     self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
-    #
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.setCurrentText(get_module_type(self._file_writer_module).value)
@@ -328,14 +284,17 @@ class FieldItem(QFrame):
     #     return self.field_type == FieldType.scalar_dataset
     #
 
-
     def _remove_existing_widget(self):
         if self._field_widget is not None:
+            self._field_widget.is_valid.disconnect()
             self.layout().removeWidget(self._field_widget)
+            self._field_widget = None
 
     def _instantiate_scalar_widgets(self):
         self._remove_existing_widget()
         self._field_widget = ScalarFieldWidget(self.parent(), self._file_writer_module)
+        self._field_widget.is_valid.connect(self.is_valid.emit)
+        self._field_widget.is_valid.emit(None)
         self.layout().addWidget(self._field_widget)
 
     def _instantiate_array_widgets(self):
@@ -442,6 +401,7 @@ class FieldItem(QFrame):
     #
     # def show_attrs_dialog(self):
     #     self.attrs_dialog.show()
+    is_valid = Signal(bool)
 
 
 def to_string(input_to_convert: Any) -> str:

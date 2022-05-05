@@ -49,6 +49,7 @@ class FieldNameEdit(QtWidgets.QLineEdit):
         )
         self.textEdited.connect(self._set_new_group_name)
         self.validator().validate(self.text(), 0)
+        self.validator().is_valid.connect(self.is_valid.emit)
 
     def _set_new_group_name(self, new_name: str):
         self._dataset.name = new_name
@@ -68,3 +69,4 @@ class FieldNameEdit(QtWidgets.QLineEdit):
                 if isinstance(g, Dataset)
             ],
         )
+    is_valid = Signal(bool)

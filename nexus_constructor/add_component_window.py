@@ -47,7 +47,7 @@ from nexus_constructor.unit_utils import METRES
 from nexus_constructor.validators import (
     GEOMETRY_FILE_TYPES,
     GeometryFileValidator,
-    MultiWidgetValidator,
+    MultiItemValidator,
     UnitValidator,
 )
 from ui.add_component import Ui_AddComponentDialog
@@ -91,7 +91,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self._group_to_edit_backup = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
-        self._main_validator = MultiWidgetValidator()
+        self._main_validator = MultiItemValidator()
         super().__init__(parent, self._group_container)
         super().setupUi()
         if nx_classes is None:
@@ -184,6 +184,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self._main_validator.is_valid.connect(self.ok_button.setEnabled)
         self.nameLineEdit.validator().is_valid.connect(partial(self._main_validator.set_is_valid, self.nameLineEdit))
         self.componentTypeComboBox.validator().is_valid.connect(partial(self._main_validator.set_is_valid, self.componentTypeComboBox))
+        self.fieldsListWidget.is_valid.connect(partial(self._main_validator.set_is_valid, self.fieldsListWidget))
 
 
         # Connect the button calls with functions

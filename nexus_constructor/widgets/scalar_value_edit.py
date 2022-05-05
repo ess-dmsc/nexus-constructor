@@ -9,6 +9,7 @@ from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.ui_utils import line_edit_validation_result_handler
 from nexus_constructor.validators import UnitValidator
 from nexus_constructor.common_attrs import CommonAttrs
+from nexus_constructor.validators import MultiItemValidator
 
 
 class FieldValueValidator(QValidator):
@@ -42,18 +43,24 @@ class ScalarValueEdit(QWidget):
         self._value_line_edit = QLineEdit(self)
         self.setLayout(QHBoxLayout())
         self._value_type_combo: QComboBox = QComboBox(self)
+        self._value_line_edit.setValidator(
+            FieldValueValidator(
+                self._value_type_combo,
+            )
+        )
         self._value_type_combo.addItems(list(VALUE_TYPE_TO_NP))
         self._value_type_combo.setCurrentText(ValueTypes.DOUBLE)
         self._units_line_edit = QLineEdit(self)
         self._units_line_edit.setValidator(UnitValidator())
+
+        self._validator = MultiItemValidator()
+        self._value_line_edit.validator().is_valid.connect(partial(self._validator.set_is_valid, self._value_line_edit))
+        self._units_line_edit.validator().is_valid.connect(partial(self._validator.set_is_valid, self._units_line_edit))
+        self._validator.is_valid.connect(self.is_valid.emit)
+
         self._units_line_edit.validator().is_valid.connect(
             partial(line_edit_validation_result_handler, self._units_line_edit)
         )
-        self._value_line_edit.setValidator(
-                        FieldValueValidator(
-                            self._value_type_combo,
-                        )
-                    )
         self._value_line_edit.validator().is_valid.connect(
             partial(
                 line_edit_validation_result_handler,
@@ -101,4 +108,6 @@ class ScalarValueEdit(QWidget):
         self._value_line_edit.validator().validate(
             self._value_line_edit.text(), 0
         )
+
+    is_valid = Signal(bool)
 

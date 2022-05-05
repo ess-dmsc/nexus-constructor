@@ -1,12 +1,13 @@
-from PySide2.QtWidgets import QListView, QWidget, QLabel, QStyledItemDelegate, QFrame, QSizePolicy, QLineEdit, QStyleOptionViewItem, QVBoxLayout, QAbstractItemView
-from PySide2.QtCore import QAbstractListModel, QModelIndex, QAbstractItemModel, Signal, Qt, QPoint, QSize
-from PySide2 import QtWidgets
+from PySide2.QtWidgets import QListView, QWidget, QLabel, QStyledItemDelegate, QFrame, QSizePolicy, QStyleOptionViewItem, QVBoxLayout, QAbstractItemView
+from PySide2.QtCore import QAbstractListModel, QModelIndex, Signal, Qt, QPoint, QSize
 from PySide2.QtGui import QPainter, QPixmap, QRegion
-from nexus_constructor.model import GroupContainer, Group, Component, Dataset
+from nexus_constructor.model import GroupContainer, Group, Dataset
 import PySide2
 import typing
 from typing import Dict, Optional
 from nexus_constructor.widgets.field_item import FieldItem
+from nexus_constructor.validators import MultiItemValidator
+from functools import partial
 
 
 class FieldListModel(QAbstractListModel):
@@ -36,14 +37,18 @@ class FieldListModel(QAbstractListModel):
 class FieldItemDelegate(QStyledItemDelegate):
     frameSize = QSize(30, 10)
 
-    def __init__(self, parent):
+    def __init__(self, parent, validator: MultiItemValidator):
         super().__init__(parent)
+        self._validator = validator
         self._dict_frames: Dict[QModelIndex, QFrame] = {}
 
-    def get_frame(self, index: QModelIndex, parent: Optional[QWidget] =None):
+    def get_frame(self, index: QModelIndex, parent: Optional[QWidget] = None):
         if parent is None:
             parent = self.parent()
-        frame = FieldItem(parent=parent, file_writer_module=index.model().data(index, Qt.DisplayRole))
+        c_module = index.model().data(index, Qt.DisplayRole)
+        frame = FieldItem(parent=parent, file_writer_module=c_module)
+        frame.is_valid.connect(partial(self._validator.set_is_valid, c_module))
+        frame.is_valid.emit(None)
         frame.setAutoFillBackground(True)
         SizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         SizePolicy.setHorizontalStretch(0)
@@ -108,11 +113,23 @@ class FieldList(QListView):
     def __init__(self, parent: QWidget, group_container: GroupContainer):
         super().__init__(parent)
         self._group_container = group_container
+        self._field_validator = MultiItemValidator()
+        self._field_validator.is_valid.connect(self.handle_validity_signal)
         self._model = FieldListModel(self, group_container)
-        self._item_delegate = FieldItemDelegate(parent)
+        self._item_delegate = FieldItemDelegate(parent, self._field_validator)
         self.setItemDelegate(self._item_delegate)
         self.setModel(self._model)
         self.setEditTriggers(QAbstractItemView.AllEditTriggers)
+
+    def handle_validity_signal(self, valid: bool):
+        self._purge_removed_validator_items()
+        self.is_valid.emit(self._field_validator.known_items_are_valid())
+
+    def _purge_removed_validator_items(self):
+        known_items = list(self._field_validator.items)
+        for item in known_items:
+            if item not in self._group_container.group.children:
+                self._field_validator.remove_item(item, no_emit=True)
 
     def add_field(self):
         self._model.beginInsertRows(QModelIndex(), self._model.rowCount(), self._model.rowCount())
@@ -127,7 +144,7 @@ class FieldList(QListView):
         c_field_parent = c_index.data().parent_node
         c_field_parent.children.remove(c_index.data())
         self._model.endRemoveRows()
+        self._field_validator.remove_item(c_index.data())
 
-    def fields_are_valid(self) -> bool:
-        return False
+    is_valid = Signal(bool)
 

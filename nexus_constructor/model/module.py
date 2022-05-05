@@ -45,7 +45,7 @@ class StreamModules(Enum):
     ADAR = "ADAr"
 
 
-@attr.s
+@attr.s(eq=False)
 class FileWriterModule(ABC):
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     writer_module = attr.ib(type=str, init=False)
@@ -146,7 +146,7 @@ class Link(FileWriterModule):
         }
 
 
-@attr.s
+@attr.s(eq=False)
 class Dataset(FileWriterModule):
     name = attr.ib(type=str)
     values = attr.ib(type=Union[List[ValueType], ValueType])
