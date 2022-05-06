@@ -15,7 +15,6 @@ jsonschema==2.6.0
 black==21.5b0
 pre-commit
 flake8==3.9.1
-mypy==0.812
 isort==5.7.0
 
 # Static type checking.
