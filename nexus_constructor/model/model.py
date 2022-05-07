@@ -26,13 +26,16 @@ class Model:
     def __init__(self):
         self.signals = Signals()
         self.entry = Entry()
-        self._components: List = []
+        self._components: Dict = {}
 
     def append_component(self, component: Component):
-        self._components.append(component)
+        self._components[component.absolute_path] = component
+
+    def remove_component(self, component: Component):
+        self._components.pop(component.absolute_path)
 
     def get_components(self):
-        return self._components
+        return [item for item in self._components.values()]
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         return {CommonKeys.CHILDREN: [self.entry.as_dict(error_collector)]}

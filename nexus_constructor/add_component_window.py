@@ -612,7 +612,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
             self._scene_widget.delete_component(c_group.name)
-            self.component_model.components.append(c_group)
+            self.component_model.model.append_component(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)
 
