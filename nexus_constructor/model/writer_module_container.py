@@ -1,14 +1,14 @@
-from .module import FileWriterModule
+from .module import StreamModule
 
 
 class ModuleContainer:
-    def __init__(self, module: FileWriterModule):
+    def __init__(self, module: StreamModule):
         self._module = module
 
     @property
-    def module(self) -> FileWriterModule:
-        return self.module
+    def module(self) -> StreamModule:
+        return self._module
 
     @module.setter
-    def group(self, new_module: FileWriterModule):
+    def group(self, new_module: StreamModule):
         self._module = new_module

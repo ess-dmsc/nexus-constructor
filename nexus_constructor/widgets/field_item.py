@@ -18,6 +18,7 @@ from nexus_constructor.model import FileWriterModule, Link
 from nexus_constructor.widgets.field_name_edit import FieldNameEdit
 from nexus_constructor.widgets.scalar_value_edit import ScalarValueEdit
 from nexus_constructor.widgets.scalar_array_edit import ScalarArrayEdit
+from nexus_constructor.widgets.file_writer_module_edit import FileWriterModuleEdit
 from nexus_constructor.validators import MultiItemValidator
 from nexus_constructor.field_attrs import FieldAttrsDialog
 
@@ -30,6 +31,16 @@ class BaseFieldWidget(QWidget):
     def __init__(self, parent: QWidget, module: Dataset):
         super().__init__(parent)
         self._module = module
+        self._validator = MultiItemValidator()
+        self.setLayout(QHBoxLayout())
+
+    is_valid = Signal(bool)
+
+
+class BaseScalarFieldWidget(BaseFieldWidget):
+    def __init__(self, parent: QWidget, module: Dataset):
+        super().__init__(parent, module)
+        self._module = module
         self._field_name = FieldNameEdit(parent, module)
         self._attrs_dialog = FieldAttrsDialog(parent=parent)
         self._attrs_dialog.accepted.connect(self._done_with_attributes)
@@ -38,12 +49,10 @@ class BaseFieldWidget(QWidget):
         self._attrs_button = QPushButton("Attrs")
         self._attrs_button.setMaximumSize(edit_button_size, edit_button_size)
         self._attrs_button.clicked.connect(self._show_attrs_dialog)
-        self.setLayout(QHBoxLayout())
         self.layout().addWidget(self._field_name)
         self.layout().addWidget(QLabel(parent=parent, text=" : "))
         self.layout().addWidget(self._attrs_button)
         self.layout().setAlignment(Qt.AlignLeft)
-        self._validator = MultiItemValidator()
         self._field_name.is_valid.connect(
             partial(self._validator.set_is_valid, self._field_name)
         )
@@ -67,10 +76,8 @@ class BaseFieldWidget(QWidget):
     def check_validity(self):
         self._field_name.check_validity()
 
-    is_valid = Signal(bool)
 
-
-class ScalarFieldWidget(BaseFieldWidget):
+class ScalarFieldWidget(BaseScalarFieldWidget):
     def __init__(self, parent: QWidget, module: Dataset):
         super().__init__(parent, module)
         self._scalar_value = ScalarValueEdit(parent, module)
@@ -83,7 +90,8 @@ class ScalarFieldWidget(BaseFieldWidget):
         super().check_validity()
         self._scalar_value.check_validity()
 
-class ScalarArrayFieldWidget(BaseFieldWidget):
+
+class ScalarArrayFieldWidget(BaseScalarFieldWidget):
     def __init__(self, parent: QWidget, module: Dataset):
         super().__init__(parent, module)
         self._scalar_array = ScalarArrayEdit(parent, module)
@@ -95,7 +103,18 @@ class ScalarArrayFieldWidget(BaseFieldWidget):
     def check_validity(self):
         super().check_validity()
         self._scalar_array.check_validity()
-        
+
+
+class WriterModuleFieldWidget(BaseFieldWidget):
+    def __init__(self, parent: QWidget, module: Dataset):
+        super().__init__(parent, module)
+        self._standard_settings = FileWriterModuleEdit(parent, module)
+        self.layout().insertWidget(2, self._standard_settings)
+        self._standard_settings.is_valid.connect(partial(self._validator.set_is_valid, self._standard_settings))
+
+    def check_validity(self):
+        self._standard_settings.check_validity()
+
 
 class FieldType(Enum):
     scalar_dataset = "Scalar dataset"
@@ -326,6 +345,10 @@ class FieldItem(QFrame):
 
     def _instantiate_stream_widgets(self):
         self._remove_existing_widget()
+        self._field_widget = WriterModuleFieldWidget(self.parent(), self._file_writer_module)
+        self._field_widget.is_valid.connect(self.is_valid.emit)
+        self.check_validity()
+        self.layout().addWidget(self._field_widget)
 
     def _instantiate_link_widgets(self):
         self._remove_existing_widget()
