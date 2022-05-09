@@ -44,7 +44,7 @@ builders = pipeline_builder.createBuilders { container ->
         container.sh """
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
+            build_env/bin/pip --proxy ${https_proxy} install -r requirements-jenkins.txt
             """
     } // stage
 

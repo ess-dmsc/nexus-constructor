@@ -1,0 +1,9 @@
+# Development requirements
+
+# Mirror the basic requirements
+-r requirements-dev.txt
+
+# Packaging
+pyinstaller
+# setuptools 45 onwards not working with pyinstaller yet
+setuptools<45.0.0
