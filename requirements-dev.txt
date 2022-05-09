@@ -4,9 +4,9 @@
 -r requirements.txt
 
 # Packaging
-# pyinstaller
+pyinstaller
 # setuptools 45 onwards not working with pyinstaller yet
-# setuptools<45.0.0
+setuptools<45.0.0
 
 # newer versions of jsonschema don't work with the executables built by cx_Freeze
 jsonschema==2.6.0
