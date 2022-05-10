@@ -45,8 +45,5 @@ class ScalarArrayEdit(ScalarValueBase):
         except ValueError:
             self._dataset.values = new_value
 
-    def _dataset_type_changed(self):
-        self._value_line_edit.validator().validate(self._value_line_edit.text(), 0)
-
     def check_validity(self):
         super().check_validity()

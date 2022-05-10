@@ -47,7 +47,6 @@ class StreamModules(Enum):
 
 @attr.s(eq=False)
 class FileWriterModule(ABC):
-    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     writer_module = attr.ib(type=str, init=False)
     parent_node = attr.ib(type="Group")
 
@@ -68,10 +67,6 @@ class StreamModule(FileWriterModule):
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {SOURCE: self.source, TOPIC: self.topic},
         }
-        if self.attributes:
-            return_dict[CommonKeys.ATTRIBUTES] = self.attributes.as_dict(
-                error_collector
-            )
         return return_dict
 
 
@@ -110,7 +105,7 @@ class EV42Stream(StreamModule):
 
 @attr.s
 class F142Stream(StreamModule):
-    type = attr.ib(type=str)
+    type = attr.ib(type=str, default="double")
     cue_interval = attr.ib(type=int, default=None)
     chunk_size = attr.ib(type=int, default=None)
     value_units = attr.ib(type=str, default=None)
@@ -151,6 +146,7 @@ class Dataset(FileWriterModule):
     name = attr.ib(type=str)
     values = attr.ib(type=Union[List[ValueType], ValueType])
     type = attr.ib(type=str, default=None)
+    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
 
     def __str__(self) -> str:

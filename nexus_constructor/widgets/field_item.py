@@ -24,13 +24,14 @@ from nexus_constructor.field_attrs import FieldAttrsDialog
 
 from enum import Enum
 from nexus_constructor.model import Dataset
-from nexus_constructor.model.module import StreamModule
+from nexus_constructor.model.module import StreamModule, F142Stream
+from nexus_constructor.model.writer_module_container import ModuleContainer
 
 
 class BaseFieldWidget(QWidget):
-    def __init__(self, parent: QWidget, module: Dataset):
+    def __init__(self, parent: QWidget, container: ModuleContainer):
         super().__init__(parent)
-        self._module = module
+        self._container = container
         self._validator = MultiItemValidator()
         self.setLayout(QHBoxLayout())
 
@@ -38,10 +39,15 @@ class BaseFieldWidget(QWidget):
 
 
 class BaseScalarFieldWidget(BaseFieldWidget):
-    def __init__(self, parent: QWidget, module: Dataset):
-        super().__init__(parent, module)
-        self._module = module
-        self._field_name = FieldNameEdit(parent, module)
+    def __init__(self, parent: QWidget, container: ModuleContainer):
+        super().__init__(parent, container)
+        if not isinstance(container.module, Dataset):
+            parent_node = container.module.parent_node
+            new_module = Dataset(parent_node=parent_node, name="", values=0)
+            parent_node.children[parent_node.children.index(container.module)] = new_module
+            container.module = new_module
+        self._container = container
+        self._field_name = FieldNameEdit(parent, container.module)
         self._attrs_dialog = FieldAttrsDialog(parent=parent)
         self._attrs_dialog.accepted.connect(self._done_with_attributes)
         edit_button_size = 50
@@ -78,9 +84,9 @@ class BaseScalarFieldWidget(BaseFieldWidget):
 
 
 class ScalarFieldWidget(BaseScalarFieldWidget):
-    def __init__(self, parent: QWidget, module: Dataset):
-        super().__init__(parent, module)
-        self._scalar_value = ScalarValueEdit(parent, module)
+    def __init__(self, parent: QWidget, container: ModuleContainer):
+        super().__init__(parent, container)
+        self._scalar_value = ScalarValueEdit(parent, container.module)
         self.layout().insertWidget(2, self._scalar_value)
         self._scalar_value.is_valid.connect(
             partial(self._validator.set_is_valid, self._scalar_value)
@@ -92,9 +98,9 @@ class ScalarFieldWidget(BaseScalarFieldWidget):
 
 
 class ScalarArrayFieldWidget(BaseScalarFieldWidget):
-    def __init__(self, parent: QWidget, module: Dataset):
-        super().__init__(parent, module)
-        self._scalar_array = ScalarArrayEdit(parent, module)
+    def __init__(self, parent: QWidget, container: ModuleContainer):
+        super().__init__(parent, container)
+        self._scalar_array = ScalarArrayEdit(parent, container.module)
         self.layout().insertWidget(2, self._scalar_array)
         self._scalar_array.is_valid.connect(
             partial(self._validator.set_is_valid, self._scalar_array)
@@ -106,9 +112,14 @@ class ScalarArrayFieldWidget(BaseScalarFieldWidget):
 
 
 class WriterModuleFieldWidget(BaseFieldWidget):
-    def __init__(self, parent: QWidget, module: Dataset):
-        super().__init__(parent, module)
-        self._standard_settings = FileWriterModuleEdit(parent, module)
+    def __init__(self, parent: QWidget, container: ModuleContainer):
+        super().__init__(parent, container)
+        if not isinstance(container.module, StreamModule):
+            parent_node = container.module.parent_node
+            new_module = F142Stream(parent_node=parent_node, source="", topic="", type="double")
+            parent_node.children[parent_node.children.index(container.module)] = new_module
+            container.module = new_module
+        self._standard_settings = FileWriterModuleEdit(parent, container)
         self.layout().insertWidget(2, self._standard_settings)
         self._standard_settings.is_valid.connect(partial(self._validator.set_is_valid, self._standard_settings))
 
@@ -157,7 +168,7 @@ class FieldItem(QFrame):
     ):
         super().__init__(parent)
         self._field_widget: Optional[QWidget] = None
-        self._file_writer_module = file_writer_module
+        self._module_container = ModuleContainer(file_writer_module)
 
         #     self.streams_widget: StreamFieldsWidget = None
         #     if possible_fields:
@@ -184,7 +195,7 @@ class FieldItem(QFrame):
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.setCurrentText(
-            get_module_type(self._file_writer_module).value
+            get_module_type(self._module_container.module).value
         )
         self.field_type_combo.currentIndexChanged.connect(self._field_type_changed)
 
@@ -268,56 +279,6 @@ class FieldItem(QFrame):
         #     # Set the layout for the default field type
         self._field_type_changed()
 
-    #
-    # def _set_up_name_validator(
-    #     self, existing_objects: List[Union["FieldWidget", FileWriterModule]]
-    # ):
-    #     self.field_name_edit.setValidator(
-    #         NameValidator(existing_objects, invalid_names=INVALID_FIELD_NAMES)
-    #     )
-    #     self.field_name_edit.validator().is_valid.connect(
-    #         partial(
-    #             validate_line_edit,
-    #             self.field_name_edit,
-    #             tooltip_on_accept="Field name is valid.",
-    #             tooltip_on_reject="Field name is not valid",
-    #         )
-    #     )
-    #
-    #
-    # @value.setter
-    # def value(self, value):
-    #     if self.field_type == FieldType.scalar_dataset:
-    #         self.value_line_edit.setText(to_string(value))
-    #     elif self.field_type == FieldType.array_dataset:
-    #         self.table_view.model.array = value
-    #     elif self.field_type == FieldType.link:
-    #         self.value_line_edit.setText(value)
-    #
-    # @property
-    # def units(self) -> str:
-    #     return self.units_line_edit.text()
-    #
-    # @units.setter
-    # def units(self, new_units: str):
-    #     self.units_line_edit.setText(new_units)
-    #
-    # def update_default_type(self):
-    #     self.value_type_combo.setCurrentText(
-    #         self.default_field_types_dict.get(self.field_name_edit.text(), "double")
-    #     )
-    #
-    # def eventFilter(self, watched: QObject, event: QEvent) -> bool:
-    #     if event.type() == QEvent.MouseButtonPress:
-    #         self.something_clicked.emit()
-    #         return True
-    #     else:
-    #         return False
-    #
-    # def field_type_is_scalar(self) -> bool:
-    #     return self.field_type == FieldType.scalar_dataset
-    #
-
     def check_validity(self):
         if self._field_widget is not None:
             self._field_widget.check_validity()
@@ -331,21 +292,21 @@ class FieldItem(QFrame):
 
     def _instantiate_scalar_widgets(self):
         self._remove_existing_widget()
-        self._field_widget = ScalarFieldWidget(self.parent(), self._file_writer_module)
+        self._field_widget = ScalarFieldWidget(self.parent(), self._module_container)
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
 
     def _instantiate_array_widgets(self):
         self._remove_existing_widget()
-        self._field_widget = ScalarArrayFieldWidget(self.parent(), self._file_writer_module)
+        self._field_widget = ScalarArrayFieldWidget(self.parent(), self._module_container)
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
 
     def _instantiate_stream_widgets(self):
         self._remove_existing_widget()
-        self._field_widget = WriterModuleFieldWidget(self.parent(), self._file_writer_module)
+        self._field_widget = WriterModuleFieldWidget(self.parent(), self._module_container)
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)

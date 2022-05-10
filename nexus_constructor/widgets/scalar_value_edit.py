@@ -60,6 +60,7 @@ class ScalarValueEdit(ScalarValueBase):
         self._value_line_edit.setText(str(self._dataset.values))
 
         self._value_line_edit.textEdited.connect(self._value_changed)
+        self._value_type_combo.currentIndexChanged.connect(self._dataset_type_changed)
         self._dataset_type_changed()
 
     def _value_changed(self, new_value: str):

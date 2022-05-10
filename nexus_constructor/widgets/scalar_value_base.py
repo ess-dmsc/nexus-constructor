@@ -41,7 +41,6 @@ class ScalarValueBase(QWidget):
 
         self.layout().setAlignment(Qt.AlignLeft)
 
-        self._value_type_combo.currentIndexChanged.connect(self._dataset_type_changed)
         self._units_line_edit.textEdited.connect(self._unit_changed)
 
         if self._dataset.attributes.contains_attribute(CommonAttrs.UNITS):

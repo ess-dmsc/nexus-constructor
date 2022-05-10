@@ -10,5 +10,5 @@ class ModuleContainer:
         return self._module
 
     @module.setter
-    def group(self, new_module: StreamModule):
+    def module(self, new_module: StreamModule):
         self._module = new_module
