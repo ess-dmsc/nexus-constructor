@@ -61,36 +61,6 @@ class FileWriterModuleEdit(QWidget):
 
         self._module_type_combo.currentIndexChanged.connect(self._handle_module_change)
 
-    #     self._units_line_edit.setPlaceholderText("unit")
-    #     self._units_line_edit.setMaximumWidth(20)
-    #     self._units_line_edit.setMaximumWidth(50)
-    #
-    #     self.layout().addWidget(self._value_type_combo)
-    #     self.layout().addWidget(self._units_line_edit)
-    #
-    #     self.layout().setAlignment(Qt.AlignLeft)
-    #
-    #     self._value_type_combo.currentIndexChanged.connect(self._dataset_type_changed)
-    #     self._units_line_edit.textEdited.connect(self._unit_changed)
-    #
-    #     if self._dataset.attributes.contains_attribute(CommonAttrs.UNITS):
-    #         self._units_line_edit.setText(
-    #             self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS)
-    #         )
-    #     self._value_type_combo.setCurrentText(
-    #         ValueTypes.STRING if not self._dataset.type else self._dataset.type
-    #     )
-    #     self._units_line_edit.setText(
-    #         self._dataset.attributes.get_attribute_value(CommonAttrs.UNITS)
-    #     )
-    #
-    # def _unit_changed(self, new_unit: str):
-    #     if not new_unit:
-    #         if self._dataset.attributes.contains_attribute(CommonAttrs.UNITS):
-    #             self._dataset.attributes.remove_attribute(CommonAttrs.UNITS)
-    #         return
-    #     self._dataset.attributes.set_attribute_value(CommonAttrs.UNITS, new_unit)
-
     def _handle_module_change(self, new_index: int):
         module_map = {WriterModules.F142.value: WriterModuleClasses.F142,
                       WriterModules.EV42.value: WriterModuleClasses.EV42,
