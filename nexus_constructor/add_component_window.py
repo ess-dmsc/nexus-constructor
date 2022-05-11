@@ -14,6 +14,7 @@ from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
+from nexus_constructor.instrument_view.instrument_view import SPECIAL_SHAPE_CASES
 from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import (
@@ -199,6 +200,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
+        self.nx_class_changed.connect(self.set_shape_button_visibility)
         self.on_nx_class_changed()
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
@@ -648,6 +650,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         if self.pixel_options:
             self.pixel_options.update_pixel_input_validity()
+
+    def set_shape_button_visibility(self):
+        nx_class = self.componentTypeComboBox.currentText()
+        self.shapeTypeBox.setVisible(nx_class in COMPONENT_TYPES)
+        if nx_class not in COMPONENT_TYPES:
+            return
+        is_not_special_case = nx_class not in SPECIAL_SHAPE_CASES.keys()
+        self.noShapeRadioButton.setVisible(True)
+        self.boxRadioButton.setVisible(is_not_special_case)
+        self.meshRadioButton.setVisible(is_not_special_case)
+        self.CylinderRadioButton.setVisible(is_not_special_case)
 
 
 def get_fields_and_update_functions_for_component(component: Group):
