@@ -30,9 +30,9 @@ class ModuleView(QGroupBox):
             self.layout.addWidget(self._get_label(f"source: {source}"))
         elif module.writer_module == WriterModules.LINK.value:
             name = module.name if module.name else "not specified"
-            source = module.source if module.source else "not specified"
+            target = module.target if module.target else "not specified"
             self.layout.addWidget(self._get_label(f"link name: {name}   |  "))
-            self.layout.addWidget(self._get_label(f"source: {source}"))
+            self.layout.addWidget(self._get_label(f"target: {target}"))
         elif module.writer_module == WriterModules.DATASET.value:
             name = module.name if module.name else "not specified"
             dtype = module.type if module.type else "not specified"
@@ -110,7 +110,7 @@ class ModuleViewEditable(QGroupBox):
             )
             self._set_additional_options()
         elif self.module.writer_module == WriterModules.LINK.value:
-            self.module.source = self.field_widget.value.source  # type: ignore
+            self.module.target = self.field_widget.value.target  # type: ignore
             self.module.name = self.field_widget.name
         else:
             self.module.parent_node.name = self.field_widget.name

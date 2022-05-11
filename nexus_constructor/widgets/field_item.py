@@ -18,6 +18,7 @@ from nexus_constructor.model import FileWriterModule, Link
 from nexus_constructor.widgets.field_name_edit import FieldNameEdit
 from nexus_constructor.widgets.scalar_value_edit import ScalarValueEdit
 from nexus_constructor.widgets.scalar_array_edit import ScalarArrayEdit
+from nexus_constructor.widgets.link_edit import LinkEdit
 from nexus_constructor.widgets.file_writer_module_edit import FileWriterModuleEdit
 from nexus_constructor.validators import MultiItemValidator
 from nexus_constructor.field_attrs import FieldAttrsDialog
@@ -125,6 +126,25 @@ class WriterModuleFieldWidget(BaseFieldWidget):
 
     def check_validity(self):
         self._standard_settings.check_validity()
+
+
+class LinkModuleFieldWidget(BaseFieldWidget):
+    def __init__(self, parent: QWidget, container: ModuleContainer):
+        super().__init__(parent, container)
+        if not isinstance(container.module, Link):
+            parent_node = container.module.parent_node
+            if isinstance(container.module, Dataset):
+                new_module = Link(parent_node=parent_node, name=container.module.name, target="")
+            else:
+                new_module = Link(parent_node=parent_node, name="", target="")
+            parent_node.children[parent_node.children.index(container.module)] = new_module
+            container.module = new_module
+        self._link_settings = LinkEdit(parent, container)
+        self.layout().addWidget(self._link_settings)
+        self._link_settings.is_valid.connect(partial(self._validator.set_is_valid, self._link_settings))
+
+    def check_validity(self):
+        self._link_settings.check_validity()
 
 
 class FieldType(Enum):
@@ -313,6 +333,10 @@ class FieldItem(QFrame):
 
     def _instantiate_link_widgets(self):
         self._remove_existing_widget()
+        self._field_widget = LinkModuleFieldWidget(self.parent(), self._module_container)
+        self._field_widget.is_valid.connect(self.is_valid.emit)
+        self.check_validity()
+        self.layout().addWidget(self._field_widget)
 
     def _field_type_changed(self):
         populate_widget_map = {

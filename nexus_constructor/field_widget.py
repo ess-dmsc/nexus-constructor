@@ -287,7 +287,7 @@ class FieldWidget(QFrame):
             return_object = Link(
                 parent_node=self._node_parent,
                 name=self.name,
-                source=self.value_line_edit.text(),
+                target=self.value_line_edit.text(),
             )
         else:
             logging.error(f"unknown field type: {self.name}")

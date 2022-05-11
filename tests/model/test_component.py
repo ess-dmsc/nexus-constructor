@@ -96,7 +96,7 @@ def test_component_as_dict_contains_links():
     name = "link1"
     target = "/entry/instrument/something"
     test_component = Component(name="test")
-    test_component[name] = Link(parent_node=None, name=name, source=target)
+    test_component[name] = Link(parent_node=None, name=name, target=target)
 
     dictionary_output = test_component.as_dict([])
 

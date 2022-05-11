@@ -22,7 +22,7 @@ SOURCE = "source"
 TOPIC = "topic"
 DATASET = "dataset"
 LINK = "link"
-
+TARGET = "target"
 
 class WriterModules(Enum):
     F142 = "f142"
@@ -47,6 +47,7 @@ class StreamModules(Enum):
 
 @attr.s(eq=False)
 class FileWriterModule(ABC):
+    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)  # Deprecated, will be removed soon
     writer_module = attr.ib(type=str, init=False)
     parent_node = attr.ib(type="Group")
 
@@ -130,14 +131,14 @@ class F142Stream(StreamModule):
 @attr.s
 class Link(FileWriterModule):
     name = attr.ib(type=str)
-    source = attr.ib(type=str)
+    target = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.LINK.value, init=False)
     values = None
 
     def as_dict(self, error_collector: List[str]):
         return {
             CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.source},
+            NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.target},
         }
 
 
@@ -245,7 +246,7 @@ def create_fw_module_object(mod_type, configuration, parent_node):
     elif mod_type == WriterModules.LINK.value:
         fw_mod_obj = fw_mod_class(
             name=configuration[CommonKeys.NAME],
-            source=configuration[SOURCE],
+            target=configuration[TARGET],
             parent_node=parent_node,
         )
     elif mod_type == WriterModules.DATASET.value:

@@ -154,6 +154,6 @@ def test_ev42_stream_optional_settings():
 def test_GIVEN_link_info_WHEN_adding_link_THEN_link_object_is_created():
     name = "link1"
     target = "/entry/instrument/detector1"
-    link = Link(parent_node=None, name=name, source=target)
+    link = Link(parent_node=None, name=name, target=target)
     assert link.name == name
-    assert link.source == target
+    assert link.target == target

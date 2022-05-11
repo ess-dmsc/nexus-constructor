@@ -26,7 +26,7 @@ def update_existing_link_field(field: Link, new_ui_field: "QFrame"):
     """
     new_ui_field.field_type = FieldType.link
     new_ui_field.name = field.name
-    new_ui_field.value = field.source
+    new_ui_field.value = field.target
 
 
 def update_existing_array_field(field: Dataset, new_ui_field: FieldWidget):

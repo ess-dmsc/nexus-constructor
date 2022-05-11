@@ -1817,7 +1817,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
 
     entry = Entry()
     link_name = "link1"
-    link = Link(parent_node=entry, name=link_name, source=entry.name)
+    link = Link(parent_node=entry, name=link_name, target=entry.name)
 
     component[link_name] = link
 
@@ -1836,7 +1836,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
     assert widget.field_type_combo.currentText().lower() == "link"
     assert widget.value.name == link_name
-    assert widget.value.source == entry.name
+    assert widget.value.target == entry.name
 
 
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
@@ -2080,7 +2080,7 @@ def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
     field.value_line_edit.setText(field_target)
 
     assert field.name == field_name
-    assert field.value.source == field_target
+    assert field.value.target == field_target
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_correct_options(

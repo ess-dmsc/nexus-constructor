@@ -162,7 +162,7 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     path = "/entry"
 
     transform = component.add_rotation(QVector3D(x, y, z), 0, name="test")
-    link = Link(parent_node=None, name="test", source=path)
+    link = Link(parent_node=None, name="test", target=path)
 
     transform.values = link
 
@@ -174,7 +174,7 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     assert view.transformation_frame.z_spinbox.value() == z
     assert view.transformation_frame.value_spinbox.value() == 0.0
     assert view.transformation_frame.magnitude_widget.field_type == FieldType.link
-    assert view.transformation_frame.magnitude_widget.value.source == path
+    assert view.transformation_frame.magnitude_widget.value.target == path
 
 
 def test_UI_GIVEN_vector_updated_WHEN_saving_view_changes_THEN_model_is_updated(
