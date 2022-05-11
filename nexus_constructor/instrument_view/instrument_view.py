@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from typing import Dict, Tuple
 
 from PySide2.Qt3DCore import Qt3DCore
@@ -205,7 +206,9 @@ class InstrumentView(QWidget):
         if geometry is None:
             return
         if nx_class == CHOPPER_CLASS_NAME:
+            component = deepcopy(component)
             _set_chopper_geometry(component)
+            geometry, positions = component.shape
         if nx_class == SOURCE_CLASS_NAME:
             q_component = NeutronSourceEntityCollection(
                 self.component_root_entity, nx_class

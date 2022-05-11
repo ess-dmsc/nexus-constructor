@@ -50,7 +50,7 @@ def _incorrect_data_type_message(
     """
     return (
         f"Wrong {field_name} type. Expected {expected_type} but found"
-        f" {data_dict[field_name].dtype}."
+        f" {data_dict[field_name].type}."
     )
 
 
@@ -382,7 +382,9 @@ class ChopperChecker:
         5) Checks that the overall chopper geometry is valid (no overlapping slits, repeated angles, etc).
         :return: True if the chopper is valid, False otherwise.
         """
-        if isinstance(self.fields_dict[SLIT_EDGES_NAME].values, list):
+        if SLIT_EDGES_NAME in self.fields_dict and isinstance(
+            self.fields_dict[SLIT_EDGES_NAME].values, list
+        ):
             self.fields_dict[SLIT_EDGES_NAME].values = np.array(
                 self.fields_dict[SLIT_EDGES_NAME].values
             )

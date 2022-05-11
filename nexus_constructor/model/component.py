@@ -491,8 +491,6 @@ class Component(Group):
         return [QVector3D(x, y, z) for x, y, z in zip(x_offsets, y_offsets, z_offsets)]
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
-        if SHAPE_GROUP_NAME in self and not self[SHAPE_GROUP_NAME].nx_class:
-            self.remove_shape()
         dictionary = super(Component, self).as_dict(error_collector)
         if self.transforms:
             # Add transformations in a child group
