@@ -15,7 +15,6 @@ from nexus_constructor.common_attrs import (
 )
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import (
-    CHOPPER_CLASS_NAME,
     COMPONENT_TYPES,
     PIXEL_COMPONENT_TYPES,
     SLIT_CLASS_NAME,
@@ -57,14 +56,12 @@ from nexus_constructor.validators import (
 from ui.add_component import Ui_AddComponentDialog
 
 
-def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget):
+def _set_chopper_geometry(component: Component):
     """
     Attempts to set a chopper geometry in the component by checking if the component fields describe a valid chopper.
     :param component: The component to be given a shape.
-    :param fields_list_widget: The fields list widget that contains the user input.
     """
-    chopper_validator = ChopperChecker(fields_list_widget)
-
+    chopper_validator = ChopperChecker(component.children)
     if chopper_validator.validate_chopper():
         chopper_details = chopper_validator.chopper_details
         chopper_creator = DiskChopperGeometryCreator(chopper_details)
@@ -543,11 +540,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 filename=self.fileLineEdit.text(),
                 pixel_data=pixel_data,
             )
-        elif (
-            self.noShapeRadioButton.isChecked()
-            and component.nx_class == CHOPPER_CLASS_NAME
-        ):
-            _set_chopper_geometry(component, self.fieldsListWidget)
         elif (
             self.noShapeRadioButton.isChecked()
             and component.nx_class == SLIT_CLASS_NAME

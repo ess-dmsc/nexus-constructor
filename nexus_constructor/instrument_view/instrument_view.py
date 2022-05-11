@@ -8,7 +8,8 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QColor, QVector3D
 from PySide2.QtWidgets import QVBoxLayout, QWidget
 
-from nexus_constructor.component_type import SOURCE_CLASS_NAME
+from nexus_constructor.add_component_window import _set_chopper_geometry
+from nexus_constructor.component_type import CHOPPER_CLASS_NAME, SOURCE_CLASS_NAME
 from nexus_constructor.instrument_view.entity_collections import (
     EntityCollection,
     NeutronSourceEntityCollection,
@@ -200,10 +201,11 @@ class InstrumentView(QWidget):
         """
         name, nx_class = component.name, component.nx_class
         geometry, positions = component.shape
+        q_component: EntityCollection
         if geometry is None:
             return
-
-        q_component: EntityCollection = None
+        if nx_class == CHOPPER_CLASS_NAME:
+            _set_chopper_geometry(component)
         if nx_class == SOURCE_CLASS_NAME:
             q_component = NeutronSourceEntityCollection(
                 self.component_root_entity, nx_class
@@ -215,7 +217,6 @@ class InstrumentView(QWidget):
             q_component = OffMeshEntityCollection(
                 mesh, self.component_root_entity, nx_class
             )
-
         q_component.create_entities()
         self.component_entities[name] = q_component
 
