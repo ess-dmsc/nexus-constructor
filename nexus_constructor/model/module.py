@@ -58,7 +58,7 @@ class FileWriterModule(ABC):
         return self.writer_module
 
 
-@attr.s
+@attr.s(eq=False)
 class StreamModule(FileWriterModule):
     source = attr.ib(type=str)
     topic = attr.ib(type=str)
@@ -71,27 +71,28 @@ class StreamModule(FileWriterModule):
         return return_dict
 
 
-@attr.s
+@attr.s(eq=False)
 class NS10Stream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
 
 
-@attr.s
+@attr.s(eq=False)
 class SENVStream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
 
 
-@attr.s
+@attr.s(eq=False)
 class TDCTStream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
 
 
-@attr.s
+@attr.s(eq=False)
 class EV42Stream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
     adc_pulse_debug = attr.ib(type=bool, default=None)
     cue_interval = attr.ib(type=int, default=None)
     chunk_size = attr.ib(type=int, default=None)
+    expanded = attr.ib(type=bool, default=False)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -104,7 +105,7 @@ class EV42Stream(StreamModule):
         return module_dict
 
 
-@attr.s
+@attr.s(eq=False)
 class F142Stream(StreamModule):
     type = attr.ib(type=str, default="double")
     cue_interval = attr.ib(type=int, default=None)
@@ -112,6 +113,7 @@ class F142Stream(StreamModule):
     value_units = attr.ib(type=str, default=None)
     array_size = attr.ib(type=list, default=None)
     writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
+    expanded = attr.ib(type=bool, default=False)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -128,7 +130,7 @@ class F142Stream(StreamModule):
         return module_dict
 
 
-@attr.s
+@attr.s(eq=False)
 class Link(FileWriterModule):
     name = attr.ib(type=str)
     target = attr.ib(type=str)
@@ -186,10 +188,11 @@ class Dataset(FileWriterModule):
         return self.name
 
 
-@attr.s
+@attr.s(eq=False)
 class ADARStream(StreamModule):
     array_size = attr.ib(type=list, init=False)
     writer_module = attr.ib(type=str, default=WriterModules.ADAR.value, init=False)
+    expanded = attr.ib(type=bool, default=False)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)

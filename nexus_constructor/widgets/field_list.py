@@ -9,7 +9,7 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
     QAbstractItemView,
 )
-from PySide2.QtCore import QAbstractListModel, QModelIndex, Signal, Qt, QPoint, QSize
+from PySide2.QtCore import QAbstractListModel, QModelIndex, Signal, Qt, QPoint, QSize, QPersistentModelIndex
 from PySide2.QtGui import QPainter, QPixmap, QRegion
 from nexus_constructor.model import GroupContainer, Group, Dataset
 import PySide2
@@ -77,6 +77,14 @@ class FieldItemDelegate(QStyledItemDelegate):
         index: PySide2.QtCore.QModelIndex,
     ) -> PySide2.QtWidgets.QWidget:
         frame = self.get_frame(index, parent=parent)
+
+        persistent = QPersistentModelIndex(index)
+
+        def emitSizeHintChanged():
+            new_index = persistent.model().index(persistent.row(), persistent.column(), persistent.parent())
+            self.sizeHintChanged.emit(new_index)
+        frame.sizeHintChanged.connect(emitSizeHintChanged)
+        self.sizeHintChanged.emit(index)
         return frame
 
     def updateEditorGeometry(
@@ -101,6 +109,8 @@ class FieldItemDelegate(QStyledItemDelegate):
     def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex) -> QSize:
         frame = self.get_frame(index)
         return frame.sizeHint()
+
+
 
 
 class FileListModel(QAbstractListModel):

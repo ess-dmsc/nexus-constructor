@@ -1,9 +1,9 @@
 from functools import partial
 
-from PySide2.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QComboBox, QPushButton
+from PySide2.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QComboBox, QPushButton, QLabel
 from PySide2.QtCore import Signal, Qt
 
-from nexus_constructor.model.module import StreamModule, StreamModules, WriterModules, WriterModuleClasses
+from nexus_constructor.model.module import StreamModules, WriterModules, WriterModuleClasses
 from nexus_constructor.model.writer_module_container import ModuleContainer
 from nexus_constructor.ui_utils import line_edit_validation_result_handler
 from nexus_constructor.validators import NoEmptyStringValidator, MultiItemValidator
@@ -12,8 +12,12 @@ from nexus_constructor.validators import NoEmptyStringValidator, MultiItemValida
 class FileWriterModuleEdit(QWidget):
     def __init__(self, parent: QWidget, container: ModuleContainer):
         super().__init__(parent)
+        self._second_line_layout_widget = None
         self._module_container = container
-        self.setLayout(QHBoxLayout())
+        self._first_line_layout = QHBoxLayout()
+        self._first_line_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
         self._module_type_combo: QComboBox = QComboBox(self)
         self._module_type_combo.addItems([m.value for m in StreamModules])
         self._module_type_combo.setCurrentText(container.module.writer_module)
@@ -24,12 +28,16 @@ class FileWriterModuleEdit(QWidget):
         self._source_edit = QLineEdit(self)
         self._source_edit.setPlaceholderText("Source name")
         self._source_edit.setValidator(NoEmptyStringValidator())
-        self._more_options = QPushButton("More")
 
-        self.layout().addWidget(self._module_type_combo)
-        self.layout().addWidget(self._topic_edit)
-        self.layout().addWidget(self._source_edit)
-        self.layout().addWidget(self._more_options)
+        self._more_options = QPushButton("More")
+        self._more_options.setEnabled(False)
+        self._more_options.clicked.connect(self._handle_more_or_less)
+
+        self._first_line_layout.addWidget(self._module_type_combo)
+        self._first_line_layout.addWidget(self._topic_edit)
+        self._first_line_layout.addWidget(self._source_edit)
+        self._first_line_layout.addWidget(self._more_options)
+        self.layout().addLayout(self._first_line_layout)
 
         self._module_validator = MultiItemValidator()
 
@@ -61,6 +69,8 @@ class FileWriterModuleEdit(QWidget):
 
         self._module_type_combo.currentIndexChanged.connect(self._handle_module_change)
 
+        self._populate_extra_attributes()
+
     def _handle_module_change(self, new_index: int):
         module_map = {WriterModules.F142.value: WriterModuleClasses.F142,
                       WriterModules.EV42.value: WriterModuleClasses.EV42,
@@ -77,6 +87,40 @@ class FileWriterModuleEdit(QWidget):
             module_index = self._module_container.module.parent_node.children.index(self._module_container.module)
             self._module_container.module.parent_node.children[module_index] = new_module
             self._module_container.module = new_module
+            self._populate_extra_attributes()
+
+    def _handle_more_or_less(self):
+        self._module_container.module.expanded = not self._module_container.module.expanded
+        if self._module_container.module.expanded:
+            self._more_options.setText("Less")
+            self._second_line_layout_widget.show()
+        else:
+            self._more_options.setText("More")
+            self._second_line_layout_widget.hide()
+        self.sizeHintChanged.emit()
+
+    def _populate_extra_attributes(self):
+        if self._second_line_layout_widget is not None:
+            self._second_line_layout_widget.hide()
+            self._second_line_layout.removeWidget(self._second_line_layout_widget)
+            self._second_line_layout_widget = None
+        if hasattr(self._module_container.module, "expanded"):
+            self._more_options.setEnabled(True)
+            self._second_line_layout = QHBoxLayout()
+            self._second_line_layout.setContentsMargins(0, 0, 0, 0)
+            self._second_line_layout_widget = QLabel("Label 1")
+            self._second_line_layout.addWidget(self._second_line_layout_widget)
+            self.layout().addLayout(self._second_line_layout)
+            if self._module_container.module.expanded:
+                self._more_options.setText("Less")
+                self._second_line_layout_widget.show()
+            else:
+                self._more_options.setText("More")
+                self._second_line_layout_widget.hide()
+        else:
+            self._more_options.setText("More")
+            self._more_options.setEnabled(False)
+        self.sizeHintChanged.emit()
 
     def _source_edited(self, new_source: str):
         self._module_container.module.source = new_source
@@ -89,3 +133,4 @@ class FileWriterModuleEdit(QWidget):
         self._source_edit.validator().validate(self._source_edit.text(), 0)
 
     is_valid = Signal(bool)
+    sizeHintChanged = Signal()

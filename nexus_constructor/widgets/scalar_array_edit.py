@@ -36,7 +36,6 @@ class ScalarArrayEdit(ScalarValueBase):
         self._edit_dialog.close()
         self._dataset.values = self._table_view.model.array
 
-
     def _value_changed(self, new_value: str):
         try:
             self._dataset.values = VALUE_TYPE_TO_NP[

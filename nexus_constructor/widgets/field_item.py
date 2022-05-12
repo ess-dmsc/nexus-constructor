@@ -121,11 +121,14 @@ class WriterModuleFieldWidget(BaseFieldWidget):
             parent_node.children[parent_node.children.index(container.module)] = new_module
             container.module = new_module
         self._standard_settings = FileWriterModuleEdit(parent, container)
+        self._standard_settings.sizeHintChanged.connect(self.sizeHintChanged.emit)
         self.layout().insertWidget(2, self._standard_settings)
         self._standard_settings.is_valid.connect(partial(self._validator.set_is_valid, self._standard_settings))
 
     def check_validity(self):
         self._standard_settings.check_validity()
+
+    sizeHintChanged = Signal()
 
 
 class LinkModuleFieldWidget(BaseFieldWidget):
@@ -214,6 +217,7 @@ class FieldItem(QFrame):
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
+        self.sizeHintChanged.emit()
 
     def _instantiate_array_widgets(self):
         self._remove_existing_widget()
@@ -221,13 +225,16 @@ class FieldItem(QFrame):
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
+        self.sizeHintChanged.emit()
 
     def _instantiate_stream_widgets(self):
         self._remove_existing_widget()
         self._field_widget = WriterModuleFieldWidget(self.parent(), self._module_container)
         self._field_widget.is_valid.connect(self.is_valid.emit)
+        self._field_widget.sizeHintChanged.connect(self.sizeHintChanged.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
+        self.sizeHintChanged.emit()
 
     def _instantiate_link_widgets(self):
         self._remove_existing_widget()
@@ -235,6 +242,7 @@ class FieldItem(QFrame):
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
+        self.sizeHintChanged.emit()
 
     def _field_type_changed(self):
         populate_widget_map = {
@@ -246,6 +254,7 @@ class FieldItem(QFrame):
 
         populate_widget_map[self.field_type_combo.currentText()]()
     is_valid = Signal(bool)
+    sizeHintChanged = Signal()
 
 
 def to_string(input_to_convert: Any) -> str:
