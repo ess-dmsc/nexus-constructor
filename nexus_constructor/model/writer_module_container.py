@@ -1,3 +1,4 @@
+# type: ignore
 from .module import FileWriterModule
 
 

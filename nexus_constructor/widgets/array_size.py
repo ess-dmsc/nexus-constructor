@@ -1,6 +1,6 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QLabel, QFrame, QCheckBox
 from PySide2.QtCore import Qt
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from .positive_integer_setting import PositiveIntegerSetting
 
 

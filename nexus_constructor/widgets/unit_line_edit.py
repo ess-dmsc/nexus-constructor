@@ -3,7 +3,7 @@ from functools import partial
 from PySide2 import QtWidgets
 from PySide2.QtCore import Signal
 
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from nexus_constructor.ui_utils import line_edit_validation_result_handler
 from nexus_constructor.validators import UnitValidator
 

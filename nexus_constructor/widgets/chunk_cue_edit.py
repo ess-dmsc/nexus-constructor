@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QLabel, QFrame
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from .positive_integer_setting import PositiveIntegerSetting
 
 

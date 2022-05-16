@@ -1,4 +1,4 @@
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from .dropdown_list import DropDownList
 from PySide2.QtGui import QValidator
 from PySide2.QtCore import Signal

@@ -1,12 +1,11 @@
 from .dropdown_list import DropDownList
 from PySide2.QtWidgets import QWidget
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from nexus_constructor.ui_utils import validate_general_widget
 from functools import partial
 from nexus_constructor.model.module import StreamModules, StreamModule
 from PySide2.QtCore import Signal
 from PySide2.QtGui import QValidator
-from typing import List
 
 
 class StreamModuleValidator(QValidator):

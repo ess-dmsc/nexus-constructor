@@ -1,5 +1,5 @@
 from typing import Optional
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from PySide2.QtWidgets import QSpinBox
 
 

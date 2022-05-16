@@ -26,7 +26,7 @@ from nexus_constructor.field_attrs import FieldAttrsDialog
 from enum import Enum
 from nexus_constructor.model import Dataset
 from nexus_constructor.model.module import StreamModule, F142Stream
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 
 
 class BaseFieldWidget(QWidget):

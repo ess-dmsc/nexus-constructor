@@ -8,7 +8,7 @@ from nexus_constructor.model.module import (
     WriterModules,
     WriterModuleClasses,
 )
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from nexus_constructor.ui_utils import line_edit_validation_result_handler
 from nexus_constructor.validators import NoEmptyStringValidator, MultiItemValidator
 from nexus_constructor.widgets.streamer_extra_config import (
@@ -17,6 +17,7 @@ from nexus_constructor.widgets.streamer_extra_config import (
     Ev42ExtraConfig,
 )
 from .stream_type_dropdown_list import StreamTypeDropdownList
+from typing import Optional
 
 extra_config_map = {
     StreamModules.ADAR.value: ADArExtraConfig,
@@ -28,7 +29,7 @@ extra_config_map = {
 class FileWriterModuleEdit(QWidget):
     def __init__(self, parent: QWidget, container: ModuleContainer):
         super().__init__(parent)
-        self._second_line_widget = None
+        self._second_line_widget: Optional[QWidget] = None
         self._module_container = container
         self._first_line_layout = QHBoxLayout()
         self._first_line_layout.setContentsMargins(0, 0, 0, 0)
@@ -131,7 +132,7 @@ class FileWriterModuleEdit(QWidget):
     def _populate_extra_attributes(self):
         if self._second_line_widget is not None:
             self._second_line_widget.hide()
-            self._second_line_layout.removeWidget(self._second_line_widget)
+            self._second_line_layout.removeWidget(self._second_line_widget)  # type: ignore
             self._second_line_widget = None
         if hasattr(self._module_container.module, "expanded"):
             self._more_options.setEnabled(True)

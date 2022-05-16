@@ -8,7 +8,7 @@ from PySide2.QtWidgets import (
     QCheckBox,
     QVBoxLayout,
 )
-from nexus_constructor.model.writer_module_container import ModuleContainer
+from nexus_constructor.model.writer_module_container import ModuleContainer  # type: ignore
 from nexus_constructor.widgets.data_type_dropdown_list import DataTypeDropDown
 from PySide2.QtCore import Signal
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
