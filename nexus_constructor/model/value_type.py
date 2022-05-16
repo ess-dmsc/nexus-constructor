@@ -4,8 +4,8 @@ import numpy as np
 
 
 class ValueTypes:
-    BYTE = "byte"
-    UBYTE = "ubyte"
+    BYTE = "int8"
+    UBYTE = "uint8"
     SHORT = "int16"
     USHORT = "uint16"
     INT = "int32"

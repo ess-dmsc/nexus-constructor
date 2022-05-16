@@ -42,6 +42,9 @@ class Group:
     values = None
     _group_placeholder: bool = False
 
+    def __str__(self):
+        return f'Group(name="{self.name}", parent="{self.parent_node.name}", #of_children={len(self.children)})'
+
     def __getitem__(self, key: str):
         return _get_item(self.children, key)
 

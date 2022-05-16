@@ -35,6 +35,7 @@ class BaseFieldWidget(QWidget):
         self._container = container
         self._validator = MultiItemValidator()
         self.setLayout(QHBoxLayout())
+        self._validator.is_valid.connect(self.is_valid.emit)
 
     is_valid = Signal(bool)
 
@@ -63,7 +64,6 @@ class BaseScalarFieldWidget(BaseFieldWidget):
         self._field_name.is_valid.connect(
             partial(self._validator.set_is_valid, self._field_name)
         )
-        self._validator.is_valid.connect(self.is_valid.emit)
 
     def _done_with_attributes(self):
         for name, value, dtype in self._attrs_dialog.get_attrs():

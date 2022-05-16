@@ -111,8 +111,6 @@ class FieldItemDelegate(QStyledItemDelegate):
         return frame.sizeHint()
 
 
-
-
 class FileListModel(QAbstractListModel):
     numberPopulated = Signal(int)
 

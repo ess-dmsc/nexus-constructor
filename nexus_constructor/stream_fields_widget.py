@@ -48,17 +48,16 @@ from nexus_constructor.validators import (
 from nexus_constructor.widgets.dropdown_list import DropDownList
 
 F142_TYPES = [
-    "byte",
-    "ubyte",
-    "short",
-    "ushort",
-    "int",
-    "uint",
-    "long",
-    "ulong",
+    "int8",
+    "uint8",
+    "int16",
+    "uint16",
+    "int32",
+    "uint32",
+    "int64",
+    "uint64",
     "float",
     "double",
-    "string",
 ]
 
 
