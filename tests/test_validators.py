@@ -225,50 +225,6 @@ def inspect_signal(result, expected):
     assert result == expected
 
 
-def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
-
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
-    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
-    validator.validate_ok()
-
-
-def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
-
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
-    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
-    validator.set_name_valid(False)
-
-
-def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
-
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
-    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
-    validator.set_units_valid(False)
-
-
-def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THEN_false_signal_is_emitted():
-
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
-    validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
-    validator.set_file_valid(False)
-
-
-def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_checked_THEN_true_signal_is_emitted():
-
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
-    mock_no_geometry_button.isChecked = Mock(return_value=True)
-    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
-    validator.set_units_valid(False)
-
-
-def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_THEN_true_signal_is_emitted():
-
-    validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
-    mock_mesh_button.isChecked = Mock(return_value=False)
-    validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
-    validator.set_file_valid(False)
-
-
 def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
 
     validator = NullableIntValidator()

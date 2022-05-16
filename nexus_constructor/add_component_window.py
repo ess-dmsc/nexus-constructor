@@ -104,6 +104,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cad_file_name = None
         self.possible_fields: List[str] = []
         self.initial_edit = initial_edit
+        self.valid_file_given = False
         self.pixel_options: PixelOptions = None
         self.setupUi()
         self.setModal(True)
@@ -224,6 +225,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             partial(self._main_validator.set_is_valid, self.fileLineEdit)
         )
         self.fileLineEdit.textChanged.connect(self.populate_pixel_mapping_if_necessary)
+        self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
         self.componentTypeComboBox.currentIndexChanged.connect(self.on_nx_class_changed)
 
@@ -589,6 +591,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 )
         except RuntimeError:
             pass
+
+    def set_file_valid(self, validity):
+        self.valid_file_given = validity
 
     def create_pixel_mapping_list_for_mesh(self):
         """

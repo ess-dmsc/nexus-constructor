@@ -12,32 +12,6 @@ from nexus_constructor.model import Entry, Group
 POSSIBLE_FIELDS = [("test", "string")]
 
 
-@pytest.fixture
-def stream_fields_widget(qtbot, model, template):
-    class DummyField:
-        @property
-        def name(self):
-            return "test"
-
-    entry = Entry()
-    group = Group(name="some_name", parent_node=entry)
-    entry.children.append(group)
-
-    add_component_dialog = AddComponentDialog(
-        None,
-        model=model,
-        component_model=ComponentTreeModel(model),
-        nx_classes=NX_CLASS_DEFINITIONS,
-        group_to_edit=group,
-        scene_widget=None,
-        initial_edit=False,
-    )
-    field = add_component_dialog.create_new_ui_field(DummyField())
-    widget = StreamFieldsWidget(field.attrs_dialog)
-    qtbot.addWidget(widget)
-    return widget
-
-
 def test_ui_field_GIVEN_field_has_units_filled_in_ui_WHEN_getting_field_group_THEN_units_are_stored_in_attrs(
     qtbot,
 ):
@@ -130,27 +104,3 @@ def test_ui_stream_field_GIVEN_ev42_is_selected_WHEN_advanced_options_are_clicke
     stream_fields_widget.ev42_advanced_group_box.setVisible.assert_called_once_with(
         True
     )
-
-
-def test_ui_stream_field_GIVEN_value_units_is_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_appears_as_field(
-    stream_fields_widget,
-):
-    value = "cubits"
-
-    stream_fields_widget.schema_combo.setCurrentText("f142")
-    stream_fields_widget.schema_combo.currentTextChanged.emit("f142")
-    stream_fields_widget.value_units_edit.setText(value)
-
-    stream = stream_fields_widget.get_stream_module(None)
-    assert value == stream.value_units
-
-
-def test_ui_stream_field_GIVEN_value_units_is_not_specified_WHEN_getting_stream_group_from_widget_THEN_value_units_does_not_appear_as_field(
-    stream_fields_widget,
-):
-    stream_fields_widget.schema_combo.setCurrentText("f142")
-    stream_fields_widget.schema_combo.currentTextChanged.emit("f142")
-    stream_fields_widget.value_units_edit.setText("")
-
-    stream = stream_fields_widget.get_stream_module(None)
-    assert not stream.value_units
