@@ -1,6 +1,6 @@
 from functools import partial
 
-from PySide2.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QComboBox, QPushButton, QLabel
+from PySide2.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton
 from PySide2.QtCore import Signal
 
 from nexus_constructor.model.module import StreamModules, WriterModules, WriterModuleClasses
@@ -8,6 +8,7 @@ from nexus_constructor.model.writer_module_container import ModuleContainer
 from nexus_constructor.ui_utils import line_edit_validation_result_handler
 from nexus_constructor.validators import NoEmptyStringValidator, MultiItemValidator
 from nexus_constructor.widgets.streamer_extra_config import ADArExtraConfig, F142ExtraConfig, Ev42ExtraConfig
+from .stream_type_dropdown_list import StreamTypeDropdownList
 
 extra_config_map = {StreamModules.ADAR.value: ADArExtraConfig,
                     StreamModules.EV42.value: Ev42ExtraConfig,
@@ -24,9 +25,7 @@ class FileWriterModuleEdit(QWidget):
         self._first_line_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
-        self._module_type_combo: QComboBox = QComboBox(self)
-        self._module_type_combo.addItems([m.value for m in StreamModules])
-        self._module_type_combo.setCurrentText(container.module.writer_module)
+        self._module_type_combo = StreamTypeDropdownList(self, container)
 
         self._topic_edit = QLineEdit(self)
         self._topic_edit.setPlaceholderText("Topic")
@@ -52,6 +51,9 @@ class FileWriterModuleEdit(QWidget):
         )
         self._source_edit.validator().is_valid.connect(
             partial(self._module_validator.set_is_valid, self._source_edit)
+        )
+        self._module_type_combo.validator().is_valid.connect(
+            partial(self._module_validator.set_is_valid, self._module_type_combo)
         )
 
         self._topic_edit.validator().is_valid.connect(
@@ -140,6 +142,7 @@ class FileWriterModuleEdit(QWidget):
     def check_validity(self):
         self._topic_edit.validator().validate(self._topic_edit.text(), 0)
         self._source_edit.validator().validate(self._source_edit.text(), 0)
+        self._module_type_combo.check_validity()
 
     is_valid = Signal(bool)
     sizeHintChanged = Signal()

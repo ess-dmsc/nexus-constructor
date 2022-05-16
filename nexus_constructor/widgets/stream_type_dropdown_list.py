@@ -26,7 +26,6 @@ class StreamModuleValidator(QValidator):
             return QValidator.Intermediate
         self.is_valid.emit(True)
         return QValidator.Acceptable
-
     is_valid = Signal(bool)
 
 
@@ -34,8 +33,8 @@ class StreamTypeDropdownList(DropDownList):
     def __init__(self, parent: QWidget, module_container: ModuleContainer):
         super().__init__(parent)
         self._module_container = module_container
-        self._module_type_combo.addItems([m.value for m in StreamModules])
-        self._module_type_combo.setCurrentText(self._module_container.module.writer_module)
+        self.addItems([m.value for m in StreamModules])
+        self.setCurrentText(self._module_container.module.writer_module)
         self.setValidator(StreamModuleValidator(self._module_container))
         self.validator().is_valid.connect(partial(validate_general_widget, self))
         self.currentIndexChanged.connect(self._stream_type_change)
