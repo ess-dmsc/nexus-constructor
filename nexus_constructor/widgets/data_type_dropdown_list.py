@@ -40,7 +40,11 @@ class DataTypeDropDown(DropDownList):
         self._container = container
         self.addItems(TYPES)
         if allow_string:
-            self.addItems(["string", ])
+            self.addItems(
+                [
+                    "string",
+                ]
+            )
         self.setCurrentText(container.module.type)
         self.setValidator(DataTypeValidator(allow_string))
         self.validator().is_valid.connect(partial(validate_general_widget, self))
@@ -52,11 +56,3 @@ class DataTypeDropDown(DropDownList):
 
     def check_validity(self):
         self.validator().validate(self.currentText(), 0)
-
-
-
-
-
-
-
-

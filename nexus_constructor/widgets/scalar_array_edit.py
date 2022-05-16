@@ -25,7 +25,14 @@ class ScalarArrayEdit(ScalarValueBase):
         if isinstance(self._dataset.values, np.ndarray):
             self._table_view.model.array = self._dataset.values
         else:
-            self._table_view.model.array = np.array([[self._dataset.values, ]], dtype=np_type)
+            self._table_view.model.array = np.array(
+                [
+                    [
+                        self._dataset.values,
+                    ]
+                ],
+                dtype=np_type,
+            )
         self._edit_dialog.layout().addWidget(self._table_view)
         self._edit_done_button = QPushButton("Done")
         self._edit_dialog.layout().addWidget(self._edit_done_button)

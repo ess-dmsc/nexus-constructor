@@ -46,7 +46,9 @@ class BaseScalarFieldWidget(BaseFieldWidget):
         if not isinstance(container.module, Dataset):
             parent_node = container.module.parent_node
             new_module = Dataset(parent_node=parent_node, name="", values=0)
-            parent_node.children[parent_node.children.index(container.module)] = new_module
+            parent_node.children[
+                parent_node.children.index(container.module)
+            ] = new_module
             container.module = new_module
         self._container = container
         self._field_name = FieldNameEdit(parent, container.module)
@@ -117,13 +119,19 @@ class WriterModuleFieldWidget(BaseFieldWidget):
         super().__init__(parent, container)
         if not isinstance(container.module, StreamModule):
             parent_node = container.module.parent_node
-            new_module = F142Stream(parent_node=parent_node, source="", topic="", type="double")
-            parent_node.children[parent_node.children.index(container.module)] = new_module
+            new_module = F142Stream(
+                parent_node=parent_node, source="", topic="", type="double"
+            )
+            parent_node.children[
+                parent_node.children.index(container.module)
+            ] = new_module
             container.module = new_module
         self._standard_settings = FileWriterModuleEdit(parent, container)
         self._standard_settings.sizeHintChanged.connect(self.sizeHintChanged.emit)
         self.layout().insertWidget(2, self._standard_settings)
-        self._standard_settings.is_valid.connect(partial(self._validator.set_is_valid, self._standard_settings))
+        self._standard_settings.is_valid.connect(
+            partial(self._validator.set_is_valid, self._standard_settings)
+        )
 
     def check_validity(self):
         self._standard_settings.check_validity()
@@ -137,14 +145,20 @@ class LinkModuleFieldWidget(BaseFieldWidget):
         if not isinstance(container.module, Link):
             parent_node = container.module.parent_node
             if isinstance(container.module, Dataset):
-                new_module = Link(parent_node=parent_node, name=container.module.name, target="")
+                new_module = Link(
+                    parent_node=parent_node, name=container.module.name, target=""
+                )
             else:
                 new_module = Link(parent_node=parent_node, name="", target="")
-            parent_node.children[parent_node.children.index(container.module)] = new_module
+            parent_node.children[
+                parent_node.children.index(container.module)
+            ] = new_module
             container.module = new_module
         self._link_settings = LinkEdit(parent, container)
         self.layout().addWidget(self._link_settings)
-        self._link_settings.is_valid.connect(partial(self._validator.set_is_valid, self._link_settings))
+        self._link_settings.is_valid.connect(
+            partial(self._validator.set_is_valid, self._link_settings)
+        )
 
     def check_validity(self):
         self._link_settings.check_validity()
@@ -221,7 +235,9 @@ class FieldItem(QFrame):
 
     def _instantiate_array_widgets(self):
         self._remove_existing_widget()
-        self._field_widget = ScalarArrayFieldWidget(self.parent(), self._module_container)
+        self._field_widget = ScalarArrayFieldWidget(
+            self.parent(), self._module_container
+        )
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
@@ -229,7 +245,9 @@ class FieldItem(QFrame):
 
     def _instantiate_stream_widgets(self):
         self._remove_existing_widget()
-        self._field_widget = WriterModuleFieldWidget(self.parent(), self._module_container)
+        self._field_widget = WriterModuleFieldWidget(
+            self.parent(), self._module_container
+        )
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self._field_widget.sizeHintChanged.connect(self.sizeHintChanged.emit)
         self.check_validity()
@@ -238,7 +256,9 @@ class FieldItem(QFrame):
 
     def _instantiate_link_widgets(self):
         self._remove_existing_widget()
-        self._field_widget = LinkModuleFieldWidget(self.parent(), self._module_container)
+        self._field_widget = LinkModuleFieldWidget(
+            self.parent(), self._module_container
+        )
         self._field_widget.is_valid.connect(self.is_valid.emit)
         self.check_validity()
         self.layout().addWidget(self._field_widget)
@@ -253,6 +273,7 @@ class FieldItem(QFrame):
         }
 
         populate_widget_map[self.field_type_combo.currentText()]()
+
     is_valid = Signal(bool)
     sizeHintChanged = Signal()
 

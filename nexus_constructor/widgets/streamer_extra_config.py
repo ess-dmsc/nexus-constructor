@@ -1,4 +1,13 @@
-from PySide2.QtWidgets import QWidget, QHBoxLayout, QLabel, QHeaderView, QTableWidget, QFrame, QCheckBox, QVBoxLayout
+from PySide2.QtWidgets import (
+    QWidget,
+    QHBoxLayout,
+    QLabel,
+    QHeaderView,
+    QTableWidget,
+    QFrame,
+    QCheckBox,
+    QVBoxLayout,
+)
 from nexus_constructor.model.writer_module_container import ModuleContainer
 from nexus_constructor.widgets.data_type_dropdown_list import DataTypeDropDown
 from PySide2.QtCore import Signal

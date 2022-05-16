@@ -9,7 +9,15 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
     QAbstractItemView,
 )
-from PySide2.QtCore import QAbstractListModel, QModelIndex, Signal, Qt, QPoint, QSize, QPersistentModelIndex
+from PySide2.QtCore import (
+    QAbstractListModel,
+    QModelIndex,
+    Signal,
+    Qt,
+    QPoint,
+    QSize,
+    QPersistentModelIndex,
+)
 from PySide2.QtGui import QPainter, QPixmap, QRegion
 from nexus_constructor.model import GroupContainer, Group, Dataset
 import PySide2
@@ -81,8 +89,11 @@ class FieldItemDelegate(QStyledItemDelegate):
         persistent = QPersistentModelIndex(index)
 
         def emitSizeHintChanged():
-            new_index = persistent.model().index(persistent.row(), persistent.column(), persistent.parent())
+            new_index = persistent.model().index(
+                persistent.row(), persistent.column(), persistent.parent()
+            )
             self.sizeHintChanged.emit(new_index)
+
         frame.sizeHintChanged.connect(emitSizeHintChanged)
         self.sizeHintChanged.emit(index)
         return frame

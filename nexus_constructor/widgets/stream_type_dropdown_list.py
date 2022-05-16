@@ -19,13 +19,15 @@ class StreamModuleValidator(QValidator):
             list_of_streams = [
                 s.writer_module
                 for s in self._module_container.module.parent_node.children
-                if isinstance(s, StreamModule) and s is not self._module_container.module
+                if isinstance(s, StreamModule)
+                and s is not self._module_container.module
             ]
         if input == "" or input in list_of_streams:
             self.is_valid.emit(False)
             return QValidator.Intermediate
         self.is_valid.emit(True)
         return QValidator.Acceptable
+
     is_valid = Signal(bool)
 
 

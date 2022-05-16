@@ -18,6 +18,7 @@ class ChunkCueEdit(QWidget):
         self.layout().addWidget(line)
 
         self.layout().addWidget(QLabel(parent=self, text="Cue interval"))
-        self._cue_interval_edit = PositiveIntegerSetting(self, container, "cue_interval")
+        self._cue_interval_edit = PositiveIntegerSetting(
+            self, container, "cue_interval"
+        )
         self.layout().addWidget(self._cue_interval_edit)
-

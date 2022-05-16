@@ -24,6 +24,7 @@ DATASET = "dataset"
 LINK = "link"
 TARGET = "target"
 
+
 class WriterModules(Enum):
     F142 = "f142"
     EV42 = "ev42"
@@ -47,7 +48,9 @@ class StreamModules(Enum):
 
 @attr.s(eq=False)
 class FileWriterModule(ABC):
-    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)  # Deprecated, will be removed soon
+    attributes = attr.ib(
+        type=Attributes, factory=Attributes, init=False
+    )  # Deprecated, will be removed soon
     writer_module = attr.ib(type=str, init=False)
     parent_node = attr.ib(type="Group")
 
