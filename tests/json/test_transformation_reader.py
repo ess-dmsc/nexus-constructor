@@ -15,7 +15,6 @@ from nexus_constructor.json.transformation_reader import (
 )
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.transformation import Transformation
-from mock import ANY
 
 
 @pytest.fixture(scope="function")
@@ -344,7 +343,7 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
         units=units,
         vector=QVector3D(*vector),
         depends_on=depends_on,
-        values=ANY,
+        values=values,
     )
 
 
