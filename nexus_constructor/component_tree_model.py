@@ -35,7 +35,6 @@ class NexusTreeModel(QAbstractItemModel):
     def __init__(self, model: Model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.components = self.model.get_components()
         self.tree_root = self.model.entry
         self.current_nxs_obj: Optional[
             Tuple[Union[Group, FileWriterModule], QModelIndex]
@@ -138,7 +137,7 @@ class NexusTreeModel(QAbstractItemModel):
             pointer, parent_node.number_of_children(), parent_node.number_of_children()
         )
         if isinstance(new_group, Component):
-            self.components.append(new_group)
+            self.model.append_component(new_group)
         parent_node[new_group.name] = new_group
         self.endInsertRows()
 
@@ -390,20 +389,20 @@ class NexusTreeModel(QAbstractItemModel):
                     return
         parent_index = QModelIndex()
         if index.internalPointer().parent_node:
-            row = self._get_row_of_child(index.internalPointer().parent_node)
+            row = index.internalPointer().parent_node.row()
             if not row < 0:
                 parent_index = self.createIndex(
                     row, 0, index.internalPointer().parent_node
                 )
-        remove_index = self._get_row_of_child(index.internalPointer())
+        remove_index = component.row()
         self.beginRemoveRows(parent_index, remove_index, remove_index)
         for transform in transforms:
             transform.remove_from_dependee_chain()
         if isinstance(component, Component) and component.name in [
-            c.name for c in self.components
+            c.name for c in self.model.get_components()
         ]:
-            self.components.remove(component)
-        del component.parent_node[component.name]
+            self.model.remove_component(component)
+        component.parent_node.children.pop(component.row())
         self.endRemoveRows()
         if component.name != TRANSFORMATIONS:
             self.model.signals.component_removed.emit(component.name)

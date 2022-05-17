@@ -44,7 +44,7 @@ builders = pipeline_builder.createBuilders { container ->
         container.sh """
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
+            build_env/bin/pip --proxy ${https_proxy} install -r requirements-jenkins.txt
             """
     } // stage
 
@@ -60,7 +60,7 @@ builders = pipeline_builder.createBuilders { container ->
                 git config user.name 'cow-bot'
                 git status -s
                 git add -u
-                git commit -m 'GO FORMAT YOURSELF (black)
+                git commit -m 'GO FORMAT YOURSELF (black)'
                 """
             } catch (e) {
                 // Okay to fail as there could be no badly formatted files to commit

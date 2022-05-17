@@ -256,10 +256,17 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             parent_node=parent_node,
         )
     elif mod_type == WriterModules.DATASET.value:
+        if CommonKeys.DATA_TYPE in configuration:
+            dtype = configuration[CommonKeys.DATA_TYPE]
+        elif CommonKeys.TYPE in configuration:
+            dtype = configuration[CommonKeys.TYPE]
+        else:
+            dtype = "string"
         fw_mod_obj = fw_mod_class(
             name=configuration[CommonKeys.NAME],
             values=configuration[CommonKeys.VALUES],
             parent_node=parent_node,
+            type=dtype,
         )
 
     if mod_type in [WriterModules.F142.value, WriterModules.EV42.value]:
