@@ -11,9 +11,10 @@ from nexus_constructor.common_attrs import (
     NodeType,
     TransformationType,
 )
+from nexus_constructor.component_type import LOG_CLASS_NAME
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.helpers import get_absolute_path
-from nexus_constructor.model.module import Dataset
+from nexus_constructor.model.module import Dataset, StreamModule
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import (
     DEGREES,
@@ -187,17 +188,15 @@ class Transformation(Dataset):
         self._dependents = []
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
-        return_dict: Dict = {}
-        if isinstance(self.values, Dataset):
-            return_dict = self.values.as_dict(error_collector)
-        elif isinstance(self.values, Group):
-            return_dict = self.values.children[0].as_dict(error_collector)
-
+        self._set_transformation_values()
+        return_dict = self.values.as_dict(error_collector)
         if NodeType.CONFIG in return_dict:
             return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 
         if self.attributes:
-            return_dict[CommonKeys.ATTRIBUTES] = [
+            if CommonKeys.ATTRIBUTES not in return_dict:
+                return_dict[CommonKeys.ATTRIBUTES] = []
+            return_dict[CommonKeys.ATTRIBUTES] += [
                 attribute.as_dict(error_collector)
                 for attribute in self.attributes
                 if attribute.name != CommonAttrs.DEPENDS_ON
@@ -214,3 +213,11 @@ class Transformation(Dataset):
                 pass
 
         return return_dict
+
+    def _set_transformation_values(self):
+        if isinstance(self.values, StreamModule):
+            nx_log = Group(name=f"{self.name}_stream", parent_node=self)  # type: ignore
+            nx_log.nx_class = LOG_CLASS_NAME
+            self.values.parent_node = nx_log
+            nx_log.children.append(self.values)
+            self.values = nx_log

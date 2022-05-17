@@ -3,7 +3,6 @@ from PySide2.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component
-from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset, F142Stream, WriterModules
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
@@ -383,19 +382,17 @@ def test_as_dict_method_of_transformation_when_values_is_a_f142_streamgroup():
     name = ":: SOME NAME ::"
     source = ":: SOME SOURCE ::"
     topic = (":: SOME TOPIC ::",)
-    stream_group = Group(name="")
-    stream_group.children = [
-        F142Stream(parent_node=stream_group, source=source, topic=topic, type="double")
-    ]
-    transform = create_transform(name=name, values=stream_group)
-    assert transform.values == stream_group
-
+    stream = F142Stream(parent_node=None, source=source, topic=topic, type="double")
+    transform = create_transform(name=name, values=stream)
+    assert transform.values == stream
     return_dict = transform.as_dict([])
-    print(return_dict)
-    assert return_dict[CommonKeys.MODULE] == WriterModules.F142.value
-    assert return_dict[NodeType.CONFIG][CommonKeys.NAME] == name
-    assert return_dict[NodeType.CONFIG]["source"] == source
-    assert return_dict[NodeType.CONFIG]["topic"] == topic
+    assert (
+        return_dict[CommonKeys.CHILDREN][0][CommonKeys.MODULE]
+        == WriterModules.F142.value
+    )
+    assert return_dict[CommonKeys.NAME] == name + "_stream"
+    assert return_dict[CommonKeys.CHILDREN][0][NodeType.CONFIG]["source"] == source
+    assert return_dict[CommonKeys.CHILDREN][0][NodeType.CONFIG]["topic"] == topic
 
 
 def test_if_valid_value_entered_then_converting_to_dict_appends_no_error():
