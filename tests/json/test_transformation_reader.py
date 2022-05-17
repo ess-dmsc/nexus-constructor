@@ -345,6 +345,9 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
         depends_on=depends_on,
         values=ANY,
     )
+    assert transformation_reader.parent_component._create_and_add_transform.call_args[
+        1
+    ]["values"].is_equal(values)
 
 
 def test_GIVEN_unrecognised_dtype_WHEN_parsing_dtype_THEN_parse_dtype_returns_empty_string(

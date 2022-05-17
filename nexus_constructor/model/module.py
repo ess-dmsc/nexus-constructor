@@ -162,7 +162,7 @@ class Dataset(FileWriterModule):
         return f'Dataset(name="{self.name}", parent={parent_name}, type={self.type})'
 
     def is_equal(self, other):
-        if isinstance(self.values, type(other.values)):
+        if not isinstance(self.values, type(other.values)):
             values_equal = False
         elif isinstance(self.values, np.ndarray):
             values_equal = (self.values == other.values).all()
