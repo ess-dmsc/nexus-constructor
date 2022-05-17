@@ -14,7 +14,6 @@ from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
-from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
@@ -28,8 +27,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import F142Stream, Link
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
 from nexus_constructor.widgets import CustomDialog as QDialog
@@ -1686,44 +1684,6 @@ def create_group_with_component(component_name: str, file_name: str):
     component = Component(parent_node=entry, name=component_name)
     component.nx_class = "NXdisk_chopper"
     return component, model, treeview_model
-
-
-def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
-    qtbot,
-):
-    component, model, treeview_model = create_group_with_component(
-        "chopper1", "test_component_editing_multiple_fields"
-    )
-
-    field_name1 = "array"
-    field_value1 = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name1, field_value1, ValueTypes.INT)
-
-    field_name2 = "scalar"
-    field_value2 = 1
-    component.set_field_value(field_name2, field_value2, ValueTypes.INT)
-
-    dialog = AddComponentDialog(
-        model=model,
-        component_model=treeview_model,
-        group_to_edit=component,
-        nx_classes=NX_CLASS_DEFINITIONS,
-        parent=None,
-        scene_widget=None,
-        initial_edit=False,
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    qtbot.addWidget(dialog)
-
-    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-    assert widget.field_type_combo.currentText().lower() == "array dataset"
-    assert widget.name == field_name1
-    assert np.array_equal(widget.value.values, field_value1)
-
-    widget2 = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(1))
-    assert widget2.field_type_combo.currentText().lower() == "scalar dataset"
-    assert widget2.name == field_name2
-    assert widget2.value.values == str(field_value2)
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(

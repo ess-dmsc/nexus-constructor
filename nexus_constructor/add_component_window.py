@@ -82,6 +82,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.cancel_button.clicked.connect(self._cancel_new_group)
             self.rejected.connect(self._rejected)
         else:
+            self.__fill_existing_shape_info()
             self.cancel_button.setVisible(True)
             self.cancel_button.clicked.connect(self._cancel_edit_group)
 
