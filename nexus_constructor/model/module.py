@@ -156,7 +156,19 @@ class Dataset(FileWriterModule):
     writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
 
     def __str__(self) -> str:
-        return f'Dataset(name="{self.name}", parent="{self.parent_node.name}", type={self.type})'
+        parent_name = "None"
+        if self.parent_node is not None:
+            parent_name = f'"{self.parent_node.name}"'
+        return f'Dataset(name="{self.name}", parent={parent_name}, type={self.type})'
+
+    def __eq__(self, other):
+        if type(self.values) is not type(other.values):
+            values_equal = False
+        elif isinstance(self.values, np.ndarray):
+            values_equal = (self.values==other.values).all()
+        else:
+            values_equal = self.values == other.values
+        return self.name == other.name and values_equal and self.type == other.type and self.attributes == other.attributes and self.writer_module == other.writer_module
 
     def as_dict(self, error_collector: List[str]):
         values = self.values

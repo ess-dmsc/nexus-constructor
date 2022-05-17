@@ -1334,14 +1334,13 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_val
 
 
 def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_data_THEN_add_component_button_is_enabled(
-    qtbot, add_component_dialog, mock_pixel_validator
+    qtbot, add_component_dialog
 ):
 
     # Deceive the AddComponentDialog into thinking valid pixel info was given
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
-    mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, False])
 
     # Enter a valid name
     enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
@@ -1356,56 +1355,6 @@ def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_da
 
     # Check that the add component button is enabled
     assert add_component_dialog.ok_button.isEnabled()
-
-
-def test_UI_GIVEN_user_provides_invalid_pixel_grid_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
-    qtbot, add_component_dialog, mock_pixel_validator
-):
-
-    # Deceive the AddComponentDialog into thinking an invalid Pixel Grid was given
-    make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
-    )
-    mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[True, False])
-
-    # Enter a valid name
-    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
-
-    # Enter a valid file path
-    enter_file_path(
-        qtbot,
-        add_component_dialog,
-        VALID_CUBE_MESH_FILE_PATH,
-        VALID_CUBE_OFF_FILE,
-    )
-
-    # Check that the add component button is disabled despite the valid name and file path
-    assert not add_component_dialog.ok_button.isEnabled()
-
-
-def test_UI_GIVEN_user_provides_invalid_pixel_mapping_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
-    qtbot, add_component_dialog, mock_pixel_validator
-):
-
-    # Deceive the AddComponentDialog into thinking an invalid Pixel Mapping was given
-    make_pixel_options_appear(
-        qtbot, add_component_dialog.meshRadioButton, add_component_dialog
-    )
-    mock_pixel_validator.unacceptable_pixel_states = Mock(return_value=[False, True])
-
-    # Enter a valid name
-    enter_component_name(qtbot, add_component_dialog, UNIQUE_COMPONENT_NAME)
-
-    # Enter a valid file path
-    enter_file_path(
-        qtbot,
-        add_component_dialog,
-        VALID_CUBE_MESH_FILE_PATH,
-        VALID_CUBE_OFF_FILE,
-    )
-
-    # Check that the add component button is disabled despite the valid name and file path
-    assert not add_component_dialog.ok_button.isEnabled()
 
 
 def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_been_generated_THEN_new_pixel_mapping_list_is_generated(
