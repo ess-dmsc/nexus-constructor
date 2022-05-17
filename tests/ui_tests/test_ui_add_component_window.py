@@ -1676,38 +1676,6 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
             assert dialog.cylinderOptionsBox.isEnabled()
 
 
-def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
-    qtbot,
-):
-
-    component, model, treeview_model = create_group_with_component(
-        "chopper1", "test_component_editing_scalar_field"
-    )
-
-    field_name = "scalar"
-    field_value = "test"
-    component.set_field_value(field_name, field_value, dtype=ValueTypes.STRING)
-
-    dialog = AddComponentDialog(
-        model=model,
-        component_model=treeview_model,
-        group_to_edit=component,
-        nx_classes=NX_CLASS_DEFINITIONS,
-        parent=None,
-        scene_widget=None,
-        initial_edit=False,
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    qtbot.addWidget(dialog)
-
-    assert dialog.fieldsListWidget.model().hasIndex(0, 0)
-    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-    assert widget.field_type_combo.currentText().lower() == "scalar dataset"
-
-    assert widget.name == field_name
-    assert widget.value.values == field_value
-
-
 def create_group_with_component(component_name: str, file_name: str):
     """
     Convenience method, for when we don't really care about the component and just want one to be added to a file
@@ -1718,69 +1686,6 @@ def create_group_with_component(component_name: str, file_name: str):
     component = Component(parent_node=entry, name=component_name)
     component.nx_class = "NXdisk_chopper"
     return component, model, treeview_model
-
-
-def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
-    qtbot,
-):
-    component, model, treeview_model = create_group_with_component(
-        "chopper1", "test_component_editing_array_field"
-    )
-
-    field_name = "array"
-    field_value = np.array([1, 2, 3, 4, 5])
-    component.set_field_value(field_name, field_value, ValueTypes.INT)
-    units = "m"
-    component[field_name].attributes.set_attribute_value(CommonAttrs.UNITS, units)
-    dialog = AddComponentDialog(
-        model=model,
-        component_model=treeview_model,
-        group_to_edit=component,
-        nx_classes=NX_CLASS_DEFINITIONS,
-        parent=None,
-        scene_widget=None,
-        initial_edit=False,
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    qtbot.addWidget(dialog)
-
-    assert dialog.fieldsListWidget.model().hasIndex(0, 0)
-    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-    assert widget.field_type_combo.currentText().lower() == "array dataset"
-    assert widget.name == field_name
-    assert np.array_equal(widget.value.values, field_value)
-    assert widget.units_line_edit.text() == units
-
-
-def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_target(
-    qtbot,
-):
-    component, model, treeview_model = create_group_with_component(
-        "chopper1", "test_component_editing_link_field"
-    )
-
-    entry = Entry()
-    link_name = "link1"
-    link = Link(parent_node=entry, name=link_name, target=entry.name)
-
-    component[link_name] = link
-
-    dialog = AddComponentDialog(
-        model=model,
-        component_model=treeview_model,
-        group_to_edit=component,
-        nx_classes=NX_CLASS_DEFINITIONS,
-        parent=None,
-        scene_widget=None,
-        initial_edit=False,
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    qtbot.addWidget(dialog)
-
-    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-    assert widget.field_type_combo.currentText().lower() == "link"
-    assert widget.value.name == link_name
-    assert widget.value.target == entry.name
 
 
 def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all_fields_appear_in_fields_list_with_correct_values(
@@ -1819,52 +1724,6 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     assert widget2.field_type_combo.currentText().lower() == "scalar dataset"
     assert widget2.name == field_name2
     assert widget2.value.values == str(field_value2)
-
-
-def test_UI_GIVEN_group_with_basic_f142_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
-    qtbot,
-):
-    component, model, treeview_model = create_group_with_component(
-        "chopper1", "test_component_editing_f142_stream_field"
-    )
-    entry = Entry()
-    field_name = "stream1"
-    stream_group = Group(parent_node=entry, name=field_name)
-    entry.children.append(entry)
-
-    topic = "topic1"
-    pvname = "source1"
-    pvtype = "double"
-
-    stream = F142Stream(
-        parent_node=stream_group, topic=topic, source=pvname, type=pvtype
-    )
-
-    stream_group.children.append(stream)
-
-    dialog = AddComponentDialog(
-        model=model,
-        component_model=treeview_model,
-        group_to_edit=stream_group,
-        nx_classes=NX_CLASS_DEFINITIONS,
-        parent=None,
-        scene_widget=None,
-        initial_edit=False,
-    )
-    dialog.pixel_options = Mock(spec=PixelOptions)
-    qtbot.addWidget(dialog)
-
-    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
-
-    stream = widget.value
-    assert stream.topic == topic
-    assert stream.source == pvname
-    assert stream.type == pvtype
-
-    assert widget.streams_widget.topic_line_edit.text() == topic
-    assert widget.streams_widget.schema_combo.currentText() == "f142"
-    assert widget.streams_widget.source_line_edit.text() == pvname
-    assert widget.streams_widget.type_combo.currentText() == pvtype
 
 
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
