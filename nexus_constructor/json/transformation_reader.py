@@ -25,6 +25,7 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     DATASET,
     Dataset,
+    StreamModule,
     WriterModules,
     create_fw_module_object,
 )
@@ -68,13 +69,11 @@ def _create_transformation_dataset(
 
 
 def _create_transformation_datastream_group(
-    data: Dict, name: str, parent_node: Optional[Group] = None
-) -> Group:
-    group = Group(name=name, parent_node=parent_node)
-    group.children.append(
-        create_fw_module_object(data[CommonKeys.MODULE], data[NodeType.CONFIG], group)
+    data: Dict, parent_node: Optional[Group] = None
+) -> StreamModule:
+    return create_fw_module_object(
+        data[CommonKeys.MODULE], data[NodeType.CONFIG], parent_node
     )
-    return group
 
 
 def get_component_and_transform_name(depends_on_string: str):
@@ -229,6 +228,17 @@ class TransformationReader:
         :param json_transformations: A list of JSON transformation entries.
         """
         for json_transformation in json_transformations:
+            is_nx_log = (
+                CommonKeys.TYPE in json_transformation
+                and json_transformation[CommonKeys.TYPE] == NodeType.GROUP
+            )
+            if is_nx_log:
+                tmp = json_transformation[CommonKeys.CHILDREN][0]
+                tmp[CommonKeys.ATTRIBUTES] += json_transformation[CommonKeys.ATTRIBUTES]
+                tmp[NodeType.CONFIG][CommonKeys.NAME] = json_transformation[
+                    CommonKeys.NAME
+                ]
+                json_transformation = tmp
             config = self._get_transformation_attribute(
                 NodeType.CONFIG, json_transformation
             )
@@ -293,9 +303,7 @@ class TransformationReader:
                 angle_or_magnitude = values
                 values = _create_transformation_dataset(angle_or_magnitude, dtype, name)
             elif module in [writer_mod.value for writer_mod in WriterModules]:
-                values = _create_transformation_datastream_group(
-                    json_transformation, name
-                )
+                values = _create_transformation_datastream_group(json_transformation)
                 angle_or_magnitude = 0.0
             else:
                 continue
