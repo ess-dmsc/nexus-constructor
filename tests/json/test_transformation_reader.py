@@ -2,7 +2,7 @@ import json
 from typing import Dict, Tuple
 
 import pytest
-from mock import Mock
+from mock import Mock, ANY
 from PySide2.QtGui import QVector3D
 
 from nexus_constructor.json.transform_id import TransformId
@@ -343,7 +343,7 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
         units=units,
         vector=QVector3D(*vector),
         depends_on=depends_on,
-        values=values,
+        values=ANY,
     )
 
 
