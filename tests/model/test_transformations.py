@@ -390,7 +390,7 @@ def test_as_dict_method_of_transformation_when_values_is_a_f142_streamgroup():
         return_dict[CommonKeys.CHILDREN][0][CommonKeys.MODULE]
         == WriterModules.F142.value
     )
-    assert return_dict[CommonKeys.NAME] == name + "_stream"
+    assert return_dict[CommonKeys.NAME] == name
     assert return_dict[CommonKeys.CHILDREN][0][NodeType.CONFIG]["source"] == source
     assert return_dict[CommonKeys.CHILDREN][0][NodeType.CONFIG]["topic"] == topic
 

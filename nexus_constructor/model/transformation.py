@@ -189,7 +189,7 @@ class Transformation(Dataset):
 
     def as_dict(self, error_collector: List[str]) -> Dict[str, Any]:
         self._set_transformation_values()
-        return_dict = self.values.as_dict(error_collector)
+        return_dict = self.values.as_dict(error_collector)  # type: ignore
         if NodeType.CONFIG in return_dict:
             return_dict[NodeType.CONFIG][CommonKeys.NAME] = self.name
 
@@ -216,7 +216,7 @@ class Transformation(Dataset):
 
     def _set_transformation_values(self):
         if isinstance(self.values, StreamModule):
-            nx_log = Group(name=f"{self.name}_stream", parent_node=self)  # type: ignore
+            nx_log = Group(name=self.name, parent_node=self)  # type: ignore
             nx_log.nx_class = LOG_CLASS_NAME
             self.values.parent_node = nx_log
             nx_log.children.append(self.values)
