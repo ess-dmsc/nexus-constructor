@@ -118,7 +118,8 @@ class TransformationReader:
             if _is_transformation_group(item):
                 try:
                     self._create_transformations(item[CommonKeys.CHILDREN])
-                except KeyError:
+                except KeyError as e:
+                    print("Error:", e)
                     continue
 
     def _get_transformation_attribute(
@@ -234,7 +235,14 @@ class TransformationReader:
             )
             if is_nx_log:
                 tmp = json_transformation[CommonKeys.CHILDREN][0]
-                tmp[CommonKeys.ATTRIBUTES] += json_transformation[CommonKeys.ATTRIBUTES]
+                if CommonKeys.ATTRIBUTES in tmp:
+                    tmp[CommonKeys.ATTRIBUTES] += json_transformation[
+                        CommonKeys.ATTRIBUTES
+                    ]
+                else:
+                    tmp[CommonKeys.ATTRIBUTES] = json_transformation[
+                        CommonKeys.ATTRIBUTES
+                    ]
                 tmp[NodeType.CONFIG][CommonKeys.NAME] = json_transformation[
                     CommonKeys.NAME
                 ]
@@ -318,7 +326,6 @@ class TransformationReader:
                 depends_on=temp_depends_on,
                 values=values,
             )
-
             if depends_on not in DEPENDS_ON_IGNORE:
                 depends_on_id = TransformId(
                     *get_component_and_transform_name(depends_on)
