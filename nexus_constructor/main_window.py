@@ -105,7 +105,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.show_add_component_window(selected_component, False)
 
     def save_to_filewriter_json(self):
-        filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
+        filename = file_dialog(True, "Save File writer JSON File", JSON_FILE_TYPES)
 
         if filename:
             if not filename.endswith(".json"):
