@@ -89,8 +89,8 @@ class Ui_MainWindow(object):
             self.tab_widget.indexOf(self.component_tree_view_tab), "Nexus Structure"
         )
         self.file_menu.setTitle("File")
-        self.open_json_file_action.setText("Open Filewriter JSON file")
-        self.export_to_filewriter_JSON_action.setText("Export to Filewriter JSON")
+        self.open_json_file_action.setText("Open File writer JSON file")
+        self.export_to_filewriter_JSON_action.setText("Export to File writer JSON")
 
         self.view_menu.setTitle("View")
         self.show_action_labels.setText("Show Button Labels")
