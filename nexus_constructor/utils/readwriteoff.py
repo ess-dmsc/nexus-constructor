@@ -101,8 +101,8 @@ def parse_off_file(off_file):
     :param off_file: File object assumed to contain geometry description in OFF format
     :return: List of vertices and list of vertex indices in each face
     """
-    file_start = off_file.readline()
-    if file_start != "OFF\n":
+    file_start = off_file.readline().strip()
+    if file_start != "OFF":
         logger.error(
             'OFF file is expected to start "OFF", actually started: ' + file_start
         )
