@@ -17,7 +17,6 @@ from nexus_constructor.unit_utils import (
     units_are_recognised_by_pint,
     units_have_magnitude_of_one,
 )
-from nexus_constructor.utils.readwriteoff import parse_off_file
 
 HDF_FILE_EXTENSIONS = ("nxs", "hdf", "hdf5")
 
@@ -195,13 +194,17 @@ class GeometryFileValidator(QValidator):
 
     def _validate_off_file(self, input: str) -> QValidator.State:
         try:
-            if parse_off_file(self.open_file(input)) is None:
+            if self._initial_check_off_file(self.open_file(input)):
                 # An invalid file can cause the function to return None
                 return self._emit_and_return(False)
         except (ValueError, TypeError, StopIteration, IndexError):
             # File is invalid
             return self._emit_and_return(False)
         return self._emit_and_return(True)
+
+    @staticmethod
+    def _initial_check_off_file(off_file):
+        return off_file.readline().strip() != "OFF"
 
     @staticmethod
     def is_file(input: str) -> bool:
