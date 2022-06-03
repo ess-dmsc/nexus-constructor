@@ -74,17 +74,13 @@ class Transformation(Dataset):
                 if np.isscalar(self.values.values):
                     val: "ValueType" = self.values.values
                     self.ui_value = float(val)
-                    return float(val)
                 else:
                     self.ui_value = float(self.values.values[0])
-                    return float(self.values.values[0])
         except (ValueError, TypeError):
             pass
 
         if self._ui_value is None:
-            default_value = 0.0
             self.ui_value = 0.0
-            return default_value
 
         return self._ui_value
 
