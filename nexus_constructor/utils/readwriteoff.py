@@ -133,7 +133,7 @@ def parse_off_file(off_file):
         if face_line[0].isdigit():
             face_split = face_line.split()
             idx = int(face_split[0]) + 1
-            face = face_split[:idx]
+            face = face_split[1:idx]
             all_faces.append([int(value) for value in face])
             if idx + 3 <= len(face_split):
                 color = face_split[idx : idx + 3]
