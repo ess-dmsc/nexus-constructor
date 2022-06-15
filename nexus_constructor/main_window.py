@@ -39,6 +39,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.simple_tree_view.triggered.connect(
             lambda: self.on_simple_tree_view(self.simple_tree_view.isChecked())
         )
+        self.on_show_action_labels(self.show_action_labels.isChecked())
 
         self.about_window.triggered.connect(lambda: self.onOpenAboutWindow(AboutWindow))
         # Clear the 3d view when closed

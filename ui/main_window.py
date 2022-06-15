@@ -72,6 +72,7 @@ class Ui_MainWindow(object):
         self.view_menu = QMenu(self.menu_bar)
         self.show_action_labels = QAction(MainWindow)
         self.show_action_labels.setCheckable(True)
+        self.show_action_labels.setChecked(True)
         self.simple_tree_view = QAction(MainWindow)
         self.simple_tree_view.setCheckable(True)
         self.about_window = QAction(MainWindow)
@@ -96,3 +97,5 @@ class Ui_MainWindow(object):
         self.show_action_labels.setText("Show Button Labels")
         self.simple_tree_view.setText("Use Simple Tree Model View")
         self.about_window.setText("About")
+
+        self.menu_bar.setNativeMenuBar(False)
