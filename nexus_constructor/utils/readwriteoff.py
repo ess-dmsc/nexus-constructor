@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import numpy as np
 
@@ -116,30 +117,28 @@ def parse_off_file(off_file):
     # These values are also in the first line, although we don't need them:
     # number_of_faces = int(counts[1])
     # number_of_edges = int(counts[2])
-    off_vertices = []  # preallocate
-    vertex_number = 0
-    while vertex_number < number_of_vertices:
+    off_vertices: List[List[float]] = [None] * number_of_vertices  # preallocate
+    for vertex_number in range(number_of_vertices):
         line = off_file.readline()
-        if line[0] != "#" and line != "\n":
-            off_vertices.append([float(value) for value in line.split()])
-            vertex_number += 1
+        off_vertices[vertex_number] = [float(value) for value in line.split()]
 
     faces_lines = off_file.readlines()
     # Only keep the first value (number of vertex indices in face) plus the number of vertices.
     # There may be other numbers following it to define a colour for the face, which we don't want to keep
-    all_faces = []
-    face_colors = []
-    for face_line in faces_lines:
+    number_face_lines = len(faces_lines)
+    all_faces: List[List[int]] = [None] * number_face_lines
+    face_colors: List[List[int]] = [None] * number_face_lines
+    for counter, face_line in enumerate(faces_lines):
         if face_line[0].isdigit():
             face_split = face_line.split()
             idx = int(face_split[0]) + 1
             face = face_split[1:idx]
-            all_faces.append([int(value) for value in face])
+            all_faces[counter] = [int(value) for value in face]
             if idx + 3 <= len(face_split):
                 color = face_split[idx : idx + 3]
-                face_colors.append([int(value) for value in color])
+                face_colors[counter] = [int(value) for value in color]
             else:
-                face_colors.append([0, 0, 0])
+                face_colors[counter] = [0, 0, 0]
     return off_vertices, all_faces, face_colors
 
 
