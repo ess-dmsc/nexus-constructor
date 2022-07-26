@@ -132,10 +132,10 @@ class FieldWidget(QFrame):
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
-        if edit_mode:
-            self.field_type_combo.currentTextChanged.connect(
-                self._open_edit_dialog_if_stream
-            )
+        self._edit_mode = edit_mode
+        self.field_type_combo.currentTextChanged.connect(
+            self._open_edit_dialog_if_stream
+        )
 
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
@@ -234,13 +234,8 @@ class FieldWidget(QFrame):
         )
 
     def _open_edit_dialog_if_stream(self):
-        self.edit_dialog.setWindowFlags(
-            self.edit_dialog.windowFlags() | Qt.CustomizeWindowHint
-        )
-        self.edit_dialog.setWindowFlags(
-            self.edit_dialog.windowFlags() & ~Qt.WindowCloseButtonHint
-        )
-        self.show_edit_dialog()
+        if self._edit_mode and self.field_type == FieldType.kafka_stream:
+            self.show_edit_dialog()
 
     @property
     def field_type(self) -> FieldType:
@@ -438,6 +433,12 @@ class FieldWidget(QFrame):
         )
 
     def show_edit_dialog(self):
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() | Qt.CustomizeWindowHint
+        )
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() & ~Qt.WindowCloseButtonHint
+        )
         if self.field_type == FieldType.array_dataset:
             self.edit_dialog.setLayout(QGridLayout())
             self.table_view.model.update_array_dtype(
