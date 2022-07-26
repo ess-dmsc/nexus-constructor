@@ -94,9 +94,9 @@ class FieldWidget(QFrame):
         self.streams_widget: StreamFieldsWidget = None
         self.valid_stream_widget_input: bool = True
         if possible_fields:
-            possible_field_names, default_field_types = zip(*possible_fields)
+            possible_field_names, default_field_types, units = zip(*possible_fields)
             self.default_field_types_dict = dict(
-                zip(possible_field_names, default_field_types)
+                zip(possible_field_names, zip(default_field_types, units))
             )
         self._show_only_f142_stream = show_only_f142_stream
         self._node_parent = node_parent
@@ -108,8 +108,6 @@ class FieldWidget(QFrame):
             self.parent().parent().destroyed.connect(self.attrs_dialog.close)
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
-        if self.default_field_types_dict:
-            self.field_name_edit.textChanged.connect(self.update_default_type)
         self.hide_name_field = hide_name_field
         if hide_name_field:
             self.name = str(uuid.uuid4())
@@ -214,6 +212,9 @@ class FieldWidget(QFrame):
         self.edit_button.clicked.connect(self.something_clicked)
         self.value_type_combo.highlighted.connect(self.something_clicked)
         self.field_type_combo.highlighted.connect(self.something_clicked)
+
+        if self.default_field_types_dict:
+            self.field_name_edit.textChanged.connect(self.update_default_type)
 
         # Set the layout for the default field type
         self.field_type_changed()
@@ -334,9 +335,24 @@ class FieldWidget(QFrame):
         self.units_line_edit.setText(new_units)
 
     def update_default_type(self):
-        self.value_type_combo.setCurrentText(
-            self.default_field_types_dict.get(self.field_name_edit.text(), "double")
-        )
+        default_meta = self.default_field_types_dict.get(self.field_name_edit.text())
+        if not default_meta:
+            dtype = "double"
+            units = ""
+        else:
+            dtype, units = default_meta
+        self.value_type_combo.setCurrentText(dtype)
+        self.units_line_edit.setText(units)
+
+    # def update_default_units(self):
+    #     default_meta = self.default_field_types_dict.get(
+    #         self.field_name_edit.text())
+    #     print("units", default_meta)
+    #     if not default_meta:
+    #         units = ""
+    #     else:
+    #         _, units = default_meta
+    #     self.units_line_edit.setCurrentText(units)
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
