@@ -85,6 +85,7 @@ class FieldWidget(QFrame):
         parent_dataset: Dataset = None,
         hide_name_field: bool = False,
         show_only_f142_stream: bool = False,
+        edit_mode=False,
     ):
         super(FieldWidget, self).__init__(parent)
 
@@ -131,6 +132,10 @@ class FieldWidget(QFrame):
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
+        if edit_mode:
+            self.field_type_combo.currentTextChanged.connect(
+                self._open_edit_dialog_if_stream
+            )
 
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
@@ -227,6 +232,15 @@ class FieldWidget(QFrame):
                 tooltip_on_reject="Field name is not valid",
             )
         )
+
+    def _open_edit_dialog_if_stream(self):
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() | Qt.CustomizeWindowHint
+        )
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() & ~Qt.WindowCloseButtonHint
+        )
+        self.show_edit_dialog()
 
     @property
     def field_type(self) -> FieldType:
@@ -350,13 +364,14 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.array_dataset:
             self.set_visibility(False, False, True, True)
             self.table_view = ArrayDatasetTableWidget()
+            self._set_edit_button_state(True)
         elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
             self.streams_widget = StreamFieldsWidget(
                 self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
             )
             self.streams_widget.ok_validator.is_valid.connect(
-                self._set_stream_edit_button_state
+                self._set_edit_button_state
             )
             self.streams_widget.ok_validator.validate_ok()
         elif self.field_type == FieldType.link:
@@ -370,7 +385,7 @@ class FieldWidget(QFrame):
             )
             self._set_up_value_validator(False)
 
-    def _set_stream_edit_button_state(self, value: bool):
+    def _set_edit_button_state(self, value: bool):
         if value:
             self.edit_button.setStyleSheet("QPushButton {color: black;}")
         else:
