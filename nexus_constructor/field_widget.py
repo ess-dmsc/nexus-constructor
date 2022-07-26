@@ -23,6 +23,7 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
+from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset, FileWriterModule, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
@@ -33,7 +34,6 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
-from nexus_constructor.model.group import Group
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -85,12 +85,14 @@ class FieldWidget(QFrame):
         parent_dataset: Dataset = None,
         hide_name_field: bool = False,
         show_only_f142_stream: bool = False,
+        edit_mode=False,
     ):
         super(FieldWidget, self).__init__(parent)
 
         possible_field_names = []
         self.default_field_types_dict = {}
         self.streams_widget: StreamFieldsWidget = None
+        self.valid_stream_widget_input: bool = True
         if possible_fields:
             possible_field_names, default_field_types = zip(*possible_fields)
             self.default_field_types_dict = dict(
@@ -130,6 +132,10 @@ class FieldWidget(QFrame):
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
+        self._edit_mode = edit_mode
+        self.field_type_combo.currentTextChanged.connect(
+            self._open_edit_dialog_if_stream
+        )
 
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
@@ -226,6 +232,10 @@ class FieldWidget(QFrame):
                 tooltip_on_reject="Field name is not valid",
             )
         )
+
+    def _open_edit_dialog_if_stream(self):
+        if self._edit_mode and self.field_type == FieldType.kafka_stream:
+            self.show_edit_dialog()
 
     @property
     def field_type(self) -> FieldType:
@@ -349,11 +359,16 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.array_dataset:
             self.set_visibility(False, False, True, True)
             self.table_view = ArrayDatasetTableWidget()
+            self._set_edit_button_state(True)
         elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
             self.streams_widget = StreamFieldsWidget(
                 self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
             )
+            self.streams_widget.ok_validator.is_valid.connect(
+                self._set_edit_button_state
+            )
+            self.streams_widget.ok_validator.validate_ok()
         elif self.field_type == FieldType.link:
             self.set_visibility(
                 True,
@@ -364,6 +379,13 @@ class FieldWidget(QFrame):
                 show_attrs_edit=False,
             )
             self._set_up_value_validator(False)
+
+    def _set_edit_button_state(self, value: bool):
+        if value:
+            self.edit_button.setStyleSheet("QPushButton {color: black;}")
+        else:
+            self.edit_button.setStyleSheet("QPushButton {color: red;}")
+        self.valid_stream_widget_input = value
 
     def _set_up_value_validator(self, is_link: bool):
         self.value_line_edit.setValidator(None)
@@ -411,6 +433,12 @@ class FieldWidget(QFrame):
         )
 
     def show_edit_dialog(self):
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() | Qt.CustomizeWindowHint
+        )
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() & ~Qt.WindowCloseButtonHint
+        )
         if self.field_type == FieldType.array_dataset:
             self.edit_dialog.setLayout(QGridLayout())
             self.table_view.model.update_array_dtype(

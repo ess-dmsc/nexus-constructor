@@ -38,12 +38,11 @@ from nexus_constructor.model.module import (
     TDCTStream,
     WriterModules,
 )
-
-from nexus_constructor.ui_utils import validate_line_edit, validate_general_widget
-
+from nexus_constructor.ui_utils import validate_general_widget, validate_line_edit
 from nexus_constructor.validators import (
     NoEmptyStringValidator,
     SchemaSelectionValidator,
+    StreamWidgetValidator,
 )
 from nexus_constructor.widgets.dropdown_list import DropDownList
 
@@ -125,6 +124,21 @@ class StreamFieldsWidget(QDialog):
         )
         validate_line_edit(self.source_line_edit, False)
 
+        self.ok_button = QPushButton("OK")
+        self.ok_button.clicked.connect(self.parent().close)
+
+        self.ok_validator = StreamWidgetValidator()
+        self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
+        self.topic_line_edit.validator().is_valid.connect(
+            self.ok_validator.set_topic_valid
+        )
+        self.source_line_edit.validator().is_valid.connect(
+            self.ok_validator.set_source_valid
+        )
+        self.schema_combo.validator().is_valid.connect(
+            self.ok_validator.set_schema_valid
+        )
+
         self.array_size_label = QLabel("Array size: ")
         self.array_size_spinbox = QSpinBox()
         self.array_size_spinbox.setMaximum(np.iinfo(np.int32).max)
@@ -176,9 +190,6 @@ class StreamFieldsWidget(QDialog):
             self.schema_combo.addItems([StreamModules.F142.value])
         else:
             self.schema_combo.addItems([e.value for e in StreamModules])
-
-        self.ok_button = QPushButton("OK")
-        self.ok_button.clicked.connect(self.parent().close)
 
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
