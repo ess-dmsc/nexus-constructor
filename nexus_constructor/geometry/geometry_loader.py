@@ -90,8 +90,8 @@ def _load_off_geometry(
         QVector3D(x * mult_factor, y * mult_factor, z * mult_factor)
         for x, y, z in (vertex for vertex in vertices)
     ]
-    geometry.faces = [face.tolist()[1:] for face in faces]
-    geometry.colors = [face_color.tolist() for face_color in face_colors]
+    geometry.faces = faces
+    geometry.colors = face_colors
     logging.info("OFF loaded")
     return geometry
 

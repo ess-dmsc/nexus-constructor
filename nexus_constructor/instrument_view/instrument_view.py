@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from typing import Dict, Tuple
 
 from PySide2.Qt3DCore import Qt3DCore
@@ -8,7 +9,17 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QColor, QVector3D
 from PySide2.QtWidgets import QVBoxLayout, QWidget
 
-from nexus_constructor.component_type import SOURCE_CLASS_NAME
+from nexus_constructor.common_attrs import SHAPE_GROUP_NAME
+from nexus_constructor.component_type import (
+    CHOPPER_CLASS_NAME,
+    SLIT_CLASS_NAME,
+    SOURCE_CLASS_NAME,
+)
+from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import ChopperChecker
+from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
+    DiskChopperGeometryCreator,
+)
+from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
 from nexus_constructor.instrument_view.entity_collections import (
     EntityCollection,
     NeutronSourceEntityCollection,
@@ -21,6 +32,31 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.model.component import Component
+
+
+def _set_chopper_geometry(component: Component):
+    """
+    Attempts to set a chopper geometry in the component by checking if the component fields describe a valid chopper.
+    :param component: The component to be given a shape.
+    """
+    chopper_validator = ChopperChecker(component.children)
+    if chopper_validator.validate_chopper():
+        chopper_details = chopper_validator.chopper_details
+        chopper_creator = DiskChopperGeometryCreator(chopper_details)
+        component[SHAPE_GROUP_NAME] = chopper_creator.create_disk_chopper_geometry()
+    else:
+        logging.warning("Validation failed. Unable to create disk chopper mesh.")
+
+
+def _set_slit_geometry(component: Component):
+    slit_geometry = SlitGeometry(component)
+    component.set_off_shape(slit_geometry.create_slit_geometry())
+
+
+SPECIAL_SHAPE_CASES = {
+    CHOPPER_CLASS_NAME: _set_chopper_geometry,
+    SLIT_CLASS_NAME: _set_slit_geometry,
+}
 
 
 class InstrumentView(QWidget):
@@ -200,10 +236,13 @@ class InstrumentView(QWidget):
         """
         name, nx_class = component.name, component.nx_class
         geometry, positions = component.shape
+        q_component: EntityCollection
         if geometry is None:
             return
-
-        q_component: EntityCollection = None
+        if nx_class in [CHOPPER_CLASS_NAME, SLIT_CLASS_NAME]:
+            component = deepcopy(component)
+            SPECIAL_SHAPE_CASES[nx_class](component)
+            geometry, positions = component.shape
         if nx_class == SOURCE_CLASS_NAME:
             q_component = NeutronSourceEntityCollection(
                 self.component_root_entity, nx_class
@@ -215,7 +254,6 @@ class InstrumentView(QWidget):
             q_component = OffMeshEntityCollection(
                 mesh, self.component_root_entity, nx_class
             )
-
         q_component.create_entities()
         self.component_entities[name] = q_component
 

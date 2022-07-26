@@ -24,7 +24,7 @@ container_build_nodes = [
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
 
 builders = pipeline_builder.createBuilders { container ->
-    
+
     pipeline_builder.stage("Checkout") {
         dir(pipeline_builder.project) {
             scm_vars = checkout scm
@@ -32,19 +32,19 @@ builders = pipeline_builder.createBuilders { container ->
         // Copy source code to container
         container.copyTo(pipeline_builder.project, pipeline_builder.project)
     }  // stage
-    
+
     pipeline_builder.stage("Create virtualenv") {
         container.sh """
             cd ${project}
             python3.6 -m venv build_env
         """
     } // stage
-    
+
     pipeline_builder.stage("Install requirements") {
         container.sh """
             cd ${project}
             build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements-dev.txt
+            build_env/bin/pip --proxy ${https_proxy} install -r requirements-jenkins.txt
             """
     } // stage
 
@@ -60,7 +60,7 @@ builders = pipeline_builder.createBuilders { container ->
                 git config user.name 'cow-bot'
                 git status -s
                 git add -u
-                git commit -m 'GO FORMAT YOURSELF (black)
+                git commit -m 'GO FORMAT YOURSELF (black)'
                 """
             } catch (e) {
                 // Okay to fail as there could be no badly formatted files to commit
@@ -69,7 +69,7 @@ builders = pipeline_builder.createBuilders { container ->
             }
         } // stage
     }
-    
+
     pipeline_builder.stage("Run Linter") {
         container.sh """
                 cd ${project}
@@ -77,13 +77,13 @@ builders = pipeline_builder.createBuilders { container ->
             """
     } // stage
 
-    pipeline_builder.stage("Static type check") {
-        container.sh """
-                cd ${project}
-                build_env/bin/python -m mypy ./nexus_constructor
-            """
-    } // stage
-    
+   pipeline_builder.stage("Static type check") {
+       container.sh """
+               cd ${project}
+               build_env/bin/python -m mypy ./nexus_constructor
+           """
+   } // stage
+
     pipeline_builder.stage("Run tests") {
         def testsError = null
         try {
@@ -98,12 +98,12 @@ builders = pipeline_builder.createBuilders { container ->
             }
 
     } // stage
-    
+
     if (env.CHANGE_ID) {
         pipeline_builder.stage('Build Executable'){
             container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
         }
-        
+
         pipeline_builder.stage('Archive Executable') {
             def git_commit_short = scm_vars.GIT_COMMIT.take(7)
             container.copyFrom("${project}/dist/", './build')
@@ -111,7 +111,7 @@ builders = pipeline_builder.createBuilders { container ->
             archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
         } // stage
     } // if
-    
+
 }
 
 def get_macos_pipeline() {
@@ -148,7 +148,7 @@ def get_macos_pipeline() {
 
 node("docker") {
     cleanWs()
-    
+
     stage('Checkout') {
         dir("${project}") {
             try {
@@ -158,7 +158,7 @@ node("docker") {
             }
         }
     }
-    
+
     builders['macOS'] = get_macos_pipeline()
     parallel builders
 }

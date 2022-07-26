@@ -72,6 +72,7 @@ class Ui_MainWindow(object):
         self.view_menu = QMenu(self.menu_bar)
         self.show_action_labels = QAction(MainWindow)
         self.show_action_labels.setCheckable(True)
+        self.show_action_labels.setChecked(True)
         self.simple_tree_view = QAction(MainWindow)
         self.simple_tree_view.setCheckable(True)
         self.about_window = QAction(MainWindow)
@@ -89,10 +90,12 @@ class Ui_MainWindow(object):
             self.tab_widget.indexOf(self.component_tree_view_tab), "Nexus Structure"
         )
         self.file_menu.setTitle("File")
-        self.open_json_file_action.setText("Open Filewriter JSON file")
-        self.export_to_filewriter_JSON_action.setText("Export to Filewriter JSON")
+        self.open_json_file_action.setText("Open File writer JSON file")
+        self.export_to_filewriter_JSON_action.setText("Export to File writer JSON")
 
         self.view_menu.setTitle("View")
         self.show_action_labels.setText("Show Button Labels")
         self.simple_tree_view.setText("Use Simple Tree Model View")
         self.about_window.setText("About")
+
+        self.menu_bar.setNativeMenuBar(False)

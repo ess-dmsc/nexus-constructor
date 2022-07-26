@@ -1,4 +1,3 @@
-import logging
 from collections import OrderedDict
 from copy import deepcopy
 from functools import partial
@@ -8,27 +7,14 @@ from PySide2.QtCore import Qt, QUrl, Signal
 from PySide2.QtGui import QKeyEvent, QVector3D
 from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 
-from nexus_constructor.common_attrs import (
-    NX_CLASSES_WITH_PLACEHOLDERS,
-    SHAPE_GROUP_NAME,
-    CommonAttrs,
-)
+from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
-from nexus_constructor.component_type import (
-    CHOPPER_CLASS_NAME,
-    COMPONENT_TYPES,
-    PIXEL_COMPONENT_TYPES,
-    SLIT_CLASS_NAME,
-)
+from nexus_constructor.component_type import COMPONENT_TYPES, PIXEL_COMPONENT_TYPES
 from nexus_constructor.field_utils import get_fields_with_update_functions
 from nexus_constructor.field_widget import FieldWidget
-from nexus_constructor.geometry.disk_chopper.disk_chopper_checker import ChopperChecker
-from nexus_constructor.geometry.disk_chopper.disk_chopper_geometry_creator import (
-    DiskChopperGeometryCreator,
-)
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
-from nexus_constructor.geometry.slit.slit_geometry import SlitGeometry
+from nexus_constructor.instrument_view.instrument_view import SPECIAL_SHAPE_CASES
 from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import (
@@ -55,27 +41,6 @@ from nexus_constructor.validators import (
     UnitValidator,
 )
 from ui.add_component import Ui_AddComponentDialog
-
-
-def _set_chopper_geometry(component: Component, fields_list_widget: QListWidget):
-    """
-    Attempts to set a chopper geometry in the component by checking if the component fields describe a valid chopper.
-    :param component: The component to be given a shape.
-    :param fields_list_widget: The fields list widget that contains the user input.
-    """
-    chopper_validator = ChopperChecker(fields_list_widget)
-
-    if chopper_validator.validate_chopper():
-        chopper_details = chopper_validator.chopper_details
-        chopper_creator = DiskChopperGeometryCreator(chopper_details)
-        component[SHAPE_GROUP_NAME] = chopper_creator.create_disk_chopper_geometry()
-    else:
-        logging.warning("Validation failed. Unable to create disk chopper mesh.")
-
-
-def _set_slit_geometry(component: Component):
-    slit_geometry = SlitGeometry(component)
-    component.set_off_shape(slit_geometry.create_slit_geometry())
 
 
 class AddComponentDialog(Ui_AddComponentDialog):
@@ -235,6 +200,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         # Set whatever the default nx_class is so the fields autocompleter can use the possible fields in the nx_class
+        self.nx_class_changed.connect(self.set_shape_button_visibility)
         self.on_nx_class_changed()
 
         self.fieldsListWidget.itemClicked.connect(self.select_field)
@@ -382,7 +348,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.noShapeRadioButton.setChecked(True)
             self.noShapeRadioButton.clicked.emit()
         else:
-            if isinstance(component_shape, OFFGeometryNexus):
+            if (
+                isinstance(component_shape, OFFGeometryNexus)
+                and component_shape.file_path
+            ):
                 self.cad_file_name = component_shape.file_path
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
@@ -540,16 +509,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 filename=self.fileLineEdit.text(),
                 pixel_data=pixel_data,
             )
-        elif (
-            self.noShapeRadioButton.isChecked()
-            and component.nx_class == CHOPPER_CLASS_NAME
-        ):
-            _set_chopper_geometry(component, self.fieldsListWidget)
-        elif (
-            self.noShapeRadioButton.isChecked()
-            and component.nx_class == SLIT_CLASS_NAME
-        ):
-            _set_slit_geometry(component)
 
     def get_pixel_visibility_condition(self) -> bool:
         """
@@ -609,7 +568,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
             self._scene_widget.delete_component(c_group.name)
-            self.component_model.components.append(c_group)
+            self.component_model.model.append_component(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)
 
@@ -691,6 +650,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
         """
         if self.pixel_options:
             self.pixel_options.update_pixel_input_validity()
+
+    def set_shape_button_visibility(self):
+        nx_class = self.componentTypeComboBox.currentText()
+        self.shapeTypeBox.setVisible(nx_class in COMPONENT_TYPES)
+        if nx_class not in COMPONENT_TYPES:
+            return
+        is_not_special_case = nx_class not in SPECIAL_SHAPE_CASES.keys()
+        self.noShapeRadioButton.setVisible(True)
+        self.boxRadioButton.setVisible(is_not_special_case)
+        self.meshRadioButton.setVisible(is_not_special_case)
+        self.CylinderRadioButton.setVisible(is_not_special_case)
 
 
 def get_fields_and_update_functions_for_component(component: Group):

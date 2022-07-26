@@ -43,7 +43,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.helpers import _generate_incremental_name
-from nexus_constructor.model.module import DATASET, Dataset
+from nexus_constructor.model.module import DATASET, Dataset, StreamModule
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
@@ -270,12 +270,11 @@ class Component(Group):
         type = ValueTypes.DOUBLE
         if isinstance(values, Dataset):
             type = values.type
-        elif isinstance(values, Group):
+        elif isinstance(values, StreamModule):
             try:
-                type = values.children[0].type  # type: ignore
+                type = "double"  # type: ignore
             except AttributeError:
                 pass
-
         transform = Transformation(
             name=name,
             parent_node=self.get_transforms_group(),

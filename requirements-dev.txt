@@ -3,11 +3,6 @@
 # Mirror the basic requirements
 -r requirements.txt
 
-# Packaging
-pyinstaller
-# setuptools 45 onwards not working with pyinstaller yet
-setuptools<45.0.0
-
 # newer versions of jsonschema don't work with the executables built by cx_Freeze
 jsonschema==2.6.0
 
@@ -15,7 +10,6 @@ jsonschema==2.6.0
 black==21.5b0
 pre-commit
 flake8==3.9.1
-mypy==0.812
 isort==5.7.0
 
 # Static type checking.

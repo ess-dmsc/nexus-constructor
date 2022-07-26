@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
-from nexus_constructor.model.component import Group, Component
+from nexus_constructor.model.component import Component, Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
@@ -39,6 +39,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.simple_tree_view.triggered.connect(
             lambda: self.on_simple_tree_view(self.simple_tree_view.isChecked())
         )
+        self.on_show_action_labels(self.show_action_labels.isChecked())
 
         self.about_window.triggered.connect(lambda: self.onOpenAboutWindow(AboutWindow))
         # Clear the 3d view when closed
@@ -105,7 +106,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.show_add_component_window(selected_component, False)
 
     def save_to_filewriter_json(self):
-        filename = file_dialog(True, "Save Filewriter JSON File", JSON_FILE_TYPES)
+        filename = file_dialog(True, "Save File writer JSON File", JSON_FILE_TYPES)
 
         if filename:
             if not filename.endswith(".json"):
@@ -133,8 +134,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 )
             if success:
                 self.model = reader.model
-                self._update_views()
                 self._setup_model_signals()
+                self._update_views()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()

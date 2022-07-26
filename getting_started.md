@@ -9,7 +9,6 @@
 				- [Loading shape from a CAD file](#loading-shape-from-a-cad-file)
 		- [Opening and saving file-writer commands](#opening-and-saving-file-writer-commands)
 			- [Sending a command to the file-writer](#sending-a-command-to-the-file-writer)
-		- [Opening and saving to NeXus File](#opening-and-saving-to-nexus-file)
 
 # Getting started
 To introduce the main features of the NeXus Constructor we will create a NeXus file template describing a simple neutron beamline, comprising a neutron source, sample, detector and monitor.
