@@ -504,8 +504,7 @@ class StreamFieldsWidget(QDialog):
                 source=source,
                 topic=topic,
             )
-            if self.advanced_options_enabled:
-                self.record_advanced_hs01_values(stream)
+            self.record_advanced_hs01_values(stream)
         elif current_schema == WriterModules.TDCTIME.value:
             stream = TDCTStream(parent_node=parent, source=source, topic=topic)
 
@@ -516,6 +515,8 @@ class StreamFieldsWidget(QDialog):
         Save the advanced f142 properties to the stream data object.
         :param stream: The stream data object to be modified.
         """
+        if not self.hs01_advanced_opts:
+            return
         shape, data_type, error_type, edge_type = self.hs01_advanced_opts
         stream.shape = shape
         stream.type = data_type

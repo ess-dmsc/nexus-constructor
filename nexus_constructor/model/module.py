@@ -1,6 +1,6 @@
 from abc import ABC
 from enum import Enum
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, Dict, List, Union
 
 import attr
 import numpy as np
@@ -194,10 +194,14 @@ class ADARStream(StreamModule):
 
 
 HS01TYPES = ["uint32", "uint64", "float", "double"]
-DATA_TYPE = "data_type"
 ERROR_TYPE = "error_type"
 EDGE_TYPE = "edge_type"
 SHAPE = "shape"
+SIZE = "size"
+LABEL = "label"
+UNIT = "unit"
+EDGES = "edges"
+DATASET_NAME = "dataset_name"
 
 
 @attr.s
@@ -210,11 +214,11 @@ class HS01Shape:
 
     def as_dict(self, error_collector: List[str]):
         return {
-            "size": self.size,
-            "label": self.label,
-            "unit": self.unit,
-            "edges": self.edges,
-            "dataset_name": self.dataset_name,
+            SIZE: self.size,
+            LABEL: self.label,
+            UNIT: self.unit,
+            EDGES: self.edges,
+            DATASET_NAME: self.dataset_name,
         }
 
 
@@ -238,7 +242,7 @@ class HS01Stream(StreamModule):
                 shape_dicts.append(item.as_dict(error_collector))
             module_dict[NodeType.CONFIG][SHAPE] = shape_dicts
         if self.type:
-            module_dict[NodeType.CONFIG][DATA_TYPE] = self.type
+            module_dict[NodeType.CONFIG][CommonKeys.TYPE] = self.type
         return module_dict
 
 
@@ -257,6 +261,17 @@ class WriterModuleClasses(Enum):
 module_class_dict = dict(
     zip([x.value for x in WriterModules], [x.value for x in WriterModuleClasses])
 )
+
+
+def create_hs01_shape(shape: List[Dict]) -> List[HS01Shape]:
+    shape_list = []
+    for item in shape:
+        shape_list.append(
+            HS01Shape(
+                item[SIZE], item[LABEL], item[UNIT], item[EDGES], item[DATASET_NAME]
+            )
+        )
+    return shape_list
 
 
 def create_fw_module_object(mod_type, configuration, parent_node):
@@ -323,8 +338,10 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             fw_mod_obj.error_type = configuration[ERROR_TYPE]
         if EDGE_TYPE in configuration:
             fw_mod_obj.edge_type = configuration[EDGE_TYPE]
-        if DATA_TYPE in configuration:
-            fw_mod_obj.data_type = configuration[DATA_TYPE]
+        if CommonKeys.TYPE in configuration:
+            fw_mod_obj.type = configuration[CommonKeys.TYPE]
+        if SHAPE in configuration:
+            fw_mod_obj.shape = create_hs01_shape(configuration[SHAPE])
 
     return fw_mod_obj
 
