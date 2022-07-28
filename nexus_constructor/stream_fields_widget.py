@@ -1,4 +1,5 @@
 from functools import partial
+from typing import List, Tuple
 
 import numpy as np
 from PySide2.QtCore import Qt
@@ -18,6 +19,7 @@ from PySide2.QtWidgets import (
     QSpinBox,
     QTableWidget,
     QTableWidgetItem,
+    QVBoxLayout,
 )
 
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
@@ -30,7 +32,8 @@ from nexus_constructor.model.module import (
     ADARStream,
     EV42Stream,
     F142Stream,
-    HS00Stream,
+    HS01Shape,
+    HS01Stream,
     NS10Stream,
     SENVStream,
     StreamModule,
@@ -85,10 +88,6 @@ class StreamFieldsWidget(QDialog):
         self.minimum_spinbox_value = 0
         self.maximum_spinbox_value = 100_000_000
         self.advanced_options_enabled = False
-
-        self.hs00_unimplemented_label = QLabel(
-            "hs00 (Event histograms) has not yet been fully implemented."
-        )
 
         self.schema_label = QLabel("Schema: ")
         self.schema_combo = DropDownList()
@@ -185,7 +184,6 @@ class StreamFieldsWidget(QDialog):
         self.array_radio = QRadioButton(text=ARRAY)
         self.array_radio.clicked.connect(partial(self._show_array_size, True))
 
-        self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
         if self._show_only_f142_stream:
             self.schema_combo.addItems([StreamModules.F142.value])
         else:
@@ -215,16 +213,28 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.array_size_spinbox, 6, 1)
         self.layout().addWidget(self.array_size_table, 6, 1)
 
-        self.layout().addWidget(self.hs00_unimplemented_label, 7, 0, 1, 2)
-
         # Spans both rows
         self.layout().addWidget(self.show_advanced_options_button, 8, 0, 1, 2)
         self.layout().addWidget(self.f142_advanced_group_box, 9, 0, 1, 2)
-
         self.layout().addWidget(self.ev42_advanced_group_box, 10, 0, 1, 2)
 
-        self.layout().addWidget(self.ok_button, 11, 0, 1, 2)
+        self.layout().addWidget(self.ok_button, 12, 0, 1, 2)
 
+        # hs01 schema advanced options dialog.
+        self.hs01_advanced_dialog = QDialog(parent=self.show_advanced_options_button)
+        self.hs01_advanced_dialog.setLayout(QVBoxLayout())
+        self.hs01_advanced_opts: Tuple[List[HS01Shape], str, str, str] = None
+        self.shape_table = QTableWidget(0, 4)
+        self.shape_table.setParent(self.hs01_advanced_dialog)
+        self.shape_table.setHorizontalHeaderLabels(
+            ["label", "unit", "edges", "dataset_name"]
+        )
+        self.data_type_edit = QLineEdit()
+        self.error_type_edit = QLineEdit()
+        self.edge_type_edit = QLineEdit()
+        self._set_up_hs01_dialog_box()
+
+        self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
         self._schema_type_changed(self.schema_combo.currentText())
         self.parent().parent().field_name_edit.setVisible(False)
 
@@ -292,12 +302,102 @@ class StreamFieldsWidget(QDialog):
             )
         )
 
+    # TODO: Create a proper subclass instead of doing it like this.
+    def _set_up_hs01_dialog_box(self):
+        """
+        Sets up the UI for the hs01 advanced options.
+        """
+        add_shape_button = QPushButton(text="Add shape")
+        remove_shape_button = QPushButton(text="Remove shape")
+        label_height = 15
+        data_type_label = QLabel("Data type:")
+        data_type_label.setFixedHeight(label_height)
+        error_type_label = QLabel("Error type:")
+        error_type_label.setFixedHeight(label_height)
+        edge_type_label = QLabel("Edge type:")
+        edge_type_label.setFixedHeight(label_height)
+        ok_button = QPushButton(text="Done")
+
+        self.hs01_advanced_dialog.setFixedWidth(
+            self.shape_table.width()
+        )  # Override showEvent in subclass.
+        add_shape_button.clicked.connect(self._add_shape)
+        remove_shape_button.clicked.connect(self._remove_shape)
+        ok_button.clicked.connect(self._on_ok_hs01_advanced_opts)
+
+        self.hs01_advanced_dialog.layout().addWidget(add_shape_button, 0)
+        self.hs01_advanced_dialog.layout().addWidget(remove_shape_button, 1)
+        self.hs01_advanced_dialog.layout().addWidget(self.shape_table, 2)
+        self.hs01_advanced_dialog.layout().addWidget(data_type_label, 3)
+        self.hs01_advanced_dialog.layout().addWidget(self.data_type_edit, 4)
+        self.hs01_advanced_dialog.layout().addWidget(error_type_label, 5)
+        self.hs01_advanced_dialog.layout().addWidget(self.error_type_edit, 6)
+        self.hs01_advanced_dialog.layout().addWidget(edge_type_label, 7)
+        self.hs01_advanced_dialog.layout().addWidget(self.edge_type_edit, 8)
+        self.hs01_advanced_dialog.layout().addWidget(ok_button, 9)
+
+    def _add_shape(self):
+        self.shape_table.insertRow(self.shape_table.rowCount())
+
+    def _remove_shape(self):
+        self.shape_table.removeRow(self.shape_table.currentRow())
+
+    def _on_ok_hs01_advanced_opts(self):
+        data_type = self.data_type_edit.text() if self.data_type_edit else None
+        error_type = self.error_type_edit.text() if self.error_type_edit else None
+        edge_type = self.edge_type_edit.text() if self.edge_type_edit else None
+        self.hs01_advanced_opts = (
+            self._extract_shape_data(),
+            data_type,
+            error_type,
+            edge_type,
+        )
+        self.hs01_advanced_dialog.setVisible(False)
+
+    def _extract_shape_data(self) -> List[HS01Shape]:
+        shapes: List[HS01Shape] = []
+        for row in range(self.shape_table.rowCount()):
+            edge_extraction_fail = False
+            label = self.shape_table.item(row, 0).text()
+            unit = self.shape_table.item(row, 1).text()
+            edges_text_list = self.shape_table.item(row, 2).text().split(",")
+            edges = []
+            for edge in edges_text_list:
+                try:
+                    edges.append(int(edge))
+                except ValueError:
+                    edge_extraction_fail = True
+                    print(f"Edge extraction failed: {edge} is not an integer.")
+            dataset_name = self.shape_table.item(row, 3).text()
+            if not edge_extraction_fail:
+                size = len(edges) - 1
+                shapes.append(HS01Shape(size, label, unit, edges, dataset_name))
+        return shapes
+
+    def _fill_existing_advanced_hs01_fields(self, field: HS01Stream):
+        self.data_type_edit.setText(field.type)
+        self.edge_type_edit.setText(field.edge_type)
+        self.error_type_edit.setText(field.error_type)
+        self._fill_in_hs01_shape(field.shape)
+
+    def _fill_in_hs01_shape(self, shapes: List[HS01Shape]):
+        for shape in shapes:
+            self.shape_table.insertRow(self.shape_table.rowCount())
+            row = self.shape_table.rowCount() - 1
+            self.shape_table.setItem(row, 0, QTableWidgetItem(shape.label))
+            self.shape_table.setItem(row, 1, QTableWidgetItem(shape.unit))
+            edges_text = [str(val) for val in shape.edges]
+            self.shape_table.setItem(row, 2, QTableWidgetItem(",".join(edges_text)))
+            self.shape_table.setItem(row, 3, QTableWidgetItem(shape.dataset_name))
+
     def _show_advanced_options(self, show):
         schema = self.schema_combo.currentText()
         if schema == WriterModules.F142.value:
             self.f142_advanced_group_box.setVisible(show)
         elif schema == WriterModules.EV42.value:
             self.ev42_advanced_group_box.setVisible(show)
+        elif schema == WriterModules.HS01.value:
+            self.hs01_advanced_dialog.setVisible(show)
         self.advanced_options_enabled = show
 
     def _show_array_size(self, show: bool):
@@ -306,9 +406,10 @@ class StreamFieldsWidget(QDialog):
 
     def _schema_type_changed(self, schema: str):
         self.parent().setWindowTitle(f"Editing {schema} stream field")
-        self.hs00_unimplemented_label.setVisible(False)
+        self.show_advanced_options_button.setText("Show/hide advanced options")
         self.f142_advanced_group_box.setVisible(False)
         self.ev42_advanced_group_box.setVisible(False)
+        self.hs01_advanced_dialog.setVisible(False)
         self.show_advanced_options_button.setVisible(False)
         self.show_advanced_options_button.setChecked(False)
         self.value_units_label.setVisible(False)
@@ -327,9 +428,11 @@ class StreamFieldsWidget(QDialog):
         elif schema == WriterModules.ADAR.value:
             self._set_edits_visible(True, False)
             self._show_array_size_table(True)
-        elif schema == WriterModules.HS00.value:
+            self.ev42_advanced_group_box.setVisible(False)
+        elif schema == WriterModules.HS01.value:
+            self.show_advanced_options_button.setText("Show advanced options dialog")
             self._set_edits_visible(True, False)
-            self.hs00_unimplemented_label.setVisible(True)
+            self.show_advanced_options_button.setVisible(True)
         elif schema == WriterModules.NS10.value:
             self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
         elif (
@@ -395,20 +498,29 @@ class StreamFieldsWidget(QDialog):
             stream = NS10Stream(parent_node=parent, source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
             stream = SENVStream(parent_node=parent, source=source, topic=topic)
-        elif current_schema == WriterModules.HS00.value:
-            stream = HS00Stream(  # type: ignore
-                parent=parent,
+        elif current_schema == WriterModules.HS01.value:
+            stream = HS01Stream(  # type: ignore
+                parent_node=parent,
                 source=source,
                 topic=topic,
-                data_type=NotImplemented,
-                edge_type=NotImplemented,
-                error_type=NotImplemented,
-                shape=[],
             )
+            if self.advanced_options_enabled:
+                self.record_advanced_hs01_values(stream)
         elif current_schema == WriterModules.TDCTIME.value:
             stream = TDCTStream(parent_node=parent, source=source, topic=topic)
 
         return stream
+
+    def record_advanced_hs01_values(self, stream: HS01Stream):
+        """
+        Save the advanced f142 properties to the stream data object.
+        :param stream: The stream data object to be modified.
+        """
+        shape, data_type, error_type, edge_type = self.hs01_advanced_opts
+        stream.shape = shape
+        stream.type = data_type
+        stream.edge_type = edge_type
+        stream.error_type = error_type
 
     def record_advanced_f142_values(self, stream: F142Stream):
         """
@@ -502,3 +614,5 @@ class StreamFieldsWidget(QDialog):
         elif schema == WriterModules.ADAR.value:
             for i, val in enumerate(field.array_size):
                 self.array_size_table.setItem(0, i, QTableWidgetItem(str(val)))
+        elif schema == WriterModules.HS01.value:
+            self._fill_existing_advanced_hs01_fields(field)

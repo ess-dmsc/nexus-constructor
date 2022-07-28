@@ -29,7 +29,7 @@ class WriterModules(Enum):
     EV42 = "ev42"
     TDCTIME = "tdct"
     NS10 = "ns10"
-    HS00 = "hs00"
+    HS01 = "hs01"
     SENV = "senv"
     LINK = "link"
     DATASET = "dataset"
@@ -43,6 +43,7 @@ class StreamModules(Enum):
     NS10 = "ns10"
     SENV = "senv"
     ADAR = "ADAr"
+    HS01 = "hs01"
 
 
 @attr.s
@@ -192,12 +193,61 @@ class ADARStream(StreamModule):
         return module_dict
 
 
+HS01TYPES = ["uint32", "uint64", "float", "double"]
+DATA_TYPE = "data_type"
+ERROR_TYPE = "error_type"
+EDGE_TYPE = "edge_type"
+SHAPE = "shape"
+
+
+@attr.s
+class HS01Shape:
+    size = attr.ib(type=int)
+    label = attr.ib(type=str)
+    unit = attr.ib(type=str)
+    edges = attr.ib(type=List[int])
+    dataset_name = attr.ib(type=str)
+
+    def as_dict(self, error_collector: List[str]):
+        return {
+            "size": self.size,
+            "label": self.label,
+            "unit": self.unit,
+            "edges": self.edges,
+            "dataset_name": self.dataset_name,
+        }
+
+
+@attr.s
+class HS01Stream(StreamModule):
+    type = attr.ib(type=str, default=None)
+    error_type = attr.ib(type=str, default=None)
+    edge_type = attr.ib(type=str, default=None)
+    shape = attr.ib(type=List[HS01Shape], default=[])
+    writer_module = attr.ib(type=str, default=WriterModules.HS01.value, init=False)
+
+    def as_dict(self, error_collector: List[str]):
+        module_dict = StreamModule.as_dict(self, error_collector)
+        if self.error_type:
+            module_dict[NodeType.CONFIG][ERROR_TYPE] = self.error_type
+        if self.edge_type:
+            module_dict[NodeType.CONFIG][EDGE_TYPE] = self.edge_type
+        if self.shape:
+            shape_dicts = []
+            for item in self.shape:
+                shape_dicts.append(item.as_dict(error_collector))
+            module_dict[NodeType.CONFIG][SHAPE] = shape_dicts
+        if self.type:
+            module_dict[NodeType.CONFIG][DATA_TYPE] = self.type
+        return module_dict
+
+
 class WriterModuleClasses(Enum):
     F142 = F142Stream
     EV42 = EV42Stream
     TDCTIME = TDCTStream
     NS10 = NS10Stream
-    HS00 = FileWriterModule
+    HS01 = HS01Stream
     SENV = SENVStream
     LINK = Link
     DATASET = Dataset
@@ -217,6 +267,7 @@ def create_fw_module_object(mod_type, configuration, parent_node):
         WriterModules.TDCTIME.value,
         WriterModules.EV42.value,
         WriterModules.ADAR.value,
+        WriterModules.HS01.value,
     ]:
         fw_mod_obj = fw_mod_class(
             topic=configuration[TOPIC],
@@ -262,49 +313,20 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             fw_mod_obj.cue_interval = configuration[CUE_INTERVAL]
         if CHUNK_SIZE in configuration:
             fw_mod_obj.chunk_size = configuration[CHUNK_SIZE]
-
-    if mod_type == WriterModules.EV42.value:
-        if ADC_PULSE_DEBUG in configuration:
-            fw_mod_obj.adc_pulse_debug = configuration[ADC_PULSE_DEBUG]
-
-    if mod_type == WriterModules.ADAR.value:
+        if mod_type == WriterModules.EV42.value:
+            if ADC_PULSE_DEBUG in configuration:
+                fw_mod_obj.adc_pulse_debug = configuration[ADC_PULSE_DEBUG]
+    elif mod_type == WriterModules.ADAR.value:
         fw_mod_obj.array_size = configuration[ARRAY_SIZE]
+    elif mod_type == WriterModules.HS01.value:
+        if ERROR_TYPE in configuration:
+            fw_mod_obj.error_type = configuration[ERROR_TYPE]
+        if EDGE_TYPE in configuration:
+            fw_mod_obj.edge_type = configuration[EDGE_TYPE]
+        if DATA_TYPE in configuration:
+            fw_mod_obj.data_type = configuration[DATA_TYPE]
 
     return fw_mod_obj
-
-
-HS00TYPES = ["uint32", "uint64", "float", "double"]
-
-DATA_TYPE = "data_type"
-ERROR_TYPE = "error_type"
-EDGE_TYPE = "edge_type"
-SHAPE = "shape"
-
-
-@attr.s
-class HS00Stream:
-    """Not currently supported yet"""
-
-    topic = attr.ib(type=str)
-    source = attr.ib(type=str)
-    data_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
-    error_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
-    edge_type = attr.ib(type=str, validator=attr.validators.in_(HS00TYPES))
-    shape = attr.ib()
-    writer_module = attr.ib(type=str, default=WriterModules.HS00.value, init=False)
-
-    def as_dict(self, error_collector: List[str]):
-        return {
-            CommonKeys.MODULE: self.writer_module,
-            NodeType.CONFIG: {
-                SOURCE: self.source,
-                TOPIC: self.topic,
-                DATA_TYPE: self.data_type,
-                ERROR_TYPE: self.error_type,
-                EDGE_TYPE: self.edge_type,
-                SHAPE: self.shape,
-            },
-        }
 
 
 Stream = StreamModule

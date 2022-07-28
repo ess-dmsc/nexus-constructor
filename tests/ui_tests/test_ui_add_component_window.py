@@ -2228,7 +2228,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_THEN_stream_dialo
     assert not streams_widget.type_combo.isVisible()
 
 
-def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs00_THEN_stream_dialog_shown_with_correct_options(
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs01_THEN_stream_dialog_shown_with_correct_options(
     qtbot, add_component_dialog
 ):
     qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
@@ -2246,7 +2246,7 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_hs00_THEN_stre
     streams_widget = field.streams_widget
     assert streams_widget.isEnabled()
 
-    streams_widget._schema_type_changed("hs00")
+    streams_widget._schema_type_changed("hs01")
 
     assert streams_widget.topic_label.isEnabled()
     assert streams_widget.topic_line_edit.isEnabled()

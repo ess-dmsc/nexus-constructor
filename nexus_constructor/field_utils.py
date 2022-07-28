@@ -14,7 +14,7 @@ from nexus_constructor.validators import FieldType
 if TYPE_CHECKING:
     from PySide2.QtWidgets import QFrame  # noqa: F401
 
-    from nexus_constructor.model.module import HS00Stream  # noqa: F401
+    from nexus_constructor.model.module import HS01Stream  # noqa: F401
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
     from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
 
