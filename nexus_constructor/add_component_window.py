@@ -386,7 +386,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self._group_container.group,
             self.possible_fields,
             self.fieldsListWidget,
-            edit_mode=True,
         )
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)

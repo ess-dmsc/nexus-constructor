@@ -62,7 +62,9 @@ class ModuleViewEditable(QGroupBox):
             parent,
         )
         layout = QVBoxLayout()
-        self.field_widget = FieldWidget(module.parent_node, parent_dataset=module)
+        self.field_widget = FieldWidget(
+            module.parent_node, parent_dataset=module, editor_mode=False
+        )
         self.field_widget.field_type_combo.setEnabled(False)
         self.module = module
         self.model = model
@@ -132,3 +134,5 @@ class ModuleViewEditable(QGroupBox):
             self.field_widget.streams_widget.record_advanced_f142_values(self.module)
         elif self.module.writer_module == StreamModules.EV42.value:
             self.field_widget.streams_widget.record_advanced_ev42_values(self.module)
+        elif self.module.writer_module == StreamModules.HS01.value:
+            self.field_widget.streams_widget.record_advanced_hs01_values(self.module)
