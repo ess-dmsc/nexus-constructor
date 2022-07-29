@@ -85,7 +85,6 @@ class FieldWidget(QFrame):
         parent_dataset: Dataset = None,
         hide_name_field: bool = False,
         show_only_f142_stream: bool = False,
-        editor_mode=True,
     ):
         super(FieldWidget, self).__init__(parent)
 
@@ -130,7 +129,6 @@ class FieldWidget(QFrame):
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
-        self._editor_mode = editor_mode
         self.field_type_combo.currentTextChanged.connect(
             self._open_edit_dialog_if_stream
         )
@@ -235,7 +233,7 @@ class FieldWidget(QFrame):
         )
 
     def _open_edit_dialog_if_stream(self):
-        if self._editor_mode and self.field_type == FieldType.kafka_stream:
+        if self.field_type == FieldType.kafka_stream and self.isVisible():
             self.show_edit_dialog()
 
     @property
