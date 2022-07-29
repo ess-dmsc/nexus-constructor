@@ -561,10 +561,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: The geometry object.
         """
         c_group = self._group_container.group
-
-        for child in self._group_container.group.children:
-            if not isinstance(child, Group):
-                self._group_container.group.children.remove(child)
+        group_children = []
+        for child in c_group.children:
+            if isinstance(child, Group):
+                group_children.append(child)
+        c_group.children = []
+        for child in group_children:
+            c_group[child.name] = child
 
         add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         if isinstance(c_group, Component):
