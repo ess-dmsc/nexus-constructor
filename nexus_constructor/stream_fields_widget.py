@@ -79,6 +79,7 @@ class HS01Dialog(QDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.setWindowTitle("Advanced options for hs01 schema")
         self.setLayout(QVBoxLayout())
         self.hs01_advanced_opts: Tuple[List[HS01Shape], str, str, str] = None
         self.shape_table = QTableWidget(0, 4)
