@@ -231,6 +231,7 @@ class StreamFieldsWidget(QDialog):
 
         self.ok_button = QPushButton("OK")
         self.ok_button.clicked.connect(self.parent().close)
+        self.cancel_button = QPushButton("Cancel")
 
         self.ok_validator = StreamWidgetValidator()
         self.ok_validator.is_valid.connect(self.ok_button.setEnabled)
@@ -325,6 +326,7 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.ev42_advanced_group_box, 10, 0, 1, 2)
 
         self.layout().addWidget(self.ok_button, 12, 0, 1, 2)
+        self.layout().addWidget(self.cancel_button, 13, 0, 1, 2)
 
         # hs01 schema advanced options dialog.
         self.hs01_advanced_dialog = HS01Dialog(self)

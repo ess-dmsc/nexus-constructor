@@ -342,16 +342,6 @@ class FieldWidget(QFrame):
         self.value_type_combo.setCurrentText(dtype)
         self.units_line_edit.setText(units)
 
-    # def update_default_units(self):
-    #     default_meta = self.default_field_types_dict.get(
-    #         self.field_name_edit.text())
-    #     print("units", default_meta)
-    #     if not default_meta:
-    #         units = ""
-    #     else:
-    #         _, units = default_meta
-    #     self.units_line_edit.setCurrentText(units)
-
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
             self.something_clicked.emit()
@@ -383,6 +373,12 @@ class FieldWidget(QFrame):
                 self._set_edit_button_state
             )
             self.streams_widget.ok_validator.validate_ok()
+
+            def reset_field_type():
+                self.field_type_combo.setCurrentText("Scalar dataset")
+                self.streams_widget.parentWidget().close()
+
+            self.streams_widget.cancel_button.clicked.connect(reset_field_type)
         elif self.field_type == FieldType.link:
             self.set_visibility(
                 True,
