@@ -374,7 +374,6 @@ class FieldWidget(QFrame):
             )
             self.streams_widget.ok_validator.validate_ok()
             self.streams_widget.cancel_button.clicked.connect(self.reset_field_type)
-            self.streams_widget.ok_button.clicked.connect(self.save_stream_widget_state)
         elif self.field_type == FieldType.link:
             self.set_visibility(
                 True,
@@ -392,12 +391,6 @@ class FieldWidget(QFrame):
             self.field_type_combo.setCurrentText("Scalar dataset")
         else:
             self.streams_widget.update_existing_stream_info(self.old_streams_settings)
-
-    def save_stream_widget_state(self):
-        if self.field_type == FieldType.kafka_stream:
-            self.old_streams_settings = self.streams_widget.get_stream_module(
-                self._node_parent
-            )
 
     def _set_edit_button_state(self, value: bool):
         if value:
@@ -468,6 +461,10 @@ class FieldWidget(QFrame):
                 f"Edit {self.value_type_combo.currentText()} Array field"
             )
         elif self.field_type == FieldType.kafka_stream:
+            if self.streams_widget:
+                self.old_streams_settings = self.streams_widget.get_stream_module(
+                    self._node_parent
+                )
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
         if self.edit_dialog.isVisible():
