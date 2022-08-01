@@ -24,7 +24,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link
+from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -91,6 +91,7 @@ class FieldWidget(QFrame):
         possible_field_names = []
         self.default_field_types_dict = {}
         self.streams_widget: StreamFieldsWidget = None
+        self.old_streams_settings: StreamModule = None
         self.valid_stream_widget_input: bool = True
         if possible_fields:
             possible_field_names, default_field_types, units = zip(*possible_fields)
@@ -357,7 +358,6 @@ class FieldWidget(QFrame):
         self.edit_dialog.setModal(True)
         self._set_up_value_validator(False)
         self.enable_3d_value_spinbox.emit(not self.field_type_is_scalar())
-
         if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
         elif self.field_type == FieldType.array_dataset:
@@ -373,12 +373,8 @@ class FieldWidget(QFrame):
                 self._set_edit_button_state
             )
             self.streams_widget.ok_validator.validate_ok()
-
-            def reset_field_type():
-                self.field_type_combo.setCurrentText("Scalar dataset")
-                self.streams_widget.parentWidget().close()
-
-            self.streams_widget.cancel_button.clicked.connect(reset_field_type)
+            self.streams_widget.cancel_button.clicked.connect(self.reset_field_type)
+            self.streams_widget.ok_button.clicked.connect(self.save_stream_widget_state)
         elif self.field_type == FieldType.link:
             self.set_visibility(
                 True,
@@ -389,6 +385,19 @@ class FieldWidget(QFrame):
                 show_attrs_edit=False,
             )
             self._set_up_value_validator(False)
+
+    def reset_field_type(self):
+        self.streams_widget.parentWidget().close()
+        if not self.old_streams_settings:
+            self.field_type_combo.setCurrentText("Scalar dataset")
+        else:
+            self.streams_widget.update_existing_stream_info(self.old_streams_settings)
+
+    def save_stream_widget_state(self):
+        if self.field_type == FieldType.kafka_stream:
+            self.old_streams_settings = self.streams_widget.get_stream_module(
+                self._node_parent
+            )
 
     def _set_edit_button_state(self, value: bool):
         if value:
