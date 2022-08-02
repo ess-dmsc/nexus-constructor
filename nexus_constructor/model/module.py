@@ -27,6 +27,7 @@ LINK = "link"
 class WriterModules(Enum):
     F142 = "f142"
     EV42 = "ev42"
+    EV44 = "ev44"
     TDCTIME = "tdct"
     NS10 = "ns10"
     HS01 = "hs01"
@@ -39,6 +40,7 @@ class WriterModules(Enum):
 class StreamModules(Enum):
     F142 = "f142"
     EV42 = "ev42"
+    EV44 = "ev44"
     TDCTIME = "tdct"
     NS10 = "ns10"
     SENV = "senv"
@@ -104,6 +106,11 @@ class EV42Stream(StreamModule):
         if self.cue_interval:
             module_dict[NodeType.CONFIG][CUE_INTERVAL] = self.cue_interval
         return module_dict
+
+
+@attr.s
+class EV44Stream(EV42Stream):
+    writer_module = attr.ib(type=str, default=WriterModules.EV44.value, init=False)
 
 
 @attr.s
@@ -249,6 +256,7 @@ class HS01Stream(StreamModule):
 class WriterModuleClasses(Enum):
     F142 = F142Stream
     EV42 = EV42Stream
+    EV44 = EV44Stream
     TDCTIME = TDCTStream
     NS10 = NS10Stream
     HS01 = HS01Stream
@@ -281,6 +289,7 @@ def create_fw_module_object(mod_type, configuration, parent_node):
         WriterModules.SENV.value,
         WriterModules.TDCTIME.value,
         WriterModules.EV42.value,
+        WriterModules.EV44.value,
         WriterModules.ADAR.value,
         WriterModules.HS01.value,
     ]:
@@ -323,12 +332,16 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             type=dtype,
         )
 
-    if mod_type in [WriterModules.F142.value, WriterModules.EV42.value]:
+    if mod_type in [
+        WriterModules.F142.value,
+        WriterModules.EV42.value,
+        WriterModules.EV44.value,
+    ]:
         if CUE_INTERVAL in configuration:
             fw_mod_obj.cue_interval = configuration[CUE_INTERVAL]
         if CHUNK_SIZE in configuration:
             fw_mod_obj.chunk_size = configuration[CHUNK_SIZE]
-        if mod_type == WriterModules.EV42.value:
+        if mod_type in [WriterModules.EV42.value, WriterModules.EV44.value]:
             if ADC_PULSE_DEBUG in configuration:
                 fw_mod_obj.adc_pulse_debug = configuration[ADC_PULSE_DEBUG]
     elif mod_type == WriterModules.ADAR.value:
