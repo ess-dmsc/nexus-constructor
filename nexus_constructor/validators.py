@@ -369,6 +369,7 @@ class StreamWidgetValidator(QObject):
             not self.schema_is_valid,
         ]
         self.is_valid.emit(not any(unacceptable))
+        return not any(unacceptable)
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.
     is_valid = Signal(bool)

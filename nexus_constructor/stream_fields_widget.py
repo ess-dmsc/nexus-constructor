@@ -31,6 +31,7 @@ from nexus_constructor.model.module import (
     CUE_INTERVAL,
     ADARStream,
     EV42Stream,
+    EV44Stream,
     F142Stream,
     HS01Shape,
     HS01Stream,
@@ -403,7 +404,7 @@ class StreamFieldsWidget(QDialog):
         schema = self.schema_combo.currentText()
         if schema == WriterModules.F142.value:
             self.f142_advanced_group_box.setVisible(show)
-        elif schema == WriterModules.EV42.value:
+        elif schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
             self.ev42_advanced_group_box.setVisible(show)
         elif schema == WriterModules.HS01.value:
             self.hs01_advanced_dialog.setVisible(show)
@@ -431,7 +432,7 @@ class StreamFieldsWidget(QDialog):
             self._set_edits_visible(True, True)
             self.show_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
-        elif schema == WriterModules.EV42.value:
+        elif schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
             self._set_edits_visible(True, False)
             self.show_advanced_options_button.setVisible(True)
             self.ev42_advanced_group_box.setVisible(False)
@@ -500,8 +501,11 @@ class StreamFieldsWidget(QDialog):
                     array_size.append(int(table_value.text()))
             stream = ADARStream(parent_node=parent, source=source, topic=topic)
             stream.array_size = array_size
-        elif current_schema == WriterModules.EV42.value:
-            stream = EV42Stream(parent_node=parent, source=source, topic=topic)
+        elif current_schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
+            if current_schema == WriterModules.EV42.value:
+                stream = EV42Stream(parent_node=parent, source=source, topic=topic)
+            else:
+                stream = EV44Stream(parent_node=parent, source=source, topic=topic)
             if self.advanced_options_enabled:
                 self.record_advanced_ev42_values(stream)
         elif current_schema == WriterModules.NS10.value:
@@ -606,6 +610,8 @@ class StreamFieldsWidget(QDialog):
         Fill in stream fields and properties into the new UI field.
         :param field: The stream group
         """
+        if not field:
+            raise TypeError("Field is NoneType when " "expecting type StreamModule.")
         if isinstance(field, Group):
             field = field.children[0]
         if hasattr(field, "parent_node") and isinstance(field.parent_node, Group):
@@ -621,7 +627,7 @@ class StreamFieldsWidget(QDialog):
         self.source_validator.validate(field.source, 0)
         if schema == WriterModules.F142.value:
             self.fill_in_existing_f142_fields(field)
-        elif schema == WriterModules.EV42.value:
+        elif schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
             self.fill_in_existing_ev42_fields(field)
         elif schema == WriterModules.ADAR.value:
             for i, val in enumerate(field.array_size):

@@ -387,7 +387,11 @@ class FieldWidget(QFrame):
 
     def reset_field_type(self):
         self.streams_widget.parentWidget().close()
-        if not self.old_streams_settings:
+        tmp_streams_widget = StreamFieldsWidget(
+            self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
+        )
+        tmp_streams_widget.update_existing_stream_info(self.old_streams_settings)
+        if not tmp_streams_widget.ok_validator.validate_ok():
             self.field_type_combo.setCurrentText("Scalar dataset")
         else:
             self.streams_widget.update_existing_stream_info(self.old_streams_settings)
