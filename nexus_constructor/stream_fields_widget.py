@@ -23,7 +23,7 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
-from nexus_constructor.common_attrs import ARRAY, SCALAR
+from nexus_constructor.common_attrs import AD_ARRAY_SIZE_PLACEHOLDER, ARRAY, SCALAR
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
@@ -249,6 +249,9 @@ class StreamFieldsWidget(QDialog):
         self.array_size_label = QLabel("Array size: ")
         self.array_size_spinbox = QSpinBox()
         self.array_size_spinbox.setMaximum(np.iinfo(np.int32).max)
+        self.array_size_placeholder_label = QLabel("Use placeholder:")
+        self.array_size_placeholder = QCheckBox()
+        self.array_size_placeholder.clicked.connect(self._hide_array_size_table)
 
         self.array_size_table = QTableWidget(1, 3)
         self.array_size_table.setHorizontalHeaderLabels(["x", "y", "z"])
@@ -320,6 +323,8 @@ class StreamFieldsWidget(QDialog):
         self.layout().addWidget(self.array_size_label, 6, 0)
         self.layout().addWidget(self.array_size_spinbox, 6, 1)
         self.layout().addWidget(self.array_size_table, 6, 1)
+        self.layout().addWidget(self.array_size_placeholder_label, 7, 0)
+        self.layout().addWidget(self.array_size_placeholder, 7, 1)
 
         # Spans both rows
         self.layout().addWidget(self.show_advanced_options_button, 8, 0, 1, 2)
@@ -425,7 +430,7 @@ class StreamFieldsWidget(QDialog):
         self.show_advanced_options_button.setChecked(False)
         self.value_units_label.setVisible(False)
         self.value_units_edit.setVisible(False)
-        self.array_size_table.setVisible(False)
+        self._show_array_size_table(False)
         if schema == WriterModules.F142.value:
             self.value_units_label.setVisible(True)
             self.value_units_edit.setVisible(True)
@@ -440,6 +445,7 @@ class StreamFieldsWidget(QDialog):
             self._set_edits_visible(True, False)
             self._show_array_size_table(True)
             self.ev42_advanced_group_box.setVisible(False)
+            self._hide_array_size_table()
         elif schema == WriterModules.HS01.value:
             self.show_advanced_options_button.setText("Show advanced options dialog")
             self._set_edits_visible(True, False)
@@ -453,6 +459,13 @@ class StreamFieldsWidget(QDialog):
 
     def _show_array_size_table(self, show: bool):
         self.array_size_label.setVisible(show)
+        self.array_size_table.setVisible(show)
+        self.array_size_placeholder.setVisible(show)
+        self.array_size_placeholder_label.setVisible(show)
+
+    def _hide_array_size_table(self):
+        show = not self.array_size_placeholder.isChecked()
+        self.array_size_table.setDisabled(not show)
         self.array_size_table.setVisible(show)
 
     def _set_edits_visible(self, source: bool, type: bool, source_hint=None):
@@ -495,10 +508,13 @@ class StreamFieldsWidget(QDialog):
                 self.record_advanced_f142_values(stream)
         elif current_schema == WriterModules.ADAR.value:
             array_size = []
-            for i in range(self.array_size_table.columnCount()):
-                table_value = self.array_size_table.item(0, i)
-                if table_value:
-                    array_size.append(int(table_value.text()))
+            if self.array_size_placeholder.isChecked():
+                array_size = AD_ARRAY_SIZE_PLACEHOLDER
+            else:
+                for i in range(self.array_size_table.columnCount()):
+                    table_value = self.array_size_table.item(0, i)
+                    if table_value:
+                        array_size.append(int(table_value.text()))
             stream = ADARStream(parent_node=parent, source=source, topic=topic)
             stream.array_size = array_size
         elif current_schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
@@ -630,7 +646,15 @@ class StreamFieldsWidget(QDialog):
         elif schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
             self.fill_in_existing_ev42_fields(field)
         elif schema == WriterModules.ADAR.value:
-            for i, val in enumerate(field.array_size):
-                self.array_size_table.setItem(0, i, QTableWidgetItem(str(val)))
+            if field.array_size == AD_ARRAY_SIZE_PLACEHOLDER:
+                self.array_size_placeholder.setChecked(True)
+                self._hide_array_size_table()
+            elif not field.array_size:
+                field.array_size = AD_ARRAY_SIZE_PLACEHOLDER
+                self.array_size_placeholder.setChecked(True)
+                self._hide_array_size_table()
+            else:
+                for i, val in enumerate(field.array_size):
+                    self.array_size_table.setItem(0, i, QTableWidgetItem(str(val)))
         elif schema == WriterModules.HS01.value:
             self.hs01_advanced_dialog.fill_existing_advanced_hs01_fields(field)
