@@ -383,7 +383,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
         field = FieldWidget(
-            self._group_container.group,
+            self._group_container,
             self.possible_fields,
             self.fieldsListWidget,
         )

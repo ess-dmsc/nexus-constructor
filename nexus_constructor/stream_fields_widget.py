@@ -24,6 +24,7 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
 from nexus_constructor.common_attrs import AD_ARRAY_SIZE_PLACEHOLDER, ARRAY, SCALAR
+from nexus_constructor.model import GroupContainer
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
@@ -184,13 +185,19 @@ class StreamFieldsWidget(QDialog):
     A stream widget containing schema-specific properties.
     """
 
-    def __init__(self, parent, show_only_f142_stream: bool = False):
+    def __init__(
+        self,
+        parent,
+        show_only_f142_stream: bool = False,
+        group_container: GroupContainer = None,
+    ):
         super().__init__()
         self.setParent(parent)
         self.setLayout(QGridLayout())
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
 
+        self._group_container = group_container
         self._show_only_f142_stream = show_only_f142_stream
         self.minimum_spinbox_value = 0
         self.maximum_spinbox_value = 100_000_000
@@ -295,10 +302,8 @@ class StreamFieldsWidget(QDialog):
         self.array_radio = QRadioButton(text=ARRAY)
         self.array_radio.clicked.connect(partial(self._show_array_size, True))
 
-        if self._show_only_f142_stream:
-            self.schema_combo.addItems([StreamModules.F142.value])
-        else:
-            self.schema_combo.addItems([e.value for e in StreamModules])
+        self.__add_items_to_schema_combo()
+        self._old_schema = self.schema_combo.currentText()
 
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
@@ -340,6 +345,32 @@ class StreamFieldsWidget(QDialog):
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
         self._schema_type_changed(self.schema_combo.currentText())
         self.parent().parent().field_name_edit.setVisible(False)
+
+    def _add_items_to_schema_combo(self):
+        self.schema_combo.currentTextChanged.disconnect(self._schema_type_changed)
+        self.schema_combo.clear()
+        self.__add_items_to_schema_combo()
+        self.schema_combo.currentText()
+        self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
+
+    def __add_items_to_schema_combo(self):
+        if self._show_only_f142_stream:
+            self.schema_combo.addItems([StreamModules.F142.value])
+        elif not self._group_container:
+            self.schema_combo.addItems([e.value for e in StreamModules])
+        else:
+            self.schema_combo.addItems(
+                self._group_container.get_possible_stream_modules()
+            )
+
+    def update_schema_combo(self):
+        self._group_container = self.parent().parent().group_container
+        self._group_container.add_stream_module(self._old_schema)
+        self._add_items_to_schema_combo()
+
+    def _update_possible_stream_modules(self, old_schema: str, new_schema: str):
+        self._group_container.add_stream_module(old_schema)
+        self._group_container.remove_stream_module(new_schema)
 
     def advanced_options_button_clicked(self):
         self._show_advanced_options(show=self.show_advanced_options_button.isChecked())
@@ -431,6 +462,7 @@ class StreamFieldsWidget(QDialog):
         self.value_units_label.setVisible(False)
         self.value_units_edit.setVisible(False)
         self._show_array_size_table(False)
+        self._update_possible_stream_modules(self._old_schema, schema)
         if schema == WriterModules.F142.value:
             self.value_units_label.setVisible(True)
             self.value_units_edit.setVisible(True)
@@ -456,6 +488,7 @@ class StreamFieldsWidget(QDialog):
             schema == WriterModules.TDCTIME.value or schema == WriterModules.SENV.value
         ):
             self._set_edits_visible(True, False)
+        self._old_schema = schema
 
     def _show_array_size_table(self, show: bool):
         self.array_size_label.setVisible(show)
