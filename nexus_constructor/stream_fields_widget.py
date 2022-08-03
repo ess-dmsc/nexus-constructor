@@ -350,7 +350,7 @@ class StreamFieldsWidget(QDialog):
         self.schema_combo.currentTextChanged.disconnect(self._schema_type_changed)
         self.schema_combo.clear()
         self.__add_items_to_schema_combo()
-        self.schema_combo.currentText()
+        self.schema_combo.setCurrentText(self._old_schema)
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
 
     def __add_items_to_schema_combo(self):
@@ -364,11 +364,16 @@ class StreamFieldsWidget(QDialog):
             )
 
     def update_schema_combo(self):
-        self._group_container = self.parent().parent().group_container
+        self.update_group_container_reference()
         self._group_container.add_stream_module(self._old_schema)
         self._add_items_to_schema_combo()
 
+    def update_group_container_reference(self):
+        if not self._group_container:
+            self._group_container = self.parent().parent().group_container
+
     def _update_possible_stream_modules(self, old_schema: str, new_schema: str):
+        self.update_group_container_reference()
         self._group_container.add_stream_module(old_schema)
         self._group_container.remove_stream_module(new_schema)
 
