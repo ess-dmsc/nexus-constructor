@@ -269,6 +269,7 @@ class JSONReader:
                     node = self._read_json_object(child, nexus_object)
                     if node and isinstance(node, StreamModule):
                         nexus_object.children.append(node)
+                        nexus_object.remove_stream_module(node.writer_module)
                     elif node and node.name not in nexus_object:
                         nexus_object[node.name] = node
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
