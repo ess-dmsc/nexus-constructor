@@ -306,7 +306,7 @@ class StreamFieldsWidget(QDialog):
         self.__add_items_to_schema_combo()
         self.schema_combo.setCurrentText(StreamModules.F142.value)
         self.ok_button.clicked.connect(self._update_possible_stream_modules)
-        self.cancel_button.clicked.connect(self._reset_possible_stream_modules)
+        # self.cancel_button.clicked.connect(self._reset_possible_stream_modules)
 
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
@@ -387,9 +387,11 @@ class StreamFieldsWidget(QDialog):
         self._node_parent.remove_stream_module(new_schema)
         self._old_schema = new_schema
 
-    def _reset_possible_stream_modules(self):
+    def reset_possible_stream_modules(self):
         self.update_node_parent_reference()
         self._node_parent.remove_stream_module(self._old_schema)
+        print("old schema", self._old_schema)
+        print(self._node_parent.get_possible_stream_modules())
 
     def advanced_options_button_clicked(self):
         self._show_advanced_options(show=self.show_advanced_options_button.isChecked())
@@ -688,13 +690,11 @@ class StreamFieldsWidget(QDialog):
 
         # Needed to correctly add the used schema when the module was created
         # from the group editor.
-        self.schema_combo.currentTextChanged.disconnect(self._schema_type_changed)
         self._old_schema = schema
         self.update_node_parent_reference()
         if self._node_parent:
             self._node_parent.add_stream_module(schema)
         self.schema_combo.setCurrentText(schema)
-        self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
 
         self.schema_validator.validate(schema, 0)
         self.topic_line_edit.setText(field.topic)

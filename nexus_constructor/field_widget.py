@@ -407,6 +407,7 @@ class FieldWidget(QFrame):
             self.field_type_combo.setCurrentText("Scalar dataset")
         else:
             self.streams_widget.update_existing_stream_info(self.old_streams_settings)
+            self.streams_widget.reset_possible_stream_modules()
 
     def _set_edit_button_state(self, value: bool):
         if value:
