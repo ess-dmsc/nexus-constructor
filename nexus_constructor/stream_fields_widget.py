@@ -386,12 +386,10 @@ class StreamFieldsWidget(QDialog):
             self._node_parent.add_stream_module(self._old_schema)
         self._node_parent.remove_stream_module(new_schema)
         self._old_schema = new_schema
-        print("possible", self._node_parent.get_possible_stream_modules())
 
     def _reset_possible_stream_modules(self):
         self.update_node_parent_reference()
         self._node_parent.remove_stream_module(self._old_schema)
-        print("possible cancel", self._node_parent.get_possible_stream_modules())
 
     def advanced_options_button_clicked(self):
         self._show_advanced_options(show=self.show_advanced_options_button.isChecked())
