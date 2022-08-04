@@ -105,7 +105,7 @@ class HS01Dialog(QDialog):
         edge_type_label.setFixedHeight(label_height)
         ok_button = QPushButton(text="Done")
 
-        self.setFixedWidth(self.shape_table.width())  # Override showEvent in subclass.
+        self.setFixedWidth(self.shape_table.width())
         add_shape_button.clicked.connect(self._add_shape)
         remove_shape_button.clicked.connect(self._remove_shape)
         ok_button.clicked.connect(self._on_ok_hs01_advanced_opts)
@@ -184,13 +184,19 @@ class StreamFieldsWidget(QDialog):
     A stream widget containing schema-specific properties.
     """
 
-    def __init__(self, parent, show_only_f142_stream: bool = False):
+    def __init__(
+        self,
+        parent,
+        show_only_f142_stream: bool = False,
+        node_parent: Group = None,
+    ):
         super().__init__()
         self.setParent(parent)
         self.setLayout(QGridLayout())
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
 
+        self._node_parent = node_parent
         self._show_only_f142_stream = show_only_f142_stream
         self.minimum_spinbox_value = 0
         self.maximum_spinbox_value = 100_000_000
@@ -295,10 +301,10 @@ class StreamFieldsWidget(QDialog):
         self.array_radio = QRadioButton(text=ARRAY)
         self.array_radio.clicked.connect(partial(self._show_array_size, True))
 
-        if self._show_only_f142_stream:
-            self.schema_combo.addItems([StreamModules.F142.value])
-        else:
-            self.schema_combo.addItems([e.value for e in StreamModules])
+        self._old_schema = None
+        self.__add_items_to_schema_combo()
+        self.schema_combo.setCurrentText(StreamModules.F142.value)
+        self.ok_button.clicked.connect(self._update_possible_stream_modules)
 
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
@@ -340,6 +346,48 @@ class StreamFieldsWidget(QDialog):
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
         self._schema_type_changed(self.schema_combo.currentText())
         self.parent().parent().field_name_edit.setVisible(False)
+
+    def _add_items_to_schema_combo(self):
+        self.schema_combo.currentTextChanged.disconnect(self._schema_type_changed)
+        self.__add_items_to_schema_combo()
+        self.schema_combo.setCurrentText(self._old_schema)
+        self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
+
+    def __add_items_to_schema_combo(self):
+        self.schema_combo.clear()
+        if self._show_only_f142_stream:
+            self.schema_combo.addItems([StreamModules.F142.value])
+        elif self._node_parent:
+            possible_stream_modules = (
+                self._node_parent.get_possible_stream_modules().copy()
+            )
+            if self._old_schema:
+                possible_stream_modules.append(self._old_schema)
+            self.schema_combo.addItems(list(set(possible_stream_modules)))
+        else:
+            self.schema_combo.addItems([e.value for e in StreamModules])
+
+    def update_schema_combo(self):
+        self.update_node_parent_reference()
+        if self._old_schema:
+            self._node_parent.add_stream_module(self._old_schema)
+        self._add_items_to_schema_combo()
+
+    def update_node_parent_reference(self):
+        if not self._node_parent:
+            self._node_parent = self.parent().parent()._node_parent
+
+    def _update_possible_stream_modules(self):
+        self.update_node_parent_reference()
+        new_schema = self.schema_combo.currentText()
+        if self._old_schema:
+            self._node_parent.add_stream_module(self._old_schema)
+        self._node_parent.remove_stream_module(new_schema)
+        self._old_schema = new_schema
+
+    def reset_possible_stream_modules(self):
+        self.update_node_parent_reference()
+        self._node_parent.remove_stream_module(self._old_schema)
 
     def advanced_options_button_clicked(self):
         self._show_advanced_options(show=self.show_advanced_options_button.isChecked())
@@ -635,7 +683,14 @@ class StreamFieldsWidget(QDialog):
         else:
             self.schema_validator.set_group(None)
         schema = field.writer_module
+
+        # Needed to correctly add the used schema when the module was created
+        # from the group editor.
+        self._old_schema = schema
+        self.update_node_parent_reference()
+        self.__add_items_to_schema_combo()
         self.schema_combo.setCurrentText(schema)
+
         self.schema_validator.validate(schema, 0)
         self.topic_line_edit.setText(field.topic)
         self.topic_validator.validate(field.topic, 0)

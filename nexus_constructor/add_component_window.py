@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from copy import deepcopy
 from functools import partial
-from typing import List
+from typing import Callable, List
 
 from PySide2.QtCore import Qt, QUrl, Signal
 from PySide2.QtGui import QKeyEvent, QVector3D
@@ -55,7 +55,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         scene_widget: QWidget,
         initial_edit: bool,
         nx_classes=None,
+        tree_view_updater: Callable = None,
     ):
+        self._tree_view_updater = tree_view_updater
         self._scene_widget = scene_widget
         self._group_to_edit_backup = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
@@ -121,6 +123,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.model.entry = self._group_to_edit_backup  # type: ignore
                 self.component_model.tree_root = self.model.entry
             self.close()
+
+    def close(self) -> bool:
+        if self._tree_view_updater:
+            self._tree_view_updater()
+        return super().close()
 
     def _handle_class_change(self):
         c_nx_class = self.componentTypeComboBox.currentText()
@@ -387,6 +394,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.possible_fields,
             self.fieldsListWidget,
         )
+        item.setData(Qt.UserRole, field)
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
@@ -400,6 +408,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def remove_field(self):
         for item in self.fieldsListWidget.selectedItems():
+            data = item.data(Qt.UserRole)
+            if data.streams_widget:
+                self._group_container.group.add_stream_module(
+                    data.streams_widget._old_schema
+                )
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def on_nx_class_changed(self):
@@ -535,7 +548,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_data = None
 
         component = self.finalise_group(pixel_data)
-
         if isinstance(component, Group):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
         if isinstance(component, Component):
@@ -568,7 +580,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         c_group.children = []
         for child in group_children:
             c_group[child.name] = child
-
         add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
