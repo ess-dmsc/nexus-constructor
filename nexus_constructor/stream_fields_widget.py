@@ -1,4 +1,3 @@
-from copy import deepcopy
 from functools import partial
 from typing import List, Tuple
 
@@ -351,17 +350,17 @@ class StreamFieldsWidget(QDialog):
 
     def _add_items_to_schema_combo(self):
         self.schema_combo.currentTextChanged.disconnect(self._schema_type_changed)
-        self.schema_combo.clear()
         self.__add_items_to_schema_combo()
         self.schema_combo.setCurrentText(self._old_schema)
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
 
     def __add_items_to_schema_combo(self):
+        self.schema_combo.clear()
         if self._show_only_f142_stream:
             self.schema_combo.addItems([StreamModules.F142.value])
         elif self._node_parent:
-            possible_stream_modules = deepcopy(
-                self._node_parent.get_possible_stream_modules()
+            possible_stream_modules = (
+                self._node_parent.get_possible_stream_modules().copy()
             )
             if self._old_schema:
                 possible_stream_modules.append(self._old_schema)
@@ -390,8 +389,6 @@ class StreamFieldsWidget(QDialog):
     def reset_possible_stream_modules(self):
         self.update_node_parent_reference()
         self._node_parent.remove_stream_module(self._old_schema)
-        print("old schema", self._old_schema)
-        print(self._node_parent.get_possible_stream_modules())
 
     def advanced_options_button_clicked(self):
         self._show_advanced_options(show=self.show_advanced_options_button.isChecked())
@@ -692,8 +689,7 @@ class StreamFieldsWidget(QDialog):
         # from the group editor.
         self._old_schema = schema
         self.update_node_parent_reference()
-        if self._node_parent:
-            self._node_parent.add_stream_module(schema)
+        self.__add_items_to_schema_combo()
         self.schema_combo.setCurrentText(schema)
 
         self.schema_validator.validate(schema, 0)
