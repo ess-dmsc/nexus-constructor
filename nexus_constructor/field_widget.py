@@ -79,7 +79,7 @@ class FieldWidget(QFrame):
 
     def __init__(
         self,
-        group_container,
+        node_parent,
         possible_fields=None,
         parent: QListWidget = None,
         parent_dataset: Dataset = None,
@@ -99,11 +99,7 @@ class FieldWidget(QFrame):
                 zip(possible_field_names, zip(default_field_types, units))
             )
         self._show_only_f142_stream = show_only_f142_stream
-        self.group_container = group_container
-        if self.group_container:
-            self._node_parent = self.group_container.group
-        else:
-            self._node_parent = None
+        self._node_parent = node_parent
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
@@ -373,7 +369,7 @@ class FieldWidget(QFrame):
             self.streams_widget = StreamFieldsWidget(
                 self.edit_dialog,
                 show_only_f142_stream=self._show_only_f142_stream,
-                group_container=self.group_container,
+                node_parent=self._node_parent,
             )
             self.edit_button.clicked.connect(self.streams_widget.update_schema_combo)
             self.streams_widget.ok_validator.is_valid.connect(

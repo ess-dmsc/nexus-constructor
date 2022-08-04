@@ -1,3 +1,4 @@
+from copy import deepcopy
 from functools import partial
 from typing import List, Tuple
 
@@ -24,7 +25,6 @@ from PySide2.QtWidgets import (
 
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
 from nexus_constructor.common_attrs import AD_ARRAY_SIZE_PLACEHOLDER, ARRAY, SCALAR
-from nexus_constructor.model import GroupContainer
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     ADC_PULSE_DEBUG,
@@ -106,7 +106,7 @@ class HS01Dialog(QDialog):
         edge_type_label.setFixedHeight(label_height)
         ok_button = QPushButton(text="Done")
 
-        self.setFixedWidth(self.shape_table.width())  # Override showEvent in subclass.
+        self.setFixedWidth(self.shape_table.width())
         add_shape_button.clicked.connect(self._add_shape)
         remove_shape_button.clicked.connect(self._remove_shape)
         ok_button.clicked.connect(self._on_ok_hs01_advanced_opts)
@@ -189,7 +189,7 @@ class StreamFieldsWidget(QDialog):
         self,
         parent,
         show_only_f142_stream: bool = False,
-        group_container: GroupContainer = None,
+        node_parent: Group = None,
     ):
         super().__init__()
         self.setParent(parent)
@@ -197,7 +197,7 @@ class StreamFieldsWidget(QDialog):
         self.setWindowModality(Qt.WindowModal)
         self.setModal(True)
 
-        self._group_container = group_container
+        self._node_parent = node_parent
         self._show_only_f142_stream = show_only_f142_stream
         self.minimum_spinbox_value = 0
         self.maximum_spinbox_value = 100_000_000
@@ -302,8 +302,10 @@ class StreamFieldsWidget(QDialog):
         self.array_radio = QRadioButton(text=ARRAY)
         self.array_radio.clicked.connect(partial(self._show_array_size, True))
 
+        self._old_schema = None
         self.__add_items_to_schema_combo()
         self._old_schema = self.schema_combo.currentText()
+        self.ok_button.clicked.connect(self._update_possible_stream_modules)
 
         self.layout().addWidget(self.schema_label, 0, 0)
         self.layout().addWidget(self.schema_combo, 0, 1)
@@ -356,26 +358,32 @@ class StreamFieldsWidget(QDialog):
     def __add_items_to_schema_combo(self):
         if self._show_only_f142_stream:
             self.schema_combo.addItems([StreamModules.F142.value])
-        elif not self._group_container:
-            self.schema_combo.addItems([e.value for e in StreamModules])
-        else:
-            self.schema_combo.addItems(
-                self._group_container.get_possible_stream_modules()
+        elif self._node_parent:
+            possible_stream_modules = deepcopy(
+                self._node_parent.get_possible_stream_modules()
             )
+            if self._old_schema:
+                possible_stream_modules.append(self._old_schema)
+            self.schema_combo.addItems(list(set(possible_stream_modules)))
+        else:
+            self.schema_combo.addItems([e.value for e in StreamModules])
 
     def update_schema_combo(self):
-        self.update_group_container_reference()
-        self._group_container.add_stream_module(self._old_schema)
+        self.update_node_parent_reference()
+        self._node_parent.add_stream_module(self._old_schema)
         self._add_items_to_schema_combo()
 
-    def update_group_container_reference(self):
-        if not self._group_container:
-            self._group_container = self.parent().parent().group_container
+    def update_node_parent_reference(self):
+        if not self._node_parent:
+            self._node_parent = self.parent().parent()._node_parent
 
-    def _update_possible_stream_modules(self, old_schema: str, new_schema: str):
-        self.update_group_container_reference()
-        self._group_container.add_stream_module(old_schema)
-        self._group_container.remove_stream_module(new_schema)
+    def _update_possible_stream_modules(self):
+        self.update_node_parent_reference()
+        new_schema = self.schema_combo.currentText()
+        self._node_parent.add_stream_module(self._old_schema)
+        self._node_parent.remove_stream_module(new_schema)
+        self._old_schema = new_schema
+        print("possible", self._node_parent.get_possible_stream_modules())
 
     def advanced_options_button_clicked(self):
         self._show_advanced_options(show=self.show_advanced_options_button.isChecked())
@@ -467,7 +475,6 @@ class StreamFieldsWidget(QDialog):
         self.value_units_label.setVisible(False)
         self.value_units_edit.setVisible(False)
         self._show_array_size_table(False)
-        self._update_possible_stream_modules(self._old_schema, schema)
         if schema == WriterModules.F142.value:
             self.value_units_label.setVisible(True)
             self.value_units_edit.setVisible(True)
@@ -493,7 +500,6 @@ class StreamFieldsWidget(QDialog):
             schema == WriterModules.TDCTIME.value or schema == WriterModules.SENV.value
         ):
             self._set_edits_visible(True, False)
-        self._old_schema = schema
 
     def _show_array_size_table(self, show: bool):
         self.array_size_label.setVisible(show)

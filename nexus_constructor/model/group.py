@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
 
 import attr
 
@@ -15,7 +15,7 @@ from nexus_constructor.model.helpers import (
     _set_item,
     get_absolute_path,
 )
-from nexus_constructor.model.module import Dataset
+from nexus_constructor.model.module import Dataset, StreamModules
 from nexus_constructor.model.value_type import ValueTypes
 
 if TYPE_CHECKING:
@@ -40,6 +40,9 @@ class Group:
     )
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
+    possible_stream_modules = attr.ib(
+        type=List[str], default=[module.value for module in StreamModules]
+    )
     _group_placeholder: bool = False
 
     def __getitem__(self, key: str):
@@ -176,6 +179,27 @@ class Group:
             else []
         )
         return return_dict
+
+    def set_possible_stream_modules(self, possible_stream_modules: List[str]):
+        self.possible_stream_modules = possible_stream_modules
+
+    def get_possible_stream_modules(self) -> List[str]:
+        return self.possible_stream_modules
+
+    def add_stream_module(self, module: str):
+        if module not in self.possible_stream_modules:
+            self._modify_possible_streams(module, self.possible_stream_modules.append)
+
+    def remove_stream_module(self, module: str):
+        if module in self.possible_stream_modules:
+            self._modify_possible_streams(module, self.possible_stream_modules.remove)
+
+    def _modify_possible_streams(self, module: str, modify_list: Callable):
+        if module in [StreamModules.EV42.value, StreamModules.EV44.value]:
+            modify_list(StreamModules.EV42.value)
+            modify_list(StreamModules.EV44.value)
+        else:
+            modify_list(module)
 
 
 def name_not_in_excludelist(child: Any):

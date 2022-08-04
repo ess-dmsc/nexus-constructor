@@ -383,7 +383,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
         field = FieldWidget(
-            self._group_container,
+            self._group_container.group,
             self.possible_fields,
             self.fieldsListWidget,
         )
@@ -535,6 +535,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_data = None
 
         component = self.finalise_group(pixel_data)
+        print("possible_modules", component.get_possible_stream_modules())
 
         if isinstance(component, Group):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
@@ -568,7 +569,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         c_group.children = []
         for child in group_children:
             c_group[child.name] = child
-
         add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
