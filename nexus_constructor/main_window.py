@@ -163,8 +163,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             scene_widget=self.sceneWidget,
             initial_edit=new_group,
             nx_classes=self.nx_classes,
+            tree_view_updater=self._update_model,
         )
         self.add_component_window.show()
+
+    def _update_model(self):
+        self.component_tree_view_tab.set_up_model(self.model)
 
 
 def show_errors_message(errors: List[str]):
