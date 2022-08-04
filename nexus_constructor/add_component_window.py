@@ -387,6 +387,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.possible_fields,
             self.fieldsListWidget,
         )
+        item.setData(Qt.UserRole, field)
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
@@ -400,6 +401,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def remove_field(self):
         for item in self.fieldsListWidget.selectedItems():
+            data = item.data(Qt.UserRole)
+            if data.streams_widget:
+                self._group_container.group.add_stream_module(
+                    data.streams_widget._old_schema
+                )
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def on_nx_class_changed(self):
@@ -535,8 +541,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_data = None
 
         component = self.finalise_group(pixel_data)
-        print("possible_modules", component.get_possible_stream_modules())
-
         if isinstance(component, Group):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
         if isinstance(component, Component):

@@ -360,8 +360,10 @@ class NexusTreeModel(QAbstractItemModel):
         parent = self.parent(node)
         remove_index = self._get_row_of_child(module)
         self.beginRemoveRows(parent, remove_index, remove_index)
-        children = parent.internalPointer().children
+        group_parent: Group = parent.internalPointer()
+        children = group_parent.children
         if children:
+            group_parent.add_stream_module(module.writer_module)
             children.pop(remove_index)
             del module
         self.endRemoveRows()

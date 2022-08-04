@@ -233,6 +233,15 @@ class FieldWidget(QFrame):
             )
         )
 
+    def disable_editing(self):
+        self.edit_button.setText("View")
+        self.streams_widget.ok_button.setDisabled(True)
+        self.streams_widget.ok_button.setVisible(False)
+        self.streams_widget.cancel_button.setText("finished viewing")
+        self.streams_widget.schema_combo.currentTextChanged.connect(
+            self.streams_widget._schema_type_changed
+        )
+
     def _open_edit_dialog_if_stream(self):
         if self.field_type == FieldType.kafka_stream and self.isVisible():
             self.show_edit_dialog()

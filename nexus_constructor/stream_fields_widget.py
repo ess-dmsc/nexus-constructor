@@ -685,10 +685,17 @@ class StreamFieldsWidget(QDialog):
         else:
             self.schema_validator.set_group(None)
         schema = field.writer_module
-        self._old_schema = schema
+
+        # Needed to correctly add the used schema when the module was created
+        # from the group editor.
         self.schema_combo.currentTextChanged.disconnect(self._schema_type_changed)
+        self._old_schema = schema
+        self.update_node_parent_reference()
+        if self._node_parent:
+            self._node_parent.add_stream_module(schema)
         self.schema_combo.setCurrentText(schema)
         self.schema_combo.currentTextChanged.connect(self._schema_type_changed)
+
         self.schema_validator.validate(schema, 0)
         self.topic_line_edit.setText(field.topic)
         self.topic_validator.validate(field.topic, 0)
