@@ -124,6 +124,7 @@ builders = pipeline_builder.createBuilders { container ->
                         nexus_doc/manual/build/html
                 """
             } catch (e) {
+                echo 'Caught exception after diff error, setting variable'
                 diffError = true
             }
         } // stage
@@ -151,7 +152,7 @@ builders = pipeline_builder.createBuilders { container ->
                         passwordVariable: 'PASSWORD'
                     )
                 ]) {
-                    withEnv(["PROJECT=${builder.project}"]) {
+                    withEnv(["PROJECT=${pipeline_builder.project}"]) {
                         container.sh '''
                             cd $PROJECT
                             git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/$PROJECT.git HEAD:$CHANGE_BRANCH
