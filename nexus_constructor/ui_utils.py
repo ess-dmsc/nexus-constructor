@@ -12,7 +12,7 @@ from PySide2.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QVBoxLayout,
-    QWidget
+    QWidget,
 )
 
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog

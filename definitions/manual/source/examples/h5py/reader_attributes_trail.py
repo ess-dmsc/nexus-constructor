@@ -1,4 +1,3 @@
-
 import h5py
 
 with h5py.File("prj_test.nexus.hdf5", "r") as nx:
