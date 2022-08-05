@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''Reads NeXus HDF5 files using h5py and prints the contents'''
 
-import h5py    # HDF5 support
+import h5py  # HDF5 support
 
 fileName = "prj_test.nexus.hdf5"
 f = h5py.File(fileName,  "r")

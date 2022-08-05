@@ -1,6 +1,8 @@
-import numpy as np
-import h5py
 import datetime
+
+import h5py
+import numpy as np
+
 
 def write_nexus_file(fname, image, md={}):
 	"""

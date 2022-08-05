@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''Writes a NeXus HDF5 file using h5py and numpy'''
 
-import h5py    # HDF5 support
+import h5py  # HDF5 support
 import numpy
 
 print("Write a NeXus HDF5 file")

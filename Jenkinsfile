@@ -113,7 +113,13 @@ builders = pipeline_builder.createBuilders { container ->
             make
         """
 
-        container.sh "diff --recursive ${project}/nx-class-documentation/html nexus_doc/manual/build/html"
+        container.sh """
+            diff \
+                --recursive \
+                --exclude=_downloads \
+                ${project}/nx-class-documentation/html \
+                nexus_doc/manual/build/html
+        """
     } // stage
 
     if (env.CHANGE_ID) {
