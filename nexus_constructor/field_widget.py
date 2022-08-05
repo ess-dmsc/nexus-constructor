@@ -79,7 +79,7 @@ class FieldWidget(QFrame):
 
     def __init__(
         self,
-        node_parent,
+        node_parent: Group,
         possible_fields=None,
         parent: QListWidget = None,
         parent_dataset: Dataset = None,
@@ -99,7 +99,7 @@ class FieldWidget(QFrame):
                 zip(possible_field_names, zip(default_field_types, units))
             )
         self._show_only_f142_stream = show_only_f142_stream
-        self._node_parent = node_parent
+        self._node_parent: Group = node_parent
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
@@ -233,6 +233,15 @@ class FieldWidget(QFrame):
             )
         )
 
+    def disable_editing(self):
+        self.edit_button.setText("View")
+        self.streams_widget.ok_button.setDisabled(True)
+        self.streams_widget.ok_button.setVisible(False)
+        self.streams_widget.cancel_button.setText("finished viewing")
+        self.streams_widget.schema_combo.currentTextChanged.connect(
+            self.streams_widget._schema_type_changed
+        )
+
     def _open_edit_dialog_if_stream(self):
         if self.field_type == FieldType.kafka_stream and self.isVisible():
             self.show_edit_dialog()
@@ -358,6 +367,8 @@ class FieldWidget(QFrame):
         self.edit_dialog.setModal(True)
         self._set_up_value_validator(False)
         self.enable_3d_value_spinbox.emit(not self.field_type_is_scalar())
+        if self.streams_widget and self.streams_widget._old_schema:
+            self._node_parent.add_stream_module(self.streams_widget._old_schema)
         if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
         elif self.field_type == FieldType.array_dataset:
@@ -367,8 +378,11 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
             self.streams_widget = StreamFieldsWidget(
-                self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
+                self.edit_dialog,
+                show_only_f142_stream=self._show_only_f142_stream,
+                node_parent=self._node_parent,
             )
+            self.edit_button.clicked.connect(self.streams_widget.update_schema_combo)
             self.streams_widget.ok_validator.is_valid.connect(
                 self._set_edit_button_state
             )
@@ -395,6 +409,7 @@ class FieldWidget(QFrame):
             self.field_type_combo.setCurrentText("Scalar dataset")
         else:
             self.streams_widget.update_existing_stream_info(self.old_streams_settings)
+            self.streams_widget.reset_possible_stream_modules()
 
     def _set_edit_button_state(self, value: bool):
         if value:

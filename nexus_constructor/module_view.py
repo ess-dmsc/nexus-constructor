@@ -81,6 +81,10 @@ class ModuleViewEditable(QGroupBox):
             update_function = find_field_type(module, [])
             if update_function is not None:
                 update_function(module, self.field_widget)
+            if module.writer_module in [
+                StreamMode.value for StreamMode in StreamModules
+            ]:
+                self.field_widget.disable_editing()
         else:
             update_function = find_field_type(module.parent_node, [])
             if update_function is not None:
