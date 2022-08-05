@@ -106,10 +106,10 @@ builders = pipeline_builder.createBuilders { container ->
             pip --proxy ${https_proxy} install --upgrade pip
             pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
 
-            export SOURCE_DIR=${project}/definitions
             mkdir nexus_doc
             cd nexus_doc
-            python ${project}/definitions/utils/build_preparation.py ${project}/definitions
+            export SOURCE_DIR=../${project}/definitions
+            python ../${project}/definitions/utils/build_preparation.py ../${project}/definitions
             make
         """
 
