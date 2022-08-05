@@ -102,8 +102,9 @@ builders = pipeline_builder.createBuilders { container ->
     pipeline_builder.stage("Verify NeXus HTML") {
         container.sh """
             python3.6 -m venv nexus_doc_venv
-            nexus_doc_venv/bin/pip --proxy ${https_proxy} install --upgrade pip
-            nexus_doc_venv/bin/pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
+            source nexus_doc_venv/bin/activate
+            pip --proxy ${https_proxy} install --upgrade pip
+            pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
 
             export SOURCE_DIR=${project}/definitions
             python ${project}/definitions/utils/build_preparation.py ${project}/definitions
