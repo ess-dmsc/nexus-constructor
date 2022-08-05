@@ -87,20 +87,20 @@ When the next Python program (<code class="docutils literal notranslate"><span c
 command line (and there are no problems), the <code class="docutils literal notranslate"><span class="pre">writer_1_3_h5py.hdf5</span></code>
 file is generated.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python</span>
-<span class="linenos"> 2</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 2</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 3</span><span class="sd">Writes the simplest NeXus HDF5 file using h5py </span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="sd">Uses method accepted at 2014NIAC</span>
 <span class="linenos"> 6</span><span class="sd">according to the example from Figure 1.3 </span>
 <span class="linenos"> 7</span><span class="sd">in the Introduction chapter</span>
-<span class="linenos"> 8</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 8</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 9</span>
 <span class="linenos">10</span><span class="kn">import</span> <span class="nn">h5py</span>
 <span class="linenos">11</span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="linenos">12</span>
 <span class="linenos">13</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;input.dat&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-<span class="linenos">14</span><span class="n">tthData</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                             <span class="c1"># float[]</span>
-<span class="linenos">15</span><span class="n">countsData</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>   <span class="c1"># int[]</span>
+<span class="linenos">14</span><span class="n">tthData</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># float[]</span>
+<span class="linenos">15</span><span class="n">countsData</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;int32&quot;</span><span class="p">)</span>  <span class="c1"># int[]</span>
 <span class="linenos">16</span>
 <span class="linenos">17</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s2">&quot;writer_1_3.hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>  <span class="c1"># create the HDF5 NeXus file</span>
 <span class="linenos">18</span><span class="c1"># since this is a simple example, no attributes are used at this point</span>
@@ -112,15 +112,17 @@ file is generated.</p>
 <span class="linenos">24</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;NXdata&quot;</span>
 <span class="linenos">25</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;counts&quot;</span>
 <span class="linenos">26</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;two_theta&quot;</span>
-<span class="linenos">27</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;two_theta_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,]</span>
-<span class="linenos">28</span>
-<span class="linenos">29</span><span class="n">tth</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;two_theta&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">tthData</span><span class="p">)</span>
-<span class="linenos">30</span><span class="n">tth</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;degrees&quot;</span>
-<span class="linenos">31</span>
-<span class="linenos">32</span><span class="n">counts</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;counts&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">countsData</span><span class="p">)</span>
-<span class="linenos">33</span><span class="n">counts</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;counts&quot;</span>
-<span class="linenos">34</span>
-<span class="linenos">35</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>   <span class="c1"># be CERTAIN to close the file</span>
+<span class="linenos">27</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;two_theta_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+<span class="linenos">28</span>    <span class="mi">0</span><span class="p">,</span>
+<span class="linenos">29</span><span class="p">]</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="n">tth</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;two_theta&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">tthData</span><span class="p">)</span>
+<span class="linenos">32</span><span class="n">tth</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;degrees&quot;</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span><span class="n">counts</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;counts&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">countsData</span><span class="p">)</span>
+<span class="linenos">35</span><span class="n">counts</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;counts&quot;</span>
+<span class="linenos">36</span>
+<span class="linenos">37</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># be CERTAIN to close the file</span>
 </pre></div>
 </div>
 <p>One of the tools provided with the HDF5 support libraries is

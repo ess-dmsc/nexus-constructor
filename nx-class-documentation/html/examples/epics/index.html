@@ -326,84 +326,86 @@ additional metadata.</p>
 <span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">h5py</span>
 <span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">datetime</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="k">def</span> <span class="nf">write_nexus_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="p">{}):</span>
-<span class="linenos"> 6</span>    <span class="sd">&quot;&quot;&quot;</span>
-<span class="linenos"> 7</span><span class="sd">    write the image to a NeXus HDF5 data file</span>
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span><span class="sd">    Parameters</span>
-<span class="linenos">10</span><span class="sd">    ----------</span>
-<span class="linenos">11</span><span class="sd">    fname : str</span>
-<span class="linenos">12</span><span class="sd">        name of the file (relative or absolute) to be written</span>
-<span class="linenos">13</span><span class="sd">    image : numpy array</span>
-<span class="linenos">14</span><span class="sd">        the image data</span>
-<span class="linenos">15</span><span class="sd">    md : dictionary</span>
-<span class="linenos">16</span><span class="sd">        key: value where value is something that can be written by h5py</span>
-<span class="linenos">17</span><span class="sd">             (such as str, int, float, numpy array, ...)</span>
-<span class="linenos">18</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">19</span>    <span class="n">nexus</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
-<span class="linenos">20</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fname</span>
-<span class="linenos">21</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;file_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
-<span class="linenos">22</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;creator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;write_nexus_file()&quot;</span>
-<span class="linenos">23</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;H5PY_VERSION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">__version__</span>
-<span class="linenos">24</span>
-<span class="linenos">25</span>    <span class="c1"># /entry</span>
-<span class="linenos">26</span>    <span class="n">nxentry</span> <span class="o">=</span> <span class="n">nexus</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
-<span class="linenos">27</span>    <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXentry&quot;</span>
-<span class="linenos">28</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">name</span>
-<span class="linenos">29</span>
-<span class="linenos">30</span>    <span class="c1"># /entry/instrument</span>
-<span class="linenos">31</span>    <span class="n">nxinstrument</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span>
-<span class="linenos">32</span>    <span class="n">nxinstrument</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXinstrument&quot;</span>
-<span class="linenos">33</span>
-<span class="linenos">34</span>    <span class="c1"># /entry/instrument/detector</span>
-<span class="linenos">35</span>    <span class="n">nxdetector</span> <span class="o">=</span> <span class="n">nxinstrument</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">)</span>
-<span class="linenos">36</span>    <span class="n">nxdetector</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXdetector&quot;</span>
-<span class="linenos">37</span>
-<span class="linenos">38</span>    <span class="c1"># /entry/instrument/detector/image</span>
-<span class="linenos">39</span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">nxdetector</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">image</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">)</span>
-<span class="linenos">40</span>    <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;counts&quot;</span>
-<span class="linenos">41</span>    <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/entry/instrument/detector/image&quot;</span>
-<span class="linenos">42</span>
-<span class="linenos">43</span>    <span class="c1"># /entry/data</span>
-<span class="linenos">44</span>    <span class="n">nxdata</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<span class="linenos">45</span>    <span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXdata&quot;</span>
-<span class="linenos">46</span>    <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">name</span>
-<span class="linenos">47</span>
-<span class="linenos">48</span>    <span class="c1"># /entry/data/data --&gt; /entry/instrument/detector/image</span>
-<span class="linenos">49</span>    <span class="n">nxdata</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nexus</span><span class="p">[</span><span class="s2">&quot;/entry/instrument/detector/image&quot;</span><span class="p">]</span>
-<span class="linenos">50</span>    <span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
-<span class="linenos">51</span>
-<span class="linenos">52</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">md</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<span class="linenos">53</span>        <span class="c1"># /entry/instrument/metadata (optional, for metadata)</span>
-<span class="linenos">54</span>        <span class="n">metadata</span> <span class="o">=</span> <span class="n">nxinstrument</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">)</span>
-<span class="linenos">55</span>        <span class="n">metadata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXcollection&quot;</span>
-<span class="linenos">56</span>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">md</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<span class="linenos">57</span>            <span class="k">try</span><span class="p">:</span>
-<span class="linenos">58</span>                <span class="n">metadata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
-<span class="linenos">59</span>            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-<span class="linenos">60</span>                <span class="n">metadata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-<span class="linenos">61</span>
-<span class="linenos">62</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="linenos">63</span>
-<span class="linenos">64</span>    
-<span class="linenos">65</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<span class="linenos">66</span>    <span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
-<span class="linenos">67</span>    <span class="kn">import</span> <span class="nn">epics</span>
-<span class="linenos">68</span>    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;13SIM1:&quot;</span>
-<span class="linenos">69</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;image1:ArrayData&quot;</span><span class="p">)</span>
-<span class="linenos">70</span>    <span class="n">size_x</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;cam1:ArraySizeX_RBV&quot;</span><span class="p">)</span>
-<span class="linenos">71</span>    <span class="n">size_y</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;cam1:ArraySizeY_RBV&quot;</span><span class="p">)</span>
-<span class="linenos">72</span>    <span class="c1"># edit the full image for just the binned data</span>
-<span class="linenos">73</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:</span><span class="n">size_x</span><span class="o">*</span><span class="n">size_y</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">))</span>
-<span class="linenos">74</span>
-<span class="linenos">75</span>    <span class="n">extra_information</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-<span class="linenos">76</span>        <span class="n">unique_id</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;image1:UniqueId_RBV&quot;</span><span class="p">),</span>
-<span class="linenos">77</span>        <span class="n">size_x</span> <span class="o">=</span> <span class="n">size_x</span><span class="p">,</span>
-<span class="linenos">78</span>        <span class="n">size_y</span> <span class="o">=</span> <span class="n">size_y</span><span class="p">,</span>
-<span class="linenos">79</span>        <span class="n">detector_state</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;cam1:DetectorState_RBV&quot;</span><span class="p">),</span>
-<span class="linenos">80</span>        <span class="n">bitcoin_value</span><span class="o">=</span><span class="s2">&quot;15000&quot;</span><span class="p">,</span>
-<span class="linenos">81</span>    <span class="p">)</span>
-<span class="linenos">82</span>    <span class="n">write_nexus_file</span><span class="p">(</span><span class="s2">&quot;example.h5&quot;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">extra_information</span><span class="p">)</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="k">def</span> <span class="nf">write_nexus_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="p">{}):</span>
+<span class="linenos"> 7</span>    <span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos"> 8</span><span class="sd">    write the image to a NeXus HDF5 data file</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="sd">    Parameters</span>
+<span class="linenos">11</span><span class="sd">    ----------</span>
+<span class="linenos">12</span><span class="sd">    fname : str</span>
+<span class="linenos">13</span><span class="sd">            name of the file (relative or absolute) to be written</span>
+<span class="linenos">14</span><span class="sd">    image : numpy array</span>
+<span class="linenos">15</span><span class="sd">            the image data</span>
+<span class="linenos">16</span><span class="sd">    md : dictionary</span>
+<span class="linenos">17</span><span class="sd">            key: value where value is something that can be written by h5py</span>
+<span class="linenos">18</span><span class="sd">                     (such as str, int, float, numpy array, ...)</span>
+<span class="linenos">19</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">20</span>    <span class="n">nexus</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="linenos">21</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fname</span>
+<span class="linenos">22</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;file_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+<span class="linenos">23</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;creator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;write_nexus_file()&quot;</span>
+<span class="linenos">24</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;H5PY_VERSION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">__version__</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span>    <span class="c1"># /entry</span>
+<span class="linenos">27</span>    <span class="n">nxentry</span> <span class="o">=</span> <span class="n">nexus</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
+<span class="linenos">28</span>    <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXentry&quot;</span>
+<span class="linenos">29</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">name</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1"># /entry/instrument</span>
+<span class="linenos">32</span>    <span class="n">nxinstrument</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span>
+<span class="linenos">33</span>    <span class="n">nxinstrument</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXinstrument&quot;</span>
+<span class="linenos">34</span>
+<span class="linenos">35</span>    <span class="c1"># /entry/instrument/detector</span>
+<span class="linenos">36</span>    <span class="n">nxdetector</span> <span class="o">=</span> <span class="n">nxinstrument</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">)</span>
+<span class="linenos">37</span>    <span class="n">nxdetector</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXdetector&quot;</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>    <span class="c1"># /entry/instrument/detector/image</span>
+<span class="linenos">40</span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">nxdetector</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">image</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">)</span>
+<span class="linenos">41</span>    <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;counts&quot;</span>
+<span class="linenos">42</span>    <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/entry/instrument/detector/image&quot;</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span>    <span class="c1"># /entry/data</span>
+<span class="linenos">45</span>    <span class="n">nxdata</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="linenos">46</span>    <span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXdata&quot;</span>
+<span class="linenos">47</span>    <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">name</span>
+<span class="linenos">48</span>
+<span class="linenos">49</span>    <span class="c1"># /entry/data/data --&gt; /entry/instrument/detector/image</span>
+<span class="linenos">50</span>    <span class="n">nxdata</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nexus</span><span class="p">[</span><span class="s2">&quot;/entry/instrument/detector/image&quot;</span><span class="p">]</span>
+<span class="linenos">51</span>    <span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
+<span class="linenos">52</span>
+<span class="linenos">53</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">md</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<span class="linenos">54</span>        <span class="c1"># /entry/instrument/metadata (optional, for metadata)</span>
+<span class="linenos">55</span>        <span class="n">metadata</span> <span class="o">=</span> <span class="n">nxinstrument</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">)</span>
+<span class="linenos">56</span>        <span class="n">metadata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXcollection&quot;</span>
+<span class="linenos">57</span>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">md</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos">58</span>            <span class="k">try</span><span class="p">:</span>
+<span class="linenos">59</span>                <span class="n">metadata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+<span class="linenos">60</span>            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<span class="linenos">61</span>                <span class="n">metadata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+<span class="linenos">62</span>
+<span class="linenos">63</span>    <span class="n">nexus</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span>
+<span class="linenos">66</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">67</span>    <span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
+<span class="linenos">68</span>    <span class="kn">import</span> <span class="nn">epics</span>
+<span class="linenos">69</span>
+<span class="linenos">70</span>    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;13SIM1:&quot;</span>
+<span class="linenos">71</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;image1:ArrayData&quot;</span><span class="p">)</span>
+<span class="linenos">72</span>    <span class="n">size_x</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;cam1:ArraySizeX_RBV&quot;</span><span class="p">)</span>
+<span class="linenos">73</span>    <span class="n">size_y</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;cam1:ArraySizeY_RBV&quot;</span><span class="p">)</span>
+<span class="linenos">74</span>    <span class="c1"># edit the full image for just the binned data</span>
+<span class="linenos">75</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:</span> <span class="n">size_x</span> <span class="o">*</span> <span class="n">size_y</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">))</span>
+<span class="linenos">76</span>
+<span class="linenos">77</span>    <span class="n">extra_information</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+<span class="linenos">78</span>        <span class="n">unique_id</span><span class="o">=</span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;image1:UniqueId_RBV&quot;</span><span class="p">),</span>
+<span class="linenos">79</span>        <span class="n">size_x</span><span class="o">=</span><span class="n">size_x</span><span class="p">,</span>
+<span class="linenos">80</span>        <span class="n">size_y</span><span class="o">=</span><span class="n">size_y</span><span class="p">,</span>
+<span class="linenos">81</span>        <span class="n">detector_state</span><span class="o">=</span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;cam1:DetectorState_RBV&quot;</span><span class="p">),</span>
+<span class="linenos">82</span>        <span class="n">bitcoin_value</span><span class="o">=</span><span class="s2">&quot;15000&quot;</span><span class="p">,</span>
+<span class="linenos">83</span>    <span class="p">)</span>
+<span class="linenos">84</span>    <span class="n">write_nexus_file</span><span class="p">(</span><span class="s2">&quot;example.h5&quot;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">extra_information</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The output from that code is given in the
@@ -480,40 +482,42 @@ using <em>nexusformat</em>:</p>
 <span class="linenos">17</span><span class="sd">             (such as str, int, float, numpy array, ...)</span>
 <span class="linenos">18</span><span class="sd">    &quot;&quot;&quot;</span>
 <span class="linenos">19</span>    <span class="n">nx</span> <span class="o">=</span> <span class="n">NXroot</span><span class="p">()</span>
-<span class="linenos">20</span>    <span class="n">nx</span><span class="p">[</span><span class="s1">&#39;/entry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXentry</span><span class="p">(</span><span class="n">NXinstrument</span><span class="p">(</span><span class="n">NXdetector</span><span class="p">()))</span>
-<span class="linenos">21</span>    <span class="n">nx</span><span class="p">[</span><span class="s1">&#39;entry/instrument/detector/image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXfield</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;counts&#39;</span><span class="p">,</span>
-<span class="linenos">22</span>                                                    <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">)</span>
-<span class="linenos">23</span>    <span class="n">nx</span><span class="p">[</span><span class="s1">&#39;entry/data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXdata</span><span class="p">()</span>
-<span class="linenos">24</span>    <span class="n">nx</span><span class="p">[</span><span class="s1">&#39;entry/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">makelink</span><span class="p">(</span><span class="n">nx</span><span class="p">[</span><span class="s1">&#39;entry/instrument/detector/image&#39;</span><span class="p">])</span>
-<span class="linenos">25</span>    <span class="n">nx</span><span class="p">[</span><span class="s1">&#39;entry/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nxsignal</span> <span class="o">=</span> <span class="n">nx</span><span class="p">[</span><span class="s1">&#39;entry/data/image&#39;</span><span class="p">]</span>
-<span class="linenos">26</span>
-<span class="linenos">27</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">md</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<span class="linenos">28</span>        <span class="c1"># /entry/instrument/metadata (optional, for metadata)</span>
-<span class="linenos">29</span>        <span class="n">metadata</span> <span class="o">=</span> <span class="n">nx</span><span class="p">[</span><span class="s1">&#39;/entry/instrument/metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXcollection</span><span class="p">()</span>
-<span class="linenos">30</span>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">md</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<span class="linenos">31</span>            <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-<span class="linenos">32</span>
-<span class="linenos">33</span>    <span class="n">nx</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-<span class="linenos">34</span>
-<span class="linenos">35</span>    
-<span class="linenos">36</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<span class="linenos">37</span>    <span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
-<span class="linenos">38</span>    <span class="kn">import</span> <span class="nn">epics</span>
-<span class="linenos">39</span>    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;13SIM1:&quot;</span>
-<span class="linenos">40</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;image1:ArrayData&quot;</span><span class="p">)</span>
-<span class="linenos">41</span>    <span class="n">size_x</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;cam1:ArraySizeX_RBV&quot;</span><span class="p">)</span>
-<span class="linenos">42</span>    <span class="n">size_y</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;cam1:ArraySizeY_RBV&quot;</span><span class="p">)</span>
-<span class="linenos">43</span>    <span class="c1"># edit the full image for just the binned data</span>
-<span class="linenos">44</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:</span><span class="n">size_x</span><span class="o">*</span><span class="n">size_y</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">))</span>
-<span class="linenos">45</span>
-<span class="linenos">46</span>    <span class="n">extra_information</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-<span class="linenos">47</span>        <span class="n">unique_id</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;image1:UniqueId_RBV&quot;</span><span class="p">),</span>
-<span class="linenos">48</span>        <span class="n">size_x</span> <span class="o">=</span> <span class="n">size_x</span><span class="p">,</span>
-<span class="linenos">49</span>        <span class="n">size_y</span> <span class="o">=</span> <span class="n">size_y</span><span class="p">,</span>
-<span class="linenos">50</span>        <span class="n">detector_state</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;cam1:DetectorState_RBV&quot;</span><span class="p">),</span>
-<span class="linenos">51</span>        <span class="n">bitcoin_value</span><span class="o">=</span><span class="s2">&quot;15000&quot;</span><span class="p">,</span>
-<span class="linenos">52</span>    <span class="p">)</span>
-<span class="linenos">53</span>    <span class="n">write_nexus_file</span><span class="p">(</span><span class="s2">&quot;example.h5&quot;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">extra_information</span><span class="p">)</span>
+<span class="linenos">20</span>    <span class="n">nx</span><span class="p">[</span><span class="s2">&quot;/entry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXentry</span><span class="p">(</span><span class="n">NXinstrument</span><span class="p">(</span><span class="n">NXdetector</span><span class="p">()))</span>
+<span class="linenos">21</span>    <span class="n">nx</span><span class="p">[</span><span class="s2">&quot;entry/instrument/detector/image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXfield</span><span class="p">(</span>
+<span class="linenos">22</span>        <span class="n">image</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;counts&quot;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span>
+<span class="linenos">23</span>    <span class="p">)</span>
+<span class="linenos">24</span>    <span class="n">nx</span><span class="p">[</span><span class="s2">&quot;entry/data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXdata</span><span class="p">()</span>
+<span class="linenos">25</span>    <span class="n">nx</span><span class="p">[</span><span class="s2">&quot;entry/data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">makelink</span><span class="p">(</span><span class="n">nx</span><span class="p">[</span><span class="s2">&quot;entry/instrument/detector/image&quot;</span><span class="p">])</span>
+<span class="linenos">26</span>    <span class="n">nx</span><span class="p">[</span><span class="s2">&quot;entry/data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">nxsignal</span> <span class="o">=</span> <span class="n">nx</span><span class="p">[</span><span class="s2">&quot;entry/data/image&quot;</span><span class="p">]</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">md</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<span class="linenos">29</span>        <span class="c1"># /entry/instrument/metadata (optional, for metadata)</span>
+<span class="linenos">30</span>        <span class="n">metadata</span> <span class="o">=</span> <span class="n">nx</span><span class="p">[</span><span class="s2">&quot;/entry/instrument/metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NXcollection</span><span class="p">()</span>
+<span class="linenos">31</span>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">md</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos">32</span>            <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span>    <span class="n">nx</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="linenos">35</span>
+<span class="linenos">36</span>
+<span class="linenos">37</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">38</span>    <span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
+<span class="linenos">39</span>    <span class="kn">import</span> <span class="nn">epics</span>
+<span class="linenos">40</span>
+<span class="linenos">41</span>    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;13SIM1:&quot;</span>
+<span class="linenos">42</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;image1:ArrayData&quot;</span><span class="p">)</span>
+<span class="linenos">43</span>    <span class="n">size_x</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;cam1:ArraySizeX_RBV&quot;</span><span class="p">)</span>
+<span class="linenos">44</span>    <span class="n">size_y</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;cam1:ArraySizeY_RBV&quot;</span><span class="p">)</span>
+<span class="linenos">45</span>    <span class="c1"># edit the full image for just the binned data</span>
+<span class="linenos">46</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:</span> <span class="n">size_x</span> <span class="o">*</span> <span class="n">size_y</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">))</span>
+<span class="linenos">47</span>
+<span class="linenos">48</span>    <span class="n">extra_information</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+<span class="linenos">49</span>        <span class="n">unique_id</span><span class="o">=</span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;image1:UniqueId_RBV&quot;</span><span class="p">),</span>
+<span class="linenos">50</span>        <span class="n">size_x</span><span class="o">=</span><span class="n">size_x</span><span class="p">,</span>
+<span class="linenos">51</span>        <span class="n">size_y</span><span class="o">=</span><span class="n">size_y</span><span class="p">,</span>
+<span class="linenos">52</span>        <span class="n">detector_state</span><span class="o">=</span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;cam1:DetectorState_RBV&quot;</span><span class="p">),</span>
+<span class="linenos">53</span>        <span class="n">bitcoin_value</span><span class="o">=</span><span class="s2">&quot;15000&quot;</span><span class="p">,</span>
+<span class="linenos">54</span>    <span class="p">)</span>
+<span class="linenos">55</span>    <span class="n">write_nexus_file</span><span class="p">(</span><span class="s2">&quot;example.h5&quot;</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">extra_information</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

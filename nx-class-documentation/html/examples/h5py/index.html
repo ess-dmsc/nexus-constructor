@@ -199,9 +199,9 @@ corrupt the file when the program quits.</p>
 <div class="compound">
 <p class="rubric"><em>BasicWriter.py</em>: Write a NeXus HDF5 file using Python with h5py</p>
 <div class="highlight-python notranslate" id="example-h5py-basicwriter"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python</span>
-<span class="linenos"> 2</span><span class="sd">&#39;&#39;&#39;Writes a NeXus HDF5 file using h5py and numpy&#39;&#39;&#39;</span>
+<span class="linenos"> 2</span><span class="sd">&quot;&quot;&quot;Writes a NeXus HDF5 file using h5py and numpy&quot;&quot;&quot;</span>
 <span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">h5py</span>    <span class="c1"># HDF5 support</span>
+<span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">h5py</span>  <span class="c1"># HDF5 support</span>
 <span class="linenos"> 5</span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Write a NeXus HDF5 file&quot;</span><span class="p">)</span>
@@ -211,47 +211,49 @@ corrupt the file when the program quits.</p>
 <span class="linenos">11</span><span class="c1"># load data from two column format</span>
 <span class="linenos">12</span><span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;input.dat&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
 <span class="linenos">13</span><span class="n">mr_arr</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="linenos">14</span><span class="n">i00_arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>
+<span class="linenos">14</span><span class="n">i00_arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;int32&quot;</span><span class="p">)</span>
 <span class="linenos">15</span>
 <span class="linenos">16</span><span class="c1"># create the HDF5 NeXus file</span>
 <span class="linenos">17</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
 <span class="linenos">18</span><span class="c1"># point to the default data to be plotted</span>
-<span class="linenos">19</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>          <span class="o">=</span> <span class="s1">&#39;entry&#39;</span>
+<span class="linenos">19</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;entry&quot;</span>
 <span class="linenos">20</span><span class="c1"># give the HDF5 root some more attributes</span>
-<span class="linenos">21</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;file_name&#39;</span><span class="p">]</span>        <span class="o">=</span> <span class="n">fileName</span>
-<span class="linenos">22</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;file_time&#39;</span><span class="p">]</span>        <span class="o">=</span> <span class="n">timestamp</span>
-<span class="linenos">23</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span>       <span class="o">=</span> <span class="s1">&#39;APS USAXS at 32ID-B&#39;</span>
-<span class="linenos">24</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">]</span>          <span class="o">=</span> <span class="s1">&#39;BasicWriter.py&#39;</span>
-<span class="linenos">25</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NeXus_version&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="s1">&#39;4.3.0&#39;</span>
-<span class="linenos">26</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;HDF5_Version&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">hdf5_version</span>
-<span class="linenos">27</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;h5py_version&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">version</span>
+<span class="linenos">21</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;file_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fileName</span>
+<span class="linenos">22</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;file_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span>
+<span class="linenos">23</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;APS USAXS at 32ID-B&quot;</span>
+<span class="linenos">24</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;creator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;BasicWriter.py&quot;</span>
+<span class="linenos">25</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NeXus_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;4.3.0&quot;</span>
+<span class="linenos">26</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;HDF5_Version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">hdf5_version</span>
+<span class="linenos">27</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;h5py_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">version</span>
 <span class="linenos">28</span>
 <span class="linenos">29</span><span class="c1"># create the NXentry group</span>
-<span class="linenos">30</span><span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry&#39;</span><span class="p">)</span>
-<span class="linenos">31</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NX_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NXentry&#39;</span>
-<span class="linenos">32</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mr_scan&#39;</span>
-<span class="linenos">33</span><span class="n">nxentry</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s1">&#39;1-D scan of I00 v. mr&#39;</span><span class="p">)</span>
+<span class="linenos">30</span><span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
+<span class="linenos">31</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXentry&quot;</span>
+<span class="linenos">32</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mr_scan&quot;</span>
+<span class="linenos">33</span><span class="n">nxentry</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;1-D scan of I00 v. mr&quot;</span><span class="p">)</span>
 <span class="linenos">34</span>
 <span class="linenos">35</span><span class="c1"># create the NXentry group</span>
-<span class="linenos">36</span><span class="n">nxdata</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;mr_scan&#39;</span><span class="p">)</span>
-<span class="linenos">37</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NX_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NXdata&#39;</span>
-<span class="linenos">38</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;signal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;I00&#39;</span>      <span class="c1"># Y axis of default plot</span>
-<span class="linenos">39</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;axes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mr&#39;</span>         <span class="c1"># X axis of default plot</span>
-<span class="linenos">40</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mr_indices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,]</span>   <span class="c1"># use &quot;mr&quot; as the first dimension of I00</span>
-<span class="linenos">41</span>
-<span class="linenos">42</span><span class="c1"># X axis data</span>
-<span class="linenos">43</span><span class="n">ds</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;mr&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">mr_arr</span><span class="p">)</span>
-<span class="linenos">44</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>
-<span class="linenos">45</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;USAXS mr (degrees)&#39;</span>    <span class="c1"># suggested X axis plot label</span>
-<span class="linenos">46</span>
-<span class="linenos">47</span><span class="c1"># Y axis data</span>
-<span class="linenos">48</span><span class="n">ds</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;I00&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">i00_arr</span><span class="p">)</span>
-<span class="linenos">49</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;counts&#39;</span>
-<span class="linenos">50</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;USAXS I00 (counts)&#39;</span>    <span class="c1"># suggested Y axis plot label</span>
-<span class="linenos">51</span>
-<span class="linenos">52</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>   <span class="c1"># be CERTAIN to close the file</span>
+<span class="linenos">36</span><span class="n">nxdata</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;mr_scan&quot;</span><span class="p">)</span>
+<span class="linenos">37</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXdata&quot;</span>
+<span class="linenos">38</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;I00&quot;</span>  <span class="c1"># Y axis of default plot</span>
+<span class="linenos">39</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mr&quot;</span>  <span class="c1"># X axis of default plot</span>
+<span class="linenos">40</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;mr_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+<span class="linenos">41</span>    <span class="mi">0</span><span class="p">,</span>
+<span class="linenos">42</span><span class="p">]</span>  <span class="c1"># use &quot;mr&quot; as the first dimension of I00</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span><span class="c1"># X axis data</span>
+<span class="linenos">45</span><span class="n">ds</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;mr&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">mr_arr</span><span class="p">)</span>
+<span class="linenos">46</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;degrees&quot;</span>
+<span class="linenos">47</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;USAXS mr (degrees)&quot;</span>  <span class="c1"># suggested X axis plot label</span>
+<span class="linenos">48</span>
+<span class="linenos">49</span><span class="c1"># Y axis data</span>
+<span class="linenos">50</span><span class="n">ds</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;I00&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">i00_arr</span><span class="p">)</span>
+<span class="linenos">51</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;counts&quot;</span>
+<span class="linenos">52</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;USAXS I00 (counts)&quot;</span>  <span class="c1"># suggested Y axis plot label</span>
 <span class="linenos">53</span>
-<span class="linenos">54</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrote file:&quot;</span><span class="p">,</span> <span class="n">fileName</span><span class="p">)</span>
+<span class="linenos">54</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># be CERTAIN to close the file</span>
+<span class="linenos">55</span>
+<span class="linenos">56</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrote file:&quot;</span><span class="p">,</span> <span class="n">fileName</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -275,16 +277,16 @@ that HDF5 is sensitive to upper or lowercase. That is, <code class="docutils lit
 <div class="compound">
 <p class="rubric"><em>BasicReader.py</em>: Read a NeXus HDF5 file using Python with h5py</p>
 <div class="highlight-python notranslate" id="example-h5py-reader"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python</span>
-<span class="linenos"> 2</span><span class="sd">&#39;&#39;&#39;Reads NeXus HDF5 files using h5py and prints the contents&#39;&#39;&#39;</span>
+<span class="linenos"> 2</span><span class="sd">&quot;&quot;&quot;Reads NeXus HDF5 files using h5py and prints the contents&quot;&quot;&quot;</span>
 <span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">h5py</span>    <span class="c1"># HDF5 support</span>
+<span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">h5py</span>  <span class="c1"># HDF5 support</span>
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span><span class="n">fileName</span> <span class="o">=</span> <span class="s2">&quot;prj_test.nexus.hdf5&quot;</span>
-<span class="linenos"> 7</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span>  <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+<span class="linenos"> 7</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
 <span class="linenos"> 8</span><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
 <span class="linenos"> 9</span>    <span class="nb">print</span><span class="p">(</span><span class="n">item</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">item</span><span class="p">])</span>
-<span class="linenos">10</span><span class="n">mr</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;/entry/mr_scan/mr&#39;</span><span class="p">]</span>
-<span class="linenos">11</span><span class="n">i00</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;/entry/mr_scan/I00&#39;</span><span class="p">]</span>
+<span class="linenos">10</span><span class="n">mr</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s2">&quot;/entry/mr_scan/mr&quot;</span><span class="p">]</span>
+<span class="linenos">11</span><span class="n">i00</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s2">&quot;/entry/mr_scan/I00&quot;</span><span class="p">]</span>
 <span class="linenos">12</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\t</span><span class="si">%s</span><span class="se">\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;mr&quot;</span><span class="p">,</span> <span class="s2">&quot;I00&quot;</span><span class="p">))</span>
 <span class="linenos">13</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mr</span><span class="p">)):</span>
 <span class="linenos">14</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="se">\t</span><span class="si">%g</span><span class="se">\t</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i00</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
@@ -351,32 +353,31 @@ field sizes. See section <a class="reference internal" href="../../datarules.htm
 subsection <a class="reference internal" href="../../datarules.html#find-plottable-data-v3"><span class="std std-ref">Version 3</span></a>, for the details.)</p>
 <div class="compound">
 <p class="rubric"><em>reader_attributes_trail.py</em>: Read a NeXus HDF5 file using Python with h5py</p>
-<div class="highlight-python notranslate" id="example-h5py-reader-attributes-trail"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>
-<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">h5py</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s2">&quot;prj_test.nexus.hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nx</span><span class="p">:</span>
-<span class="linenos"> 5</span>    <span class="c1"># find the default NXentry group</span>
-<span class="linenos"> 6</span>    <span class="n">nx_entry</span> <span class="o">=</span> <span class="n">nx</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]]</span>
-<span class="linenos"> 7</span>    <span class="c1"># find the default NXdata group</span>
-<span class="linenos"> 8</span>    <span class="n">nx_data</span> <span class="o">=</span> <span class="n">nx_entry</span><span class="p">[</span><span class="n">nx_entry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]]</span>
-<span class="linenos"> 9</span>    <span class="c1"># find the signal field</span>
-<span class="linenos">10</span>    <span class="n">signal</span> <span class="o">=</span> <span class="n">nx_data</span><span class="p">[</span><span class="n">nx_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;signal&quot;</span><span class="p">]]</span>
-<span class="linenos">11</span>    <span class="c1"># find the axes field(s)</span>
-<span class="linenos">12</span>    <span class="n">attr_axes</span> <span class="o">=</span> <span class="n">nx_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span>
-<span class="linenos">13</span>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr_axes</span><span class="p">,</span> <span class="p">(</span><span class="nb">set</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<span class="linenos">14</span>        <span class="c1">#  but check that attr_axes only describes 1-D data</span>
-<span class="linenos">15</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr_axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<span class="linenos">16</span>            <span class="n">attr_axes</span> <span class="o">=</span> <span class="n">attr_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="linenos">17</span>        <span class="k">else</span><span class="p">:</span>
-<span class="linenos">18</span>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;expected 1-D data but @axes=</span><span class="si">{</span><span class="n">attr_axes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">19</span>    <span class="n">axes</span> <span class="o">=</span> <span class="n">nx_data</span><span class="p">[</span><span class="n">attr_axes</span><span class="p">]</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file: </span><span class="si">{</span><span class="n">nx</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">22</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;signal: </span><span class="si">{</span><span class="n">signal</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">23</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;axes: </span><span class="si">{</span><span class="n">axes</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">24</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axes</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">signal</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">25</span>    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">signal</span><span class="p">):</span>
-<span class="linenos">26</span>        <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<div class="highlight-python notranslate" id="example-h5py-reader-attributes-trail"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">h5py</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s2">&quot;prj_test.nexus.hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nx</span><span class="p">:</span>
+<span class="linenos"> 4</span>    <span class="c1"># find the default NXentry group</span>
+<span class="linenos"> 5</span>    <span class="n">nx_entry</span> <span class="o">=</span> <span class="n">nx</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]]</span>
+<span class="linenos"> 6</span>    <span class="c1"># find the default NXdata group</span>
+<span class="linenos"> 7</span>    <span class="n">nx_data</span> <span class="o">=</span> <span class="n">nx_entry</span><span class="p">[</span><span class="n">nx_entry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]]</span>
+<span class="linenos"> 8</span>    <span class="c1"># find the signal field</span>
+<span class="linenos"> 9</span>    <span class="n">signal</span> <span class="o">=</span> <span class="n">nx_data</span><span class="p">[</span><span class="n">nx_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;signal&quot;</span><span class="p">]]</span>
+<span class="linenos">10</span>    <span class="c1"># find the axes field(s)</span>
+<span class="linenos">11</span>    <span class="n">attr_axes</span> <span class="o">=</span> <span class="n">nx_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span>
+<span class="linenos">12</span>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr_axes</span><span class="p">,</span> <span class="p">(</span><span class="nb">set</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<span class="linenos">13</span>        <span class="c1">#  but check that attr_axes only describes 1-D data</span>
+<span class="linenos">14</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr_axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<span class="linenos">15</span>            <span class="n">attr_axes</span> <span class="o">=</span> <span class="n">attr_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">16</span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos">17</span>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;expected 1-D data but @axes=</span><span class="si">{</span><span class="n">attr_axes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">18</span>    <span class="n">axes</span> <span class="o">=</span> <span class="n">nx_data</span><span class="p">[</span><span class="n">attr_axes</span><span class="p">]</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file: </span><span class="si">{</span><span class="n">nx</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">21</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;signal: </span><span class="si">{</span><span class="n">signal</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">22</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;axes: </span><span class="si">{</span><span class="n">axes</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">23</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axes</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">signal</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">24</span>    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">signal</span><span class="p">):</span>
+<span class="linenos">25</span>        <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -540,11 +541,11 @@ to write a NeXus-compliant HDF5 file with links to data in other HDF5 files.</p>
 <div class="compound">
 <p class="rubric"><em>externalExample.py</em>: Write using HDF5 external links</p>
 <div class="highlight-python notranslate" id="example-h5py-externalexample"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python</span>
-<span class="linenos"> 2</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 2</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 3</span><span class="sd">Writes a NeXus HDF5 file using h5py with links to data in other HDF5 files.</span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="sd">This example is based on ``writer_2_1``.</span>
-<span class="linenos"> 6</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 6</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 7</span>
 <span class="linenos"> 8</span><span class="kn">import</span> <span class="nn">h5py</span>
 <span class="linenos"> 9</span><span class="kn">import</span> <span class="nn">numpy</span>
@@ -553,21 +554,21 @@ to write a NeXus-compliant HDF5 file with links to data in other HDF5 files.</p>
 <span class="linenos">12</span><span class="n">FILE_HDF5_ANGLES</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;external_angles.hdf5&quot;</span>
 <span class="linenos">13</span><span class="n">FILE_HDF5_COUNTS</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;external_counts.hdf5&quot;</span>
 <span class="linenos">14</span>
-<span class="linenos">15</span><span class="c1">#---------------------------</span>
+<span class="linenos">15</span><span class="c1"># ---------------------------</span>
 <span class="linenos">16</span>
 <span class="linenos">17</span><span class="c1"># get some data</span>
 <span class="linenos">18</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;input.dat&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-<span class="linenos">19</span><span class="n">tthData</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                             <span class="c1"># float[]</span>
-<span class="linenos">20</span><span class="n">countsData</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>   <span class="c1"># int[]</span>
+<span class="linenos">19</span><span class="n">tthData</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># float[]</span>
+<span class="linenos">20</span><span class="n">countsData</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;int32&quot;</span><span class="p">)</span>  <span class="c1"># int[]</span>
 <span class="linenos">21</span>
 <span class="linenos">22</span><span class="c1"># put the angle data in an external (non-NeXus) HDF5 data file</span>
 <span class="linenos">23</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">FILE_HDF5_ANGLES</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
 <span class="linenos">24</span><span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;angles&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">tthData</span><span class="p">)</span>
 <span class="linenos">25</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;degrees&quot;</span>
-<span class="linenos">26</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>    <span class="c1"># be CERTAIN to close the file</span>
+<span class="linenos">26</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># be CERTAIN to close the file</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span>
-<span class="linenos">29</span><span class="c1"># put the detector counts in an external HDF5 data file </span>
+<span class="linenos">29</span><span class="c1"># put the detector counts in an external HDF5 data file</span>
 <span class="linenos">30</span><span class="c1"># with *incomplete* NeXus structure (no NXdata group)</span>
 <span class="linenos">31</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">FILE_HDF5_COUNTS</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
 <span class="linenos">32</span><span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
@@ -587,13 +588,13 @@ to write a NeXus-compliant HDF5 file with links to data in other HDF5 files.</p>
 <span class="linenos">46</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">FILE_HDF5_MASTER</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
 <span class="linenos">47</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;entry&quot;</span>
 <span class="linenos">48</span><span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
-<span class="linenos">49</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span><span class="sa">u</span><span class="s2">&quot;NXentry&quot;</span>
+<span class="linenos">49</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;NXentry&quot;</span>
 <span class="linenos">50</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;data&quot;</span>
 <span class="linenos">51</span><span class="n">nxdata</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
 <span class="linenos">52</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;NXdata&quot;</span>
 <span class="linenos">53</span>
 <span class="linenos">54</span><span class="c1"># link in the signal data</span>
-<span class="linenos">55</span><span class="n">local_addr</span> <span class="o">=</span> <span class="s1">&#39;/entry/data/counts&#39;</span>
+<span class="linenos">55</span><span class="n">local_addr</span> <span class="o">=</span> <span class="s2">&quot;/entry/data/counts&quot;</span>
 <span class="linenos">56</span><span class="n">external_addr</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;/entry/instrument/detector/counts&quot;</span>
 <span class="linenos">57</span><span class="n">f</span><span class="p">[</span><span class="n">local_addr</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">ExternalLink</span><span class="p">(</span><span class="n">FILE_HDF5_COUNTS</span><span class="p">,</span> <span class="n">external_addr</span><span class="p">)</span>
 <span class="linenos">58</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;counts&quot;</span>
@@ -602,12 +603,14 @@ to write a NeXus-compliant HDF5 file with links to data in other HDF5 files.</p>
 <span class="linenos">61</span><span class="n">local_addr</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;/entry/data/two_theta&quot;</span>
 <span class="linenos">62</span><span class="n">f</span><span class="p">[</span><span class="n">local_addr</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">ExternalLink</span><span class="p">(</span><span class="n">FILE_HDF5_ANGLES</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;/angles&quot;</span><span class="p">)</span>
 <span class="linenos">63</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;two_theta&quot;</span>
-<span class="linenos">64</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;two_theta_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,]</span>
-<span class="linenos">65</span>
-<span class="linenos">66</span><span class="n">local_addr</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;/entry/instrument&quot;</span>
-<span class="linenos">67</span><span class="n">f</span><span class="p">[</span><span class="n">local_addr</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">ExternalLink</span><span class="p">(</span><span class="n">FILE_HDF5_COUNTS</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;/entry/instrument&quot;</span><span class="p">)</span>
-<span class="linenos">68</span>
-<span class="linenos">69</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">64</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">u</span><span class="s2">&quot;two_theta_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+<span class="linenos">65</span>    <span class="mi">0</span><span class="p">,</span>
+<span class="linenos">66</span><span class="p">]</span>
+<span class="linenos">67</span>
+<span class="linenos">68</span><span class="n">local_addr</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;/entry/instrument&quot;</span>
+<span class="linenos">69</span><span class="n">f</span><span class="p">[</span><span class="n">local_addr</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">ExternalLink</span><span class="p">(</span><span class="n">FILE_HDF5_COUNTS</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;/entry/instrument&quot;</span><span class="p">)</span>
+<span class="linenos">70</span>
+<span class="linenos">71</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
