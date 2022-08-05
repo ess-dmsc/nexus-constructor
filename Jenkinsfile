@@ -101,6 +101,7 @@ builders = pipeline_builder.createBuilders { container ->
     
     // Only run in pull request builds
     if (env.CHANGE_ID) {
+        def diffError = false
         pipeline_builder.stage("Verify NeXus HTML") {
             container.sh """
                 python3.6 -m venv nexus_doc_venv
@@ -115,7 +116,6 @@ builders = pipeline_builder.createBuilders { container ->
                 make
             """
     
-            def diffError = false
             try {
                 container.sh """
                     diff \
