@@ -73,7 +73,7 @@ builders = pipeline_builder.createBuilders { container ->
     pipeline_builder.stage("Run Linter") {
         container.sh """
                 cd ${project}
-                build_env/bin/flake8 --exclude nx-class-documentation
+                build_env/bin/flake8 --exclude build_env,definitions,nx-class-documentation
             """
     } // stage
 
