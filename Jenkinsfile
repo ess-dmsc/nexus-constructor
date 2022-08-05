@@ -99,6 +99,19 @@ builders = pipeline_builder.createBuilders { container ->
 
     } // stage
 
+    pipeline_builder.stage("Verify NeXus HTML") {
+        container.sh """
+            python3.6 -m venv nexus_doc_venv
+            nexus_doc_venv/bin/pip --proxy ${https_proxy} install --upgrade pip
+            nexus_doc_venv/bin/pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
+
+            export SOURCE_DIR=${project}/definitions
+            python ${project}/definitions/utils/build_preparation.py ${project}/definitions
+            make
+            ls
+        """
+    } // stage
+
     if (env.CHANGE_ID) {
         pipeline_builder.stage('Build Executable'){
             container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
