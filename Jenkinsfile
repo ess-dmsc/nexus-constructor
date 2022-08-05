@@ -98,31 +98,70 @@ builders = pipeline_builder.createBuilders { container ->
             }
 
     } // stage
-
-    pipeline_builder.stage("Verify NeXus HTML") {
-        container.sh """
-            python3.6 -m venv nexus_doc_venv
-            source nexus_doc_venv/bin/activate
-            pip --proxy ${https_proxy} install --upgrade pip
-            pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
-
-            mkdir nexus_doc
-            cd nexus_doc
-            export SOURCE_DIR=../${project}/definitions
-            python ../${project}/definitions/utils/build_preparation.py ../${project}/definitions
-            make
-        """
-
-        container.sh """
-            diff \
-                --recursive \
-                --exclude=_downloads \
-                ${project}/nx-class-documentation/html \
-                nexus_doc/manual/build/html
-        """
-    } // stage
-
+    
+    // Only run in pull request builds
     if (env.CHANGE_ID) {
+        pipeline_builder.stage("Verify NeXus HTML") {
+            container.sh """
+                python3.6 -m venv nexus_doc_venv
+                source nexus_doc_venv/bin/activate
+                pip --proxy ${https_proxy} install --upgrade pip
+                pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
+    
+                mkdir nexus_doc
+                cd nexus_doc
+                export SOURCE_DIR=../${project}/definitions
+                python ../${project}/definitions/utils/build_preparation.py ../${project}/definitions
+                make
+            """
+    
+            def diffError = false
+            try {
+                container.sh """
+                    diff \
+                        --recursive \
+                        --exclude=_downloads \
+                        ${project}/nx-class-documentation/html \
+                        nexus_doc/manual/build/html
+                """
+            } catch (e) {
+                diffError = true
+            }
+        } // stage
+    
+        if (diffError) {
+            pipeline_builder.stage("Update NeXus HTML") {
+                container.sh """
+                    export LC_ALL=en_US.utf-8
+                    export LANG=en_US.utf-8
+                    cd ${project}
+                    rm -rf nx-class-documentation/html
+                    cp -r ../nexus_doc/manual/build/html nx-class-documentation/
+                    git config user.email 'dm-jenkins-integration@esss.se'
+                    git config user.name 'cow-bot'
+                    git status -s
+                    git add -u
+                    git commit -m 'Update NeXus HTML documentation'
+                """
+            
+                // Push any changes resulting from formatting
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'cow-bot-username-with-token',
+                        usernameVariable: 'USERNAME',
+                        passwordVariable: 'PASSWORD'
+                    )
+                ]) {
+                    withEnv(["PROJECT=${builder.project}"]) {
+                        container.sh '''
+                            cd $PROJECT
+                            git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/$PROJECT.git HEAD:$CHANGE_BRANCH
+                        '''
+                     }  // withEnv
+                }  // withCredentials
+            }  // stage
+        }  // if
+
         pipeline_builder.stage('Build Executable'){
             container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
         }
