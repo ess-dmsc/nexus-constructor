@@ -120,7 +120,6 @@ builders = pipeline_builder.createBuilders { container ->
                 container.sh """
                     diff \
                         --recursive \
-                        --exclude=_downloads \
                         ${project}/nx-class-documentation/html \
                         nexus_doc/manual/build/html
                 """
@@ -159,6 +158,8 @@ builders = pipeline_builder.createBuilders { container ->
                         '''
                      }  // withEnv
                 }  // withCredentials
+
+                error 'Updating NeXus HTML documentation'
             }  // stage
         }  // if
 
