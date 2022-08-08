@@ -675,7 +675,7 @@ class StreamFieldsWidget(QDialog):
         :param field: The stream group
         """
         if not field:
-            raise TypeError("Field is NoneType when " "expecting type StreamModule.")
+            raise TypeError("Field is NoneType when expecting type StreamModule.")
         if isinstance(field, Group):
             field = field.children[0]
         if hasattr(field, "parent_node") and isinstance(field.parent_node, Group):
