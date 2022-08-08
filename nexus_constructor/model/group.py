@@ -27,6 +27,10 @@ TRANSFORMS_GROUP_NAME = "transformations"
 CHILD_EXCLUDELIST = [TRANSFORMS_GROUP_NAME]
 
 
+def create_list_of_possible_streams():
+    return [module.value for module in StreamModules]
+
+
 @attr.s
 class Group:
     """
@@ -41,7 +45,7 @@ class Group:
     attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     values = None
     possible_stream_modules = attr.ib(
-        type=List[str], default=[module.value for module in StreamModules]
+        type=List[str], default=attr.Factory(create_list_of_possible_streams)
     )
     _group_placeholder: bool = False
 
@@ -181,13 +185,15 @@ class Group:
         return return_dict
 
     def set_possible_stream_modules(self, possible_stream_modules: List[str]):
-        self.possible_stream_modules = possible_stream_modules
+        self.possible_stream_modules = possible_stream_modules.copy()
 
     def get_possible_stream_modules(self) -> List[str]:
-        return self.possible_stream_modules
+        return self.possible_stream_modules.copy()
 
     def add_stream_module(self, module: str):
-        if module not in self.possible_stream_modules:
+        if module not in self.possible_stream_modules and module in [
+            module.value for module in StreamModules
+        ]:
             self._modify_possible_streams(module, self.possible_stream_modules.append)
 
     def remove_stream_module(self, module: str):
