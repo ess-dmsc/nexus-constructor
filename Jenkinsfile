@@ -55,7 +55,7 @@ builders = pipeline_builder.createBuilders { container ->
                 cd ${project}
                 export LC_ALL=en_US.utf-8
                 export LANG=en_US.utf-8
-                build_env/bin/python -m black --extend-exclude /(build_env|definitions|nx-class-documentation)/ .
+                build_env/bin/python -m black --extend-exclude '/(build_env|definitions|nx-class-documentation)/' .
                 git config user.email 'dm-jenkins-integration@esss.se'
                 git config user.name 'cow-bot'
                 git status -s
