@@ -139,8 +139,8 @@ builders = pipeline_builder.createBuilders { container ->
                     cp -r ../nexus_doc/manual/build/html nx-class-documentation/
                     git config user.email 'dm-jenkins-integration@esss.se'
                     git config user.name 'cow-bot'
-                    git status -s
-                    git add nx-class-documentation
+                    git status --ignored
+                    git add --force nx-class-documentation
                     git commit -m 'Update NeXus HTML documentation'
                 """
             
