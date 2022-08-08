@@ -1,2 +1,2 @@
 [tool.black]
-exclude = '/(build*|ui*|definitions*)'
+exclude = '/(build*|ui*|definitions*|nx-class-documentation*)'
