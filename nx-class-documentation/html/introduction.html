@@ -298,69 +298,39 @@ a short Python program and the <em>h5py</em> package:</p>
 <div class="compound">
 <p class="rubric" id="fig-verysimple-py">Using Python to write a very simple NeXus HDF5 Data file</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python</span>
-<span class="linenos"> 2</span><span class="sd">&quot;&quot;&quot;uses h5py to build the verysimple.nx5 data file&quot;&quot;&quot;</span>
+<span class="linenos"> 2</span><span class="sd">&#39;&#39;&#39;uses h5py to build the verysimple.nx5 data file&#39;&#39;&#39;</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">h5py</span>
 <span class="linenos"> 5</span>
-<span class="linenos"> 6</span><span class="n">angle</span> <span class="o">=</span> <span class="p">[</span>
-<span class="linenos"> 7</span>    <span class="mf">18.9094</span><span class="p">,</span>
-<span class="linenos"> 8</span>    <span class="mf">18.9096</span><span class="p">,</span>
-<span class="linenos"> 9</span>    <span class="mf">18.9098</span><span class="p">,</span>
-<span class="linenos">10</span>    <span class="mf">18.91</span><span class="p">,</span>
-<span class="linenos">11</span>    <span class="mf">18.9102</span><span class="p">,</span>
-<span class="linenos">12</span>    <span class="mf">18.9104</span><span class="p">,</span>
-<span class="linenos">13</span>    <span class="mf">18.9106</span><span class="p">,</span>
-<span class="linenos">14</span>    <span class="mf">18.9108</span><span class="p">,</span>
-<span class="linenos">15</span>    <span class="mf">18.911</span><span class="p">,</span>
-<span class="linenos">16</span>    <span class="mf">18.9112</span><span class="p">,</span>
-<span class="linenos">17</span>    <span class="mf">18.9114</span><span class="p">,</span>
-<span class="linenos">18</span>    <span class="mf">18.9116</span><span class="p">,</span>
-<span class="linenos">19</span>    <span class="mf">18.9118</span><span class="p">,</span>
-<span class="linenos">20</span>    <span class="mf">18.912</span><span class="p">,</span>
-<span class="linenos">21</span>    <span class="mf">18.9122</span><span class="p">,</span>
-<span class="linenos">22</span><span class="p">]</span>
-<span class="linenos">23</span><span class="n">diode</span> <span class="o">=</span> <span class="p">[</span>
-<span class="linenos">24</span>    <span class="mi">1193</span><span class="p">,</span>
-<span class="linenos">25</span>    <span class="mi">4474</span><span class="p">,</span>
-<span class="linenos">26</span>    <span class="mi">53220</span><span class="p">,</span>
-<span class="linenos">27</span>    <span class="mi">274310</span><span class="p">,</span>
-<span class="linenos">28</span>    <span class="mi">515430</span><span class="p">,</span>
-<span class="linenos">29</span>    <span class="mi">827880</span><span class="p">,</span>
-<span class="linenos">30</span>    <span class="mi">1227100</span><span class="p">,</span>
-<span class="linenos">31</span>    <span class="mi">1434640</span><span class="p">,</span>
-<span class="linenos">32</span>    <span class="mi">1330280</span><span class="p">,</span>
-<span class="linenos">33</span>    <span class="mi">1037070</span><span class="p">,</span>
-<span class="linenos">34</span>    <span class="mi">598720</span><span class="p">,</span>
-<span class="linenos">35</span>    <span class="mi">316460</span><span class="p">,</span>
-<span class="linenos">36</span>    <span class="mi">56677</span><span class="p">,</span>
-<span class="linenos">37</span>    <span class="mi">1000</span><span class="p">,</span>
-<span class="linenos">38</span>    <span class="mi">1000</span><span class="p">,</span>
-<span class="linenos">39</span><span class="p">]</span>
-<span class="linenos">40</span>
-<span class="linenos">41</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s2">&quot;verysimple.nx5&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
-<span class="linenos">42</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;entry&quot;</span>
-<span class="linenos">43</span>
-<span class="linenos">44</span><span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
-<span class="linenos">45</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXentry&quot;</span>
-<span class="linenos">46</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
-<span class="linenos">47</span>
-<span class="linenos">48</span><span class="n">nxdata</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<span class="linenos">49</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NXdata&quot;</span>
-<span class="linenos">50</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;counts&quot;</span>
-<span class="linenos">51</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;two_theta&quot;</span>
-<span class="linenos">52</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;two_theta_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-<span class="linenos">53</span>    <span class="mi">0</span><span class="p">,</span>
-<span class="linenos">54</span><span class="p">]</span>
-<span class="linenos">55</span>
-<span class="linenos">56</span><span class="n">tth</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;two_theta&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">angle</span><span class="p">)</span>
-<span class="linenos">57</span><span class="n">tth</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;degrees&quot;</span>
-<span class="linenos">58</span><span class="n">tth</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;two_theta (degrees)&quot;</span>
-<span class="linenos">59</span>
-<span class="linenos">60</span><span class="n">counts</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;counts&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">diode</span><span class="p">)</span>
-<span class="linenos">61</span><span class="n">counts</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;counts&quot;</span>
-<span class="linenos">62</span><span class="n">counts</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;photodiode counts&quot;</span>
-<span class="linenos">63</span>
-<span class="linenos">64</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos"> 6</span><span class="n">angle</span> <span class="o">=</span> <span class="p">[</span><span class="mf">18.9094</span><span class="p">,</span> <span class="mf">18.9096</span><span class="p">,</span> <span class="mf">18.9098</span><span class="p">,</span> <span class="mf">18.91</span><span class="p">,</span>  <span class="mf">18.9102</span><span class="p">,</span> 
+<span class="linenos"> 7</span>         <span class="mf">18.9104</span><span class="p">,</span> <span class="mf">18.9106</span><span class="p">,</span> <span class="mf">18.9108</span><span class="p">,</span> <span class="mf">18.911</span><span class="p">,</span> <span class="mf">18.9112</span><span class="p">,</span> 
+<span class="linenos"> 8</span>         <span class="mf">18.9114</span><span class="p">,</span> <span class="mf">18.9116</span><span class="p">,</span> <span class="mf">18.9118</span><span class="p">,</span> <span class="mf">18.912</span><span class="p">,</span> <span class="mf">18.9122</span><span class="p">]</span>
+<span class="linenos"> 9</span><span class="n">diode</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1193</span><span class="p">,</span> <span class="mi">4474</span><span class="p">,</span> <span class="mi">53220</span><span class="p">,</span> <span class="mi">274310</span><span class="p">,</span> <span class="mi">515430</span><span class="p">,</span> <span class="mi">827880</span><span class="p">,</span> 
+<span class="linenos">10</span>         <span class="mi">1227100</span><span class="p">,</span> <span class="mi">1434640</span><span class="p">,</span> <span class="mi">1330280</span><span class="p">,</span> <span class="mi">1037070</span><span class="p">,</span> <span class="mi">598720</span><span class="p">,</span> 
+<span class="linenos">11</span>         <span class="mi">316460</span><span class="p">,</span> <span class="mi">56677</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;verysimple.nx5&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="linenos">14</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;entry&#39;</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry&#39;</span><span class="p">)</span>
+<span class="linenos">17</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NXentry&#39;</span>
+<span class="linenos">18</span><span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;data&#39;</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span><span class="n">nxdata</span> <span class="o">=</span> <span class="n">nxentry</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="linenos">21</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;NX_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NXdata&#39;</span>
+<span class="linenos">22</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;signal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;counts&#39;</span>
+<span class="linenos">23</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;axes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;two_theta&#39;</span>
+<span class="linenos">24</span><span class="n">nxdata</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;two_theta_indices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,]</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span><span class="n">tth</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;two_theta&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">angle</span><span class="p">)</span>
+<span class="linenos">27</span><span class="n">tth</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>
+<span class="linenos">28</span><span class="n">tth</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;two_theta (degrees)&#39;</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="n">counts</span> <span class="o">=</span> <span class="n">nxdata</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;counts&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">diode</span><span class="p">)</span>
+<span class="linenos">31</span><span class="n">counts</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;counts&#39;</span>
+<span class="linenos">32</span><span class="n">counts</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;photodiode counts&#39;</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
