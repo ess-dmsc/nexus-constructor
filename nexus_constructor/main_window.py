@@ -98,12 +98,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.show_add_component_window(new_group, new_group=True)
 
     def show_edit_component_dialog(self):
-        selected_component = (
-            self.component_tree_view_tab.component_tree_view.selectedIndexes()[
-                0
-            ].internalPointer()
-        )
-        self.show_add_component_window(selected_component, False)
+        try:
+            selected_component = (
+                self.component_tree_view_tab.component_tree_view.selectedIndexes()[
+                    0
+                ].internalPointer()
+            )
+            self.show_add_component_window(selected_component, False)
+        except IndexError:
+            print("Select a valid group in the NeXus tree view before editing.")
 
     def save_to_filewriter_json(self):
         filename = file_dialog(True, "Save File writer JSON File", JSON_FILE_TYPES)

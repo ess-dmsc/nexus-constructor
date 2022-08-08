@@ -229,7 +229,7 @@ class FieldWidget(QFrame):
                 validate_line_edit,
                 self.field_name_edit,
                 tooltip_on_accept="Field name is valid.",
-                tooltip_on_reject="Field name is not valid",
+                tooltip_on_reject="Field name is not valid.",
             )
         )
 
@@ -237,7 +237,7 @@ class FieldWidget(QFrame):
         self.edit_button.setText("View")
         self.streams_widget.ok_button.setDisabled(True)
         self.streams_widget.ok_button.setVisible(False)
-        self.streams_widget.cancel_button.setText("finished viewing")
+        self.streams_widget.cancel_button.setText("Finished viewing")
         self.streams_widget.schema_combo.currentTextChanged.connect(
             self.streams_widget._schema_type_changed
         )
