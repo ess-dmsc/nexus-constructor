@@ -12,9 +12,7 @@ class Ui_Link(object):
         self.vertical_layout.addWidget(self.select_link_label)
         self.horizontal_layout = QtWidgets.QHBoxLayout()
         self.transformations_combo_box = QtWidgets.QComboBox(self.group_box)
-        combo_size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed
-        )
+        combo_size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         combo_size_policy.setHorizontalStretch(1)
         combo_size_policy.setVerticalStretch(0)
         self.transformations_combo_box.setSizePolicy(combo_size_policy)
