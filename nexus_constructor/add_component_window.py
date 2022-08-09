@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from copy import deepcopy
 from functools import partial
+from os import path
 from typing import Callable, List
 
 from PySide2.QtCore import Qt, QUrl, Signal
@@ -62,6 +63,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self._group_to_edit_backup = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
+        file_dir = path.dirname(__file__)
+        self.local_url_root = path.join(
+            file_dir, "..", "nx-class-documentation", "html"
+        )
         super().__init__(parent, self._group_container)
         super().setupUi()
         if nx_classes is None:
@@ -165,11 +170,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.ok_button.setEnabled(False)
 
         # Set default URL to nexus base classes in web view
-        self.webEngineView.setUrl(
-            QUrl(
-                "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
-            )
+        local_url_index = QUrl.fromLocalFile(
+            path.join(self.local_url_root, "index.html")
         )
+        self.webEngineView.setUrl(local_url_index)
 
         self.placeholder_checkbox.stateChanged.connect(self._disable_fields_and_buttons)
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
@@ -422,11 +426,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.placeholder_checkbox.setChecked(False)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
-        self.webEngineView.setUrl(
-            QUrl(
-                f"http://download.nexusformat.org/sphinx/classes/base_classes/{c_nx_class}.html"
-            )
+        class_html = path.join(
+            self.local_url_root, "classes", "base_classes", f"{c_nx_class}.html"
         )
+        local_url_class = QUrl.fromLocalFile(class_html)
+        self.webEngineView.setUrl(local_url_class)
 
         self.possible_fields = self.nx_component_classes[c_nx_class]
         try:
