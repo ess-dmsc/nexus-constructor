@@ -85,6 +85,7 @@ class FieldWidget(QFrame):
         parent_dataset: Dataset = None,
         hide_name_field: bool = False,
         show_only_f142_stream: bool = False,
+        allow_invalid_field_names: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
 
@@ -201,7 +202,12 @@ class FieldWidget(QFrame):
                 if child is not parent_dataset and hasattr(child, "name"):
                     existing_objects.append(child)
             emit = True
-        self._set_up_name_validator(existing_objects=existing_objects)
+        if allow_invalid_field_names:
+            self._set_up_name_validator(
+                existing_objects=existing_objects, invalid_field_names=[]
+            )
+        else:
+            self._set_up_name_validator(existing_objects=existing_objects)
         self.field_name_edit.validator().is_valid.emit(emit)
 
         self.value_line_edit.installEventFilter(self)
@@ -219,10 +225,12 @@ class FieldWidget(QFrame):
         self.field_type_changed()
 
     def _set_up_name_validator(
-        self, existing_objects: List[Union["FieldWidget", FileWriterModule]]
+        self,
+        existing_objects: List[Union["FieldWidget", FileWriterModule]],
+        invalid_field_names: List[str] = INVALID_FIELD_NAMES,
     ):
         self.field_name_edit.setValidator(
-            NameValidator(existing_objects, invalid_names=INVALID_FIELD_NAMES)
+            NameValidator(existing_objects, invalid_names=invalid_field_names)
         )
         self.field_name_edit.validator().is_valid.connect(
             partial(
