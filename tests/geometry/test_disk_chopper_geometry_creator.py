@@ -508,7 +508,7 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_points_not_i
     centre_to_bottom_of_slit = chopper_details.radius - chopper_details.slit_height
 
     for point in geometry_creator.points[2:-2]:
-        distance_from_centre = np.sqrt(point.x**2 + point.y**2)
+        distance_from_centre = np.sqrt(point.x ** 2 + point.y ** 2)
         assert np.isclose(distance_from_centre, chopper_details.radius) or np.isclose(
             distance_from_centre, centre_to_bottom_of_slit
         )
