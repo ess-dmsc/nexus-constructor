@@ -47,7 +47,9 @@ class NexusConstructorMainWindow(QMainWindow):
             self.resize(
                 self._config.value(X_SIZE, 500), self._config.value(Y_SIZE, 500)
             )
-            self.move(int(self._config.value(X_LOC, 0)), int(self._config.value(Y_LOC, 0)))
+            self.move(
+                int(self._config.value(X_LOC, 0)), int(self._config.value(Y_LOC, 0))
+            )
             super().show()
 
     def closeEvent(self, event: QCloseEvent) -> None:
