@@ -66,8 +66,10 @@ class Ui_MainWindow(object):
         self.open_json_file_action.setShortcut(QKeySequence("Ctrl+O"))
         self.export_to_filewriter_JSON_action = QAction(MainWindow)
         self.export_to_filewriter_JSON_action.setShortcut(QKeySequence("Ctrl+S"))
+        self.export_to_compressed_filewriter_JSON_action = QAction(MainWindow)
         self.file_menu.addAction(self.open_json_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
+        self.file_menu.addAction(self.export_to_compressed_filewriter_JSON_action)
 
         self.view_menu = QMenu(self.menu_bar)
         self.show_action_labels = QAction(MainWindow)
@@ -91,7 +93,10 @@ class Ui_MainWindow(object):
         )
         self.file_menu.setTitle("File")
         self.open_json_file_action.setText("Open File writer JSON file")
-        self.export_to_filewriter_JSON_action.setText("Export to File writer JSON")
+        self.export_to_filewriter_JSON_action.setText("Export to file writer JSON")
+        self.export_to_compressed_filewriter_JSON_action.setText(
+            "Export to compressed file writer JSON"
+        )
 
         self.view_menu.setTitle("View")
         self.show_action_labels.setText("Show Button Labels")

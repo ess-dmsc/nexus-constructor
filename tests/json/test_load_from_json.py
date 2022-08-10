@@ -358,17 +358,6 @@ def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_n
     assert json_reader.entry_node[sample_name].name == sample_name
 
 
-@pytest.mark.skip(reason="this is not a valid test anymore")
-def test_GIVEN_no_nx_instrument_class_WHEN_loading_from_json_THEN_read_json_object_returns_false(
-    nexus_json_dictionary, json_reader
-):
-    nx_instrument = nexus_json_dictionary["children"][0]["children"][0]
-    nx_instrument["attributes"][0]["name"] = None
-    node = json_reader._read_json_object(nx_instrument)
-
-    assert not node
-
-
 def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contains_component_with_json_name(
     json_dict_with_component, json_reader
 ):
@@ -396,29 +385,12 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     assert node.children[0].nx_class == component_class
 
 
-@pytest.mark.skip(reason="not a valid test anymore due to reimplementation")
-def test_GIVEN_json_with_component_depending_on_transform_WHEN_loaded_THEN_component_in_model_contains_transform(
-    json_dict_with_component_and_transform, json_reader
-):
-    json_reader._load_from_json_dict(json_dict_with_component_and_transform)
-    component_found = False
-    for component in json_reader.entry_node["instrument"].children:
-        if component.name == "test_component":
-            for item in component.children:
-                if item.name == "transformations":
-                    component_found = True
-                    assert len([item["location"].values]) == 1
-                    assert item["location"]
-    assert component_found
-
-
 def contains_warning_of_type(
     json_warnings: JsonWarningsContainer, warning_type: Type[JsonWarning]
 ) -> bool:
     return any(isinstance(json_warning, warning_type) for json_warning in json_warnings)
 
 
-@pytest.mark.skip(reason="skipping for now as it returns a group")
 def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
     json_dict_with_component, json_reader
 ):
@@ -442,26 +414,6 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
     json_reader._load_from_json_dict(json_dict_with_component)
 
     assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
-
-
-@pytest.mark.skip(reason="groups should not care about components")
-def test_GIVEN_json_with_transformation_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
-    json_dict_with_component_and_transform, json_reader
-):
-    # Makes depends_on attribute of transformation point to a transformation which does not exist
-    for node in json_dict_with_component_and_transform["children"][0]["children"][0][
-        "children"
-    ][0]["children"]:
-        if "name" in node and node["name"] == "transformations":
-            for attribute in node["children"][0]["attributes"]:
-                if attribute["name"] == "depends_on":
-                    attribute["values"] = "/transform/does/not/exist"
-
-    json_reader._load_from_json_dict(json_dict_with_component_and_transform)
-
-    assert contains_warning_of_type(
-        json_reader.warnings, TransformDependencyMissing
-    ), "Expected a warning due to depends_on pointing to a non-existent transform"
 
 
 def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
