@@ -23,7 +23,8 @@ from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link
+from nexus_constructor.model.group import Group
+from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -33,7 +34,6 @@ from nexus_constructor.validators import (
     NameValidator,
     UnitValidator,
 )
-from nexus_constructor.model.group import Group
 
 
 class FieldNameLineEdit(QLineEdit):
@@ -79,25 +79,28 @@ class FieldWidget(QFrame):
 
     def __init__(
         self,
-        node_parent,
+        node_parent: Group,
         possible_fields=None,
         parent: QListWidget = None,
         parent_dataset: Dataset = None,
         hide_name_field: bool = False,
         show_only_f142_stream: bool = False,
+        allow_invalid_field_names: bool = False,
     ):
         super(FieldWidget, self).__init__(parent)
 
         possible_field_names = []
         self.default_field_types_dict = {}
         self.streams_widget: StreamFieldsWidget = None
+        self.old_streams_settings: StreamModule = None
+        self.valid_stream_widget_input: bool = True
         if possible_fields:
-            possible_field_names, default_field_types = zip(*possible_fields)
+            possible_field_names, default_field_types, units = zip(*possible_fields)
             self.default_field_types_dict = dict(
-                zip(possible_field_names, default_field_types)
+                zip(possible_field_names, zip(default_field_types, units))
             )
         self._show_only_f142_stream = show_only_f142_stream
-        self._node_parent = node_parent
+        self._node_parent: Group = node_parent
 
         self.edit_dialog = QDialog(parent=self)
         self.attrs_dialog = FieldAttrsDialog(parent=self)
@@ -106,8 +109,6 @@ class FieldWidget(QFrame):
             self.parent().parent().destroyed.connect(self.attrs_dialog.close)
 
         self.field_name_edit = FieldNameLineEdit(possible_field_names)
-        if self.default_field_types_dict:
-            self.field_name_edit.textChanged.connect(self.update_default_type)
         self.hide_name_field = hide_name_field
         if hide_name_field:
             self.name = str(uuid.uuid4())
@@ -130,6 +131,9 @@ class FieldWidget(QFrame):
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
         self.field_type_combo.currentIndexChanged.connect(self.field_type_changed)
+        self.field_type_combo.currentTextChanged.connect(
+            self._open_edit_dialog_if_stream
+        )
 
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
@@ -198,7 +202,12 @@ class FieldWidget(QFrame):
                 if child is not parent_dataset and hasattr(child, "name"):
                     existing_objects.append(child)
             emit = True
-        self._set_up_name_validator(existing_objects=existing_objects)
+        if allow_invalid_field_names:
+            self._set_up_name_validator(
+                existing_objects=existing_objects, invalid_field_names=[]
+            )
+        else:
+            self._set_up_name_validator(existing_objects=existing_objects)
         self.field_name_edit.validator().is_valid.emit(emit)
 
         self.value_line_edit.installEventFilter(self)
@@ -209,23 +218,41 @@ class FieldWidget(QFrame):
         self.value_type_combo.highlighted.connect(self.something_clicked)
         self.field_type_combo.highlighted.connect(self.something_clicked)
 
+        if self.default_field_types_dict:
+            self.field_name_edit.textChanged.connect(self.update_default_type)
+
         # Set the layout for the default field type
         self.field_type_changed()
 
     def _set_up_name_validator(
-        self, existing_objects: List[Union["FieldWidget", FileWriterModule]]
+        self,
+        existing_objects: List[Union["FieldWidget", FileWriterModule]],
+        invalid_field_names: List[str] = INVALID_FIELD_NAMES,
     ):
         self.field_name_edit.setValidator(
-            NameValidator(existing_objects, invalid_names=INVALID_FIELD_NAMES)
+            NameValidator(existing_objects, invalid_names=invalid_field_names)
         )
         self.field_name_edit.validator().is_valid.connect(
             partial(
                 validate_line_edit,
                 self.field_name_edit,
                 tooltip_on_accept="Field name is valid.",
-                tooltip_on_reject="Field name is not valid",
+                tooltip_on_reject="Field name is not valid.",
             )
         )
+
+    def disable_editing(self):
+        self.edit_button.setText("View")
+        self.streams_widget.ok_button.setDisabled(True)
+        self.streams_widget.ok_button.setVisible(False)
+        self.streams_widget.cancel_button.setText("Finished viewing")
+        self.streams_widget.schema_combo.currentTextChanged.connect(
+            self.streams_widget._schema_type_changed
+        )
+
+    def _open_edit_dialog_if_stream(self):
+        if self.field_type == FieldType.kafka_stream and self.isVisible():
+            self.show_edit_dialog()
 
     @property
     def field_type(self) -> FieldType:
@@ -324,9 +351,14 @@ class FieldWidget(QFrame):
         self.units_line_edit.setText(new_units)
 
     def update_default_type(self):
-        self.value_type_combo.setCurrentText(
-            self.default_field_types_dict.get(self.field_name_edit.text(), "double")
-        )
+        default_meta = self.default_field_types_dict.get(self.field_name_edit.text())
+        if not default_meta:
+            dtype = "double"
+            units = ""
+        else:
+            dtype, units = default_meta
+        self.value_type_combo.setCurrentText(dtype)
+        self.units_line_edit.setText(units)
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.MouseButtonPress:
@@ -343,17 +375,27 @@ class FieldWidget(QFrame):
         self.edit_dialog.setModal(True)
         self._set_up_value_validator(False)
         self.enable_3d_value_spinbox.emit(not self.field_type_is_scalar())
-
+        if self.streams_widget and self.streams_widget._old_schema:
+            self._node_parent.add_stream_module(self.streams_widget._old_schema)
         if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
         elif self.field_type == FieldType.array_dataset:
             self.set_visibility(False, False, True, True)
             self.table_view = ArrayDatasetTableWidget()
+            self._set_edit_button_state(True)
         elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
             self.streams_widget = StreamFieldsWidget(
-                self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
+                self.edit_dialog,
+                show_only_f142_stream=self._show_only_f142_stream,
+                node_parent=self._node_parent,
             )
+            self.edit_button.clicked.connect(self.streams_widget.update_schema_combo)
+            self.streams_widget.ok_validator.is_valid.connect(
+                self._set_edit_button_state
+            )
+            self.streams_widget.ok_validator.validate_ok()
+            self.streams_widget.cancel_button.clicked.connect(self.reset_field_type)
         elif self.field_type == FieldType.link:
             self.set_visibility(
                 True,
@@ -364,6 +406,25 @@ class FieldWidget(QFrame):
                 show_attrs_edit=False,
             )
             self._set_up_value_validator(False)
+
+    def reset_field_type(self):
+        self.streams_widget.parentWidget().close()
+        tmp_streams_widget = StreamFieldsWidget(
+            self.edit_dialog, show_only_f142_stream=self._show_only_f142_stream
+        )
+        tmp_streams_widget.update_existing_stream_info(self.old_streams_settings)
+        if not tmp_streams_widget.ok_validator.validate_ok():
+            self.field_type_combo.setCurrentText("Scalar dataset")
+        else:
+            self.streams_widget.update_existing_stream_info(self.old_streams_settings)
+            self.streams_widget.reset_possible_stream_modules()
+
+    def _set_edit_button_state(self, value: bool):
+        if value:
+            self.edit_button.setStyleSheet("QPushButton {color: black;}")
+        else:
+            self.edit_button.setStyleSheet("QPushButton {color: red;}")
+        self.valid_stream_widget_input = value
 
     def _set_up_value_validator(self, is_link: bool):
         self.value_line_edit.setValidator(None)
@@ -411,6 +472,12 @@ class FieldWidget(QFrame):
         )
 
     def show_edit_dialog(self):
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() | Qt.CustomizeWindowHint
+        )
+        self.edit_dialog.setWindowFlags(
+            self.edit_dialog.windowFlags() & ~Qt.WindowCloseButtonHint
+        )
         if self.field_type == FieldType.array_dataset:
             self.edit_dialog.setLayout(QGridLayout())
             self.table_view.model.update_array_dtype(
@@ -421,6 +488,10 @@ class FieldWidget(QFrame):
                 f"Edit {self.value_type_combo.currentText()} Array field"
             )
         elif self.field_type == FieldType.kafka_stream:
+            if self.streams_widget:
+                self.old_streams_settings = self.streams_widget.get_stream_module(
+                    self._node_parent
+                )
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
         if self.edit_dialog.isVisible():

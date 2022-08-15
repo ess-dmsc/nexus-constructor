@@ -31,7 +31,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         super().setupUi(main_window)
         self.open_json_file_action.triggered.connect(self.open_json_file)
         self.export_to_filewriter_JSON_action.triggered.connect(
-            self.save_to_filewriter_json
+            self.save_to_uncompressed_filewriter_json
+        )
+        self.export_to_compressed_filewriter_JSON_action.triggered.connect(
+            self.save_to_compressed_filewriter_json
         )
         self.show_action_labels.triggered.connect(
             lambda: self.on_show_action_labels(self.show_action_labels.isChecked())
@@ -98,21 +101,39 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.show_add_component_window(new_group, new_group=True)
 
     def show_edit_component_dialog(self):
-        selected_component = (
-            self.component_tree_view_tab.component_tree_view.selectedIndexes()[
-                0
-            ].internalPointer()
-        )
-        self.show_add_component_window(selected_component, False)
+        try:
+            selected_component = (
+                self.component_tree_view_tab.component_tree_view.selectedIndexes()[
+                    0
+                ].internalPointer()
+            )
+            self.show_add_component_window(selected_component, False)
+        except IndexError:
+            print("Select a valid group in the NeXus tree view before editing.")
 
-    def save_to_filewriter_json(self):
-        filename = file_dialog(True, "Save File writer JSON File", JSON_FILE_TYPES)
+    def save_to_compressed_filewriter_json(self):
+        self._save_to_filewriter_json(True)
+
+    def save_to_uncompressed_filewriter_json(self):
+        self._save_to_filewriter_json(False)
+
+    def _save_to_filewriter_json(self, save_compressed_file):
+        if save_compressed_file:
+            dialog_text = "Save Compressed File Writer JSON File"
+        else:
+            dialog_text = "Save File Writer JSON File"
+        filename = file_dialog(True, dialog_text, JSON_FILE_TYPES)
 
         if filename:
             if not filename.endswith(".json"):
                 filename += ".json"
             error_collector: List[str] = []
-            data_dump = json.dumps(self.model.as_dict(error_collector), indent=2)
+            if save_compressed_file:
+                data_dump = json.dumps(
+                    self.model.as_dict(error_collector), separators=(",", ":")
+                )
+            else:
+                data_dump = json.dumps(self.model.as_dict(error_collector), indent=2)
             if error_collector:
                 show_errors_message(error_collector)
                 return
@@ -163,8 +184,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             scene_widget=self.sceneWidget,
             initial_edit=new_group,
             nx_classes=self.nx_classes,
+            tree_view_updater=self._update_model,
         )
         self.add_component_window.show()
+
+    def _update_model(self):
+        self.component_tree_view_tab.set_up_model(self.model)
 
 
 def show_errors_message(errors: List[str]):

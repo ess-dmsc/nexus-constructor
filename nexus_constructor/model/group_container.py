@@ -1,6 +1,7 @@
-from .group import Group
-from .component import Component
 from typing import Union
+
+from .component import Component
+from .group import Group
 
 
 class GroupContainer:

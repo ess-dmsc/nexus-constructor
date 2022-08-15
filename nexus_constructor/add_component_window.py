@@ -1,7 +1,8 @@
 from collections import OrderedDict
 from copy import deepcopy
 from functools import partial
-from typing import List
+from os import path
+from typing import Callable, List
 
 from PySide2.QtCore import Qt, QUrl, Signal
 from PySide2.QtGui import QKeyEvent, QVector3D
@@ -55,11 +56,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
         scene_widget: QWidget,
         initial_edit: bool,
         nx_classes=None,
+        tree_view_updater: Callable = None,
     ):
+        self._tree_view_updater = tree_view_updater
         self._scene_widget = scene_widget
         self._group_to_edit_backup = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
+        file_dir = path.dirname(__file__)
+        self.local_url_root = path.join(
+            file_dir, "..", "nx-class-documentation", "html"
+        )
         super().__init__(parent, self._group_container)
         super().setupUi()
         if nx_classes is None:
@@ -122,6 +129,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.component_model.tree_root = self.model.entry
             self.close()
 
+    def close(self) -> bool:
+        if self._tree_view_updater:
+            self._tree_view_updater()
+        return super().close()
+
     def _handle_class_change(self):
         c_nx_class = self.componentTypeComboBox.currentText()
         c_attributes = self._group_container.group.attributes
@@ -158,11 +170,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.ok_button.setEnabled(False)
 
         # Set default URL to nexus base classes in web view
-        self.webEngineView.setUrl(
-            QUrl(
-                "http://download.nexusformat.org/doc/html/classes/base_classes/index.html"
-            )
+        local_url_index = QUrl.fromLocalFile(
+            path.join(self.local_url_root, "index.html")
         )
+        self.webEngineView.setUrl(local_url_index)
+        self.descriptionPlainTextEdit.setText(self._group_container.group.description)
 
         self.placeholder_checkbox.stateChanged.connect(self._disable_fields_and_buttons)
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
@@ -383,8 +395,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def add_field(self) -> FieldWidget:
         item = QListWidgetItem()
         field = FieldWidget(
-            self._group_container.group, self.possible_fields, self.fieldsListWidget
+            self._group_container.group,
+            self.possible_fields,
+            self.fieldsListWidget,
         )
+        item.setData(Qt.UserRole, field)
         field.something_clicked.connect(partial(self.select_field, item))
         self.nx_class_changed.connect(field.field_name_edit.update_possible_fields)
         item.setSizeHint(field.sizeHint())
@@ -398,6 +413,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def remove_field(self):
         for item in self.fieldsListWidget.selectedItems():
+            data = item.data(Qt.UserRole)
+            if data.streams_widget:
+                self._group_container.group.add_stream_module(
+                    data.streams_widget._old_schema
+                )
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
 
     def on_nx_class_changed(self):
@@ -407,11 +427,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.placeholder_checkbox.setChecked(False)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
-        self.webEngineView.setUrl(
-            QUrl(
-                f"http://download.nexusformat.org/sphinx/classes/base_classes/{c_nx_class}.html"
-            )
+        class_html = path.join(
+            self.local_url_root, "classes", "base_classes", f"{c_nx_class}.html"
         )
+        local_url_class = QUrl.fromLocalFile(class_html)
+        self.webEngineView.setUrl(local_url_class)
 
         self.possible_fields = self.nx_component_classes[c_nx_class]
         try:
@@ -533,7 +553,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             pixel_data = None
 
         component = self.finalise_group(pixel_data)
-
         if isinstance(component, Group):
             component.group_placeholder = self.placeholder_checkbox.isChecked()
         if isinstance(component, Component):
@@ -559,12 +578,15 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: The geometry object.
         """
         c_group = self._group_container.group
-
-        for child in self._group_container.group.children:
-            if not isinstance(child, Group):
-                self._group_container.group.children.remove(child)
-
+        group_children = []
+        for child in c_group.children:
+            if isinstance(child, Group):
+                group_children.append(child)
+        c_group.children = []
+        for child in group_children:
+            c_group[child.name] = child
         add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
+        self.write_description_to_group(c_group)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
             self._scene_widget.delete_component(c_group.name)
@@ -573,6 +595,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.write_pixel_data_to_component(c_group, pixel_data)
 
         return c_group
+
+    def write_description_to_group(self, c_group: Group):
+        description = self.descriptionPlainTextEdit.text()
+        if description:
+            c_group.description = description
 
     def write_pixel_data_to_component(
         self, component: Component, pixel_data: PixelData

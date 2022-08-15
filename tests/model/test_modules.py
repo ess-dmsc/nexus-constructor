@@ -6,6 +6,7 @@ from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import (
     Dataset,
     EV42Stream,
+    EV44Stream,
     F142Stream,
     Link,
     NS10Stream,
@@ -99,6 +100,7 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
         TDCTStream(parent_node=None, source=source, topic=topic),
         NS10Stream(parent_node=None, source=source, topic=topic),
         EV42Stream(parent_node=None, source=source, topic=topic),
+        EV44Stream(parent_node=None, source=source, topic=topic),
     ],
 )
 def test_streams_with_name_source_and_topic(stream):

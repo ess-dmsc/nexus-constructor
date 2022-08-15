@@ -62,7 +62,9 @@ class ModuleViewEditable(QGroupBox):
             parent,
         )
         layout = QVBoxLayout()
-        self.field_widget = FieldWidget(module.parent_node, parent_dataset=module)
+        self.field_widget = FieldWidget(
+            module.parent_node, parent_dataset=module, allow_invalid_field_names=True
+        )
         self.field_widget.field_type_combo.setEnabled(False)
         self.module = module
         self.model = model
@@ -81,6 +83,10 @@ class ModuleViewEditable(QGroupBox):
             update_function = find_field_type(module, [])
             if update_function is not None:
                 update_function(module, self.field_widget)
+            if module.writer_module in [
+                StreamMode.value for StreamMode in StreamModules
+            ]:
+                self.field_widget.disable_editing()
         else:
             update_function = find_field_type(module.parent_node, [])
             if update_function is not None:
@@ -130,5 +136,10 @@ class ModuleViewEditable(QGroupBox):
                     self.module.array_size.append(int(table_value.text()))
         elif self.module.writer_module == StreamModules.F142.value:
             self.field_widget.streams_widget.record_advanced_f142_values(self.module)
-        elif self.module.writer_module == StreamModules.EV42.value:
+        elif self.module.writer_module in [
+            StreamModules.EV42.value,
+            StreamModules.EV44.value,
+        ]:
             self.field_widget.streams_widget.record_advanced_ev42_values(self.module)
+        elif self.module.writer_module == StreamModules.HS01.value:
+            self.field_widget.streams_widget.record_advanced_hs01_values(self.module)

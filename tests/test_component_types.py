@@ -68,7 +68,7 @@ def test_GIVEN_a_valid_base_class_containing_name_key_and_name_field_WHEN_creati
     component_base_classes = dict()
     _create_base_class_dict(xml, None, base_classes, component_base_classes)
     assert class_name in base_classes.keys()
-    assert ("name", "string") in base_classes[class_name]
+    assert ("name", "string", "") in base_classes[class_name]
 
 
 def test_GIVEN_a_valid_base_class_with_no_fields_WHEN_creating_base_class_dict_THEN_dict_contains_empty_list_for_value():

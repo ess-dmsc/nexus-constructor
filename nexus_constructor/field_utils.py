@@ -14,7 +14,7 @@ from nexus_constructor.validators import FieldType
 if TYPE_CHECKING:
     from PySide2.QtWidgets import QFrame  # noqa: F401
 
-    from nexus_constructor.model.module import HS00Stream  # noqa: F401
+    from nexus_constructor.model.module import HS01Stream  # noqa: F401
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
     from nexus_constructor.stream_fields_widget import StreamFieldsWidget  # noqa: F401
 
@@ -68,6 +68,7 @@ def update_existing_stream_field(
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.kafka_stream
+    new_ui_field._old_schema = field.writer_module  # type: ignore
     new_ui_field.streams_widget.update_existing_stream_info(field)
     new_ui_field.attrs = field
     units = field.attributes.get_attribute_value(CommonAttrs.UNITS)

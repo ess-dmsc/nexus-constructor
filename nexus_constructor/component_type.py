@@ -142,6 +142,35 @@ nexus_dtype_dict = {
     "NX_UINT": "uint64",
 }
 
+nexus_units_dict = {
+    "NX_ANGLE": "rad",
+    "NX_AREA": "m^2",
+    "NX_CHARGE": "C",
+    "NX_CROSS_SECTION": "m^2",
+    "NX_CURRENT": "A",
+    "NX_EMITTANCE": "nm*rad",
+    "NX_ENERGY": "J",
+    "NX_FLUX": "1/s/m^2",
+    "NX_FREQUENCY": "Hz",
+    "NX_LENGTH": "m",
+    "NX_MASS": "kg",
+    "NX_MASS_DENSITY": "kg/m^3",
+    "NX_MOLECULAR_WEIGHT": "g/mol",
+    "NX_PERIOD": "s",
+    "NX_PER_AREA": "1/m^2",
+    "NX_PER_LENGTH": "1/m",
+    "NX_POWER": "W",
+    "NX_PRESSURE": "Pa",
+    "NX_SCATTERING_LENGTH_DENSITY": "m/m^3",
+    "NX_TEMPERATURE": "K",
+    "NX_TIME": "s",
+    "NX_TIME_OF_FLIGHT": "s",
+    "NX_VOLTAGE": "V",
+    "NX_VOLUME": "m^3",
+    "NX_WAVELENGTH": "nm",
+    "NX_WAVENUMBER": "1/nm",
+}
+
 
 def _create_base_class_dict(
     xml_text, not_allowed, class_definitions, component_definitions
@@ -159,15 +188,20 @@ def _create_base_class_dict(
         try:
             for field in fields:
                 data_type = "string"
+                units = ""
                 if "@type" in field:
                     data_type = nexus_dtype_dict.get(field["@type"], "double")
-                class_fields.append((field["@name"], data_type))
-
+                if "@units" in field:
+                    units = nexus_units_dict.get(field["@units"], "")
+                class_fields.append((field["@name"], data_type, units))
         except Exception:
             data_type = "string"
+            units = ""
             if "@type" in fields:
                 data_type = nexus_dtype_dict.get(fields["@type"], "double")
-            class_fields.append((fields["@name"], data_type))
+            if "@units" in fields:
+                units = nexus_units_dict.get(fields["@units"], "")
+            class_fields.append((fields["@name"], data_type, units))
     except KeyError:
         pass
     class_definitions[nx_class_name] = class_fields
