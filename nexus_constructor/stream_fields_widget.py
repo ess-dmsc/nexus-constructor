@@ -382,7 +382,8 @@ class StreamFieldsWidget(QDialog):
         new_schema = self.schema_combo.currentText()
         if self._old_schema:
             self._node_parent.add_stream_module(self._old_schema)
-        self._node_parent.remove_stream_module(new_schema)
+        if self._node_parent:
+            self._node_parent.remove_stream_module(new_schema)
         self._old_schema = new_schema
 
     def reset_possible_stream_modules(self):
