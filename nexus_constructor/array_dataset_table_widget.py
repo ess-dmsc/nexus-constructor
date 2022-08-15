@@ -69,7 +69,13 @@ class ArrayDatasetTableModel(QAbstractTableModel):
         """
         self.beginResetModel()
         try:
-            self.array = np.array(self.array.data, dtype=dtype)
+            if isinstance(self.array, list):
+                if np.isscalar(self.array[0]):
+                    self.array = np.array([self.array], dtype=dtype).T
+                else:
+                    self.array = np.array(self.array, dtype=dtype)
+            else:
+                self.array = np.array(self.array.data, dtype=dtype)
         except ValueError:
             self.array = np.array([[0]], dtype=dtype)
         self.parent().view.itemDelegate().dtype = dtype
