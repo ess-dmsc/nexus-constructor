@@ -302,6 +302,8 @@ def create_fw_module_object(mod_type, configuration, parent_node):
         f142_type = None
         if CommonKeys.TYPE in configuration:
             f142_type = configuration[CommonKeys.TYPE]
+        elif CommonKeys.DATA_TYPE in configuration:
+            f142_type = configuration[CommonKeys.DATA_TYPE]
         fw_mod_obj = fw_mod_class(
             topic=configuration[TOPIC],
             source=configuration[SOURCE],
