@@ -369,6 +369,8 @@ class StreamFieldsWidget(QDialog):
 
     def update_schema_combo(self):
         self.update_node_parent_reference()
+        if not self._node_parent:
+            return
         if self._old_schema:
             self._node_parent.add_stream_module(self._old_schema)
         self._add_items_to_schema_combo()
@@ -379,6 +381,8 @@ class StreamFieldsWidget(QDialog):
 
     def _update_possible_stream_modules(self):
         self.update_node_parent_reference()
+        if not self._node_parent:
+            return
         new_schema = self.schema_combo.currentText()
         if self._old_schema:
             self._node_parent.add_stream_module(self._old_schema)
@@ -388,6 +392,8 @@ class StreamFieldsWidget(QDialog):
 
     def reset_possible_stream_modules(self):
         self.update_node_parent_reference()
+        if not self._node_parent:
+            return
         self._node_parent.remove_stream_module(self._old_schema)
 
     def advanced_options_button_clicked(self):
