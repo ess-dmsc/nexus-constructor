@@ -42,12 +42,8 @@ from nexus_constructor.model.module import (
     TDCTStream,
     WriterModules,
 )
-from nexus_constructor.ui_utils import validate_general_widget, validate_line_edit
-from nexus_constructor.validators import (
-    NoEmptyStringValidator,
-    SchemaSelectionValidator,
-    StreamWidgetValidator,
-)
+from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import NoEmptyStringValidator, StreamWidgetValidator
 from nexus_constructor.widgets.dropdown_list import DropDownList
 
 F142_TYPES = [
@@ -204,11 +200,6 @@ class StreamFieldsWidget(QDialog):
 
         self.schema_label = QLabel("Schema: ")
         self.schema_combo = DropDownList()
-        self.schema_validator = SchemaSelectionValidator()
-        self.schema_combo.setValidator(self.schema_validator)
-        self.schema_validator.is_valid.connect(
-            partial(validate_general_widget, self.schema_combo)
-        )
 
         self.topic_label = QLabel("Topic: ")
         self.topic_line_edit = QLineEdit()
@@ -247,9 +238,6 @@ class StreamFieldsWidget(QDialog):
         )
         self.source_line_edit.validator().is_valid.connect(
             self.ok_validator.set_source_valid
-        )
-        self.schema_combo.validator().is_valid.connect(
-            self.ok_validator.set_schema_valid
         )
 
         self.array_size_label = QLabel("Array size: ")
@@ -685,10 +673,6 @@ class StreamFieldsWidget(QDialog):
             raise TypeError("Field is NoneType when expecting type StreamModule.")
         if isinstance(field, Group):
             field = field.children[0]
-        if hasattr(field, "parent_node") and isinstance(field.parent_node, Group):
-            self.schema_validator.set_group(field.parent_node)
-        else:
-            self.schema_validator.set_group(None)
         schema = field.writer_module
 
         # Needed to correctly add the used schema when the module was created
@@ -697,8 +681,6 @@ class StreamFieldsWidget(QDialog):
         self.update_node_parent_reference()
         self.__add_items_to_schema_combo()
         self.schema_combo.setCurrentText(schema)
-
-        self.schema_validator.validate(schema, 0)
         self.topic_line_edit.setText(field.topic)
         self.topic_validator.validate(field.topic, 0)
         self.source_line_edit.setText(field.source)
