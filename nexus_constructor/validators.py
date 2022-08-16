@@ -1,7 +1,7 @@
 import os
 import re
 from enum import Enum
-from typing import Callable, List, Optional
+from typing import Callable, List
 
 import numpy as np
 import pint
@@ -344,7 +344,6 @@ class StreamWidgetValidator(QObject):
         super().__init__()
         self.topic_is_valid = False
         self.source_is_valid = False
-        self.schema_is_valid = False
 
     def set_topic_valid(self, is_valid):
         self.topic_is_valid = is_valid
@@ -352,10 +351,6 @@ class StreamWidgetValidator(QObject):
 
     def set_source_valid(self, is_valid):
         self.source_is_valid = is_valid
-        self.validate_ok()
-
-    def set_schema_valid(self, is_valid):
-        self.schema_is_valid = is_valid
         self.validate_ok()
 
     def validate_ok(self):
@@ -366,7 +361,6 @@ class StreamWidgetValidator(QObject):
         unacceptable = [
             not self.topic_is_valid,
             not self.source_is_valid,
-            not self.schema_is_valid,
         ]
         self.is_valid.emit(not any(unacceptable))
         return not any(unacceptable)
@@ -522,42 +516,6 @@ class NoEmptyStringValidator(QValidator):
 
     def validate(self, input: str, pos: int) -> QValidator.State:
         if input == "":
-            self.is_valid.emit(False)
-            return QValidator.Intermediate
-        self.is_valid.emit(True)
-        return QValidator.Acceptable
-
-    is_valid = Signal(bool)
-
-
-from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import FileWriterModule
-
-
-class SchemaSelectionValidator(QValidator):
-    """
-    Multiple schemas of the same type or some combinations of schemas in the same group are not allowed. Check/verify this.
-    """
-
-    def __init__(
-        self,
-    ):
-        super().__init__()
-        self.parent_group: Optional[Group] = None
-
-    def set_group(self, group: Optional[Group] = None):
-        self.parent_group = group
-
-    def validate(self, input: str, pos: int) -> QValidator.State:
-        if not self.parent_group:
-            self.is_valid.emit(True)
-            return QValidator.Acceptable
-        list_of_writer_modules = [
-            m.writer_module
-            for m in self.parent_group.children
-            if isinstance(m, FileWriterModule)
-        ]
-        if list_of_writer_modules.count(input) > 1:
             self.is_valid.emit(False)
             return QValidator.Intermediate
         self.is_valid.emit(True)
