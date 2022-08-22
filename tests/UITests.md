@@ -86,27 +86,19 @@ the red sample cube, with center in the rear upper corner.
 - The cylinders radius should intersect the upper edges of the cubes front faces, and the rear edges
 of the cubes bottom faces.
 
-## Validating Component Names
+## Validating Group Names
 
-Click the 'Add component' button.  
-Select a Cylinder geometry and leave the other options untouched.  
-Try to name this new component "Sample".
+Click the 'Group' button after selecting 'entry (NXentry)' in the NeXus tree view.  
+- Create an 'NXsample' component called "Sample" under 'entry (NXentry)'.
+- Now create another 'NXsample' and try to name this new component "Sample" as well.
 - The text field will accept the name "Sampl"  
-- Once you try to type in the remaining "e" a red cross will appear.
-- Placing your mouse over the cross will show a message saying that component names must be unique.
-
-Remove focus from the text field by selecting a different field or by moving the mouse out of the window.
-- The red cross disappear and the message will no longer be accessible.
-- The component name will still be "Sampl".
-
-Change the name back to its default and click "Add" without changing any of the other options.  
-Expand the component details box in the left-hand-side of the main window.  
-- Repeat the steps above and you should observe the same behaviour.
-
-Change the name back to its default again.  
-Expand the component details box.  
-Click the 'Full editor' button.  
-- Repeat the steps above and you should observe the same behaviour.
+- Once you try to type in the remaining "e" the line edit should turn red.
+- Placing your mouse over the line edit will show a message saying that group name is not valid, 
+  and it will suggest naming it "Sample1" instead.
+- It should not be possible to press 'Add group' while the line edit is colored red.
+- The rule is that groups on the save level must have unique names. We should however be able 
+  to create an 'NXinstrument' under the 'entry (NXentry)' node and under the instrument create a
+  'NXsample' named Sample. Confirm that this is in reality the case!
 
 ## Validating Units 
 
@@ -232,7 +224,7 @@ Open ui_test.nxs in HDFView.
 group 'entry'.
 - 'instrument' should contain another group called 'Cube detector'.
 
-## Removing components
+## Removing groups
 
 Set Monitor's transform parent to 'Cube Detector'.
 - Cube Detector's delete button should grey out, and clicking it result in nothing.
@@ -245,11 +237,6 @@ Click Monitor's delete button.
 Click Cube Detector's delete button.
 - It should also disappear from the components list.
 - It's green cube should no longer be in the visualisation.
-
-## Sample details
-
-- There should be no delete button or transform controls in the Sample box in the components list.
-- Clicking it's full editor button will open an editor window without pixel or transform fields.
 
 ## Loading json
 
