@@ -12,8 +12,8 @@ import signal
 import sys
 
 from PySide2 import QtCore
-from PySide2.QtGui import QIcon, QCloseEvent
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtGui import QCloseEvent, QIcon
+from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.main_window import MainWindow
@@ -53,13 +53,23 @@ class NexusConstructorMainWindow(QMainWindow):
             super().show()
 
     def closeEvent(self, event: QCloseEvent) -> None:
-        window_size = self.size()
-        self._config.setValue(X_SIZE, window_size.width())
-        self._config.setValue(Y_SIZE, window_size.height())
-        window_loc = self.pos()
-        self._config.setValue(X_LOC, window_loc.x())
-        self._config.setValue(Y_LOC, window_loc.y())
-        event.accept()
+        msg = QMessageBox.question(
+            None,
+            "Close application",
+            "Are you sure you want to quit?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+        if msg == QMessageBox.Yes:
+            window_size = self.size()
+            self._config.setValue(X_SIZE, window_size.width())
+            self._config.setValue(Y_SIZE, window_size.height())
+            window_loc = self.pos()
+            self._config.setValue(X_LOC, window_loc.x())
+            self._config.setValue(Y_LOC, window_loc.y())
+            event.accept()
+        else:
+            event.ignore()
 
 
 if __name__ == "__main__":

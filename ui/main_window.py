@@ -62,11 +62,14 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menu_bar)
         self.status_bar = QStatusBar(MainWindow)
         MainWindow.setStatusBar(self.status_bar)
+        self.new_json_template_action = QAction(MainWindow)
+        self.new_json_template_action.setShortcut(QKeySequence("Ctrl+N"))
         self.open_json_file_action = QAction(MainWindow)
         self.open_json_file_action.setShortcut(QKeySequence("Ctrl+O"))
         self.export_to_filewriter_JSON_action = QAction(MainWindow)
         self.export_to_filewriter_JSON_action.setShortcut(QKeySequence("Ctrl+S"))
         self.export_to_compressed_filewriter_JSON_action = QAction(MainWindow)
+        self.file_menu.addAction(self.new_json_template_action)
         self.file_menu.addAction(self.open_json_file_action)
         self.file_menu.addAction(self.export_to_filewriter_JSON_action)
         self.file_menu.addAction(self.export_to_compressed_filewriter_JSON_action)
@@ -92,6 +95,7 @@ class Ui_MainWindow(object):
             self.tab_widget.indexOf(self.component_tree_view_tab), "Nexus Structure"
         )
         self.file_menu.setTitle("File")
+        self.new_json_template_action.setText("Create new NeXus JSON template")
         self.open_json_file_action.setText("Open File writer JSON file")
         self.export_to_filewriter_JSON_action.setText("Export to file writer JSON")
         self.export_to_compressed_filewriter_JSON_action.setText(

@@ -40,6 +40,9 @@ class NexusTreeModel(QAbstractItemModel):
             Tuple[Union[Group, FileWriterModule], QModelIndex]
         ] = (self.model.entry, None)
 
+    def replace_model(self, model):
+        self.model = model
+
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
 
