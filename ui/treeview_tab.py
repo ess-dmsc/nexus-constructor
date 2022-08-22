@@ -122,6 +122,10 @@ class ComponentTreeViewTab(QWidget):
     def reset_model(self):
         self.set_up_model(self.component_model.model)
 
+    def replace_model(self, model: Model = Model()):
+        self.component_model.replace_model(model)
+        self.set_up_model(self.component_model.model)
+
     def _set_button_state(self):
         set_button_states(
             self.component_tree_view,
@@ -155,9 +159,13 @@ class ComponentTreeViewTab(QWidget):
         if len(selected[0].data().parent_node.children) == 1:
             new_selection_index = selected[0].parent()
         elif selected[0].row() > 0:
-            new_selection_index = self.component_model.parent(selected[0]).child(selected[0].row() - 1, 0)
+            new_selection_index = self.component_model.parent(selected[0]).child(
+                selected[0].row() - 1, 0
+            )
         elif selected[-1].row() <= len(selected[-1].data().parent_node.children) - 1:
-            new_selection_index = self.component_model.parent(selected[-1]).child(selected[-1].row(), 0)
+            new_selection_index = self.component_model.parent(selected[-1]).child(
+                selected[-1].row(), 0
+            )
         else:
             new_selection_index = selected[0].parent()
         for item in selected:
