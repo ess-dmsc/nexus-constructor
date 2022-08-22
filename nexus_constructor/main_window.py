@@ -33,6 +33,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.export_to_filewriter_JSON_action.triggered.connect(
             self.save_to_uncompressed_filewriter_json
         )
+        self.new_json_template_action.triggered.connect(self.create_new_json_template)
         self.export_to_compressed_filewriter_JSON_action.triggered.connect(
             self.save_to_compressed_filewriter_json
         )
@@ -110,6 +111,20 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.show_add_component_window(selected_component, False)
         except IndexError:
             print("Select a valid group in the NeXus tree view before editing.")
+
+    def create_new_json_template(self):
+        msg = QMessageBox.question(
+            None,
+            "New NeXus JSON template",
+            "Are you sure you want to create a new NeXus JSON template?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+        if msg == QMessageBox.Yes:
+            self.model = Model()
+            self._setup_model_signals()
+            self.component_tree_view_tab.replace_model(self.model)
+            self._update_views()
 
     def save_to_compressed_filewriter_json(self):
         self._save_to_filewriter_json(True)
