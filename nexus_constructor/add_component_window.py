@@ -227,7 +227,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         self.ok_validator = OkValidator(
-            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
+            self.noShapeRadioButton,
+            self.meshRadioButton,
+            self.pixel_options.validator,
+            self.fieldsListWidget,
         )
 
         c_group = self._group_container.group
@@ -274,6 +277,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
         self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
+
+        self.fieldsListWidget.currentTextChanged.connect(
+            self.ok_validator.validate_field_widget_list
+        )
 
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
@@ -420,6 +427,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
+        self.ok_validator.validate_field_widget_list()
         return field
 
     def select_field(self, widget):
@@ -433,6 +441,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                     data.streams_widget._old_schema
                 )
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
+        self.ok_validator.validate_field_widget_list()
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()

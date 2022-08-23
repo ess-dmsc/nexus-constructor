@@ -7,7 +7,7 @@ import numpy as np
 import pint
 from PySide2.QtCore import QObject, Signal
 from PySide2.QtGui import QIntValidator, QValidator
-from PySide2.QtWidgets import QComboBox, QRadioButton, QWidget
+from PySide2.QtWidgets import QComboBox, QListWidget, QRadioButton, QWidget
 from stl import mesh
 
 from nexus_constructor.common_attrs import SCALAR
@@ -290,6 +290,7 @@ class OkValidator(QObject):
         no_geometry_button: QRadioButton,
         mesh_button: QRadioButton,
         pixel_validator: PixelValidator,
+        field_widgets: QListWidget,
     ):
         super().__init__()
         self.name_is_valid = False
@@ -299,7 +300,9 @@ class OkValidator(QObject):
         self.no_geometry_button = no_geometry_button
         self.mesh_button = mesh_button
         self.pixel_validator = pixel_validator
+        self.field_widgets = field_widgets
         self.pixel_validator.reassess_validity.connect(self.validate_ok)
+        self.acceptable_field_widgets: List[bool] = []
 
     def set_name_valid(self, is_valid):
         self.name_is_valid = is_valid
@@ -317,17 +320,33 @@ class OkValidator(QObject):
         self.nx_class_is_valid = is_valid
         self.validate_ok()
 
+    def validate_field_widget_list(self):
+        widget_list = []
+        self.unacceptable_field_widgets = []
+        for i in range(self.field_widgets.count()):
+            widget_list.append(
+                self.field_widgets.itemWidget(self.field_widgets.item(i))
+            )
+        self.acceptable_field_widgets = [
+            item.is_valid() if item else True for item in widget_list
+        ]
+        self.validate_ok()
+
     def validate_ok(self):
         """
         Validates the fields in order to dictate whether the OK button should be disabled or enabled.
         :return: None, but emits the isValid signal.
         """
-        unacceptable = [
-            not self.nx_class_is_valid,
-            not self.name_is_valid,
-            not self.no_geometry_button.isChecked() and not self.units_are_valid,
-            self.mesh_button.isChecked() and not self.file_is_valid,
-        ] + self.pixel_validator.unacceptable_pixel_states()
+        unacceptable = (
+            [
+                not self.nx_class_is_valid,
+                not self.name_is_valid,
+                not self.no_geometry_button.isChecked() and not self.units_are_valid,
+                self.mesh_button.isChecked() and not self.file_is_valid,
+            ]
+            + self.pixel_validator.unacceptable_pixel_states()
+            + [not val for val in self.acceptable_field_widgets]
+        )
         self.is_valid.emit(not any(unacceptable))
 
     # Signal to indicate that the fields are valid or invalid. False: invalid.
