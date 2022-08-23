@@ -314,6 +314,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.change_pixel_options_visibility()
         self.setAttribute(Qt.WA_DeleteOnClose)
+        self.ok_validator.validate_ok()
 
     def set_pixel_related_changes(self):
         """
@@ -427,7 +428,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
-        self.ok_validator.validate_field_widget_list()
+        if self.ok_validator:
+            self.ok_validator.validate_field_widget_list()
         return field
 
     def select_field(self, widget):
@@ -441,7 +443,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
                     data.streams_widget._old_schema
                 )
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
-        self.ok_validator.validate_field_widget_list()
+        if self.ok_validator:
+            self.ok_validator.validate_field_widget_list()
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()
