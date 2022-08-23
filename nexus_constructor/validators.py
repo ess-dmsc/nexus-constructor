@@ -290,7 +290,7 @@ class OkValidator(QObject):
         no_geometry_button: QRadioButton,
         mesh_button: QRadioButton,
         pixel_validator: PixelValidator,
-        field_widgets: QListWidget,
+        field_widgets: QListWidget = None,
     ):
         super().__init__()
         self.name_is_valid = False
@@ -323,13 +323,14 @@ class OkValidator(QObject):
     def validate_field_widget_list(self):
         widget_list = []
         self.unacceptable_field_widgets = []
-        for i in range(self.field_widgets.count()):
-            widget_list.append(
-                self.field_widgets.itemWidget(self.field_widgets.item(i))
-            )
-        self.acceptable_field_widgets = [
-            item.is_valid() if item else True for item in widget_list
-        ]
+        if self.field_widgets:
+            for i in range(self.field_widgets.count()):
+                widget_list.append(
+                    self.field_widgets.itemWidget(self.field_widgets.item(i))
+                )
+            self.acceptable_field_widgets = [
+                item.is_valid() if item else True for item in widget_list
+            ]
         self.validate_ok()
 
     def validate_ok(self):
