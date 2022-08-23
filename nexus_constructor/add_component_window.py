@@ -11,7 +11,10 @@ from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import COMPONENT_TYPES, PIXEL_COMPONENT_TYPES
-from nexus_constructor.field_utils import get_fields_with_update_functions
+from nexus_constructor.field_utils import (
+    add_required_component_fields,
+    get_fields_with_update_functions,
+)
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
@@ -223,8 +226,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixelOptionsWidget.ui = self.pixel_options
 
         self.ok_validator = OkValidator(
-            self.noShapeRadioButton, self.meshRadioButton, self.pixel_options.validator
+            self.noShapeRadioButton,
+            self.meshRadioButton,
+            self.pixel_options.validator,
+            self.fieldsListWidget,
         )
+        self.nx_class_changed.connect(self.__add_required_fields)
 
         c_group = self._group_container.group
 
@@ -271,6 +278,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.fileLineEdit.validator().is_valid.connect(self.ok_validator.set_file_valid)
         self.fileLineEdit.validator().is_valid.connect(self.set_file_valid)
 
+        self.fieldsListWidget.currentTextChanged.connect(
+            self.ok_validator.validate_field_widget_list
+        )
+
         # Validate the default values set by the UI
         self.unitsLineEdit.validator().validate(self.unitsLineEdit.text(), 0)
         self.nameLineEdit.validator().validate(self.nameLineEdit.text(), 0)
@@ -303,6 +314,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.change_pixel_options_visibility()
         self.setAttribute(Qt.WA_DeleteOnClose)
+        self.ok_validator.validate_field_widget_list()
 
     def set_pixel_related_changes(self):
         """
@@ -335,11 +347,22 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.__fill_existing_shape_info()
         self.__fill_existing_fields()
 
+    def __add_required_fields(self):
+        c_group = self._group_container.group
+        items_and_update_methods: List = []
+        add_required_component_fields(c_group, items_and_update_methods)
+        if items_and_update_methods:
+            self.__populate_ui_fields(items_and_update_methods)
+        self.ok_validator.validate_field_widget_list()
+
     def __fill_existing_fields(self):
         c_group = self._group_container.group
         items_and_update_methods = get_fields_and_update_functions_for_component(
             c_group
         )
+        self.__populate_ui_fields(items_and_update_methods)
+
+    def __populate_ui_fields(self, items_and_update_methods):
         for field, update_method in items_and_update_methods:
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)
@@ -406,6 +429,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
+        if hasattr(self, "ok_validator") and self.ok_validator:
+            self.ok_validator.validate_field_widget_list()
         return field
 
     def select_field(self, widget):
@@ -419,6 +444,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
                     data.streams_widget._old_schema
                 )
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
+        if hasattr(self, "ok_validator") and self.ok_validator:
+            self.ok_validator.validate_field_widget_list()
 
     def on_nx_class_changed(self):
         c_nx_class = self.componentTypeComboBox.currentText()

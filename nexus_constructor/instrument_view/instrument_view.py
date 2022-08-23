@@ -307,10 +307,13 @@ class InstrumentView(QWidget):
         Add a transformation to a component, each component has a single transformation which contains
         the resultant transformation for its entire depends_on chain of translations and rotations
         """
-        name, transformation = component.name, component.qtransform
-        self.transformations[name] = transformation
-        component = self.component_entities[name]
-        component.add_transformation(transformation)
+        try:
+            name, transformation = component.name, component.qtransform
+            self.transformations[name] = transformation
+            component = self.component_entities[name]
+            component.add_transformation(transformation)
+        except KeyError:
+            pass
 
     def clear_all_transformations(self):
         """

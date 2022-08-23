@@ -5,6 +5,7 @@ from typing import Any, List, Union
 
 import numpy as np
 from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
+from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (
     QComboBox,
     QCompleter,
@@ -210,6 +211,16 @@ class FieldWidget(QFrame):
             self._set_up_name_validator(existing_objects=existing_objects)
         self.field_name_edit.validator().is_valid.emit(emit)
 
+        self.field_name_edit.textChanged.connect(
+            self._emit_current_item_changed_in_parent
+        )
+        self.value_line_edit.textChanged.connect(
+            self._emit_current_item_changed_in_parent
+        )
+        self.field_type_combo.currentTextChanged.connect(
+            self._emit_current_item_changed_in_parent
+        )
+
         self.value_line_edit.installEventFilter(self)
         self.nx_class_combo.installEventFilter(self)
 
@@ -223,6 +234,10 @@ class FieldWidget(QFrame):
 
         # Set the layout for the default field type
         self.field_type_changed()
+
+    def _emit_current_item_changed_in_parent(self):
+        if self.parent() and self.parent().parent():
+            self.parent().parent().currentTextChanged.emit("")
 
     def _set_up_name_validator(
         self,
@@ -239,6 +254,21 @@ class FieldWidget(QFrame):
                 tooltip_on_accept="Field name is valid.",
                 tooltip_on_reject="Field name is not valid.",
             )
+        )
+
+    def is_valid(self) -> bool:
+        field_name_valid = self.field_name_edit.validator().validate(
+            self.field_name_edit.text(), 0
+        )
+        value_valid = self.value_line_edit.validator().validate(
+            self.value_line_edit.text(), 0
+        )
+        return (
+            field_name_valid == QValidator.Acceptable
+            and value_valid == QValidator.Acceptable
+        ) or (
+            self.field_type_combo.currentText() == FieldType.array_dataset.value
+            and field_name_valid == QValidator.Acceptable
         )
 
     def disable_editing(self):
