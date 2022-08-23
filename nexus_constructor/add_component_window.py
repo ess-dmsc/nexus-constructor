@@ -11,7 +11,10 @@ from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.component_type import COMPONENT_TYPES, PIXEL_COMPONENT_TYPES
-from nexus_constructor.field_utils import get_fields_with_update_functions
+from nexus_constructor.field_utils import (
+    add_required_component_fields,
+    get_fields_with_update_functions,
+)
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
@@ -75,6 +78,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.model = model
         self.component_model = component_model
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
+        self.nx_class_changed.connect(self.__add_required_fields)
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
@@ -335,11 +339,21 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.__fill_existing_shape_info()
         self.__fill_existing_fields()
 
+    def __add_required_fields(self):
+        c_group = self._group_container.group
+        items_and_update_methods: List = []
+        add_required_component_fields(c_group, items_and_update_methods)
+        if items_and_update_methods:
+            self.__populate_ui_fields(items_and_update_methods)
+
     def __fill_existing_fields(self):
         c_group = self._group_container.group
         items_and_update_methods = get_fields_and_update_functions_for_component(
             c_group
         )
+        self.__populate_ui_fields(items_and_update_methods)
+
+    def __populate_ui_fields(self, items_and_update_methods):
         for field, update_method in items_and_update_methods:
             if update_method is not None:
                 new_ui_field = self.create_new_ui_field(field)

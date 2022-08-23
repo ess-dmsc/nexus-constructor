@@ -9,6 +9,7 @@ from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.utils.required_component_fields import required_component_fields
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
@@ -87,7 +88,21 @@ def get_fields_with_update_functions(
     for item in component.children:
         update_function = find_field_type(item)
         items_with_update_functions.append((item, update_function))
+    add_required_component_fields(component, items_with_update_functions)
     return items_with_update_functions
+
+
+def add_required_component_fields(component: Group, items_with_update_functions):
+    if component.nx_class in required_component_fields:
+        datasets_config: List = required_component_fields[component.nx_class]
+        for name, data_type, values, units in datasets_config:
+            if not component[name]:
+                dataset = Dataset(
+                    name=name, parent_node=None, values=values, type=data_type
+                )
+                dataset.attributes.set_attribute_value(CommonAttrs.UNITS, units)
+                find_field_type(dataset)
+                items_with_update_functions.append((dataset, find_field_type(dataset)))
 
 
 def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Callable:
