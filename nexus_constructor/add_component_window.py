@@ -78,7 +78,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.model = model
         self.component_model = component_model
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
-        self.nx_class_changed.connect(self.__add_required_fields)
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
@@ -232,6 +231,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.pixel_options.validator,
             self.fieldsListWidget,
         )
+        self.nx_class_changed.connect(self.__add_required_fields)
 
         c_group = self._group_container.group
 
@@ -353,6 +353,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         add_required_component_fields(c_group, items_and_update_methods)
         if items_and_update_methods:
             self.__populate_ui_fields(items_and_update_methods)
+        self.ok_validator.validate_field_widget_list()
 
     def __fill_existing_fields(self):
         c_group = self._group_container.group
