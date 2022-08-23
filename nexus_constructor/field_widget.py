@@ -217,6 +217,9 @@ class FieldWidget(QFrame):
         self.value_line_edit.textChanged.connect(
             self._emit_current_item_changed_in_parent
         )
+        self.field_type_combo.currentTextChanged.connect(
+            self._emit_current_item_changed_in_parent
+        )
 
         self.value_line_edit.installEventFilter(self)
         self.nx_class_combo.installEventFilter(self)
@@ -263,6 +266,9 @@ class FieldWidget(QFrame):
         return (
             field_name_valid == QValidator.Acceptable
             and value_valid == QValidator.Acceptable
+        ) or (
+            self.field_type_combo.currentText() == FieldType.array_dataset.value
+            and field_name_valid == QValidator.Acceptable
         )
 
     def disable_editing(self):
