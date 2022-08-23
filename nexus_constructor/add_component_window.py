@@ -314,7 +314,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.change_pixel_options_visibility()
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.ok_validator.validate_ok()
+        self.ok_validator.validate_field_widget_list()
 
     def set_pixel_related_changes(self):
         """
