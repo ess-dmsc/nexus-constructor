@@ -428,7 +428,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.fieldsListWidget.addItem(item)
         self.fieldsListWidget.setItemWidget(item, field)
-        if self.ok_validator:
+        if hasattr(self, "ok_validator") and self.ok_validator:
             self.ok_validator.validate_field_widget_list()
         return field
 
@@ -443,7 +443,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                     data.streams_widget._old_schema
                 )
             self.fieldsListWidget.takeItem(self.fieldsListWidget.row(item))
-        if self.ok_validator:
+        if hasattr(self, "ok_validator") and self.ok_validator:
             self.ok_validator.validate_field_widget_list()
 
     def on_nx_class_changed(self):
