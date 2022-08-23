@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from mock import Mock
 from PySide2.QtGui import QValidator
-from PySide2.QtWidgets import QListWidget
+from PySide2.QtWidgets import QApplication, QListWidget
 
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import METRES
@@ -231,7 +231,7 @@ def create_content_ok_validator():
 
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
-
+    QApplication()
     field_widget_list = QListWidget()
 
     validator = OkValidator(
