@@ -230,8 +230,11 @@ def create_content_ok_validator():
 
     mock_no_geometry_button.isChecked = Mock(return_value=False)
     mock_mesh_button.isChecked = Mock(return_value=True)
+    field_widget_list = None
 
-    validator = OkValidator(mock_no_geometry_button, mock_mesh_button, pixel_validator)
+    validator = OkValidator(
+        mock_no_geometry_button, mock_mesh_button, pixel_validator, field_widget_list
+    )
     validator.set_units_valid(True)
     validator.set_name_valid(True)
     validator.set_file_valid(True)

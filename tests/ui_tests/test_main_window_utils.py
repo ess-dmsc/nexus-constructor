@@ -1,9 +1,10 @@
 from unittest.mock import Mock
 
 import pytest
-from PySide2.QtCore import QModelIndex, QPoint
+from PySide2.QtCore import QModelIndex, QPoint, Signal
 from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFrame, QToolBar, QTreeView, QVBoxLayout, QWidget
+from PySide2.QtWidgets import QFrame as QFrameBase
+from PySide2.QtWidgets import QToolBar, QTreeView, QVBoxLayout, QWidget
 
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
@@ -18,6 +19,10 @@ from nexus_constructor.treeview_utils import (
     create_and_add_toolbar_action,
     get_transformation_frame,
 )
+
+
+class QFrame(QFrameBase):
+    currentTextChanged = Signal(str)
 
 
 @pytest.fixture
