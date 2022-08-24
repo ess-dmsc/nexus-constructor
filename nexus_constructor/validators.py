@@ -290,7 +290,7 @@ class OkValidator(QObject):
         no_geometry_button: QRadioButton,
         mesh_button: QRadioButton,
         pixel_validator: PixelValidator,
-        field_widgets: QListWidget = None,
+        field_widgets: QListWidget,
     ):
         super().__init__()
         self.name_is_valid = False

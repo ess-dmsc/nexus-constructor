@@ -31,7 +31,6 @@ from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import F142Stream, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
-from nexus_constructor.utils.required_component_fields import required_component_fields
 from nexus_constructor.validators import FieldType, PixelValidator
 from nexus_constructor.widgets import CustomDialog as QDialog
 from tests.test_utils import NX_CLASS_DEFINITIONS
@@ -1745,8 +1744,6 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
     field_value = "test"
     component.set_field_value(field_name, field_value, dtype=ValueTypes.STRING)
 
-    offset_pos = len(required_component_fields["NXdisk_chopper"])
-
     dialog = AddComponentDialog(
         model=model,
         component_model=treeview_model,
@@ -1760,9 +1757,7 @@ def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_
     qtbot.addWidget(dialog)
 
     assert dialog.fieldsListWidget.model().hasIndex(0, 0)
-    widget = dialog.fieldsListWidget.itemWidget(
-        dialog.fieldsListWidget.item(offset_pos)
-    )
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
     assert widget.field_type_combo.currentText().lower() == "scalar dataset"
 
     assert widget.name == field_name
@@ -1788,8 +1783,6 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
         "chopper1", "test_component_editing_array_field"
     )
 
-    offset_pos = len(required_component_fields["NXdisk_chopper"])
-
     field_name = "array"
     field_value = np.array([1, 2, 3, 4, 5])
     component.set_field_value(field_name, field_value, ValueTypes.INT)
@@ -1808,9 +1801,7 @@ def test_UI_GIVEN_component_with_array_field_WHEN_editing_component_THEN_field_a
     qtbot.addWidget(dialog)
 
     assert dialog.fieldsListWidget.model().hasIndex(0, 0)
-    widget = dialog.fieldsListWidget.itemWidget(
-        dialog.fieldsListWidget.item(offset_pos)
-    )
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
     assert widget.field_type_combo.currentText().lower() == "array dataset"
     assert widget.name == field_name
     assert np.array_equal(widget.value.values, field_value)
@@ -1823,8 +1814,6 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_link_field"
     )
-
-    offset_pos = len(required_component_fields["NXdisk_chopper"])
 
     entry = Entry()
     link_name = "link1"
@@ -1844,9 +1833,7 @@ def test_UI_GIVEN_component_with_link_field_WHEN_editing_component_THEN_field_ap
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
 
-    widget = dialog.fieldsListWidget.itemWidget(
-        dialog.fieldsListWidget.item(offset_pos + 0)
-    )
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
     assert widget.field_type_combo.currentText().lower() == "link"
     assert widget.value.name == link_name
     assert widget.value.source == entry.name
@@ -1858,8 +1845,6 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_multiple_fields"
     )
-
-    offset_pos = len(required_component_fields["NXdisk_chopper"])
 
     field_name1 = "array"
     field_value1 = np.array([1, 2, 3, 4, 5])
@@ -1881,16 +1866,12 @@ def test_UI_GIVEN_component_with_multiple_fields_WHEN_editing_component_THEN_all
     dialog.pixel_options = Mock(spec=PixelOptions)
     qtbot.addWidget(dialog)
 
-    widget = dialog.fieldsListWidget.itemWidget(
-        dialog.fieldsListWidget.item(offset_pos)
-    )
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
     assert widget.field_type_combo.currentText().lower() == "array dataset"
     assert widget.name == field_name1
     assert np.array_equal(widget.value.values, field_value1)
 
-    widget2 = dialog.fieldsListWidget.itemWidget(
-        dialog.fieldsListWidget.item(offset_pos + 1)
-    )
+    widget2 = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(1))
     assert widget2.field_type_combo.currentText().lower() == "scalar dataset"
     assert widget2.name == field_name2
     assert widget2.value.values == str(field_value2)
