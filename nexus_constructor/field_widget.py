@@ -264,11 +264,23 @@ class FieldWidget(QFrame):
             self.value_line_edit.text(), 0
         )
         return (
-            field_name_valid == QValidator.Acceptable
-            and value_valid == QValidator.Acceptable
-        ) or (
-            self.field_type_combo.currentText() == FieldType.array_dataset.value
-            and field_name_valid == QValidator.Acceptable
+            (
+                field_name_valid == QValidator.Acceptable
+                and value_valid == QValidator.Acceptable
+            )
+            or (
+                self.field_type_combo.currentText() == FieldType.array_dataset.value
+                and field_name_valid == QValidator.Acceptable
+            )
+            or (
+                self.field_type_combo.currentText() == FieldType.kafka_stream.value
+                and self.streams_widget.topic_line_edit.validator().validate(
+                    self.streams_widget.topic_line_edit.text(), 0
+                )
+                and self.streams_widget.source_line_edit.validator().validate(
+                    self.streams_widget.source_line_edit.text(), 0
+                )
+            )
         )
 
     def disable_editing(self):

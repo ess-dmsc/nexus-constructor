@@ -92,11 +92,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view_tab.component_delegate.use_simple_tree_view(value)
 
     def show_add_component_dialog(self):
-        selected_component = (
-            self.component_tree_view_tab.component_tree_view.selectedIndexes()[
-                0
-            ].internalPointer()
-        )
+        try:
+            selected_component = (
+                self.component_tree_view_tab.component_tree_view.selectedIndexes()[
+                    0
+                ].internalPointer()
+            )
+        except IndexError:
+            print("Select a valid node in the NeXus tree before modifying it.")
+            return
         new_group = Group("", parent_node=selected_component)
         selected_component.children.append(new_group)
         self.show_add_component_window(new_group, new_group=True)
