@@ -1,7 +1,7 @@
 # UI Tests
 
 Due to difficulties combining the UI and testing libraries we use, the Nexus Constructor's
-interface isn't able to be easily tested programmatically. The following is a description of the
+interface isn't able to be easily tested programaticaly. The following are a description of the
 manual steps that should be taken, and the expected outcomes, to test the user interface.
 
 These tests should be run using a shell environment such as powershell or bash, and not through the
@@ -12,93 +12,147 @@ as a failure of that test.
 ## Starting the application
 
 Run the application (`python main.py` in the root directory).
-- The main application window should appear, split into two sections.
-- On the left, there should be a QTabWidget labelled "Nexus Structure" containing line edit fields, buttons, checkboxes and 
-  a NeXus tree structure with only "entry (NXentry)".
-- On the right, there should be an empty instrument view with a Cartesian coordinate system. 
-  A small coordinate axis direction indicator should be visible in the lower right corner of the instrument view, 
-  which also contains an animation of the beam and its direction.
+- The main application window should appear, split into three sections.
+- On the left should be a box labelled "Components" containing a single smaller box titled "Sample".
+- In the center should be an animated neutron beam, pointing into a red cube.
+- To the right should be a scrollable JSON area.
 
 ## Main Window
 
 Increase the width of the window.
-* This should cause only the instrument view section to increase in width while the NeXus tree structure section retains a fixed width.
-  
+* This should cause only the (center) Instrument View to increase in width while the other components retain a fixed width.
+
 Increase the height of the window.
-* This should cause both sections in the Main Window to expand in height.
+* This should cause all elements in the Main Window to expand in height.
 
 Decrease the width of the window as much as possible.
-* This should only affect the width of the instrument view area while the NeXus tree structure retains a fixed width. 
-  It should also be confirmed that the instrument view area cannot become any narrower than 300 pixels.
+* This should only affect the width of the Instrument View area while the other components retain a fixed width. It should also be noticed that the Instrument View area cannot become any narrower than 300 pixels.
 
 Decrease the height of the window as much as possible.
 * This should cause all components beneath the menu bar to reach a minimum height of 100 pixels.
 
-Adjust the Nexus structure QTabWidget width.
-* Confirm that a circle is visible in the middle of the right border of the NeXus Structure QTabWidget.
-* Clicking and dragging that button left and right should change the width of the box, decreasing the size of the instrument view simultaneously.
-  The instrument view and QTabWidget both have a minimum size, which enforces a limit on how much
-  the size of the widget can be adjusted by dragging the circle left and right.
+## JSON Display
 
-## Adding groups and transforms
+With the application open, click on the 'Sample' box in the 'Components' pane.
+- It should expand, showing a text field to edit the name.
 
-Press the 'Group' button.
-- An editing window should appear.
-- It should contain a name input field and description input field.
-- It should contain a selector for group type, split into components and groups.
-  Components are also groups but with a geometric shape and location.
-- It should contain the following radio buttons for component geometry: 'Auto', 'Box', 'Mesh' and 'Cylinder'.
-- It should contain the NeXus standard HTML documentation on the right.
-- It should contain an 'Add group' and 'Cancel' button in the bottom right.
+Change the value of the name field, and press enter.
+- The JSON display should automatically update to show the name value on the relevant line.
 
-Select 'NXdetector' as the component type, and 'Mesh' as the geometry type.
-- It should not be possible to select 'Repeated Single Pixel Shape', 'Entire Shape', 'No Pixels' as the pixel types.
+Open the 'JSON' menu at the top of the application window, and click the "Show Nexus Constructor
+JSON" radio button.
+- The format of the JSON display should change, but the new name value should still be contained in
+it.
 
-Select 'Detector' and 'Mesh' as geometry.
+Update the name of the sample to a new value as before.
+- This change should also apply automatically to the JSON display.
+
+Open the 'JSON' menu again, and click the "Hide JSON display" radio button.
+- The JSON display should disappear, with its space in the window being taken by the 3D
+visualisation area.
+
+Open the 'JSON' menu, and reselect "Show Nexus FileWriter JSON".
+- The JSON display should reappear, containing JSON in the original format, with the current name
+value.
+
+Click on the opening line in the JSON display `{`
+- The initial line should be replaced with `{...}`
+- All other lines should be hidden.
+
+Click on the `{...}` line.
+- The trailing `...}` should vanish from the first line.
+- The hidden lines should reappear.
+
+Reset the sample's name to 'Sample'.
+
+## Adding components and transforms
+
+Press the 'Add component' button.
+- The "Add component" window should appear.
+- It should contain a selector for component type.
+- It should contain the following radio buttons for component geometry: 'Mesh', 'Cylinder' and 'None'.
+- It should contain a set of radio buttons for pixel layout, 'Single ID', 'Repeatable grid', 'Face
+mapped mesh' and 'None'.
+- It should contain a 'Continue' button at the bottom.
+
+Select 'Detector' as the component type, and 'Mesh' as the geometry type.
+- It should not be possible to select 'Single ID' or 'None' as the pixel types.
+
+Select 'Cylinder' as the geometry type.
+- It should now also not be possible to select 'Face mapped mesh' as a pixel type.
+
+Select 'Monitor' as the component type.
+- Regardless of selected geometry type, only 'Single ID' can be selected as pixel type.
+
+Select any other component type (except 'Monitor').
+- Regardless of selected geometry type (except 'None'), only 'None' can be selected as pixel type.
+
+Select 'Detector', 'Mesh', and 'Face mapped mesh'. Click 'Continue'.
 - The window should show controls for editing the properties of this new detector.
+- The window should automatically resize to fit these new controls.
 
-Click the 'Browse...' button next to the 'CAD file:' textbox.
-Open cube_colored.off from the repo's `~/tests` directory. When prompted, select "cm" as unit.
-- Choosing 'Entire shape' should populate with 6 empty numbered table columns in a scrollable list.
-The first column in the table should be 'Pixel ID for face #0:' and the last one 'Pixel ID for face #5:'.
-- Switch to 'No Pixels' and name the 'NXdetector' to detector. Press the 'Add group' button that now should be enabled.
-- The NeXus tree structure should now be populated with a 'detector (NXdetector)' child to 'entry (NXentry)'.
-- Select the 'detector (NXdetector)' in the tree. The zoom button should be enabled. Press it and you should be able 
-to see a colored and slightly tilted cube.
-- When the 'detector (NXdetector)' in the NeXus tree is expanded, a 'shape (NXoff_geometry)' should be a child of it.
-- Expanding the 'shape (NXoff_geometry)' should show three datasets: 'winding_order', 'faces' and 'vertices'.
-- Mark the 'detector (NXdetector)' in the tree again and click the Translation button. That should have created
-a 'transformation (NXtransformations)' child to the detector component in the NeXus tree structure.
-Double click the 'translation' child of the transformations group and add 0.5 m in the 'Distance' input field.
-- Confirm that the cube has moved in the z-direction by again pressing the 'Zoom' button for the detector component.
+Click the 'Choose file' button next to the 'Geometry file:' textbox.
+Open cube.stl from the repo's `~/tests` directory.
+- The 'Pixel mapping' area should populate with 12 empty numbered textboxes in a scrollable list.
 
-Select 'entry (NXentry)' in the tree and click the 'Group' button again.
-- Select 'Monitor' as group type under 'Components', name it 'monitor' and select 'Cylinder' as geometry.
-- Instead of the file selector controls of before, a 'Cylinder options' section should be present.
-- It should contain textboxes for height, radius, and x, y, z components of the Cartesian coordinate system.
-- Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, its radius to 1 and unit to "cm". 
-  Finally, press the 'Add group' button.
-- Now, Add a translation with values (x=-2.5, y=0.5, z=-0.5) to 'monitor (NXmonitor)' under 'entry (NXentry)'.
-- Add a rotation, of 315 degrees around axis (x=0, y=0, z=1).
+Enter '1' into the first such box. Click again on the 'Choose file' button, and open cube.off from
+the repo's `~/tests` directory. When prompted, select "cm" as unit.
+- The 'Pixel mapping' area should re-populate with 6 empty numbered textboxes in a scrollable list.
+
+Click the 'add translation' button in the 'Transform:' section.
+- A box should appear containing textboxes for the translations name and x, y, z components, along
+with 'move up', 'move down' and 'delete' buttons.
+- The window should increase its size to fit these controls.
+
+Enter a '2' in the translate's x field, and 'cube transform' in the translate's name field.
+
+Enter 'Cube detector' in the name field.
+Click the 'Add' button.
+- The window should close.
+- The main windows 'components' section should contain a second box, reading 'Name:Cube detector'.
+- A green cube should be visible in the 3D view. It should be to the right of the sample's red cube,
+with a gap between them equal to one of their widths.
+
+Click the 'Add Component' button.
+Select 'Monitor' as component type, and 'Cylinder' as geometry.
+Click 'Continue'.
+- Instead of the file selector controls of before, a 'Cylinder Geometry' section should be present.
+- It should contain textboxes for height, radius, and x, y, z components of axis direction.
+- A 'pixel data' section should contain a single textbox for detector id.
+
+Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, its radius to 1 and unit to "cm".
+Add a translation with values (x=-2.5, y=0.5, z=-0.5).
+Add a rotation, of 315 degrees around axis (x=0, y=0, z=1).
+Set the 'Transform parent' dropdowns to 'Cube Detector' and 'cube transform'.
+Click 'Add'.
+- The add component window will close.
 - A cylinder should appear in the 3D view. One flat end should be flush with the leftmost side of
 the red sample cube, with center in the rear upper corner.
 - The other face should be flush with the right most side of the green detector cube.
 - The cylinders radius should intersect the upper edges of the cubes front faces, and the rear edges
 of the cubes bottom faces.
 
-## Validating Group Names
+## Validating Component Names
 
-Click the 'Group' button after selecting 'entry (NXentry)' in the NeXus tree view.  
-- Create an 'NXsample' component called "Sample" under 'entry (NXentry)'.
-- Now create another 'NXsample' and try to name this new component "Sample" as well.
+Click the 'Add component' button.  
+Select a Cylinder geometry and leave the other options untouched.  
+Try to name this new component "Sample".
 - The text field will accept the name "Sampl"  
-- Once you try to type in the remaining "e" the line edit should turn red.
-- Placing your mouse over the line edit will show a message saying that group name is not valid, 
-  and it will suggest naming it "Sample1" instead.
-- It should not be possible to press 'Add group' while the line edit is colored red.
-- The rule is that groups on the save level must have unique names. We should however be able 
-  to create an 'NXinstrument' under the 'entry (NXentry)' node and under the instrument create a
-  'NXsample' named Sample. Confirm that this is in reality the case!
+- Once you try to type in the remaining "e" a red cross will appear.
+- Placing your mouse over the cross will show a message saying that component names must be unique.
+
+Remove focus from the text field by selecting a different field or by moving the mouse out of the window.
+- The red cross disappear and the message will no longer be accessible.
+- The component name will still be "Sampl".
+
+Change the name back to its default and click "Add" without changing any of the other options.  
+Expand the component details box in the left-hand-side of the main window.  
+- Repeat the steps above and you should observe the same behaviour.
+
+Change the name back to its default again.  
+Expand the component details box.  
+Click the 'Full editor' button.  
+- Repeat the steps above and you should observe the same behaviour.
 
 ## Validating Units 
 
@@ -224,7 +278,7 @@ Open ui_test.nxs in HDFView.
 group 'entry'.
 - 'instrument' should contain another group called 'Cube detector'.
 
-## Removing groups
+## Removing components
 
 Set Monitor's transform parent to 'Cube Detector'.
 - Cube Detector's delete button should grey out, and clicking it result in nothing.
@@ -237,6 +291,11 @@ Click Monitor's delete button.
 Click Cube Detector's delete button.
 - It should also disappear from the components list.
 - It's green cube should no longer be in the visualisation.
+
+## Sample details
+
+- There should be no delete button or transform controls in the Sample box in the components list.
+- Clicking it's full editor button will open an editor window without pixel or transform fields.
 
 ## Loading json
 
