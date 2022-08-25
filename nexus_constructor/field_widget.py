@@ -277,9 +277,11 @@ class FieldWidget(QFrame):
                 and self.streams_widget.topic_line_edit.validator().validate(
                     self.streams_widget.topic_line_edit.text(), 0
                 )
+                == QValidator.Acceptable
                 and self.streams_widget.source_line_edit.validator().validate(
                     self.streams_widget.source_line_edit.text(), 0
                 )
+                == QValidator.Acceptable
             )
         )
 
