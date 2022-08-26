@@ -7,7 +7,6 @@ import logging
 import os
 
 os.environ["QT_MAC_WANTS_LAYER"] = "1"
-import locale
 import signal
 import sys
 
@@ -45,7 +44,8 @@ class NexusConstructorMainWindow(QMainWindow):
             self.showMaximized()
         else:
             self.resize(
-                self._config.value(X_SIZE, 500), self._config.value(Y_SIZE, 500)
+                int(self._config.value(X_SIZE, 500)),
+                int(self._config.value(Y_SIZE, 500)),
             )
             self.move(
                 int(self._config.value(X_LOC, 0)), int(self._config.value(Y_LOC, 0))
@@ -73,12 +73,7 @@ class NexusConstructorMainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    if locale.getlocale()[0] is None:
-        used_locale = "en_GB.UTF-8"
-        locale.setlocale(locale.LC_ALL, used_locale)
-        print(
-            f"Unable to determine the system locale, using the default ({used_locale})."
-        )
+    QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.c()))
     parser = argparse.ArgumentParser(description="Nexus Constructor")
     if "help" in parser.parse_args():
         exit(0)
