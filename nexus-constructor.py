@@ -45,7 +45,7 @@ class NexusConstructorMainWindow(QMainWindow):
         else:
             self.resize(
                 int(self._config.value(X_SIZE, 500)),
-                int(self._config.value(Y_SIZE, 500))
+                int(self._config.value(Y_SIZE, 500)),
             )
             self.move(
                 int(self._config.value(X_LOC, 0)), int(self._config.value(Y_LOC, 0))
