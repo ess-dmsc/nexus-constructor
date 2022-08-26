@@ -7,7 +7,6 @@ import logging
 import os
 
 os.environ["QT_MAC_WANTS_LAYER"] = "1"
-import locale
 import signal
 import sys
 
@@ -45,7 +44,8 @@ class NexusConstructorMainWindow(QMainWindow):
             self.showMaximized()
         else:
             self.resize(
-                int(self._config.value(X_SIZE, 500)), int(self._config.value(Y_SIZE, 500))
+                int(self._config.value(X_SIZE, 500)), 
+                int(self._config.value(Y_SIZE, 500))
             )
             self.move(
                 int(self._config.value(X_LOC, 0)), int(self._config.value(Y_LOC, 0))
