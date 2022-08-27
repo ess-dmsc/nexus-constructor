@@ -1,6 +1,14 @@
 from typing import Dict, Union
 
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, QObject, QPoint, QSize, Qt
+from PySide2.QtCore import (
+    QAbstractItemModel,
+    QModelIndex,
+    QObject,
+    QPoint,
+    QSize,
+    Qt,
+    Signal,
+)
 from PySide2.QtGui import QPainter, QPixmap, QRegion
 from PySide2.QtWidgets import (
     QFrame,
@@ -32,6 +40,10 @@ MODULE_FRAME = "module_frame"
 TRANSFORMATION_FRAME = "transformation_frame"
 
 
+class NexusQFrame(QFrame):
+    currentTextChanged = Signal(str)
+
+
 class ComponentEditorDelegate(QStyledItemDelegate):
     frameSize = QSize(30, 10)
 
@@ -39,7 +51,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         super().__init__(parent)
         self.model = model
         self._use_simple_tree_view = False
-        self._dict_frames: Dict[QModelIndex, QFrame] = {}
+        self._dict_frames: Dict[QModelIndex, NexusQFrame] = {}
 
     def get_frame(
         self,
@@ -52,7 +64,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             FileWriterModule,
         ],
     ):
-        frame = QFrame()
+        frame = NexusQFrame()
         frame.setAutoFillBackground(True)
         SizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         SizePolicy.setHorizontalStretch(0)
