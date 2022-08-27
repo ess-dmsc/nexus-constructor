@@ -236,11 +236,7 @@ class FieldWidget(QFrame):
         self.field_type_changed()
 
     def _emit_current_item_changed_in_parent(self):
-        if (
-            self.parent()
-            and self.parent().parent()
-            and isinstance(self.parent().parent(), QListWidget)
-        ):
+        if self.parent() and self.parent().parent():
             self.parent().parent().currentTextChanged.emit("")
 
     def _set_up_name_validator(
