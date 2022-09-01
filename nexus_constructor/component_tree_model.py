@@ -203,7 +203,7 @@ class NexusTreeModel(QAbstractItemModel):
                     group.children[link_idx],
                 )
 
-            # Reorganize depends. Will restructure this ugly loop
+            # Reorganize depends.
             for i, t in enumerate(transformation_list):
                 if i == 0:
                     t.remove_from_dependee_chain()
@@ -212,19 +212,10 @@ class NexusTreeModel(QAbstractItemModel):
                     transformation_list[0].parent_component.depends_on = t
                 elif i < len(transformation_list)-1:
                     t.depends_on = transformation_list[i+1]
-
-                if i > 0:
-                    try:
-                        t.deregister_dependent(
-                            component_index.internalPointer().parent_node
-                        )
-                    except Exception:
-                        pass
-                    try:
-                        t.register_dependent(transformation_list[i-1])
-                    except Exception:
-                        pass
-
+                    t.deregister_dependent(
+                        component_index.internalPointer().parent_node
+                    )
+                    t.register_dependent(transformation_list[i-1])
             transformation_list[-1].depends_on = None
 
             # Check structure
