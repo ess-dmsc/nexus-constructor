@@ -1,15 +1,9 @@
+import pickle
 from json import loads
 from typing import List, Optional, Tuple, Union
-import pickle
 
 import PySide2.QtGui
-from PySide2.QtCore import (
-    QAbstractItemModel,
-    QModelIndex,
-    Qt,
-    QMimeData,
-    QByteArray
-)
+from PySide2.QtCore import QAbstractItemModel, QByteArray, QMimeData, QModelIndex, Qt
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
@@ -104,9 +98,7 @@ class NexusTreeModel(QAbstractItemModel):
                 | Qt.ItemIsDropEnabled
                 | Qt.ItemIsDragEnabled
             )
-        elif isinstance(
-            parent_item, (FileWriterModule, LinkTransformation)
-        ):
+        elif isinstance(parent_item, (FileWriterModule, LinkTransformation)):
             return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
         return (
             Qt.ItemIsSelectable
@@ -130,12 +122,12 @@ class NexusTreeModel(QAbstractItemModel):
             mimedata = QMimeData()
             self._stored_transform_index = index
             data = QByteArray(pickle.dumps(index.internalPointer()))
-            mimedata.setData('node/transformation', data)
+            mimedata.setData("node/transformation", data)
             return mimedata
 
     def canDropMimeData(self, mimedata, action, row, column, parentIndex):
         parent_item = parentIndex.internalPointer()
-        if mimedata.hasFormat('node/transformation'):
+        if mimedata.hasFormat("node/transformation"):
             if isinstance(parent_item, Transformation):
                 return True
             else:
@@ -146,8 +138,8 @@ class NexusTreeModel(QAbstractItemModel):
             return True
 
     def dropMimeData(self, mimedata, action, row, column, parentIndex):
-        if mimedata.hasFormat('node/transformation'):
-            selected_child_item = pickle.loads(mimedata.data('node/transformation'))
+        if mimedata.hasFormat("node/transformation"):
+            selected_child_item = pickle.loads(mimedata.data("node/transformation"))
             selected_child_index = self._stored_transform_index
 
             component_index = self.parent(parentIndex)
@@ -174,14 +166,9 @@ class NexusTreeModel(QAbstractItemModel):
             insert_location = parentIndex.row()
 
             # Insert the selected transformation and its writer module
-            self.beginInsertRows(
-                selected_child_index,
-                insert_location,
-                insert_location
-            )
+            self.beginInsertRows(selected_child_index, insert_location, insert_location)
             transformation_list.insert(
-                insert_location,
-                selected_child_index.internalPointer()
+                insert_location, selected_child_index.internalPointer()
             )
             self.endInsertRows()
 
@@ -208,18 +195,18 @@ class NexusTreeModel(QAbstractItemModel):
                 if i == 0:
                     t.remove_from_dependee_chain()
                     t.register_dependent(component_index.internalPointer().parent_node)
-                    t.depends_on = transformation_list[i+1]
+                    t.depends_on = transformation_list[i + 1]
                     transformation_list[0].parent_component.depends_on = t
-                elif i < len(transformation_list)-1:
-                    t.depends_on = transformation_list[i+1]
+                elif i < len(transformation_list) - 1:
+                    t.depends_on = transformation_list[i + 1]
                     t.deregister_dependent(
                         component_index.internalPointer().parent_node
                     )
-                    t.register_dependent(transformation_list[i-1])
+                    t.register_dependent(transformation_list[i - 1])
             transformation_list[-1].depends_on = None
 
             # Check structure
-            print('<<<<<>>>>>')
+            print("<<<<<>>>>>")
             for t in transformation_list:
                 print(t.name)
                 print(t.vector)
@@ -227,9 +214,9 @@ class NexusTreeModel(QAbstractItemModel):
                 try:
                     print(t.depends_on.name)
                 except Exception:
-                    print('No depends')
-                print('-------')
-                print('-------')
+                    print("No depends")
+                print("-------")
+                print("-------")
 
             self.model.signals.transformation_changed.emit()
             self.model.signals.group_edited.emit(component_index, True)
