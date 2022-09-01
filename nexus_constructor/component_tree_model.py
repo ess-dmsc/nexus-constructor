@@ -1,8 +1,15 @@
 from json import loads
 from typing import List, Optional, Tuple, Union
+import pickle
 
 import PySide2.QtGui
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
+from PySide2.QtCore import (
+    QAbstractItemModel,
+    QModelIndex,
+    Qt,
+    QMimeData,
+    QByteArray
+)
 from PySide2.QtGui import QVector3D
 from PySide2.QtWidgets import QMessageBox
 
@@ -89,8 +96,16 @@ class NexusTreeModel(QAbstractItemModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
         elif isinstance(parent_item, ComponentInfo):
             return Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
+        elif isinstance(parent_item, Transformation):
+            return (
+                Qt.ItemIsSelectable
+                | Qt.ItemIsEnabled
+                | Qt.ItemIsEditable
+                | Qt.ItemIsDropEnabled
+                | Qt.ItemIsDragEnabled
+            )
         elif isinstance(
-            parent_item, (Transformation, FileWriterModule, LinkTransformation)
+            parent_item, (FileWriterModule, LinkTransformation)
         ):
             return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
         return (
@@ -103,23 +118,143 @@ class NexusTreeModel(QAbstractItemModel):
     def mimeTypes(self):
         return [
             "streaming/writer_module",
+            "node/transformation",
         ]
 
     def supportedDropActions(self) -> PySide2.QtCore.Qt.DropActions:
         return Qt.DropAction.MoveAction | Qt.DropAction.CopyAction
 
+    def mimeData(self, indexes):
+        index = indexes[0]
+        if isinstance(index.internalPointer(), Transformation):
+            mimedata = QMimeData()
+            self._stored_transform_index = index
+            data = QByteArray(pickle.dumps(index.internalPointer()))
+            mimedata.setData('node/transformation', data)
+            return mimedata
+
+    def canDropMimeData(self, mimedata, action, row, column, parentIndex):
+        parent_item = parentIndex.internalPointer()
+        if mimedata.hasFormat('node/transformation'):
+            if isinstance(parent_item, Transformation):
+                return True
+            else:
+                return False
+        elif isinstance(parent_item, LinkTransformation):
+            return False
+        else:
+            return True
+
     def dropMimeData(self, mimedata, action, row, column, parentIndex):
-        module_config = loads(mimedata.text())
-        insert_location = len(parentIndex.data().children)
-        if row != -1:
-            insert_location = row
-        new_module = create_fw_module_object(
-            module_config["module"], module_config["config"], parentIndex.data()
-        )
-        self.beginInsertRows(QModelIndex(), insert_location, insert_location)
-        parentIndex.data().children.insert(insert_location, new_module)
-        self.endInsertRows()
-        return True
+        if mimedata.hasFormat('node/transformation'):
+            selected_child_item = pickle.loads(mimedata.data('node/transformation'))
+            selected_child_index = self._stored_transform_index
+
+            component_index = self.parent(parentIndex)
+
+            # Remove the selected transformation and its writer module
+            remove_transform = selected_child_index.internalPointer()
+            transformation_list = remove_transform.parent_component.stored_transforms
+            transformation_list_index = self.parent(selected_child_index)
+            remove_pos = transformation_list.index(remove_transform)
+            self.beginRemoveRows(transformation_list_index, remove_pos, remove_pos)
+            transformation_list.pop(remove_pos)
+            self.endRemoveRows()
+            self.model.signals.transformation_changed.emit()
+
+            parent = self.parent(selected_child_index)
+            remove_index = self._get_row_of_child(selected_child_item)
+            self.beginRemoveRows(parent, remove_index, remove_index)
+            group_parent: Group = parent.internalPointer()
+            children = group_parent.children
+            group_parent.remove_stream_module(selected_child_item.writer_module)
+            children.pop(remove_index)
+            self.endRemoveRows()
+
+            insert_location = parentIndex.row()
+
+            # Insert the selected transformation and its writer module
+            self.beginInsertRows(
+                selected_child_index,
+                insert_location,
+                insert_location
+            )
+            transformation_list.insert(
+                insert_location,
+                selected_child_index.internalPointer()
+            )
+            self.endInsertRows()
+
+            self.beginInsertRows(parent, insert_location, insert_location)
+            children = group_parent.children
+            group_parent.add_stream_module(selected_child_item.writer_module)
+            children.insert(insert_location, selected_child_index.internalPointer())
+            self.endInsertRows()
+
+            # Force link to the bottom   Needs to be further investigated.
+            # Maybe dont allow dragNdrop when you have a link?
+            if transformation_list.has_link:
+                group = transformation_list[-1].parent_node
+                for i, child in enumerate(group.children):
+                    if not isinstance(child, Transformation):
+                        link_idx = i
+                group.children[link_idx], group.children[i] = (
+                    group.children[i],
+                    group.children[link_idx],
+                )
+
+            # Reorganize depends. Will restructure this ugly loop
+            for i, t in enumerate(transformation_list):
+                if i == 0:
+                    t.remove_from_dependee_chain()
+                    t.register_dependent(component_index.internalPointer().parent_node)
+                    t.depends_on = transformation_list[i+1]
+                    transformation_list[0].parent_component.depends_on = t
+                elif i < len(transformation_list)-1:
+                    t.depends_on = transformation_list[i+1]
+
+                if i > 0:
+                    try:
+                        t.deregister_dependent(
+                            component_index.internalPointer().parent_node
+                        )
+                    except Exception:
+                        pass
+                    try:
+                        t.register_dependent(transformation_list[i-1])
+                    except Exception:
+                        pass
+
+            transformation_list[-1].depends_on = None
+
+            # Check structure
+            print('<<<<<>>>>>')
+            for t in transformation_list:
+                print(t.name)
+                print(t.vector)
+                print(t.ui_value)
+                try:
+                    print(t.depends_on.name)
+                except Exception:
+                    print('No depends')
+                print('-------')
+                print('-------')
+
+            self.model.signals.transformation_changed.emit()
+            self.model.signals.group_edited.emit(component_index, True)
+            return True
+        else:
+            module_config = loads(mimedata.text())
+            insert_location = len(parentIndex.data().children)
+            if row != -1:
+                insert_location = row
+            new_module = create_fw_module_object(
+                module_config["module"], module_config["config"], parentIndex.data()
+            )
+            self.beginInsertRows(QModelIndex(), insert_location, insert_location)
+            parentIndex.data().children.insert(insert_location, new_module)
+            self.endInsertRows()
+            return True
 
     def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
