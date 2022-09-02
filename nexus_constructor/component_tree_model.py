@@ -129,6 +129,8 @@ class NexusTreeModel(QAbstractItemModel):
         parent_item = parentIndex.internalPointer()
         if mimedata.hasFormat("node/transformation"):
             if isinstance(parent_item, Transformation):
+                if parent_item.parent_component.stored_transforms.has_link:
+                    return False
                 return True
             else:
                 return False
