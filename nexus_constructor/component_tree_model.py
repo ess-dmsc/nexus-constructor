@@ -159,7 +159,6 @@ class NexusTreeModel(QAbstractItemModel):
             self.beginRemoveRows(parent, remove_index, remove_index)
             group_parent: Group = parent.internalPointer()
             children = group_parent.children
-            group_parent.remove_stream_module(selected_child_item.writer_module)
             children.pop(remove_index)
             self.endRemoveRows()
 
@@ -174,7 +173,6 @@ class NexusTreeModel(QAbstractItemModel):
 
             self.beginInsertRows(parent, insert_location, insert_location)
             children = group_parent.children
-            group_parent.add_stream_module(selected_child_item.writer_module)
             children.insert(insert_location, selected_child_index.internalPointer())
             self.endInsertRows()
 
