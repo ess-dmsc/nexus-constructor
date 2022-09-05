@@ -208,7 +208,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.add_component_window.show()
 
     def _update_model(self):
-        self.component_tree_view_tab.set_up_model(self.model)
+        self.component_tree_view_tab.set_up_model(self.model, False)
 
 
 def show_errors_message(errors: List[str]):

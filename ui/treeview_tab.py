@@ -24,7 +24,10 @@ from ui.parameters_widget import ParametersView
 
 class QNexusTreeView(QTreeView):
     def collapse_group_in_tree(self, index: QModelIndex, expand: bool):
+        if not index.isValid():
+            return
         self.setExpanded(index, expand)
+        self.collapse_group_in_tree(index.parent(), expand)
 
 
 class ComponentTreeViewTab(QWidget):
@@ -107,11 +110,12 @@ class ComponentTreeViewTab(QWidget):
         self.component_tool_bar.insertSeparator(self.delete_action)
         self.componentsTabLayout.insertWidget(0, self.component_tool_bar)
 
-    def set_up_model(self, model: Model):
-        model.signals.group_edited.connect(
-            self.component_tree_view.collapse_group_in_tree
-        )
-        self.component_model = NexusTreeModel(model)
+    def set_up_model(self, model: Model, create_new_tree: bool = True):
+        if create_new_tree:
+            model.signals.group_edited.connect(
+                self.component_tree_view.collapse_group_in_tree
+            )
+            self.component_model = NexusTreeModel(model)
         self.component_delegate = ComponentEditorDelegate(
             self.component_tree_view, model
         )
