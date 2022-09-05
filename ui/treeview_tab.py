@@ -24,7 +24,10 @@ from ui.parameters_widget import ParametersView
 
 class QNexusTreeView(QTreeView):
     def collapse_group_in_tree(self, index: QModelIndex, expand: bool):
+        if not index.isValid():
+            return
         self.setExpanded(index, expand)
+        self.collapse_group_in_tree(index.parent(), expand)
 
 
 class ComponentTreeViewTab(QWidget):

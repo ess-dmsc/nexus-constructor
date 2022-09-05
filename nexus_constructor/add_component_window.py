@@ -134,7 +134,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def close(self) -> bool:
         if self._tree_view_updater:
-            self._tree_view_updater()
+            group, _ = self.component_model.current_nxs_obj
+            self._tree_view_updater(group)
         return super().close()
 
     def _handle_class_change(self):

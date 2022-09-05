@@ -43,6 +43,15 @@ class NexusTreeModel(QAbstractItemModel):
     def replace_model(self, model):
         self.model = model
 
+    def find_index_of_group(self, group: Group) -> QModelIndex:
+        abs_path = group.absolute_path.split("/")[2:]
+        sub_tree_root = self.model.entry
+        for item in abs_path:
+            sub_tree_root = sub_tree_root[item]
+        if not sub_tree_root.parent_node:
+            return None
+        return self.index_from_component(sub_tree_root)
+
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
 
@@ -71,7 +80,7 @@ class NexusTreeModel(QAbstractItemModel):
         index = self.createIndex(row, column, parent_item.children[row])
         return index
 
-    def index_from_component(self, component: Component):
+    def index_from_component(self, component: Group):
         row = component.parent_node.children.index(component)
         return self.createIndex(row, 0, component)
 
