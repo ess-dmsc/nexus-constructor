@@ -49,7 +49,7 @@ class NexusTreeModel(QAbstractItemModel):
         for item in abs_path:
             sub_tree_root = sub_tree_root[item]
         if not sub_tree_root.parent_node:
-            return None
+            return self.createIndex(0, 0, self.model.entry)
         return self.index_from_component(sub_tree_root)
 
     def columnCount(self, parent: QModelIndex) -> int:
