@@ -434,6 +434,9 @@ class FieldWidget(QFrame):
                 show_only_f142_stream=self._show_only_f142_stream,
                 node_parent=self._node_parent,
             )
+            self.streams_widget.ok_button.clicked.connect(
+                self._emit_current_item_changed_in_parent
+            )
             self.edit_button.clicked.connect(self.streams_widget.update_schema_combo)
             self.streams_widget.ok_validator.is_valid.connect(
                 self._set_edit_button_state
