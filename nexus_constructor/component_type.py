@@ -100,6 +100,8 @@ NX_CLASSES = {
     "NXxraylens",
 }
 
+STREAM_MODULE_GROUPS = {"NXlog", "NXevent_data"}
+
 CHOPPER_CLASS_NAME = "NXdisk_chopper"
 ENTRY_CLASS_NAME = "NXentry"
 LOG_CLASS_NAME = "NXlog"

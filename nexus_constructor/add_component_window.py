@@ -4,13 +4,23 @@ from functools import partial
 from os import path
 from typing import Callable, List
 
-from PySide2.QtCore import Qt, QUrl, Signal
+from PySide2.QtCore import QStringListModel, Qt, QUrl, Signal
 from PySide2.QtGui import QKeyEvent, QVector3D
-from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
+from PySide2.QtWidgets import (
+    QCompleter,
+    QListWidget,
+    QListWidgetItem,
+    QMessageBox,
+    QWidget,
+)
 
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
-from nexus_constructor.component_type import COMPONENT_TYPES, PIXEL_COMPONENT_TYPES
+from nexus_constructor.component_type import (
+    COMPONENT_TYPES,
+    PIXEL_COMPONENT_TYPES,
+    STREAM_MODULE_GROUPS,
+)
 from nexus_constructor.field_utils import (
     add_required_component_fields,
     get_fields_with_update_functions,
@@ -455,15 +465,28 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.placeholder_checkbox.setChecked(False)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
+        nx_class_docs_to_display = c_nx_class
+        if c_nx_class in STREAM_MODULE_GROUPS:
+            nx_class_docs_to_display = self._group_parent.nx_class
+            self.nameLineEdit.setCompleter(QCompleter())
+            model = QStringListModel()
+            possible_fields = self.nx_component_classes[self._group_parent.nx_class]
+            possible_field_names, _, _ = zip(*possible_fields)
+            possible_field_names = sorted(possible_field_names)
+            model.setStringList(possible_field_names)
+            self.nameLineEdit.completer().setModel(model)
         class_html = path.join(
-            self.local_url_root, "classes", "base_classes", f"{c_nx_class}.html"
+            self.local_url_root,
+            "classes",
+            "base_classes",
+            f"{nx_class_docs_to_display}.html",
         )
         local_url_class = QUrl.fromLocalFile(class_html)
         self.webEngineView.setUrl(local_url_class)
 
         self.possible_fields = self.nx_component_classes[c_nx_class]
         try:
-            possible_field_names, _ = zip(*self.possible_fields)
+            possible_field_names, _, _ = zip(*self.possible_fields)
             self.nx_class_changed.emit(possible_field_names)
         except ValueError:
             self.nx_class_changed.emit([])
