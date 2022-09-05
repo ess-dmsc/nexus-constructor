@@ -207,8 +207,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
         self.add_component_window.show()
 
-    def _update_model(self):
+    def _update_model(self, selected_group: Group):
         self.component_tree_view_tab.set_up_model(self.model)
+        component_model = self.component_tree_view_tab.component_model
+        index = component_model.find_index_of_group(selected_group)
+        self.model.signals.group_edited.emit(index, True)
+        self.component_tree_view_tab.component_tree_view.repaint()
 
 
 def show_errors_message(errors: List[str]):
