@@ -223,6 +223,6 @@ node("docker") {
         }
     }
 
-    // builders['macOS'] = get_macos_pipeline()
+    builders['macOS'] = get_macos_pipeline()
     parallel builders
 }
