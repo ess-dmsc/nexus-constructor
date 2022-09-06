@@ -48,7 +48,7 @@ class NexusTreeModel(QAbstractItemModel):
         sub_tree_root = self.model.entry
         for item in abs_path:
             sub_tree_root = sub_tree_root[item]
-        if not sub_tree_root.parent_node:
+        if not sub_tree_root or not sub_tree_root.parent_node:
             return self.createIndex(0, 0, self.model.entry)
         return self.index_from_component(sub_tree_root)
 

@@ -73,7 +73,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     ):
         self._tree_view_updater = tree_view_updater
         self._scene_widget = scene_widget
-        self._group_to_edit_backup = deepcopy(group_to_edit)
+        self._group_to_edit_backup: Group = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
         file_dir = path.dirname(__file__)
@@ -128,6 +128,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def _cancel_new_group(self):
         if self._confirm_cancel():
+            group, _ = self.component_model.current_nxs_obj
+            if isinstance(group, Group):
+                self._refresh_tree(group)
             self.close()
 
     def _cancel_edit_group(self):
@@ -140,13 +143,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
             else:
                 self.model.entry = self._group_to_edit_backup  # type: ignore
                 self.component_model.tree_root = self.model.entry
+            self._refresh_tree(self._group_to_edit_backup)
             self.close()
 
-    def close(self) -> bool:
+    def _refresh_tree(self, group: Group):
         if self._tree_view_updater:
-            group, _ = self.component_model.current_nxs_obj
             self._tree_view_updater(group)
-        return super().close()
 
     def _handle_class_change(self):
         c_nx_class = self.componentTypeComboBox.currentText()
