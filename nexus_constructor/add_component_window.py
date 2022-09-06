@@ -131,6 +131,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
             group, _ = self.component_model.current_nxs_obj
             if isinstance(group, Group):
                 self._refresh_tree(group)
+            else:
+                self._refresh_tree(self._group_to_edit_backup)
             self.close()
 
     def _cancel_edit_group(self):
