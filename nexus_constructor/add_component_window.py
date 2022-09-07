@@ -4,15 +4,9 @@ from functools import partial
 from os import path
 from typing import Callable, List
 
-from PySide2.QtCore import QStringListModel, Qt, QUrl, Signal
+from PySide2.QtCore import Qt, QUrl, Signal
 from PySide2.QtGui import QKeyEvent, QVector3D
-from PySide2.QtWidgets import (
-    QCompleter,
-    QListWidget,
-    QListWidgetItem,
-    QMessageBox,
-    QWidget,
-)
+from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
@@ -59,6 +53,7 @@ from ui.add_component import Ui_AddComponentDialog
 
 class AddComponentDialog(Ui_AddComponentDialog):
     nx_class_changed = Signal("QVariant")
+    suggest_group_name_from_parent_fields = Signal("QVariant")
 
     def __init__(
         self,
@@ -247,6 +242,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.fieldsListWidget,
         )
         self.nx_class_changed.connect(self.__add_required_fields)
+        self.suggest_group_name_from_parent_fields.connect(
+            self.nameLineEdit.update_possible_fields
+        )
 
         c_group = self._group_container.group
 
@@ -472,13 +470,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         nx_class_docs_to_display = c_nx_class
         if c_nx_class in STREAM_MODULE_GROUPS:
             nx_class_docs_to_display = self._group_parent.nx_class
-            self.nameLineEdit.setCompleter(QCompleter())
-            model = QStringListModel()
             possible_fields = self.nx_component_classes[self._group_parent.nx_class]
             possible_field_names, _, _ = zip(*possible_fields)
             possible_field_names = sorted(possible_field_names)
-            model.setStringList(possible_field_names)
-            self.nameLineEdit.completer().setModel(model)
+            self.suggest_group_name_from_parent_fields.emit(possible_field_names)
+        else:
+            self.suggest_group_name_from_parent_fields.emit([])
         class_html = path.join(
             self.local_url_root,
             "classes",
@@ -633,6 +630,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: The geometry object.
         """
         c_group = self._group_container.group
+        old_group_name = c_group.name
+        self.nameLineEdit.set_new_group_name()
         group_children = []
         for child in c_group.children:
             if isinstance(child, Group):
@@ -644,7 +643,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.write_description_to_group(c_group)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
-            self._scene_widget.delete_component(c_group.name)
+            self._scene_widget.delete_component(old_group_name)
             self.component_model.model.append_component(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)
