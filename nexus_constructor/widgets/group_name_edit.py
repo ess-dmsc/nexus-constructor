@@ -2,8 +2,9 @@ from functools import partial
 from typing import List
 
 from PySide2 import QtWidgets
-from PySide2.QtCore import Signal
+from PySide2.QtCore import QStringListModel, Qt, Signal
 from PySide2.QtGui import QValidator
+from PySide2.QtWidgets import QCompleter
 
 from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.ui_utils import validate_line_edit
@@ -47,11 +48,11 @@ class GroupNameEdit(QtWidgets.QLineEdit):
                 suggestion_callable=self.generate_name_suggestion,
             )
         )
-        self.textEdited.connect(self._set_new_group_name)
         self.validator().validate(self.text(), 0)
+        self.setCompleter(QCompleter())
 
-    def _set_new_group_name(self, new_name: str):
-        self._container.group.name = new_name
+    def set_new_group_name(self):
+        self._container.group.name = self.text()
 
     def generate_name_suggestion(self):
         """
@@ -68,3 +69,18 @@ class GroupNameEdit(QtWidgets.QLineEdit):
                 if isinstance(g, Group)
             ],
         )
+
+    def focusInEvent(self, event):
+        self.completer().complete()
+        super(GroupNameEdit, self).focusInEvent(event)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Down:
+            self.completer().complete()
+        else:
+            super().keyPressEvent(event)
+
+    def update_possible_fields(self, possible_fields: List[str]):
+        model = QStringListModel()
+        model.setStringList(sorted(possible_fields))
+        self.completer().setModel(model)
