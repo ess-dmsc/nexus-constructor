@@ -83,8 +83,8 @@ class OffMeshEntityCollection(EntityCollection):
 class NeutronSourceEntityCollection(EntityCollection):
     def __init__(self, root_entity, nx_class):
         super().__init__(root_entity, nx_class)
-        self._source_length = 1.5
-        self._source_radius = 0.1
+        self._source_length = 0.5
+        self._source_radius = 0.05
         self.neutron_radius = min(self._source_length, self._source_radius) / 10
         self._num_neutrons = 8
         self._neutron_offsets = self._generate_random_points_in_cylinder(
