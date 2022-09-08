@@ -16,7 +16,7 @@ class SlitGeometry:
                 float(component["y_gap"].values) if "y_gap" in component else None,
             )
         else:
-            gaps = (0.05, 0.125)
+            gaps = (None, None)
         self._units = self._get_units(component)
         self.vertices: List[QVector3D] = []
         self.faces: List[List[int]]
