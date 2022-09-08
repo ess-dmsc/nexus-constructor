@@ -83,11 +83,14 @@ class OffMeshEntityCollection(EntityCollection):
 class NeutronSourceEntityCollection(EntityCollection):
     def __init__(self, root_entity, nx_class):
         super().__init__(root_entity, nx_class)
-        self._source_length = 4
-        self._source_radius = 1
+        self._source_length = 0.5
+        self._source_radius = 0.05
+        self.neutron_radius = min(self._source_length, self._source_radius) / 10
         self._num_neutrons = 8
         self._neutron_offsets = self._generate_random_points_in_cylinder(
-            self._num_neutrons, self._source_radius, self._source_length
+            self._num_neutrons,
+            self._source_radius - self.neutron_radius,
+            self._source_length - self.neutron_radius,
         )
 
     def create_entities(self):
@@ -137,10 +140,9 @@ class NeutronSourceEntityCollection(EntityCollection):
         )
 
     def _setup_neutrons(self):
-        neutron_radius = 0.1
         for i in range(self._num_neutrons):
             mesh = Qt3DExtras.QSphereMesh(self.root_entity)
-            mesh.setRadius(neutron_radius)
+            mesh.setRadius(self.neutron_radius)
 
             transform = Qt3DCore.QTransform(self.root_entity)
             transform.setMatrix(
