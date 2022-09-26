@@ -6,6 +6,7 @@ numpy-stl
 pint
 xmltodict
 numpy
+open3d
 pytest-qt
 ess-streaming-data-types >= 0.9.5
-PySide2
+PySide6
