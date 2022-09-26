@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
-from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFrame, QGroupBox, QWidget
+from PySide6.QtGui import QVector3D
+from PySide6.QtWidgets import QFrame, QGroupBox, QWidget
 
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import LinkTransformation

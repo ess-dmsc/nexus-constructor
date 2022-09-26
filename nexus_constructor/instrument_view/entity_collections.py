@@ -2,10 +2,11 @@ from abc import ABC
 from typing import Callable, List, Tuple, Union
 
 import numpy as np
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.Qt3DExtras import Qt3DExtras
-from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtGui import QColor, QMatrix4x4, QVector3D
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.Qt3DExtras import Qt3DExtras
+from PySide6.Qt3DRender import Qt3DRender
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QColor, QMatrix4x4, QVector3D
 
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.instrument_view.qentity_utils import (
@@ -57,7 +58,15 @@ class OffMeshEntityCollection(EntityCollection):
         self.entities: List[Qt3DCore.QEntity] = []
         self._mesh = mesh
         if nx_class not in MATERIAL_COLORS:
-            self.default_material = Qt3DExtras.QPerVertexColorMaterial()
+            # self.default_material = Qt3DExtras.QPhongMaterial(
+            #     ambient=QColor("#dbdbdb")
+            #     # diffuse=QColor("#9f9f9f")
+            # )
+            self.default_material = Qt3DExtras.QGoochMaterial(
+                cool=QColor("#9f9f9f"),
+                warm=QColor("#dbdbdb")
+            )
+
 
     def create_entities(self):
         self.entities.append(
@@ -194,3 +203,54 @@ class NeutronSourceEntityCollection(EntityCollection):
     def _set_cylinder_dimension(cylinder_mesh, radius, length):
         cylinder_mesh.setRadius(radius)
         cylinder_mesh.setLength(length)
+
+
+class GroundEntityCollection(EntityCollection):
+    def __init__(self, root_entity: Qt3DCore.QEntity):
+        nx_class = 'none'
+        super().__init__(root_entity, nx_class)
+        self.entities: List[Qt3DCore.QEntity] = []
+        if nx_class not in MATERIAL_COLORS:
+            self.default_material = Qt3DExtras.QPhongMaterial(
+                ambient=QColor("#f8dd9e"),
+                diffuse=QColor("#b69442")
+            )
+            # self.default_material = Qt3DExtras.QPhongMaterial(
+            #     ambient=QColor("#ffa614"),
+            #     # diffuse=QColor("#ffbf40")
+            # )
+            # self.default_material = Qt3DExtras.QGoochMaterial(
+            #     cool=QColor("#f74510"),
+            #     warm=QColor("#f85829")
+            # )
+
+    def create_entities(self):
+        self._mesh = Qt3DExtras.QPlaneMesh(self.root_entity)
+        ground_transform = Qt3DCore.QTransform(self.root_entity)
+        self._mesh.setHeight(200)
+        self._mesh.setWidth(200)
+        ground_transform.setMatrix(self._get_ground_transformation_matrix())
+        self.entities.append(
+            create_qentity([self._mesh, self.default_material, ground_transform], self.root_entity, False)
+        )
+
+    def add_transformation(self, transformation: Qt3DCore.QComponent):
+        for entity in self.entities:
+            entity.addComponent(transformation)
+
+    def remove_transformation(self, transformation: Qt3DCore.QComponent):
+        for entity in self.entities:
+            entity.removeComponent(transformation)
+
+    def setParent(self, value=None):
+        for entity in self.entities:
+            entity.setParent(value)
+
+    def entity_to_zoom(self):
+        return self.entities[0]
+
+    @staticmethod
+    def _get_ground_transformation_matrix() -> QMatrix4x4:
+        matrix = QMatrix4x4()
+        matrix.translate(QVector3D(0, -1.5, 0))
+        return matrix

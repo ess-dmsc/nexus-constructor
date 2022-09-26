@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 import attr
 import numpy as np
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtGui import QMatrix4x4, QTransform, QVector3D
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.QtGui import QMatrix4x4, QTransform, QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,

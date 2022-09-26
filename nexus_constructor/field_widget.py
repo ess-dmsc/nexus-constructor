@@ -4,9 +4,9 @@ from functools import partial
 from typing import Any, List, Union
 
 import numpy as np
-from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
-from PySide2.QtGui import QValidator
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
+from PySide6.QtGui import QValidator
+from PySide6.QtWidgets import (
     QComboBox,
     QCompleter,
     QDialog,

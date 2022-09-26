@@ -1,6 +1,6 @@
 import itertools
 
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.instrument_view.off_renderer import (
     OffMesh,

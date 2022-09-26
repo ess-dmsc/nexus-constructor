@@ -1,5 +1,5 @@
-from PySide2.QtCore import QModelIndex
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QModelIndex
+from PySide6.QtWidgets import (
     QAbstractItemView,
     QSizePolicy,
     QToolBar,
@@ -162,12 +162,12 @@ class ComponentTreeViewTab(QWidget):
         if len(selected[0].data().parent_node.children) == 1:
             new_selection_index = selected[0].parent()
         elif selected[0].row() > 0:
-            new_selection_index = self.component_model.parent(selected[0]).child(
-                selected[0].row() - 1, 0
+            new_selection_index = self.component_model.index(
+                selected[0].row() - 1, 0, self.component_model.parent(selected[0])
             )
         elif selected[-1].row() <= len(selected[-1].data().parent_node.children) - 1:
-            new_selection_index = self.component_model.parent(selected[-1]).child(
-                selected[-1].row(), 0
+            new_selection_index = self.component_model.index(
+                selected[-1].row(), 0, self.component_model.parent(selected[-1])
             )
         else:
             new_selection_index = selected[0].parent()
@@ -180,5 +180,5 @@ class ComponentTreeViewTab(QWidget):
         selected = self.component_tree_view.selectedIndexes()[0]
         component = selected.internalPointer()
         self.sceneWidget.zoom_to_component(
-            self.sceneWidget.get_entity(component.name), self.sceneWidget.view.camera()
+            self.sceneWidget.get_entity(component.absolute_path), self.sceneWidget.view.camera()
         )

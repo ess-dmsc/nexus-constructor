@@ -3,13 +3,13 @@ from typing import Optional
 
 import h5py
 import numpy as np
-import PySide2
+import PySide6
 import pytest
 import pytestqt
 from mock import Mock, call, mock_open, patch
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QMainWindow, QRadioButton
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QVector3D
+from PySide6.QtWidgets import QMainWindow, QRadioButton
 from pytestqt.qtbot import QtBot
 
 from nexus_constructor import component_type
@@ -261,7 +261,7 @@ def get_shape_type_button(dialog: AddComponentDialog, button_name: str):
     :param button_name: The name of the desired button.
     :return: The QRadioButton for the given shape type.
     """
-    for child in dialog.shapeTypeBox.findChildren(PySide2.QtWidgets.QRadioButton):
+    for child in dialog.shapeTypeBox.findChildren(PySide6.QtWidgets.QRadioButton):
         if child.text() == button_name:
             return child
 

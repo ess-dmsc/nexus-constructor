@@ -1,7 +1,7 @@
 import os.path as osp
 
-from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QLabel, QMainWindow, QVBoxLayout, QWidget
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QLabel, QMainWindow, QVBoxLayout, QWidget
 
 
 class AboutWindow(QMainWindow):

@@ -13,7 +13,7 @@ from nexus_constructor.utils.required_component_fields import required_component
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
-    from PySide2.QtWidgets import QFrame  # noqa: F401
+    from PySide6.QtWidgets import QFrame  # noqa: F401
 
     from nexus_constructor.model.module import HS01Stream  # noqa: F401
     from nexus_constructor.model.value_type import ValueType  # noqa: F401

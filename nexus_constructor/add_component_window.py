@@ -4,9 +4,9 @@ from functools import partial
 from os import path
 from typing import Callable, List
 
-from PySide2.QtCore import Qt, QUrl, Signal
-from PySide2.QtGui import QKeyEvent, QVector3D
-from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
+from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtGui import QKeyEvent, QVector3D
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
@@ -447,7 +447,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         return field
 
     def select_field(self, widget):
-        self.fieldsListWidget.setItemSelected(widget, True)
+        # self.fieldsListWidget.setItemSelected(widget, True)
+        widget.setSelected(True)
 
     def remove_field(self):
         for item in self.fieldsListWidget.selectedItems():

@@ -1,10 +1,10 @@
 from unittest.mock import Mock
 
 import pytest
-from PySide2.QtCore import QModelIndex, QPoint, Signal
-from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFrame as QFrameBase
-from PySide2.QtWidgets import QToolBar, QTreeView, QVBoxLayout, QWidget
+from PySide6.QtCore import QModelIndex, QPoint, Signal
+from PySide6.QtGui import QVector3D
+from PySide6.QtWidgets import QFrame as QFrameBase
+from PySide6.QtWidgets import QToolBar, QTreeView, QVBoxLayout, QWidget
 
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel

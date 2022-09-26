@@ -1,9 +1,9 @@
 import struct
 from typing import List
 
-from PySide2 import QtCore
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.Qt3DRender import Qt3DRender
+from PySide6 import QtCore
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.Qt3DRender import Qt3DRender
 
 from nexus_constructor.instrument_view.axis_colors import AxisColors
 from nexus_constructor.instrument_view.line_geometry import LineGeometry
@@ -36,7 +36,7 @@ class InstrumentViewAxes(object):
 
             self.set_mesh_properties(mesh, geometry)
             material = create_material(color, color, component_root_entity)
-            create_qentity([mesh, material], component_root_entity)
+            create_qentity([mesh, material], component_root_entity, False)
 
     @staticmethod
     def create_data_array(line_vertices: List[int]):

@@ -6,7 +6,7 @@ import attr
 import numpy as np
 import pytest
 from mock import Mock
-from PySide2.QtGui import QValidator
+from PySide6.QtGui import QValidator
 
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.unit_utils import METRES

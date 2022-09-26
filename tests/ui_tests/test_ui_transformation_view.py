@@ -3,7 +3,7 @@ from typing import Any
 import numpy as np
 import pytest
 from mock import Mock
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 from pytestqt.qtbot import QtBot  # noqa: F401
 
 from nexus_constructor.field_attrs import _get_human_readable_type

@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Union
 
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
@@ -177,6 +177,11 @@ class ShapeReader:
         )
         self.component[name] = off_geometry
         self.shape = off_geometry
+        # children = off_geometry.children
+        # for child in children:
+        #     print(child.name)
+        #     print(child.values[0:10])
+        # exit()
 
     @staticmethod
     def __create_off_geometry(

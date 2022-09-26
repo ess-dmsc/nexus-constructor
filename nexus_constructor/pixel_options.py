@@ -1,8 +1,8 @@
 from typing import List, Optional, Tuple
 
 import numpy as np
-from PySide2.QtCore import QObject, Qt, Signal
-from PySide2.QtWidgets import QDoubleSpinBox, QMessageBox, QSpinBox, QTableWidgetItem
+from PySide6.QtCore import QObject, Qt, Signal
+from PySide6.QtWidgets import QDoubleSpinBox, QMessageBox, QSpinBox, QTableWidgetItem
 
 from nexus_constructor.geometry.geometry_loader import load_geometry
 from nexus_constructor.geometry.pixel_data import (

@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     NX_TRANSFORMATIONS,

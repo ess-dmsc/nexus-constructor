@@ -3,7 +3,7 @@ from math import acos, cos, degrees, pi, sin
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide6.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import (
     GEOMETRY_NX_CLASS,

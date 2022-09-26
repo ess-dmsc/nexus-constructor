@@ -5,9 +5,9 @@ from typing import Callable, List
 
 import numpy as np
 import pint
-from PySide2.QtCore import QObject, Signal
-from PySide2.QtGui import QIntValidator, QValidator
-from PySide2.QtWidgets import QComboBox, QListWidget, QRadioButton, QWidget
+from PySide6.QtCore import QObject, Signal
+from PySide6.QtGui import QIntValidator, QValidator
+from PySide6.QtWidgets import QComboBox, QListWidget, QRadioButton, QWidget
 from stl import mesh
 
 from nexus_constructor.common_attrs import SCALAR

@@ -1,5 +1,5 @@
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.model.component import TRANSFORMS_GROUP_NAME, Component
 from nexus_constructor.model.module import Link, NS10Stream

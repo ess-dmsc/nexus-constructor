@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from mock import Mock
-from PySide2.QtCore import QItemSelectionModel, QModelIndex, Qt
+from PySide6.QtCore import QItemSelectionModel, QModelIndex, Qt
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.model.value_type import ValueTypes

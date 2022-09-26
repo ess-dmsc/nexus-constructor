@@ -1,5 +1,5 @@
 from mock import Mock
-from PySide2.QtGui import QMatrix4x4
+from PySide6.QtGui import QMatrix4x4
 
 from nexus_constructor.instrument_view.neutron_animation_controller import (
     NeutronAnimationController,

@@ -1,10 +1,10 @@
 from json import loads
 from typing import List, Optional, Tuple, Union
 
-import PySide2.QtGui
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
-from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QMessageBox
+import PySide6.QtGui
+from PySide6.QtCore import QAbstractItemModel, QModelIndex, Qt
+from PySide6.QtGui import QVector3D
+from PySide6.QtWidgets import QMessageBox
 
 from nexus_constructor.common_attrs import (
     NX_TRANSFORMATIONS,
@@ -54,6 +54,22 @@ class NexusTreeModel(QAbstractItemModel):
 
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
+
+    def find_component_of(self, index: QModelIndex):
+        if index.isValid():
+            item = index.internalPointer()
+            if isinstance(item, Component):
+                return index
+            parent_item = item.parent_node
+            if parent_item:
+                parent_index = self.createIndex(parent_item.row(), 0, parent_item)
+                next_index = self.find_component_of(parent_index)
+                if isinstance(next_index.internalPointer(), Component):
+                    return next_index
+            if item:
+                if item.name == item.absolute_path.split('/')[1]:
+                    return self.createIndex(0, 0, item)
+        return QModelIndex()
 
     def parent(self, index: QModelIndex):
         if index.isValid():
@@ -114,7 +130,7 @@ class NexusTreeModel(QAbstractItemModel):
             "streaming/writer_module",
         ]
 
-    def supportedDropActions(self) -> PySide2.QtCore.Qt.DropActions:
+    def supportedDropActions(self) -> PySide6.QtCore.Qt.DropActions:
         return Qt.DropAction.MoveAction | Qt.DropAction.CopyAction
 
     def dropMimeData(self, mimedata, action, row, column, parentIndex):

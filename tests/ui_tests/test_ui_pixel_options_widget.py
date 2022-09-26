@@ -4,7 +4,7 @@ from unittest.mock import mock_open
 import numpy as np
 import pytest
 from mock import patch
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 
 from nexus_constructor.geometry.geometry_loader import load_geometry_from_file_object
 from nexus_constructor.geometry.pixel_data import (

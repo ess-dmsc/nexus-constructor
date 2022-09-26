@@ -6,7 +6,7 @@ from nexus_constructor.instrument_view.qentity_utils import (
 )
 
 
-@patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
+@patch("PySide6.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
 def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
     mock,
 ):
@@ -22,7 +22,7 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     mock_material.setShininess.assert_not_called()
 
 
-@patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongAlphaMaterial", return_value=Mock())
+@patch("PySide6.Qt3DExtras.Qt3DExtras.QPhongAlphaMaterial", return_value=Mock())
 def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
     mock,
 ):
@@ -39,7 +39,7 @@ def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_TH
     mock_alpha_material.setShininess.assert_not_called()
 
 
-@patch("PySide2.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
+@patch("PySide6.Qt3DExtras.Qt3DExtras.QPhongMaterial", return_value=Mock())
 def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shininess_set_to_zero(
     mock,
 ):
@@ -55,7 +55,7 @@ def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shin
     mock_material.setShininess.assert_called_once_with(0)
 
 
-@patch("PySide2.Qt3DCore.Qt3DCore.QEntity", return_value=Mock())
+@patch("PySide6.Qt3DCore.Qt3DCore.QEntity", return_value=Mock())
 def test_GIVEN_components_WHEN_calling_add_components_to_entity_THEN_components_added(
     mock,
 ):

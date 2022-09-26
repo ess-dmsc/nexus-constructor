@@ -1,6 +1,6 @@
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtWebEngineWidgets import QWebEngineView
-from PySide2.QtWidgets import QDialog
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtWidgets import QDialog
 
 from nexus_constructor.model import GroupContainer
 from nexus_constructor.widgets import ClassDropDownList, DescriptionEdit, GroupNameEdit

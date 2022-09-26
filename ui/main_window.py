@@ -1,7 +1,6 @@
-from PySide2.QtCore import QMetaObject, QObject, QRect, QSize
-from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import (
-    QAction,
+from PySide6.QtCore import QMetaObject, QObject, QRect, QSize
+from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtWidgets import (
     QGridLayout,
     QLayout,
     QMenu,
@@ -13,6 +12,7 @@ from PySide2.QtWidgets import (
 )
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
+from ui.camerasettings_tab import CameraSettingsTab
 from ui.treeview_tab import ComponentTreeViewTab
 
 
@@ -49,11 +49,15 @@ class Ui_MainWindow(object):
         self.splitter.addWidget(self.sceneWidget)
 
     def _set_up_component_tree_view(self):
-        self.sceneWidget = InstrumentView(self.splitter)
+        self.sceneWidget = InstrumentView(self.splitter, self)
         self.component_tree_view_tab = ComponentTreeViewTab(
             scene_widget=self.sceneWidget, parent=self
         )
+        self.camera_settings_tab = CameraSettingsTab(
+            scene_widget=self.sceneWidget, parent=self
+        )
         self.tab_widget.addTab(self.component_tree_view_tab, "")
+        self.tab_widget.addTab(self.camera_settings_tab, "")
 
     def _set_up_menus(self, MainWindow: QObject):
         self.menu_bar = QMenuBar()
@@ -93,6 +97,9 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle("NeXus Constructor")
         self.tab_widget.setTabText(
             self.tab_widget.indexOf(self.component_tree_view_tab), "Nexus Structure"
+        )
+        self.tab_widget.setTabText(
+            self.tab_widget.indexOf(self.camera_settings_tab), "Camera Settings"
         )
         self.file_menu.setTitle("File")
         self.new_json_template_action.setText("Create new NeXus JSON template")
