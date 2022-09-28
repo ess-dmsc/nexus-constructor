@@ -258,11 +258,11 @@ class Gnomon:
         :return: The gnomon camera.
         """
         aspect = 1
-        near_plane = 0.1
+        near_plane = 1
 
         # Set far plane so that the camera can see the gnomon even when it is turned "behind" it and the cylinders are
         # facing away from the camera.
-        far_plane = 25
+        far_plane = 1000
 
         gnomon_camera = Qt3DRender.QCamera()
         gnomon_camera.setParent(self.gnomon_root_entity)

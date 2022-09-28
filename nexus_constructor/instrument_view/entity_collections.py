@@ -227,8 +227,8 @@ class GroundEntityCollection(EntityCollection):
     def create_entities(self):
         self._mesh = Qt3DExtras.QPlaneMesh(self.root_entity)
         ground_transform = Qt3DCore.QTransform(self.root_entity)
-        self._mesh.setHeight(200)
-        self._mesh.setWidth(200)
+        self._mesh.setHeight(400)
+        self._mesh.setWidth(400)
         ground_transform.setMatrix(self._get_ground_transformation_matrix())
         self.entities.append(
             create_qentity([self._mesh, self.default_material, ground_transform], self.root_entity, False)

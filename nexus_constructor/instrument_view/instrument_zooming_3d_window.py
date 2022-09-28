@@ -19,7 +19,7 @@ class InstrumentZooming3DWindow(Qt3DExtras.Qt3DWindow):
         render_settings = self.renderSettings()
         picking_settings = render_settings.pickingSettings()
         picking_settings.setFaceOrientationPickingMode(Qt3DRender.QPickingSettings.FrontAndBackFace)
-        picking_settings.setPickMethod(Qt3DRender.QPickingSettings.BoundingVolumePicking)             #TrianglePicking
+        picking_settings.setPickMethod(Qt3DRender.QPickingSettings.BoundingVolumePicking)            #BoundingVolumePicking #TrianglePicking
         picking_settings.setPickResultMode(Qt3DRender.QPickingSettings.NearestPick)
         
         self.last_press_time = 0

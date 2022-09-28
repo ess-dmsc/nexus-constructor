@@ -178,6 +178,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.model = reader.model
                 self._setup_model_signals()
                 self._update_views()
+                self.sceneWidget.create_ground()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()

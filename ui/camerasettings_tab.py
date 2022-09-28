@@ -175,7 +175,12 @@ class CameraSettingsTab(QWidget):
         self.viewCenterVector_x_dsb.setValue(self.sceneWidget.camera_entity.viewCenter().x())
         self.viewCenterVector_y_dsb.setValue(self.sceneWidget.camera_entity.viewCenter().y())
         self.viewCenterVector_z_dsb.setValue(self.sceneWidget.camera_entity.viewCenter().z())
-        
+
+        # self.sceneWidget.gnomon_camera.setUpVector(self.sceneWidget.camera_entity.upVector())
+        # self.sceneWidget.gnomon_camera.setViewCenter(self.sceneWidget.camera_entity.viewCenter())
+        # self.sceneWidget.gnomon_camera.setPosition(self.sceneWidget.camera_entity.position())
+        self.sceneWidget.gnomon.update_gnomon()
+
     def update_current_values(self):
         self.sceneWidget.current_camera_settings['position'] = QVector3D(
             self.positionVector_x_dsb.value(),

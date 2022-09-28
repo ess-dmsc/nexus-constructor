@@ -117,12 +117,6 @@ class InstrumentView(QWidget):
         self.cam_controller = Qt3DExtras.QFirstPersonCameraController(self.root_entity)
         self.switch_to_perspective()
         # self.switch_to_ortographic('side')
-        
-        # renderPass = Qt3DRender.QRenderPass()
-        # cullMode = Qt3DRender.QCullFace()
-        # cullMode.setMode(Qt3DRender.QCullFace.FrontAndBack)
-        # renderPass.addRenderState(cullMode)
-
 
         # Make sure that the size of the gnomon stays the same when the 3D view is resized
         self.view.heightChanged.connect(self.update_gnomon_size)
@@ -143,9 +137,7 @@ class InstrumentView(QWidget):
         # Dictionary of components and transformations so that we can delete them later
         self.component_entities: Dict[str, EntityCollection] = {}
         self.transformations = {}
-        
 
-        
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
         # components and axis lines
         self.create_layers()
@@ -225,7 +217,7 @@ class InstrumentView(QWidget):
 
         # Set the background color of the main scene
         component_clear_buffers.setClearColor(QColor("lightgrey"))
-        
+
         # Make sure flat surfaces are rendered on both sides
         renderStateSet = Qt3DRender.QRenderStateSet(component_clear_buffers)
         m_CullFace = Qt3DRender.QCullFace(renderStateSet)
@@ -237,9 +229,9 @@ class InstrumentView(QWidget):
         self.update_gnomon_size()
 
         # Filter out the gnomon for just the gnomon camera to see
-        gnomon_camera = self.gnomon.get_gnomon_camera()
+        self.gnomon_camera = self.gnomon.get_gnomon_camera()
         gnomon_clear_buffers = self.create_camera_filter(
-            self.gnomon_viewport, self.gnomon_root_entity, gnomon_camera
+            self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
         )
         # Make the gnomon appear in front of everything else
         # gnomon_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
@@ -363,7 +355,6 @@ class InstrumentView(QWidget):
         for component in self.component_entities.keys():
             self.component_entities[component].setParent(None)
         self.component_entities = dict()
-        self.create_ground()
 
     def delete_component(self, name: str):
         """
