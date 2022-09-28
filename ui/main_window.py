@@ -114,4 +114,5 @@ class Ui_MainWindow(object):
         self.simple_tree_view.setText("Use Simple Tree Model View")
         self.about_window.setText("About")
 
-        self.menu_bar.setNativeMenuBar(False)
+        # TODO: Fix so it does not crash on mac when this is called.
+        # self.menu_bar.setNativeMenuBar(False)
