@@ -22,6 +22,7 @@ from nexus_constructor.model.module import (
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.unique_name import generate_unique_name
 
 
@@ -67,7 +68,7 @@ class NexusTreeModel(QAbstractItemModel):
                 if isinstance(next_index.internalPointer(), Component):
                     return next_index
             if item:
-                if item.name == item.absolute_path.split('/')[1]:
+                if item.name == item.absolute_path.split("/")[1]:
                     return self.createIndex(0, 0, item)
         return QModelIndex()
 
@@ -488,6 +489,8 @@ class NexusTreeModel(QAbstractItemModel):
     ):  # TODO: this function is a bit shaky and needs an update in a future PR.
         try:
             component = self.current_nxs_obj[0].parent_component  # type: ignore
+            if not isinstance(component, Component):
+                component = self.current_nxs_obj[0].parent_component  # type: ignore
         except AttributeError:
             print("Not able to update link rows.")
             return
@@ -496,7 +499,11 @@ class NexusTreeModel(QAbstractItemModel):
             component_index = self.index(i, 0, QModelIndex())
             transformations_index = self.index(1, 0, component_index)
             transformations = transformations_index.internalPointer()
-            if transformations and transformations.has_link:
+            if (
+                transformations
+                and isinstance(transformations, TransformationsList)
+                and transformations.has_link
+            ):
                 transformation_rows = self.rowCount(transformations_index)
                 link_index = self.index(
                     transformation_rows - 1, 0, transformations_index
