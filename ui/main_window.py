@@ -94,6 +94,7 @@ class Ui_MainWindow(object):
         self._set_up_titles(MainWindow)
 
     def _set_up_titles(self, MainWindow):
+        self.menu_bar.setNativeMenuBar(False)
         MainWindow.setWindowTitle("NeXus Constructor")
         self.tab_widget.setTabText(
             self.tab_widget.indexOf(self.component_tree_view_tab), "Nexus Structure"
@@ -113,6 +114,3 @@ class Ui_MainWindow(object):
         self.show_action_labels.setText("Show Button Labels")
         self.simple_tree_view.setText("Use Simple Tree Model View")
         self.about_window.setText("About")
-
-        # TODO: Fix so it does not crash on mac when this is called.
-        # self.menu_bar.setNativeMenuBar(False)
