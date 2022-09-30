@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from ui.camerasettings_tab import CameraSettingsTab
+from ui.rendersettings_tab import RenderSettingsTab
 from ui.treeview_tab import ComponentTreeViewTab
 
 
@@ -56,8 +57,12 @@ class Ui_MainWindow(object):
         self.camera_settings_tab = CameraSettingsTab(
             scene_widget=self.sceneWidget, parent=self
         )
+        self.render_settings_tab = RenderSettingsTab(
+            scene_widget=self.sceneWidget, parent=self
+        )
         self.tab_widget.addTab(self.component_tree_view_tab, "")
         self.tab_widget.addTab(self.camera_settings_tab, "")
+        self.tab_widget.addTab(self.render_settings_tab, "")
 
     def _set_up_menus(self, MainWindow: QObject):
         self.menu_bar = QMenuBar()
@@ -101,6 +106,9 @@ class Ui_MainWindow(object):
         )
         self.tab_widget.setTabText(
             self.tab_widget.indexOf(self.camera_settings_tab), "Camera Settings"
+        )
+        self.tab_widget.setTabText(
+            self.tab_widget.indexOf(self.render_settings_tab), "Render Settings"
         )
         self.file_menu.setTitle("File")
         self.new_json_template_action.setText("Create new NeXus JSON template")

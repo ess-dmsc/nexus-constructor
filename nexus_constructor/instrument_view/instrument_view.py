@@ -136,6 +136,7 @@ class InstrumentView(QWidget):
 
         # Dictionary of components and transformations so that we can delete them later
         self.component_entities: Dict[str, EntityCollection] = {}
+        self.components: Dict[str, Component] = {}
         self.transformations = {}
 
         # Create layers in order to allow one camera to only see the gnomon and one camera to only see the
@@ -297,8 +298,8 @@ class InstrumentView(QWidget):
         name, nx_class = component.absolute_path, component.nx_class
         geometry, positions = component.shape
         q_component: EntityCollection
-        print(name, '\n', nx_class,'\n', geometry,'\n', positions, '\n')
-        print('\n','\n','\n','\n')
+        # print(name, '\n', nx_class,'\n', geometry,'\n', positions, '\n')
+        # print('\n','\n','\n','\n')
         if geometry is None:
             return
         if nx_class in [CHOPPER_CLASS_NAME, SLIT_CLASS_NAME]:
@@ -318,11 +319,34 @@ class InstrumentView(QWidget):
             )
         q_component.create_entities()
         self.component_entities[name] = q_component
+        self.components[name] = component
 
-        try:
-            geometry.vertices, geometry.faces = mesh.new_geometry
-        except:
-            print('keeping the same geometry')
+        backend_use_simplified_mesh = False
+        if backend_use_simplified_mesh:
+            try:
+                geometry.vertices, geometry.faces = mesh.simple_geometry
+            except:
+                print('Failed to set simplified mesh to backend for {}'.format(name))
+
+    def update_meshes(self):
+        for name in self.component_entities.keys():
+            if '_ground' in name:
+                continue
+            if not hasattr(self.component_entities[name], '_mesh'):
+                continue
+            for e in self.component_entities[name].entities:
+                if isinstance(e, tuple):
+                    e = e[0]
+                component = self.components[name]
+                geometry, positions = component.shape
+                if e.old_mesh is not None:
+                    new_mesh = e.old_mesh
+                else:
+                    new_mesh = OffMesh(
+                        geometry.off_geometry, self.component_root_entity, positions, True, False
+                    )
+                e.switch_mesh(new_mesh)
+
 
                 
     def get_entity(self, component_name: str) -> Qt3DCore.QEntity:
@@ -355,6 +379,7 @@ class InstrumentView(QWidget):
         for component in self.component_entities.keys():
             self.component_entities[component].setParent(None)
         self.component_entities = dict()
+        self.components = dict()
 
     def delete_component(self, name: str):
         """
@@ -364,6 +389,7 @@ class InstrumentView(QWidget):
         try:
             self.component_entities[name].setParent(None)
             self.component_entities.pop(name)
+            self.components.pop(name)
         except KeyError:
             logging.error(
                 f"Unable to delete component {name} because it doesn't exist."

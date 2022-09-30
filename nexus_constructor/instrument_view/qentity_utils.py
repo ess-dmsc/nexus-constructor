@@ -42,6 +42,7 @@ class Entity(Qt3DCore.QEntity):
    
         self.clicked = False
         self.inside = False
+        self.old_mesh = None
 
         
         if picker:
@@ -90,6 +91,15 @@ class Entity(Qt3DCore.QEntity):
         if self.clicked:
             return
         self.switch_to_normal()
+
+    def switch_mesh(self, new_mesh):
+        for c in self.components():
+            if type(c) == type(new_mesh):
+                if c == new_mesh:
+                    return
+                self.old_mesh = c
+                self.removeComponent(c)
+                self.addComponent(new_mesh)
 
                 
     # def mouse_clicked_event(self, event):        

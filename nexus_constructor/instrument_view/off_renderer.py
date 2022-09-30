@@ -161,6 +161,7 @@ class QtOFFGeometry(Qt3DCore.QGeometry):
             positions: List[QVector3D] = None,
             parent=None,
             use_progress_bar: bool = False,
+            allow_simplification: bool = True,
     ):
         """
         Creates the geometry for the OFF to be displayed in Qt3D.
@@ -170,6 +171,8 @@ class QtOFFGeometry(Qt3DCore.QGeometry):
         produced at the origin.
         """
         super().__init__(parent)
+
+        self.has_simplified_geometry = False
 
         if positions is None:
             positions = [QVector3D(0, 0, 0)]
@@ -183,8 +186,8 @@ class QtOFFGeometry(Qt3DCore.QGeometry):
             else None,
         )
 
-        if len(triangles) > 1000000:
-            print('Decimating mesh')
+        if len(triangles) > 100000 and allow_simplification:
+            print('Simplifying mesh')
             temp_mesh = o3d.geometry.TriangleMesh()
 
             temp_mesh.vertices = o3d.utility.Vector3dVector(np.array([np.asarray(v.toTuple()) for v in vertices]))
@@ -210,7 +213,8 @@ class QtOFFGeometry(Qt3DCore.QGeometry):
 
             vertices = [QVector3D(*list(v)) for v in new_vertices]
             triangles = [list(t) for t in new_triangles]
-            self.new_geometry = vertices, triangles
+            self.has_simplified_geometry = True
+            self.simple_geometry = vertices, triangles
 
         vertex_buffer_values = list(create_vertex_buffer(vertices, triangles))
         self.vertex_count = len(vertex_buffer_values) // 3
@@ -274,6 +278,7 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
             parent: Qt3DCore.QEntity,
             positions: List[QVector3D] = None,
             use_progress_bar: bool = False,
+            allow_simplification: bool = True,
     ):
         """
         Creates a geometry renderer for OFF geometry.
@@ -285,13 +290,12 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
         super().__init__(parent)
 
         self.setInstanceCount(1)
-        qt_geometry = QtOFFGeometry(geometry, positions, self, use_progress_bar)
-        self.setVertexCount(qt_geometry.vertex_count)
+        self.qt_geometry = QtOFFGeometry(geometry, positions, self, use_progress_bar, allow_simplification)
+        self.setVertexCount(self.qt_geometry.vertex_count)
         self.setFirstVertex(0)
         self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)
         self.setFirstInstance(0)
-        self.setGeometry(qt_geometry)
-        try:
-            self.new_geometry = qt_geometry.new_geometry
-        except:
-            pass
+        self.setGeometry(self.qt_geometry)
+        self.simple_geometry = None
+        if self.qt_geometry.has_simplified_geometry:
+            self.simple_geometry = self.qt_geometry.simple_geometry
