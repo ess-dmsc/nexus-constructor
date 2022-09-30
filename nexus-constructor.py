@@ -5,8 +5,6 @@ Requires Python 3.6+
 import argparse
 import logging
 import os
-
-os.environ["QT_MAC_WANTS_LAYER"] = "1"
 import signal
 import sys
 
