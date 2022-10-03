@@ -86,9 +86,6 @@ class Entity(Qt3DCore.QEntity):
                 self.removeComponent(c)
                 self.addComponent(new_mesh)
 
-    # def mouse_clicked_event(self, event):
-    #     self.from_view = True
-
 
 def create_material(
     ambient: QColor,
