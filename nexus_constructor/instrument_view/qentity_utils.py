@@ -32,56 +32,41 @@ MATERIAL_ALPHA = {
 }
 
 
-
-
 class Entity(Qt3DCore.QEntity):
     def __init__(self, parent, picker=True):
         super().__init__(parent)
         self.parent = parent
-        
-   
+
         self.clicked = False
         self.inside = False
         self.old_mesh = None
 
-        
         if picker:
             self.picker = Qt3DRender.QObjectPicker()
             self.picker.setHoverEnabled(True)
             self.picker.setDragEnabled(True)
-            
-            # self.hoover_material = Qt3DExtras.QPhongMaterial(
-            #     ambient=QColor("#275fff")
-            #     # diffuse=QColor("#99e6ff")
-            # )
             self.hoover_material = Qt3DExtras.QGoochMaterial(
-                cool=QColor("#275fff"),
-                warm=QColor("#99e6ff")
+                cool=QColor("#275fff"), warm=QColor("#99e6ff")
             )
-            
+
             self.picker.entered.connect(self.mouse_enter_event)
             self.picker.exited.connect(self.mouse_leave_event)
-            
-            # self.picker.clicked.connect(self.mouse_clicked_event)
-            # self.picker.released.connect(self.mouse_event)
-            
             self.addComponent(self.picker)
 
-        
     def switch_to_highlight(self):
         for c in self.components():
-            if type(c) == type(self.hoover_material):
+            if isinstance(type(c), type(self.hoover_material)):
                 if c != self.hoover_material:
                     self.true_material = c
                     self.removeComponent(c)
                     self.addComponent(self.hoover_material)
-                    
+
     def switch_to_normal(self):
         for c in self.components():
-            if type(c) == type(self.hoover_material):
+            if isinstance(type(c), type(self.hoover_material)):
                 self.removeComponent(self.hoover_material)
                 self.addComponent(self.true_material)
-    
+
     def mouse_enter_event(self):
         self.inside = True
         self.switch_to_highlight()
@@ -101,13 +86,9 @@ class Entity(Qt3DCore.QEntity):
                 self.removeComponent(c)
                 self.addComponent(new_mesh)
 
-                
-    # def mouse_clicked_event(self, event):        
+    # def mouse_clicked_event(self, event):
     #     self.from_view = True
-        
 
-
-        
 
 def create_material(
     ambient: QColor,
@@ -143,7 +124,9 @@ def create_material(
 
 
 def create_qentity(
-    components: List[Qt3DCore.QComponent], parent=None, picker=True,
+    components: List[Qt3DCore.QComponent],
+    parent=None,
+    picker=True,
 ) -> Qt3DCore.QEntity:
     """
     Creates a QEntity and gives it all of the QComponents that are contained in a list.

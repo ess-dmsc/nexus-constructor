@@ -6,7 +6,7 @@ from typing import Dict, Tuple
 from PySide6.Qt3DCore import Qt3DCore
 from PySide6.Qt3DExtras import Qt3DExtras
 from PySide6.Qt3DRender import Qt3DRender
-from PySide6.QtCore import QModelIndex, QRectF
+from PySide6.QtCore import QRectF
 from PySide6.QtGui import QColor, QVector3D
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
@@ -80,7 +80,7 @@ class InstrumentView(QWidget):
 
     def __init__(self, parent, main_window):
         super().__init__()
-        
+
         self.main_window = main_window
 
         self.root_entity = Qt3DCore.QEntity()
@@ -101,22 +101,20 @@ class InstrumentView(QWidget):
         container = QWidget.createWindowContainer(self.view)
         lay.addWidget(container)
 
-
         self.default_camera_settings = {
-            'perspective': [45, 16.0 / 9.0, 0.01, 1000],
-            'position': QVector3D(6, 8, 30),
-            'ortographic': [-20, 20, -20, 20, 0.01, 1000],
-            'position_top': QVector3D(0, 5, 0),
-            'position_side': QVector3D(5, 0, 0),
-            'position_front': QVector3D(0, 0, -5),
-            'viewcenter': QVector3D(0, 0, 0),
-            'cameraspeed': 10
-            }
+            "perspective": [45, 16.0 / 9.0, 0.01, 1000],
+            "position": QVector3D(6, 8, 30),
+            "ortographic": [-20, 20, -20, 20, 0.01, 1000],
+            "position_top": QVector3D(0, 5, 0),
+            "position_side": QVector3D(5, 0, 0),
+            "position_front": QVector3D(0, 0, -5),
+            "viewcenter": QVector3D(0, 0, 0),
+            "cameraspeed": 10,
+        }
         self.current_camera_settings = deepcopy(self.default_camera_settings)
         self.camera_entity = self.view.camera()
         self.cam_controller = Qt3DExtras.QFirstPersonCameraController(self.root_entity)
         self.switch_to_perspective()
-        # self.switch_to_ortographic('side')
 
         # Make sure that the size of the gnomon stays the same when the 3D view is resized
         self.view.heightChanged.connect(self.update_gnomon_size)
@@ -143,7 +141,7 @@ class InstrumentView(QWidget):
         # components and axis lines
         self.create_layers()
         self.initialise_view()
-        
+
         # Create the ground layer
         self.create_ground()
         self.start_time = time.time()
@@ -153,54 +151,30 @@ class InstrumentView(QWidget):
 
         # Move the gnomon when the camera view changes
         self.view.camera().viewVectorChanged.connect(self.gnomon.update_gnomon)
-        
-        
+
     def switch_to_perspective(self):
         """
         Method for setting camera perspective
         """
         # Set the properties of the instrument camera controller
-        self.cam_controller.setLinearSpeed(self.current_camera_settings['cameraspeed'])
-        self.cam_controller.setCamera(self.camera_entity )
+        self.cam_controller.setLinearSpeed(self.current_camera_settings["cameraspeed"])
+        self.cam_controller.setCamera(self.camera_entity)
 
         # Enable the camera to see a large distance by giving it a small nearView and large farView
-        self.view.camera().lens().setPerspectiveProjection(*self.current_camera_settings['perspective'])
-        # self.view.camera().lens().setOrthographicProjection(-3, 3, -3, 3, 1, 100)
+        self.view.camera().lens().setPerspectiveProjection(
+            *self.current_camera_settings["perspective"]
+        )
 
         # Set the camera view centre as the origin and position the camera so that it looks down at the initial sample
-        self.view.camera().setPosition(self.current_camera_settings['position'])
-        # self.view.camera().setPosition(QVector3D(5, 0, 0))
+        self.view.camera().setPosition(self.current_camera_settings["position"])
 
-        self.view.camera().setViewCenter(self.current_camera_settings['viewcenter'])
-        
-        
-    def switch_to_ortographic(self, axis):
-        """
-        Not used
-        """
-        # Set the properties of the instrument camera controller
-        self.cam_controller.setLinearSpeed(self.current_camera_settings['cameraspeed'])
-        self.cam_controller.setCamera(self.camera_entity )
-
-        # Enable the camera to see a large distance by giving it a small nearView and large farView
-        self.view.camera().lens().setOrthographicProjection(*self.current_camera_settings['ortographic'])
-        self.view.camera().lens().horizontalMagnification = 2.
-        self.view.camera().lens().verticalMagnification = 2.
-
-        # Set the camera view centre as the origin and position the camera so that it looks down at the initial sample
-        self.view.camera().setPosition(self.current_camera_settings['position_'+axis])
-
-        self.view.camera().setViewCenter(self.current_camera_settings['viewcenter'])
-        
-                
+        self.view.camera().setViewCenter(self.current_camera_settings["viewcenter"])
 
     def create_ground(self):
         """
         Method for creating the ground entity
         """
-        ground_component = GroundEntityCollection(
-            self.component_root_entity
-        )
+        ground_component = GroundEntityCollection(self.component_root_entity)
         ground_component.create_entities()
         self.component_entities["_ground"] = ground_component
 
@@ -240,12 +214,6 @@ class InstrumentView(QWidget):
 
         # Filter out the gnomon for just the gnomon camera to see
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
-        gnomon_clear_buffers = self.create_camera_filter(
-            self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
-        )
-        # Make the gnomon appear in front of everything else
-        # gnomon_clear_buffers.setBuffers(Qt3DRender.QClearBuffers.DepthBuffer)
-
         self.gnomon.update_gnomon()
 
     def update_gnomon_size(self):
@@ -307,8 +275,6 @@ class InstrumentView(QWidget):
         name, nx_class = component.absolute_path, component.nx_class
         geometry, positions = component.shape
         q_component: EntityCollection
-        # print(name, '\n', nx_class,'\n', geometry,'\n', positions, '\n')
-        # print('\n','\n','\n','\n')
         if geometry is None:
             return
         if nx_class in [CHOPPER_CLASS_NAME, SLIT_CLASS_NAME]:
@@ -334,17 +300,17 @@ class InstrumentView(QWidget):
         if backend_use_simplified_mesh:
             try:
                 geometry.vertices, geometry.faces = mesh.simple_geometry
-            except:
-                print('Failed to set simplified mesh to backend for {}'.format(name))
+            except Exception:
+                print("Failed to set simplified mesh to backend for {}".format(name))
 
     def update_meshes(self):
         """
         Switch from low-res meshes to high-res meshes, and vice versa
         """
         for name in self.component_entities.keys():
-            if '_ground' in name:
+            if "_ground" in name:
                 continue
-            if not hasattr(self.component_entities[name], '_mesh'):
+            if not hasattr(self.component_entities[name], "_mesh"):
                 continue
             for e in self.component_entities[name].entities:
                 if isinstance(e, tuple):
@@ -355,12 +321,14 @@ class InstrumentView(QWidget):
                     new_mesh = e.old_mesh
                 else:
                     new_mesh = OffMesh(
-                        geometry.off_geometry, self.component_root_entity, positions, True, False
+                        geometry.off_geometry,
+                        self.component_root_entity,
+                        positions,
+                        True,
+                        False,
                     )
                 e.switch_mesh(new_mesh)
 
-
-                
     def get_entity(self, component_name: str) -> Qt3DCore.QEntity:
         """
         Obtain the entity from the InstrumentView based on its name.
@@ -410,7 +378,7 @@ class InstrumentView(QWidget):
             self.transformations.pop(name)
         except KeyError:
             pass  # no problem if there are no transformations to remove
-            
+
     def select_component(self, name: str):
         """
         Method for when a component is pressed in the treeview
@@ -430,16 +398,15 @@ class InstrumentView(QWidget):
                             e.clicked = False
                             e.inside = False
                             e.switch_to_normal()
-                    except:
+                    except Exception:
                         pass
         except KeyError:
             logging.error(
                 f"Unable to select component {name} because it doesn't exist."
             )
-            
-            
+
     def iterate_tree(self, parent, target):
-        if self.target_child != None or not isinstance(parent, Group):
+        if self.target_child or not isinstance(parent, Group):
             return
         for child in parent.children:
             if not isinstance(child, Group):
@@ -449,10 +416,9 @@ class InstrumentView(QWidget):
                 break
             try:
                 self.iterate_tree(child, target)
-            except:
+            except Exception:
                 pass
-            
-            
+
     def select_entity(self, component: Component):
         """
         Method for when a component is pressed in the instrument view
@@ -462,16 +428,21 @@ class InstrumentView(QWidget):
             for e in entity.entities:
                 if e == component:
                     name = key
-                    
-        component_tree_view = self.main_window.component_tree_view_tab.component_tree_view
+
+        component_tree_view = (
+            self.main_window.component_tree_view_tab.component_tree_view
+        )
         component_model = self.main_window.component_tree_view_tab.component_model
         selected = component_tree_view.selectedIndexes()
         if len(selected) == 0:
             return
 
         try:
-            name_compare = selected[0].internalPointer().name == selected[0].internalPointer().absolute_path.split('/')[1]
-        except:
+            name_compare = (
+                selected[0].internalPointer().name
+                == selected[0].internalPointer().absolute_path.split("/")[1]
+            )
+        except Exception:
             name_compare = False
         if name_compare:
             root_index = selected[0].internalPointer()
@@ -479,16 +450,15 @@ class InstrumentView(QWidget):
             root_index = selected[0].data().parent_node
             while True:
                 new_root_index = root_index.parent_node
-                if new_root_index != None:
+                if new_root_index:
                     root_index = new_root_index
-                elif new_root_index == None:
+                elif new_root_index is None:
                     break
-        
+
         self.target_child = None
         self.iterate_tree(root_index, name)
         new_selection_index = component_model.find_index_of_group(self.target_child)
         component_tree_view.setCurrentIndex(new_selection_index)
-        
 
     def add_transformation(self, component):
         """

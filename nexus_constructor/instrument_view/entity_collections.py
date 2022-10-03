@@ -5,7 +5,6 @@ import numpy as np
 from PySide6.Qt3DCore import Qt3DCore
 from PySide6.Qt3DExtras import Qt3DExtras
 from PySide6.Qt3DRender import Qt3DRender
-from PySide6.QtCore import QSize
 from PySide6.QtGui import QColor, QMatrix4x4, QVector3D
 
 from nexus_constructor.instrument_view.off_renderer import OffMesh
@@ -58,15 +57,9 @@ class OffMeshEntityCollection(EntityCollection):
         self.entities: List[Qt3DCore.QEntity] = []
         self._mesh = mesh
         if nx_class not in MATERIAL_COLORS:
-            # self.default_material = Qt3DExtras.QPhongMaterial(
-            #     ambient=QColor("#dbdbdb")
-            #     # diffuse=QColor("#9f9f9f")
-            # )
             self.default_material = Qt3DExtras.QGoochMaterial(
-                cool=QColor("#9f9f9f"),
-                warm=QColor("#dbdbdb")
+                cool=QColor("#9f9f9f"), warm=QColor("#dbdbdb")
             )
-
 
     def create_entities(self):
         self.entities.append(
@@ -207,22 +200,13 @@ class NeutronSourceEntityCollection(EntityCollection):
 
 class GroundEntityCollection(EntityCollection):
     def __init__(self, root_entity: Qt3DCore.QEntity):
-        nx_class = 'none'
+        nx_class = "none"
         super().__init__(root_entity, nx_class)
         self.entities: List[Qt3DCore.QEntity] = []
         if nx_class not in MATERIAL_COLORS:
             self.default_material = Qt3DExtras.QPhongMaterial(
-                ambient=QColor("#f8dd9e"),
-                diffuse=QColor("#b69442")
+                ambient=QColor("#f8dd9e"), diffuse=QColor("#b69442")
             )
-            # self.default_material = Qt3DExtras.QPhongMaterial(
-            #     ambient=QColor("#ffa614"),
-            #     # diffuse=QColor("#ffbf40")
-            # )
-            # self.default_material = Qt3DExtras.QGoochMaterial(
-            #     cool=QColor("#f74510"),
-            #     warm=QColor("#f85829")
-            # )
 
     def create_entities(self):
         self._mesh = Qt3DExtras.QPlaneMesh(self.root_entity)
@@ -231,7 +215,11 @@ class GroundEntityCollection(EntityCollection):
         self._mesh.setWidth(400)
         ground_transform.setMatrix(self._get_ground_transformation_matrix())
         self.entities.append(
-            create_qentity([self._mesh, self.default_material, ground_transform], self.root_entity, False)
+            create_qentity(
+                [self._mesh, self.default_material, ground_transform],
+                self.root_entity,
+                False,
+            )
         )
 
     def add_transformation(self, transformation: Qt3DCore.QComponent):

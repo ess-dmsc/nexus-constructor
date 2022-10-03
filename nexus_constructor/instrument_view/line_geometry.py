@@ -1,6 +1,5 @@
 from PySide6 import QtCore
 from PySide6.Qt3DCore import Qt3DCore
-from PySide6.Qt3DRender import Qt3DRender
 
 
 class LineGeometry(Qt3DCore.QGeometry):
