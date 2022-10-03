@@ -156,6 +156,9 @@ class InstrumentView(QWidget):
         
         
     def switch_to_perspective(self):
+        """
+        Method for setting camera perspective
+        """
         # Set the properties of the instrument camera controller
         self.cam_controller.setLinearSpeed(self.current_camera_settings['cameraspeed'])
         self.cam_controller.setCamera(self.camera_entity )
@@ -172,6 +175,9 @@ class InstrumentView(QWidget):
         
         
     def switch_to_ortographic(self, axis):
+        """
+        Not used
+        """
         # Set the properties of the instrument camera controller
         self.cam_controller.setLinearSpeed(self.current_camera_settings['cameraspeed'])
         self.cam_controller.setCamera(self.camera_entity )
@@ -189,6 +195,9 @@ class InstrumentView(QWidget):
                 
 
     def create_ground(self):
+        """
+        Method for creating the ground entity
+        """
         ground_component = GroundEntityCollection(
             self.component_root_entity
         )
@@ -329,6 +338,9 @@ class InstrumentView(QWidget):
                 print('Failed to set simplified mesh to backend for {}'.format(name))
 
     def update_meshes(self):
+        """
+        Switch from low-res meshes to high-res meshes, and vice versa
+        """
         for name in self.component_entities.keys():
             if '_ground' in name:
                 continue
@@ -400,6 +412,9 @@ class InstrumentView(QWidget):
             pass  # no problem if there are no transformations to remove
             
     def select_component(self, name: str):
+        """
+        Method for when a component is pressed in the treeview
+        """
         if time.time() - self.view.last_press_time < 0.1:
             return
         try:
@@ -439,6 +454,9 @@ class InstrumentView(QWidget):
             
             
     def select_entity(self, component: Component):
+        """
+        Method for when a component is pressed in the instrument view
+        """
         for key in self.component_entities.keys():
             entity = self.component_entities[key]
             for e in entity.entities:
@@ -450,9 +468,7 @@ class InstrumentView(QWidget):
         selected = component_tree_view.selectedIndexes()
         if len(selected) == 0:
             return
-        
-        # print(selected[0].internalPointer().name)
-        # print(selected[0].internalPointer().absolute_path.split('/')[1])
+
         try:
             name_compare = selected[0].internalPointer().name == selected[0].internalPointer().absolute_path.split('/')[1]
         except:
