@@ -74,19 +74,7 @@ PIXEL_OPTIONS = dict()
 NO_PIXEL_OPTIONS = dict()
 ALL_COMPONENT_TYPES = dict()
 
-for i, component_class in enumerate(
-    list(
-        AddComponentDialog(
-            None,
-            t_model,
-            t_component,
-            group_to_edit=t_group,
-            initial_edit=False,
-            nx_classes=NX_CLASS_DEFINITIONS,
-            scene_widget=None,
-        ).nx_component_classes.keys()
-    )
-):
+for i, component_class in enumerate(list(NX_CLASS_DEFINITIONS.keys())):
 
     ALL_COMPONENT_TYPES[component_class] = i
 
