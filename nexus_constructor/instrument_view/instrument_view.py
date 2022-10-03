@@ -486,10 +486,7 @@ class InstrumentView(QWidget):
         
         self.target_child = None
         self.iterate_tree(root_index, name)
-        # print(name, self.target_child.absolute_path)
-        
         new_selection_index = component_model.find_index_of_group(self.target_child)
-        
         component_tree_view.setCurrentIndex(new_selection_index)
         
 
