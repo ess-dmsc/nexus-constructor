@@ -117,7 +117,6 @@ def get_component_combobox_index(
 
 @pytest.fixture(scope="function")
 def parent_mock():
-
     parent_mock = Mock(spec=MainWindow)
     parent_mock.sceneWidget = Mock(spec=InstrumentView)
     return parent_mock
@@ -126,6 +125,18 @@ def parent_mock():
 @pytest.fixture(scope="function")
 def instrument():
     return Model()
+
+
+class MockWebEngineView:
+    def setUrl(self, url):
+        pass
+
+
+def set_web_engine_view_mock(self, sizePolicy):
+    self.webEngineView = MockWebEngineView()
+
+
+AddComponentDialog.set_web_engine_view = set_web_engine_view_mock
 
 
 @pytest.fixture(scope="function")
@@ -2280,29 +2291,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
 
     assert streams_widget.array_size_label.isVisible()
     assert streams_widget.array_size_spinbox.isVisible()
-
-
-def test_UI_GIVEN_initial_component_THEN_webbrowser_url_contains_component_class(
-    qtbot, add_component_dialog
-):
-    add_component_dialog.componentTypeComboBox.setCurrentText("NXaperture")
-    current_nx_class = add_component_dialog.componentTypeComboBox.currentText()
-    assert current_nx_class in add_component_dialog.webEngineView.url().toString()
-
-
-def test_UI_GIVEN_change_of_component_type_THEN_webbrowser_url_is_updated_and_contains_component_class(
-    qtbot, add_component_dialog
-):
-    # Setting a valid nexus class.
-    add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
-
-    current_nx_class = add_component_dialog.componentTypeComboBox.currentText()
-
-    new_nx_class = add_component_dialog.componentTypeComboBox.itemText(3)
-    add_component_dialog.componentTypeComboBox.setCurrentIndex(3)
-
-    assert new_nx_class in add_component_dialog.webEngineView.url().toString()
-    assert current_nx_class not in add_component_dialog.webEngineView.url().toString()
 
 
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(

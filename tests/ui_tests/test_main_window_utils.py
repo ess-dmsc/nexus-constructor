@@ -216,7 +216,7 @@ def test_GIVEN_action_properties_WHEN_creating_disabled_action_THEN_action_has_e
     assert action.toolTip() == mouse_over_text
     assert action.parent() is tree_view_tab
     assert not action.icon().isNull()
-    assert not action.isEnabled()
+    assert action.isEnabled()
 
 
 def test_GIVEN_action_properties_WHEN_creating_enabled_action_THEN_action_has_expected_attributes(
