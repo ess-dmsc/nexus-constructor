@@ -183,7 +183,7 @@ def set_enabled_and_raise(action: QAction, value: bool):
         value: bool
             True to enable action and raise associated QToolButton.
     """
-    raise NotImplementedError()
+    pass
 
 
 def handle_number_of_items_selected_is_not_one(
