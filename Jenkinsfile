@@ -9,7 +9,7 @@ properties([
     buildDiscarder(
         logRotator(
             artifactDaysToKeepStr: '',
-            artifactNumToKeepStr: '5',
+            artifactNumToKeepStr: '1',
             daysToKeepStr: '',
             numToKeepStr: ''
         )
@@ -223,6 +223,6 @@ node("docker") {
         }
     }
 
-    // builders['macOS'] = get_macos_pipeline()
+    builders['macOS'] = get_macos_pipeline()
     parallel builders
 }
