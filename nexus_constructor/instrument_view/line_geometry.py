@@ -1,8 +1,15 @@
+from sys import platform
+
 from PySide6 import QtCore
 from PySide6.Qt3DCore import Qt3DCore
+from PySide6.QtGui import QVector3D
+
+from nexus_constructor.instrument_view.off_renderer import convert_to_bytes
 
 
 class LineGeometry(Qt3DCore.QGeometry):
+    q_attribute = Qt3DCore.QAttribute
+
     def __init__(self, vertex_data: QtCore.QByteArray, parent=None):
         """
         Geometry for depicting a line. Used for axes placed in the origin of the instrument view.
@@ -25,9 +32,32 @@ class LineGeometry(Qt3DCore.QGeometry):
             Qt3DCore.QAttribute.defaultPositionAttributeName()
         )
         self.position_attribute.setBuffer(self.position_buffer)
-
         # Set the number of points contained in the attribute
         # This must be two for the start and end of the line
         self.position_attribute.setCount(2)
 
-        self.addAttribute(self.position_attribute)
+        if platform == "darwin":
+            normal = QVector3D.normal(QVector3D(0, 0, 0), QVector3D(0, 0, 0))
+            normal_buffer_values = []
+            # Need to have a normal for each vector
+            normal_buffer_values.extend(normal.toTuple())
+            self.normal_attribute = self.create_attribute(
+                normal_buffer_values, self.q_attribute.defaultNormalAttributeName()
+            )
+            self.addAttribute(self.position_attribute)
+            self.addAttribute(self.normal_attribute)
+
+    def create_attribute(self, buffer_values, name):
+        SIZE_OF_FLOAT_IN_STRUCT = 4
+        POINTS_IN_VECTOR = 3
+        buffer = Qt3DCore.QBuffer(self)
+        buffer.setData(convert_to_bytes(buffer_values))
+        attribute = self.q_attribute(self)
+        attribute.setAttributeType(self.q_attribute.VertexAttribute)
+        attribute.setBuffer(buffer)
+        attribute.setVertexSize(POINTS_IN_VECTOR)
+        attribute.setByteOffset(0)
+        attribute.setByteStride(POINTS_IN_VECTOR * SIZE_OF_FLOAT_IN_STRUCT)
+        attribute.setCount(len(buffer_values))
+        attribute.setName(name)
+        return attribute
