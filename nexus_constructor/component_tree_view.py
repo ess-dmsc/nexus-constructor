@@ -106,7 +106,8 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         if index in self.parent().selectedIndexes():
             fill_selection(option, painter)
             group = model.find_component_of(index).internalPointer()
-            self.model.signals.component_selected.emit(group.absolute_path)
+            if group:
+                self.model.signals.component_selected.emit(group.absolute_path)
 
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
