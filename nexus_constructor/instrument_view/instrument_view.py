@@ -214,6 +214,9 @@ class InstrumentView(QWidget):
 
         # Filter out the gnomon for just the gnomon camera to see
         self.gnomon_camera = self.gnomon.get_gnomon_camera()
+        gnomon_clear_buffers = self.create_camera_filter(
+            self.gnomon_viewport, self.gnomon_root_entity, self.gnomon_camera
+        )
         self.gnomon.update_gnomon()
 
     def update_gnomon_size(self):
