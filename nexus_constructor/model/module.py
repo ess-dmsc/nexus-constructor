@@ -55,7 +55,7 @@ class FileWriterModule(ABC):
     parent_node = attr.ib(type="Group")
 
     def as_dict(self, error_collector: List[str]):
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 @attr.s

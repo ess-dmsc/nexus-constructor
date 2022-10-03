@@ -63,7 +63,7 @@ class OFFGeometry(ABC):
         Flattened 1D list of indices in vertices for each face
         winding_order_indices gives the start index for each face in this list
         """
-        pass
+        raise NotImplementedError()
 
     @property
     @abstractmethod
@@ -71,7 +71,7 @@ class OFFGeometry(ABC):
         """
         The start index for each face in winding_order
         """
-        pass
+        raise NotImplementedError()
 
     @property
     @abstractmethod

@@ -177,11 +177,6 @@ class ShapeReader:
         )
         self.component[name] = off_geometry
         self.shape = off_geometry
-        # children = off_geometry.children
-        # for child in children:
-        #     print(child.name)
-        #     print(child.values[0:10])
-        # exit()
 
     @staticmethod
     def __create_off_geometry(

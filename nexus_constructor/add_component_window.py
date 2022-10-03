@@ -447,7 +447,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         return field
 
     def select_field(self, widget):
-        # self.fieldsListWidget.setItemSelected(widget, True)
         widget.setSelected(True)
 
     def remove_field(self):

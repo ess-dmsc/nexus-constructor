@@ -20,7 +20,6 @@ class PixelData(ABC):
     """Base class for a detector's pixel description"""
 
     type = "PixelData"
-    pass
 
 
 @attr.s

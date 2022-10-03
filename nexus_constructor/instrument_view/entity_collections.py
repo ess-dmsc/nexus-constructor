@@ -28,19 +28,19 @@ class EntityCollection(ABC):
         self.default_material: Qt3DRender.QMaterial = self._create_default_material()
 
     def create_entities(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def add_transformation(self, transformation: Qt3DCore.QComponent):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def remove_transformation(self, transformation: Qt3DCore.QComponent):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def setParent(self, value=None):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def entity_to_zoom(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def _create_default_material(self) -> Qt3DRender.QMaterial:
         return create_material(
