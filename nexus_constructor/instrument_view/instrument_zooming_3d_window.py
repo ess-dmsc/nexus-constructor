@@ -25,7 +25,7 @@ class InstrumentZooming3DWindow(Qt3DExtras.Qt3DWindow):
         )  # BoundingVolumePicking #TrianglePicking
         picking_settings.setPickResultMode(Qt3DRender.QPickingSettings.NearestPick)
 
-        self.last_press_time = 0
+        self.last_press_time = 0.0
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent):
         """

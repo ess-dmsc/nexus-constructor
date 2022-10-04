@@ -1,5 +1,6 @@
 import logging
 import time
+import typing
 from copy import deepcopy
 from typing import Dict, Tuple
 
@@ -34,6 +35,7 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.model.component import Component
+from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.model.group import Group
 
 
@@ -151,6 +153,7 @@ class InstrumentView(QWidget):
 
         # Move the gnomon when the camera view changes
         self.view.camera().viewVectorChanged.connect(self.gnomon.update_gnomon)
+        self.target_child = None
 
     def switch_to_perspective(self):
         """
@@ -300,7 +303,7 @@ class InstrumentView(QWidget):
         self.components[name] = component
 
         backend_use_simplified_mesh = False
-        if backend_use_simplified_mesh:
+        if backend_use_simplified_mesh and isinstance(geometry, OFFGeometryNexus):
             try:
                 geometry.vertices, geometry.faces = mesh.simple_geometry
             except Exception:
@@ -382,6 +385,7 @@ class InstrumentView(QWidget):
         except KeyError:
             pass  # no problem if there are no transformations to remove
 
+    @typing.no_type_check
     def select_component(self, name: str):
         """
         Method for when a component is pressed in the treeview
