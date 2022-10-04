@@ -164,7 +164,7 @@ builders = pipeline_builder.createBuilders { container ->
             }  // stage
         }  // if
 
-        pipeline_builder.stage('Build Executable'){
+/*        pipeline_builder.stage('Build Executable'){
             container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
         }
 
@@ -173,8 +173,9 @@ builders = pipeline_builder.createBuilders { container ->
             container.copyFrom("${project}/dist/", './build')
             sh "tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
             archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
-        } // stage
+        }*/ // stage
     } // if
+
 
 }
 
