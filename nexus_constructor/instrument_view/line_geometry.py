@@ -35,6 +35,7 @@ class LineGeometry(Qt3DCore.QGeometry):
         # Set the number of points contained in the attribute
         # This must be two for the start and end of the line
         self.position_attribute.setCount(2)
+        self.addAttribute(self.position_attribute)
 
         if platform == "darwin":
             normal = QVector3D.normal(QVector3D(0, 0, 0), QVector3D(0, 0, 0))
@@ -44,10 +45,7 @@ class LineGeometry(Qt3DCore.QGeometry):
             self.normal_attribute = self.create_attribute(
                 normal_buffer_values, self.q_attribute.defaultNormalAttributeName()
             )
-            self.addAttribute(self.position_attribute)
             self.addAttribute(self.normal_attribute)
-        else:
-            self.addAttribute(self.position_attribute)
 
     def create_attribute(self, buffer_values, name):
         SIZE_OF_FLOAT_IN_STRUCT = 4
