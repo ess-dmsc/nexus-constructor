@@ -46,6 +46,8 @@ class LineGeometry(Qt3DCore.QGeometry):
             )
             self.addAttribute(self.position_attribute)
             self.addAttribute(self.normal_attribute)
+        else:
+            self.addAttribute(self.position_attribute)
 
     def create_attribute(self, buffer_values, name):
         SIZE_OF_FLOAT_IN_STRUCT = 4
