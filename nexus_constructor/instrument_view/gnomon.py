@@ -211,7 +211,9 @@ class Gnomon:
             cone_transformation.setMatrix(matrix)
 
             create_qentity(
-                [cone_mesh, cone_transformation, material], self.gnomon_root_entity, False
+                [cone_mesh, cone_transformation, material],
+                self.gnomon_root_entity,
+                False,
             )
 
     def create_gnomon_cylinders(self):
@@ -234,7 +236,9 @@ class Gnomon:
             axis_transformation.setMatrix(matrix)
 
             create_qentity(
-                [axis_mesh, axis_transformation, material], self.gnomon_root_entity, False
+                [axis_mesh, axis_transformation, material],
+                self.gnomon_root_entity,
+                False,
             )
 
     @staticmethod
@@ -366,7 +370,9 @@ class Gnomon:
             QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5
         )
         create_qentity(
-            [cylinder_mesh, beam_material, cylinder_transform], self.gnomon_root_entity, False
+            [cylinder_mesh, beam_material, cylinder_transform],
+            self.gnomon_root_entity,
+            False,
         )
 
     @staticmethod
@@ -435,4 +441,6 @@ class Gnomon:
                 QColor("black"), QColor("grey"), self.gnomon_root_entity
             )
 
-            create_qentity([mesh, neutron_material, transform], self.gnomon_root_entity, False)
+            create_qentity(
+                [mesh, neutron_material, transform], self.gnomon_root_entity, False
+            )
