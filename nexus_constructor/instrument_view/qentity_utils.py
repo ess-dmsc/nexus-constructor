@@ -55,7 +55,7 @@ class Entity(Qt3DCore.QEntity):
 
     def switch_to_highlight(self):
         for c in self.components():
-            if isinstance(type(c), type(self.hoover_material)):
+            if isinstance(c, Qt3DExtras.QGoochMaterial):
                 if c != self.hoover_material:
                     self.true_material = c
                     self.removeComponent(c)
@@ -63,7 +63,7 @@ class Entity(Qt3DCore.QEntity):
 
     def switch_to_normal(self):
         for c in self.components():
-            if isinstance(type(c), type(self.hoover_material)):
+            if isinstance(c, Qt3DExtras.QGoochMaterial):
                 self.removeComponent(self.hoover_material)
                 self.addComponent(self.true_material)
 
