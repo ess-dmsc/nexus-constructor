@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 
 import pytest
 from mock import Mock
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.json.transform_id import TransformId
 from nexus_constructor.json.transformation_reader import (

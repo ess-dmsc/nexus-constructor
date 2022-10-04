@@ -1,6 +1,6 @@
 from typing import List
 
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
 from nexus_constructor.model.component import Component

@@ -1,13 +1,13 @@
-from PySide2.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
+from PySide6.QtWidgets import (
+    QCheckBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QCheckBox,
     QPushButton,
-    QSpacerItem,
     QSizePolicy,
+    QSpacerItem,
+    QVBoxLayout,
+    QWidget,
 )
 
 from nexus_constructor.model.model import Model

@@ -5,14 +5,12 @@ Requires Python 3.6+
 import argparse
 import logging
 import os
-
-os.environ["QT_MAC_WANTS_LAYER"] = "1"
 import signal
 import sys
 
-from PySide2 import QtCore
-from PySide2.QtGui import QCloseEvent, QIcon
-from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6 import QtCore
+from PySide6.QtGui import QCloseEvent, QIcon, QSurfaceFormat
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.main_window import MainWindow
@@ -79,6 +77,10 @@ if __name__ == "__main__":
         exit(0)
     logging.basicConfig(level=logging.INFO)
     QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    surfaceFormat = QSurfaceFormat()
+    surfaceFormat.setSwapInterval(1)
+    surfaceFormat.setSwapBehavior(QSurfaceFormat.DoubleBuffer)
+    QSurfaceFormat.setDefaultFormat(surfaceFormat)
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = NexusConstructorMainWindow()
@@ -88,4 +90,4 @@ if __name__ == "__main__":
     ui = MainWindow(model, nx_component_classes)
     ui.setupUi(window)
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

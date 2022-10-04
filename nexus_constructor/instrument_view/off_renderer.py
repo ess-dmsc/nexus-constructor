@@ -6,13 +6,14 @@ and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
 import itertools
-import logging
 import struct
 from typing import List, Tuple
 
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtGui import QVector3D
+import numpy as np
+import open3d as o3d
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.Qt3DRender import Qt3DRender
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.model.geometry import OFFGeometry
 from nexus_constructor.ui_utils import ProgressBar
@@ -130,13 +131,27 @@ def repeat_shape_over_positions(
     return faces, vertices
 
 
-class QtOFFGeometry(Qt3DRender.QGeometry):
+def vertri_to_verfacwin(vertices, triangles):
+    new_vertices = []
+    new_faces = []
+    winding_order = []
+    face_ind = 0
+    for triangle in triangles:
+        new_faces.append(face_ind)
+        for ind in triangle:
+            face_ind += 1
+            winding_order.append(ind)
+            new_vertices.append(vertices[ind])
+    return new_vertices, new_faces, winding_order
+
+
+class QtOFFGeometry(Qt3DCore.QGeometry):
     """
     Builds vertex and normal buffers from arbitrary OFF geometry files that contain the faces in the geometry - these
     need to be converted to a list of triangles so they can be rendered in Qt3d by an OffMesh.
     """
 
-    q_attribute = Qt3DRender.QAttribute
+    q_attribute = Qt3DCore.QAttribute
 
     def __init__(
         self,
@@ -144,6 +159,7 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         positions: List[QVector3D] = None,
         parent=None,
         use_progress_bar: bool = False,
+        allow_simplification: bool = True,
     ):
         """
         Creates the geometry for the OFF to be displayed in Qt3D.
@@ -153,6 +169,8 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
         produced at the origin.
         """
         super().__init__(parent)
+
+        self.has_simplified_geometry = False
 
         if positions is None:
             positions = [QVector3D(0, 0, 0)]
@@ -165,6 +183,29 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
             if use_progress_bar
             else None,
         )
+
+        if len(triangles) > 100000 and allow_simplification:
+            print("Simplifying mesh")
+            temp_mesh = o3d.geometry.TriangleMesh()
+
+            temp_mesh.vertices = o3d.utility.Vector3dVector(
+                np.array([np.asarray(v.toTuple()) for v in vertices])
+            )
+            temp_mesh.triangles = o3d.utility.Vector3iVector(
+                np.array([np.asarray(t) for t in triangles]).astype(np.int32)
+            )
+
+            simplified_mesh, _ = temp_mesh.compute_convex_hull()
+            simplified_mesh.compute_vertex_normals()
+
+            new_vertices = np.asarray(simplified_mesh.vertices)
+            new_triangles = np.asarray(simplified_mesh.triangles)
+
+            vertices = [QVector3D(*list(v)) for v in new_vertices]
+            triangles = [list(t) for t in new_triangles]
+            self.has_simplified_geometry = True
+            self.simple_geometry = vertices, triangles
+
         vertex_buffer_values = list(create_vertex_buffer(vertices, triangles))
         self.vertex_count = len(vertex_buffer_values) // 3
         normal_buffer_values = create_normal_buffer(
@@ -195,19 +236,17 @@ class QtOFFGeometry(Qt3DRender.QGeometry):
             )
             self.addAttribute(colorAttribute)
 
-        logging.info("Qt mesh built")
-
     def create_attribute(self, buffer_values, name):
         SIZE_OF_FLOAT_IN_STRUCT = 4
         POINTS_IN_VECTOR = 3
 
-        buffer = Qt3DRender.QBuffer(self)
+        buffer = Qt3DCore.QBuffer(self)
         buffer.setData(convert_to_bytes(buffer_values))
 
         attribute = self.q_attribute(self)
         attribute.setAttributeType(self.q_attribute.VertexAttribute)
         attribute.setBuffer(buffer)
-        attribute.setDataSize(POINTS_IN_VECTOR)
+        attribute.setVertexSize(POINTS_IN_VECTOR)
         attribute.setByteOffset(0)
         attribute.setByteStride(POINTS_IN_VECTOR * SIZE_OF_FLOAT_IN_STRUCT)
         attribute.setCount(len(buffer_values))
@@ -226,6 +265,7 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
         parent: Qt3DCore.QEntity,
         positions: List[QVector3D] = None,
         use_progress_bar: bool = False,
+        allow_simplification: bool = True,
     ):
         """
         Creates a geometry renderer for OFF geometry.
@@ -237,9 +277,14 @@ class OffMesh(Qt3DRender.QGeometryRenderer):
         super().__init__(parent)
 
         self.setInstanceCount(1)
-        qt_geometry = QtOFFGeometry(geometry, positions, self, use_progress_bar)
-        self.setVertexCount(qt_geometry.vertex_count)
+        self.qt_geometry = QtOFFGeometry(
+            geometry, positions, self, use_progress_bar, allow_simplification
+        )
+        self.setVertexCount(self.qt_geometry.vertex_count)
         self.setFirstVertex(0)
         self.setPrimitiveType(Qt3DRender.QGeometryRenderer.Triangles)
         self.setFirstInstance(0)
-        self.setGeometry(qt_geometry)
+        self.setGeometry(self.qt_geometry)
+        self.simple_geometry = None
+        if self.qt_geometry.has_simplified_geometry:
+            self.simple_geometry = self.qt_geometry.simple_geometry

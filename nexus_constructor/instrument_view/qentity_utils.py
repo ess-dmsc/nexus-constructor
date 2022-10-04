@@ -1,9 +1,9 @@
 from typing import List
 
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.Qt3DExtras import Qt3DExtras
-from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtGui import QColor
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.Qt3DExtras import Qt3DExtras
+from PySide6.Qt3DRender import Qt3DRender
+from PySide6.QtGui import QColor
 
 from nexus_constructor.component_type import (
     SAMPLE_CLASS_NAME,
@@ -30,6 +30,61 @@ MATERIAL_ALPHA = {
     SLIT_CLASS_NAME: 0.75,
     SOURCE_CLASS_NAME: 0.5,
 }
+
+
+class Entity(Qt3DCore.QEntity):
+    def __init__(self, parent, picker=True):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.clicked = False
+        self.inside = False
+        self.old_mesh = None
+
+        if picker:
+            self.picker = Qt3DRender.QObjectPicker()
+            self.picker.setHoverEnabled(True)
+            self.picker.setDragEnabled(True)
+            self.hoover_material = Qt3DExtras.QGoochMaterial(
+                cool=QColor("#275fff"), warm=QColor("#99e6ff")
+            )
+
+            self.picker.entered.connect(self.mouse_enter_event)
+            self.picker.exited.connect(self.mouse_leave_event)
+            self.addComponent(self.picker)
+
+    def switch_to_highlight(self):
+        for c in self.components():
+            if isinstance(c, Qt3DExtras.QGoochMaterial):
+                if c != self.hoover_material:
+                    self.true_material = c
+                    self.removeComponent(c)
+                    self.addComponent(self.hoover_material)
+
+    def switch_to_normal(self):
+        for c in self.components():
+            if isinstance(c, Qt3DExtras.QGoochMaterial):
+                self.removeComponent(self.hoover_material)
+                self.addComponent(self.true_material)
+
+    def mouse_enter_event(self):
+        self.inside = True
+        self.switch_to_highlight()
+
+    def mouse_leave_event(self):
+        self.inside = False
+        if self.clicked:
+            return
+        self.switch_to_normal()
+
+    def switch_mesh(self, new_mesh):
+        for c in self.components():
+            if type(c) == type(new_mesh):
+                if c == new_mesh:
+                    return
+                self.old_mesh = c
+                self.removeComponent(c)
+                self.addComponent(new_mesh)
 
 
 def create_material(
@@ -66,12 +121,14 @@ def create_material(
 
 
 def create_qentity(
-    components: List[Qt3DCore.QComponent], parent=None
+    components: List[Qt3DCore.QComponent],
+    parent=None,
+    picker=True,
 ) -> Qt3DCore.QEntity:
     """
     Creates a QEntity and gives it all of the QComponents that are contained in a list.
     """
-    entity = Qt3DCore.QEntity(parent)
+    entity = Entity(parent, picker)
     for component in components:
         entity.addComponent(component)
     return entity

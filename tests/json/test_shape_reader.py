@@ -3,7 +3,7 @@ from typing import Dict, List
 import numpy as np
 import pytest
 from mock import Mock, call
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,

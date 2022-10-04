@@ -1,4 +1,4 @@
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.module import Dataset

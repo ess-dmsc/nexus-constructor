@@ -1,8 +1,8 @@
 from typing import Any, List, Optional, Tuple
 
 import pytest
-from PySide2.QtCore import QModelIndex, Qt
-from PySide2.QtGui import QVector3D
+from PySide6.QtCore import QModelIndex, Qt
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import NX_TRANSFORMATIONS
 from nexus_constructor.component_tree_model import ComponentInfo

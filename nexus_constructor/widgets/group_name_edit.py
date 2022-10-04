@@ -1,10 +1,10 @@
 from functools import partial
 from typing import List
 
-from PySide2 import QtWidgets
-from PySide2.QtCore import QStringListModel, Qt, Signal
-from PySide2.QtGui import QValidator
-from PySide2.QtWidgets import QCompleter
+from PySide6 import QtWidgets
+from PySide6.QtCore import QStringListModel, Qt, Signal
+from PySide6.QtGui import QValidator
+from PySide6.QtWidgets import QCompleter
 
 from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.ui_utils import validate_line_edit

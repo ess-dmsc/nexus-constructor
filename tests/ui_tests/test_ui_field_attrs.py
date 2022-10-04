@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 import numpy as np
 import pytest
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QListWidget
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QListWidget
 
 from nexus_constructor.field_attrs import FieldAttrFrame, FieldAttrsDialog
 from nexus_constructor.model.module import Dataset

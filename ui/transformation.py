@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
-from PySide2.QtCore import QMetaObject, QSize
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QMetaObject, QSize
+from PySide6.QtWidgets import (
     QApplication,
     QDoubleSpinBox,
     QFormLayout,

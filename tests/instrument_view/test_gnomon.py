@@ -1,5 +1,5 @@
 from mock import Mock
-from PySide2.QtGui import QColor, QFont, QMatrix4x4, QVector3D, QVector4D
+from PySide6.QtGui import QColor, QFont, QMatrix4x4, QVector3D, QVector4D
 
 from nexus_constructor.instrument_view.gnomon import Gnomon
 

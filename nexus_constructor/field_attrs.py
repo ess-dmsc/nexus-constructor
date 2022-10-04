@@ -2,7 +2,7 @@ from functools import partial
 from typing import Any, Union
 
 import numpy as np
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QFrame,

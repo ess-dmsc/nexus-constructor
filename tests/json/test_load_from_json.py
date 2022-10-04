@@ -3,7 +3,7 @@ from typing import Type
 
 import pytest
 from mock import mock_open, patch
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import NX_USER
 from nexus_constructor.json.json_warnings import (

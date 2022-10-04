@@ -2,8 +2,8 @@ import json
 from typing import Dict, List
 from weakref import WeakKeyDictionary
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
@@ -59,6 +59,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.model.signals.transformation_changed.connect(
             self._update_transformations_3d_view
         )
+        self.model.signals.component_selected.connect(self.sceneWidget.select_component)
+        self.model.signals.entity_selected.connect(self.sceneWidget.select_entity)
 
     def onOpenAboutWindow(self, instance):
         if self.checkWindowOpen(instance, self._registered_windows):
@@ -176,6 +178,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.model = reader.model
                 self._setup_model_signals()
                 self._update_views()
+                self.sceneWidget.create_ground()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()

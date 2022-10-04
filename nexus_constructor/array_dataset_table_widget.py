@@ -2,10 +2,10 @@ import typing
 from functools import partial
 
 import numpy as np
-from PySide2.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import (
     QAbstractItemView,
-    QAction,
     QGridLayout,
     QItemDelegate,
     QLineEdit,

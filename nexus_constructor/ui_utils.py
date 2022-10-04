@@ -1,10 +1,9 @@
 from typing import Optional
 
 import numpy as np
-from PySide2.QtGui import QVector3D
-from PySide2.QtGui import QPalette
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette, QVector3D
+from PySide6.QtWidgets import (
     QApplication,
     QDialog,
     QFileDialog,
@@ -12,7 +11,7 @@ from PySide2.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QVBoxLayout,
-    QWidget
+    QWidget,
 )
 
 FILE_DIALOG_NATIVE = QFileDialog.DontUseNativeDialog
@@ -39,7 +38,7 @@ def file_dialog(is_save, caption, filter):
     filename, _ = func(
         parent=None,
         caption=caption,
-        directory="",
+        dir="",
         filter=f"{filter};;All Files (*)",
         options=options,
     )

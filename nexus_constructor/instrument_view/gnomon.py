@@ -1,8 +1,8 @@
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.Qt3DExtras import Qt3DExtras
-from PySide2.Qt3DRender import Qt3DRender
-from PySide2.QtCore import QPropertyAnimation
-from PySide2.QtGui import QColor, QFont, QMatrix4x4, QVector3D, QVector4D
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.Qt3DExtras import Qt3DExtras
+from PySide6.Qt3DRender import Qt3DRender
+from PySide6.QtCore import QPropertyAnimation
+from PySide6.QtGui import QColor, QFont, QMatrix4x4, QVector3D, QVector4D
 
 from nexus_constructor.instrument_view.axis_colors import AxisColors
 from nexus_constructor.instrument_view.neutron_animation_controller import (
@@ -211,7 +211,9 @@ class Gnomon:
             cone_transformation.setMatrix(matrix)
 
             create_qentity(
-                [cone_mesh, cone_transformation, material], self.gnomon_root_entity
+                [cone_mesh, cone_transformation, material],
+                self.gnomon_root_entity,
+                False,
             )
 
     def create_gnomon_cylinders(self):
@@ -234,7 +236,9 @@ class Gnomon:
             axis_transformation.setMatrix(matrix)
 
             create_qentity(
-                [axis_mesh, axis_transformation, material], self.gnomon_root_entity
+                [axis_mesh, axis_transformation, material],
+                self.gnomon_root_entity,
+                False,
             )
 
     @staticmethod
@@ -258,11 +262,11 @@ class Gnomon:
         :return: The gnomon camera.
         """
         aspect = 1
-        near_plane = 0.1
+        near_plane = 1
 
         # Set far plane so that the camera can see the gnomon even when it is turned "behind" it and the cylinders are
         # facing away from the camera.
-        far_plane = 25
+        far_plane = 1000
 
         gnomon_camera = Qt3DRender.QCamera()
         gnomon_camera.setParent(self.gnomon_root_entity)
@@ -366,7 +370,9 @@ class Gnomon:
             QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5
         )
         create_qentity(
-            [cylinder_mesh, beam_material, cylinder_transform], self.gnomon_root_entity
+            [cylinder_mesh, beam_material, cylinder_transform],
+            self.gnomon_root_entity,
+            False,
         )
 
     @staticmethod
@@ -435,4 +441,6 @@ class Gnomon:
                 QColor("black"), QColor("grey"), self.gnomon_root_entity
             )
 
-            create_qentity([mesh, neutron_material, transform], self.gnomon_root_entity)
+            create_qentity(
+                [mesh, neutron_material, transform], self.gnomon_root_entity, False
+            )

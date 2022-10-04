@@ -1,7 +1,7 @@
 import sys
 
-from PySide2.QtCore import QPoint, Qt
-from PySide2.QtWidgets import QAbstractButton, QDialog
+from PySide6.QtCore import QPoint, Qt
+from PySide6.QtWidgets import QAbstractButton, QDialog
 from pytestqt.qtbot import QtBot
 
 RUNNING_ON_WINDOWS = sys.platform.startswith("win")

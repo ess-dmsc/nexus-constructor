@@ -1,7 +1,7 @@
 import logging
 from typing import BinaryIO, TextIO, Union
 
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 from stl import mesh
 
 from nexus_constructor.model.geometry import OFFGeometry, OFFGeometryNoNexus
