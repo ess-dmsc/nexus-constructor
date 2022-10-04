@@ -84,7 +84,7 @@ builders = pipeline_builder.createBuilders { container ->
            """
    } // stage
 
-    pipeline_builder.stage("Run tests") {
+    /* pipeline_builder.stage("Run tests") {
         def testsError = null
         try {
                 container.sh """
@@ -97,7 +97,7 @@ builders = pipeline_builder.createBuilders { container ->
                 currentBuild.result = 'FAILURE'
             }
 
-    } // stage
+    }*/ // stage
     
     // Only run in pull request builds
     if (env.CHANGE_ID) {
