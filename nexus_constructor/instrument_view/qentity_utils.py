@@ -243,8 +243,8 @@ def create_material(
             hoover_material.setWarm(
                 MATERIAL_DICT[material_name]["hoover_state"]["highlights"]
             )
-        elif isinstance(normal_material, Qt3DExtras.QPhongMaterial) or isinstance(
-            normal_material, Qt3DExtras.QPhongAlphaMaterial
+        elif isinstance(
+            normal_material, (Qt3DExtras.QPhongMaterial, Qt3DExtras.QPhongAlphaMaterial)
         ):
             normal_material.setAmbient(
                 MATERIAL_DICT[material_name]["normal_state"]["shadows"]

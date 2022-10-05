@@ -10,11 +10,10 @@ from nexus_constructor.instrument_view.qentity_utils import (
 def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
     mock,
 ):
-
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material = create_material(ambient, diffuse, None)
+    mock_material, mock_hoover_material = create_material("x_material", None)
 
     mock_material.setAmbient.assert_called_once_with(ambient)
     mock_material.setDiffuse.assert_called_once_with(diffuse)
@@ -26,12 +25,11 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
 def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_THEN_properties_set(
     mock,
 ):
-
     ambient = Mock()
     diffuse = Mock()
     alpha = 0.5
 
-    mock_alpha_material = create_material(ambient, diffuse, None, alpha=alpha)
+    mock_alpha_material, mock_hoover_material = create_material("beam_material", None)
 
     mock_alpha_material.setAmbient.assert_called_once_with(ambient)
     mock_alpha_material.setDiffuse.assert_called_once_with(diffuse)
@@ -43,11 +41,12 @@ def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_TH
 def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shininess_set_to_zero(
     mock,
 ):
-
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material = create_material(ambient, diffuse, None, remove_shininess=True)
+    mock_material, mock_hoover_material = create_material(
+        "x_material", None, remove_shininess=True
+    )
 
     mock_material.setAmbient.assert_called_once_with(ambient)
     mock_material.setDiffuse.assert_called_once_with(diffuse)
