@@ -45,16 +45,14 @@ class Gnomon:
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
 
-        diffuse_color = QColor("grey")
-
-        self.x_material = create_material(
-            AxisColors.X.value, diffuse_color, root_entity, remove_shininess=True
+        self.x_material, self.x_hoover_material = create_material(
+            "x_material", root_entity, remove_shininess=True
         )
-        self.y_material = create_material(
-            AxisColors.Y.value, diffuse_color, root_entity, remove_shininess=True
+        self.y_material, self.y_hoover_material = create_material(
+            "y_material", root_entity, remove_shininess=True
         )
-        self.z_material = create_material(
-            AxisColors.Z.value, diffuse_color, root_entity, remove_shininess=True
+        self.z_material, self.z_hoover_material = create_material(
+            "z_material", root_entity, remove_shininess=True
         )
 
         self.num_neutrons = 9
@@ -366,14 +364,16 @@ class Gnomon:
             cylinder_mesh, 1.5, self.neutron_animation_length, 2
         )
         self.set_beam_transform(cylinder_transform, self.neutron_animation_length)
-        beam_material = create_material(
-            QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5
+        beam_material, beam_hoover_material = create_material(
+            "beam_material", self.gnomon_root_entity
         )
-        create_qentity(
+        entity = create_qentity(
             [cylinder_mesh, beam_material, cylinder_transform],
             self.gnomon_root_entity,
             False,
         )
+        entity.default_material = beam_material
+        # entity.hoover_material = beam_hoover_material
 
     @staticmethod
     def set_neutron_animation_properties(
@@ -437,10 +437,12 @@ class Gnomon:
                 time_span_offsets[i],
             )
 
-            neutron_material = create_material(
-                QColor("black"), QColor("grey"), self.gnomon_root_entity
+            neutron_material, neutron_hoover_material = create_material(
+                "neutron_material", self.gnomon_root_entity
             )
 
-            create_qentity(
+            entity = create_qentity(
                 [mesh, neutron_material, transform], self.gnomon_root_entity, False
             )
+            entity.default_material = neutron_material
+            # entity.hoover_material = neutron_hoover_material

@@ -178,7 +178,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.model = reader.model
                 self._setup_model_signals()
                 self._update_views()
-                self.sceneWidget.create_ground()
 
     def _update_transformations_3d_view(self):
         self.sceneWidget.clear_all_transformations()
@@ -189,6 +188,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def _update_views(self):
         self.sceneWidget.clear_all_transformations()
         self.sceneWidget.clear_all_components()
+        self.sceneWidget.create_ground()
         self.component_tree_view_tab.set_up_model(self.model)
         self._update_3d_view_with_component_shapes()
 

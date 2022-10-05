@@ -1,34 +1,129 @@
-from typing import List
+from typing import Any, List, Union
 
 from PySide6.Qt3DCore import Qt3DCore
 from PySide6.Qt3DExtras import Qt3DExtras
 from PySide6.Qt3DRender import Qt3DRender
 from PySide6.QtGui import QColor
 
-from nexus_constructor.component_type import (
-    SAMPLE_CLASS_NAME,
-    SLIT_CLASS_NAME,
-    SOURCE_CLASS_NAME,
-)
-
-MATERIAL_COLORS = {
-    SAMPLE_CLASS_NAME: QColor("red"),
-    SLIT_CLASS_NAME: QColor("green"),
-    SOURCE_CLASS_NAME: QColor("blue"),
-}
-
-
-MATERIAL_DIFFUSE_COLORS = {
-    SAMPLE_CLASS_NAME: QColor("grey"),
-    SLIT_CLASS_NAME: QColor("darkgreen"),
-    SOURCE_CLASS_NAME: QColor("lightblue"),
-}
-
-
-MATERIAL_ALPHA = {
-    SAMPLE_CLASS_NAME: 0.5,
-    SLIT_CLASS_NAME: 0.75,
-    SOURCE_CLASS_NAME: 0.5,
+MATERIAL_DICT = {
+    "DEFAULT": {
+        "material_type": Qt3DExtras.QGoochMaterial,
+        "normal_state": {
+            "shadows": QColor("#9f9f9f"),
+            "highlights": QColor("#dbdbdb"),
+        },
+        "hoover_state": {
+            "shadows": QColor("#275fff"),
+            "highlights": QColor("#99e6ff"),
+        },
+    },
+    "ground": {
+        "material_type": Qt3DExtras.QPhongMaterial,
+        "normal_state": {
+            "shadows": QColor("#f8dd9e"),
+            "highlights": QColor("#b69442"),
+        },
+        "hoover_state": {
+            "shadows": QColor("#f8dd9e"),
+            "highlights": QColor("#b69442"),
+        },
+    },
+    "NXslit": {
+        "material_type": Qt3DExtras.QPhongAlphaMaterial,
+        "normal_state": {
+            "shadows": QColor("green"),
+            "highlights": QColor("darkgreen"),
+            "alpha": 0.75,
+        },
+        "hoover_state": {
+            "shadows": QColor("green"),
+            "highlights": QColor("darkgreen"),
+            "alpha": 1.0,
+        },
+    },
+    "NXsample": {
+        "material_type": Qt3DExtras.QPhongAlphaMaterial,
+        "normal_state": {
+            "shadows": QColor("red"),
+            "highlights": QColor("grey"),
+            "alpha": 0.5,
+        },
+        "hoover_state": {
+            "shadows": QColor("red"),
+            "highlights": QColor("grey"),
+            "alpha": 0.75,
+        },
+    },
+    "NXsource": {
+        "material_type": Qt3DExtras.QPhongAlphaMaterial,
+        "normal_state": {
+            "shadows": QColor("blue"),
+            "highlights": QColor("lightblue"),
+            "alpha": 0.5,
+        },
+        "hoover_state": {
+            "shadows": QColor("blue"),
+            "highlights": QColor("lightblue"),
+            "alpha": 0.75,
+        },
+    },
+    "x_material": {
+        "material_type": Qt3DExtras.QPhongMaterial,
+        "normal_state": {
+            "shadows": QColor(255, 0, 0),
+            "highlights": QColor("grey"),
+        },
+        "hoover_state": {
+            "shadows": QColor(255, 0, 0),
+            "highlights": QColor("grey"),
+        },
+    },
+    "y_material": {
+        "material_type": Qt3DExtras.QPhongMaterial,
+        "normal_state": {
+            "shadows": QColor(0, 255, 0),
+            "highlights": QColor("grey"),
+        },
+        "hoover_state": {
+            "shadows": QColor(0, 255, 0),
+            "highlights": QColor("grey"),
+        },
+    },
+    "z_material": {
+        "material_type": Qt3DExtras.QPhongMaterial,
+        "normal_state": {
+            "shadows": QColor(0, 0, 255),
+            "highlights": QColor("grey"),
+        },
+        "hoover_state": {
+            "shadows": QColor(0, 0, 255),
+            "highlights": QColor("grey"),
+        },
+    },
+    "beam_material": {
+        "material_type": Qt3DExtras.QPhongAlphaMaterial,
+        "normal_state": {
+            "shadows": QColor("blue"),
+            "highlights": QColor("lightblue"),
+            "alpha": 0.5,
+        },
+        "hoover_state": {
+            "shadows": QColor("blue"),
+            "highlights": QColor("lightblue"),
+            "alpha": 0.75,
+        },
+    },
+    "neutron_material": {
+        "material_type": Qt3DExtras.QPhongMaterial,
+        "normal_state": {
+            "shadows": QColor("black"),
+            "highlights": QColor("grey"),
+        },
+        "hoover_state": {
+            "shadows": QColor("black"),
+            "highlights": QColor("grey"),
+        },
+    },
 }
 
 
@@ -40,32 +135,30 @@ class Entity(Qt3DCore.QEntity):
         self.clicked = False
         self.inside = False
         self.old_mesh = None
+        self.default_material = None
+        self.hoover_material = None
 
         if picker:
             self.picker = Qt3DRender.QObjectPicker()
             self.picker.setHoverEnabled(True)
             self.picker.setDragEnabled(True)
-            self.hoover_material = Qt3DExtras.QGoochMaterial(
-                cool=QColor("#275fff"), warm=QColor("#99e6ff")
-            )
-
             self.picker.entered.connect(self.mouse_enter_event)
             self.picker.exited.connect(self.mouse_leave_event)
             self.addComponent(self.picker)
 
     def switch_to_highlight(self):
-        for c in self.components():
-            if isinstance(c, Qt3DExtras.QGoochMaterial):
-                if c != self.hoover_material:
-                    self.true_material = c
-                    self.removeComponent(c)
-                    self.addComponent(self.hoover_material)
+        try:
+            self.removeComponent(self.default_material)
+            self.addComponent(self.hoover_material)
+        except Exception:
+            pass
 
     def switch_to_normal(self):
-        for c in self.components():
-            if isinstance(c, Qt3DExtras.QGoochMaterial):
-                self.removeComponent(self.hoover_material)
-                self.addComponent(self.true_material)
+        try:
+            self.removeComponent(self.hoover_material)
+            self.addComponent(self.default_material)
+        except Exception:
+            pass
 
     def mouse_enter_event(self):
         self.inside = True
@@ -87,37 +180,98 @@ class Entity(Qt3DCore.QEntity):
                 self.addComponent(new_mesh)
 
 
-def create_material(
-    ambient: QColor,
-    diffuse: QColor,
-    parent: Qt3DCore.QEntity,
-    alpha: float = None,
-    remove_shininess: bool = False,
-) -> Qt3DRender.QMaterial:
-    """
-    Creates a material and then sets its ambient, diffuse, alpha (if provided) properties. Sets shininess to zero if
-    instructed.
-    :param ambient: The desired ambient colour of the material.
-    :param diffuse: The desired diffuse colour of the material.
-    :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
-                  property.
-    :param remove_shininess: Boolean indicating whether or not to remove shininess. This is used for the gnomon.
-    :return A material that is now able to be added to an entity.
-    """
+# def create_material(
+#     ambient: QColor,
+#     diffuse: QColor,
+#     parent: Qt3DCore.QEntity,
+#     alpha: float = None,
+#     remove_shininess: bool = False,
+# ) -> Qt3DRender.QMaterial:
+#     """
+#     Creates a material and then sets its ambient, diffuse, alpha (if provided) properties. Sets shininess to zero if
+#     instructed.
+#     :param ambient: The desired ambient colour of the material.
+#     :param diffuse: The desired diffuse colour of the material.
+#     :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
+#                   property.
+#     :param remove_shininess: Boolean indicating whether or not to remove shininess. This is used for the gnomon.
+#     :return A material that is now able to be added to an entity.
+#     """
+#
+#     if alpha is not None:
+#         material = Qt3DExtras.QPhongAlphaMaterial(parent)
+#         material.setAlpha(alpha)
+#     else:
+#         material = Qt3DExtras.QPhongMaterial(parent)
+#
+#     if remove_shininess:
+#         material.setShininess(0)
+#
+#     material.setAmbient(ambient)
+#     material.setDiffuse(diffuse)
+#
+#     return material
 
-    if alpha is not None:
-        material = Qt3DExtras.QPhongAlphaMaterial(parent)
-        material.setAlpha(alpha)
+
+def create_material(
+    material_name: str,
+    parent: Qt3DCore.QEntity,
+    remove_shininess: bool = False,
+) -> tuple[
+    Union[Union[Qt3DExtras.QPhongAlphaMaterial, Qt3DExtras.QGoochMaterial], Any], Any
+]:
+    if material_name not in MATERIAL_DICT.keys():
+        normal_material = MATERIAL_DICT["DEFAULT"]["material_type"].__call__(parent)
+        hoover_material = MATERIAL_DICT["DEFAULT"]["material_type"].__call__(parent)
+        normal_material.setCool(MATERIAL_DICT["DEFAULT"]["normal_state"]["shadows"])
+        normal_material.setWarm(MATERIAL_DICT["DEFAULT"]["normal_state"]["highlights"])
+        hoover_material.setCool(MATERIAL_DICT["DEFAULT"]["hoover_state"]["shadows"])
+        hoover_material.setWarm(MATERIAL_DICT["DEFAULT"]["hoover_state"]["highlights"])
     else:
-        material = Qt3DExtras.QPhongMaterial(parent)
+        normal_material = MATERIAL_DICT[material_name]["material_type"].__call__(parent)
+        hoover_material = MATERIAL_DICT[material_name]["material_type"].__call__(parent)
+        if isinstance(normal_material, Qt3DExtras.QGoochMaterial):
+            normal_material.setCool(
+                MATERIAL_DICT[material_name]["normal_state"]["shadows"]
+            )
+            normal_material.setWarm(
+                MATERIAL_DICT[material_name]["normal_state"]["highlights"]
+            )
+            hoover_material.setCool(
+                MATERIAL_DICT[material_name]["hoover_state"]["shadows"]
+            )
+            hoover_material.setWarm(
+                MATERIAL_DICT[material_name]["hoover_state"]["highlights"]
+            )
+        elif isinstance(normal_material, Qt3DExtras.QPhongMaterial) or isinstance(
+            normal_material, Qt3DExtras.QPhongAlphaMaterial
+        ):
+            normal_material.setAmbient(
+                MATERIAL_DICT[material_name]["normal_state"]["shadows"]
+            )
+            normal_material.setDiffuse(
+                MATERIAL_DICT[material_name]["normal_state"]["highlights"]
+            )
+            hoover_material.setAmbient(
+                MATERIAL_DICT[material_name]["hoover_state"]["shadows"]
+            )
+            hoover_material.setDiffuse(
+                MATERIAL_DICT[material_name]["hoover_state"]["highlights"]
+            )
+
+        if isinstance(normal_material, Qt3DExtras.QPhongAlphaMaterial):
+            normal_material.setAlpha(
+                MATERIAL_DICT[material_name]["normal_state"]["alpha"]
+            )
+            hoover_material.setAlpha(
+                MATERIAL_DICT[material_name]["hoover_state"]["alpha"]
+            )
 
     if remove_shininess:
-        material.setShininess(0)
+        normal_material.setShininess(0)
+        hoover_material.setShininess(0)
 
-    material.setAmbient(ambient)
-    material.setDiffuse(diffuse)
-
-    return material
+    return normal_material, hoover_material
 
 
 def create_qentity(

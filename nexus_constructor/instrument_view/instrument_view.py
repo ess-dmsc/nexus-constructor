@@ -396,6 +396,10 @@ class InstrumentView(QWidget):
             for key in self.component_entities.keys():
                 entity = self.component_entities[key]
                 for e in entity.entities:
+                    if isinstance(e, tuple):
+                        e = e[0]
+                    if not e.hoover_material:
+                        continue
                     try:
                         if key == name:
                             e.clicked = True
