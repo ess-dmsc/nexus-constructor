@@ -106,6 +106,16 @@ class Component(Group):
             self.depends_on.deregister_dependent(self)
 
         self._depends_on = new_depends_on
+        try:
+            self[CommonAttrs.DEPENDS_ON] = Dataset(
+                parent_node=self,
+                name=CommonAttrs.DEPENDS_ON,
+                values=self._depends_on.absolute_path,
+            )
+        except AttributeError:
+            logging.debug(
+                f"NeXus Constructor cannot display depends_on for {self.name} in tree structure."
+            )
         if new_depends_on is not None:
             new_depends_on.register_dependent(self)
 
@@ -510,7 +520,7 @@ class Component(Group):
                 }
             )
         try:
-            if self.depends_on is not None:
+            if self.depends_on is not None and CommonAttrs.DEPENDS_ON not in self:
                 dictionary[CommonKeys.CHILDREN].append(
                     {
                         CommonKeys.MODULE: DATASET,
