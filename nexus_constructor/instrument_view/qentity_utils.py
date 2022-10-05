@@ -71,33 +71,33 @@ MATERIAL_DICT = {
         "material_type": Qt3DExtras.QPhongMaterial,
         "normal_state": {
             "shadows": QColor(255, 0, 0),
-            "highlights": QColor("grey"),
+            "highlights": QColor(255, 100, 100),
         },
         "hoover_state": {
             "shadows": QColor(255, 0, 0),
-            "highlights": QColor("grey"),
+            "highlights": QColor(255, 100, 100),
         },
     },
     "y_material": {
         "material_type": Qt3DExtras.QPhongMaterial,
         "normal_state": {
             "shadows": QColor(0, 255, 0),
-            "highlights": QColor("grey"),
+            "highlights": QColor(100, 255, 100),
         },
         "hoover_state": {
             "shadows": QColor(0, 255, 0),
-            "highlights": QColor("grey"),
+            "highlights": QColor(100, 255, 100),
         },
     },
     "z_material": {
         "material_type": Qt3DExtras.QPhongMaterial,
         "normal_state": {
             "shadows": QColor(0, 0, 255),
-            "highlights": QColor("grey"),
+            "highlights": QColor(100, 100, 255),
         },
         "hoover_state": {
             "shadows": QColor(0, 0, 255),
-            "highlights": QColor("grey"),
+            "highlights": QColor(100, 100, 255),
         },
     },
     "beam_material": {

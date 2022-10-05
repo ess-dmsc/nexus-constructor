@@ -437,6 +437,8 @@ class InstrumentView(QWidget):
         for key in self.component_entities.keys():
             entity = self.component_entities[key]
             for e in entity.entities:
+                if isinstance(e, tuple):
+                    e = e[0]
                 if e == component:
                     name = key
 
