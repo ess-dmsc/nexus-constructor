@@ -439,7 +439,7 @@ class NexusTreeModel(QAbstractItemModel):
         component.parent_node.children.pop(component.row())
         self.endRemoveRows()
         if component.name != TRANSFORMATIONS and isinstance(component, Component):
-            self.model.signals.component_removed.emit(component.name)
+            self.model.signals.component_removed.emit(component.absolute_path)
         elif removed_components_in_group:
             for c_name in removed_components_in_group:
                 self.model.signals.component_removed.emit(c_name)
@@ -447,7 +447,7 @@ class NexusTreeModel(QAbstractItemModel):
     def _remove_child_components(self, group: Group, removed_components: List[str]):
         for child in group.children:
             if isinstance(child, Component):
-                removed_components.append(child.name)
+                removed_components.append(child.absolute_path)
                 self.model.remove_component(child)
             elif isinstance(child, Group):
                 self._remove_child_components(child, removed_components)

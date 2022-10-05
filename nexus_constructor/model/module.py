@@ -7,6 +7,7 @@ import numpy as np
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.attributes import Attributes
+from nexus_constructor.model.helpers import get_absolute_path
 
 if TYPE_CHECKING:
     from nexus_constructor.model.group import Group  # noqa: F401
@@ -56,6 +57,10 @@ class FileWriterModule(ABC):
 
     def as_dict(self, error_collector: List[str]):
         raise NotImplementedError()
+
+    @property
+    def absolute_path(self):
+        return get_absolute_path(self)
 
 
 @attr.s
