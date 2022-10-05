@@ -73,7 +73,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self._group_parent = group_to_edit.parent_node
         file_dir = path.dirname(__file__)
         self.local_url_root = path.join(
-            file_dir, "..", "nx-class-documentation", "html"
+            file_dir,
+            "..",
+            "nx-class-documentation",
+            "html",
+            "classes",
+            "base_classes",
         )
         super().__init__(parent, self._group_container)
         super().setupUi()
@@ -181,14 +186,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         # Disable by default as component name will be missing at the very least.
         self.ok_button.setEnabled(False)
-
-        # Set default URL to nexus base classes in web view
-        local_url_index = QUrl.fromLocalFile(
-            path.join(self.local_url_root, "index.html")
-        )
-        self.webEngineView.setUrl(local_url_index)
         self.descriptionPlainTextEdit.setText(self._group_container.group.description)
-
         self.placeholder_checkbox.stateChanged.connect(self._disable_fields_and_buttons)
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.boxRadioButton.clicked.connect(self.show_box_fields)
@@ -329,6 +327,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.ok_validator.validate_field_widget_list()
 
+        self._set_html_docs_and_possible_fields(self._group_to_edit_backup.nx_class)
+
     def set_pixel_related_changes(self):
         """
         Manages the pixel-related changes that are induced by changing the shape type. This entails changing the
@@ -467,9 +467,20 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.placeholder_checkbox.setChecked(False)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
+        self._set_html_docs_and_possible_fields(c_nx_class)
+
+        self.possible_fields = self.nx_component_classes[c_nx_class]
+        try:
+            possible_field_names, _, _ = zip(*self.possible_fields)
+            self.nx_class_changed.emit(possible_field_names)
+        except ValueError:
+            self.nx_class_changed.emit([])
+
+    def _set_html_docs_and_possible_fields(self, c_nx_class):
         nx_class_docs_to_display = c_nx_class
-        if c_nx_class in STREAM_MODULE_GROUPS:
+        if c_nx_class in STREAM_MODULE_GROUPS or not c_nx_class:
             nx_class_docs_to_display = self._group_parent.nx_class
+        if self._group_parent:
             possible_fields = self.nx_component_classes[self._group_parent.nx_class]
             possible_field_names, _, _ = zip(*possible_fields)
             possible_field_names = sorted(possible_field_names)
@@ -478,19 +489,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.suggest_group_name_from_parent_fields.emit([])
         class_html = path.join(
             self.local_url_root,
-            "classes",
-            "base_classes",
             f"{nx_class_docs_to_display}.html",
         )
         local_url_class = QUrl.fromLocalFile(class_html)
         self.webEngineView.setUrl(local_url_class)
-
-        self.possible_fields = self.nx_component_classes[c_nx_class]
-        try:
-            possible_field_names, _, _ = zip(*self.possible_fields)
-            self.nx_class_changed.emit(possible_field_names)
-        except ValueError:
-            self.nx_class_changed.emit([])
 
     def mesh_file_picker(self):
         """
