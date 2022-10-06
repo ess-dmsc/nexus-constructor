@@ -34,6 +34,7 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
+from nexus_constructor.instrument_view.qentity_utils import create_material
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.model.group import Group
@@ -472,6 +473,35 @@ class InstrumentView(QWidget):
         self.iterate_tree(root_index, name)
         new_selection_index = component_model.find_index_of_group(self.target_child)
         component_tree_view.setCurrentIndex(new_selection_index)
+
+    def updateRenderedMaterials(self, material_name, color_state):
+        for entity in self.component_root_entity.children():
+            try:
+                material_family = entity.material_family
+                print(material_family)
+            except Exception:
+                continue
+
+            if material_family == material_name:
+                (
+                    new_default_material,
+                    new_hoover_material,
+                    new_material_family,
+                ) = create_material(
+                    material_name,
+                    self.root_entity,
+                )
+            for c in entity.components():
+                if isinstance(
+                    c,
+                    (
+                        Qt3DExtras.QPhongMaterial,
+                        Qt3DExtras.QPhongAlphaMaterial,
+                        Qt3DExtras.QGoochMaterial,
+                    ),
+                ):
+                    entity.removeComponent(c)
+            entity.addComponent(new_default_material)
 
     def add_transformation(self, component):
         """

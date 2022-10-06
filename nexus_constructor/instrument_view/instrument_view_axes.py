@@ -20,7 +20,7 @@ class InstrumentViewAxes(object):
         :param line_length: The length of the line in the axes.
         """
         vertices: List = [0 for _ in range(3)]
-
+        self.entities = []
         for i, material_name in enumerate(["x_material", "y_material", "z_material"]):
             mesh = Qt3DRender.QGeometryRenderer(component_root_entity)
 
@@ -32,10 +32,14 @@ class InstrumentViewAxes(object):
             )
 
             self.set_mesh_properties(mesh, geometry)
-            material, hoover_material = create_material(
+            material, hoover_material, material_family = create_material(
                 material_name, component_root_entity
             )
-            create_qentity([mesh, material], component_root_entity, False)
+            self.entities.append(
+                create_qentity([mesh, material], component_root_entity, False)
+            )
+            self.entities[-1].default_material = material
+            self.entities[-1].material_family = material_family
 
     @staticmethod
     def create_data_array(line_vertices: List[int]):

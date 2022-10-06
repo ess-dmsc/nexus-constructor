@@ -137,6 +137,7 @@ class Entity(Qt3DCore.QEntity):
         self.old_mesh = None
         self.default_material = None
         self.hoover_material = None
+        self.material_family = None
 
         if picker:
             self.picker = Qt3DRender.QObjectPicker()
@@ -227,9 +228,11 @@ def create_material(
         normal_material.setWarm(MATERIAL_DICT["DEFAULT"]["normal_state"]["highlights"])
         hoover_material.setCool(MATERIAL_DICT["DEFAULT"]["hoover_state"]["shadows"])
         hoover_material.setWarm(MATERIAL_DICT["DEFAULT"]["hoover_state"]["highlights"])
+        material_family = "DEFAULT"
     else:
         normal_material = MATERIAL_DICT[material_name]["material_type"].__call__(parent)
         hoover_material = MATERIAL_DICT[material_name]["material_type"].__call__(parent)
+        material_family = material_name
         if isinstance(normal_material, Qt3DExtras.QGoochMaterial):
             normal_material.setCool(
                 MATERIAL_DICT[material_name]["normal_state"]["shadows"]
@@ -271,7 +274,7 @@ def create_material(
         normal_material.setShininess(0)
         hoover_material.setShininess(0)
 
-    return normal_material, hoover_material
+    return normal_material, hoover_material, material_family
 
 
 def create_qentity(
