@@ -2,7 +2,6 @@ from typing import Any
 
 import numpy as np
 import pytest
-from mock import Mock
 from PySide6.QtGui import QVector3D
 from pytestqt.qtbot import QtBot  # noqa: F401
 
@@ -51,7 +50,6 @@ def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled
     assert view.transformation_frame.x_spinbox.value() == x
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
-    assert view.transformation_frame.value_spinbox.value() == value
     assert view.transformation_frame.magnitude_widget.value_line_edit.text() == str(
         value
     )
@@ -78,7 +76,6 @@ def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_cor
     assert view.transformation_frame.x_spinbox.value() == x
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
-    assert view.transformation_frame.value_spinbox.value() == angle
     assert view.transformation_frame.magnitude_widget.value_line_edit.text() == str(
         angle
     )
@@ -139,7 +136,6 @@ def test_UI_GIVEN_stream_group_as_angle_WHEN_creating_rotation_THEN_ui_is_filled
     assert view.transformation_frame.x_spinbox.value() == x
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
-    assert view.transformation_frame.value_spinbox.value() == 0.0
     assert (
         view.transformation_frame.magnitude_widget.field_type == FieldType.kafka_stream
     )
@@ -172,7 +168,6 @@ def test_UI_GIVEN_link_as_rotation_magnitude_WHEN_creating_rotation_view_THEN_ui
     assert view.transformation_frame.x_spinbox.value() == x
     assert view.transformation_frame.y_spinbox.value() == y
     assert view.transformation_frame.z_spinbox.value() == z
-    assert view.transformation_frame.value_spinbox.value() == 0.0
     assert view.transformation_frame.magnitude_widget.field_type == FieldType.link
     assert view.transformation_frame.magnitude_widget.value.source == path
 
@@ -246,77 +241,3 @@ def test_UI_GIVEN_view_loses_focus_WHEN_transformation_view_exists_THEN_spinboxe
     assert not view.transformation_frame.y_spinbox.isEnabled()
     assert not view.transformation_frame.z_spinbox.isEnabled()
     assert not view.transformation_frame.name_line_edit.isEnabled()
-
-
-def test_UI_GIVEN_new_values_are_provided_WHEN_save_changes_is_called_THEN_transformation_changed_signal_is_called_to_update_3d_view(
-    qtbot, component, model
-):
-    x = 1
-    y = 2
-    z = 3
-    angle = 90
-
-    transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
-    transform.values = create_corresponding_value_dataset(angle)
-
-    view = EditRotation(parent=None, transformation=transform, model=model)
-    model.signals.transformation_changed = Mock()
-    qtbot.addWidget(view)
-
-    new_x = 4
-
-    view.transformation_frame.x_spinbox.setValue(new_x)
-    view.save_all_changes()
-    assert transform.vector == QVector3D(new_x, y, z)
-
-
-def test_UI_GIVEN_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_spinbox_is_disabled(
-    qtbot, component, model
-):
-    x = 1
-    y = 0
-    z = 0
-    value = 0.0
-    transform = component.add_translation(QVector3D(x, y, z), name="transform")
-    transform.values = create_corresponding_value_dataset(value)
-
-    view = EditTranslation(parent=None, transformation=transform, model=model)
-    qtbot.addWidget(view)
-
-    assert not view.transformation_frame.value_spinbox.isEnabled()
-
-
-@pytest.mark.parametrize("field_type", [item for item in FieldType][1:])
-def test_UI_GIVEN_change_to_non_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_spinbox_is_enabled(
-    qtbot, component, model, field_type
-):
-    x = 1
-    y = 0
-    z = 0
-    value = 0.0
-    transform = component.add_translation(QVector3D(x, y, z), name="transform")
-    transform.values = create_corresponding_value_dataset(value)
-
-    view = EditTranslation(parent=None, transformation=transform, model=model)
-    view.transformation_frame.magnitude_widget.field_type = field_type
-    qtbot.addWidget(view)
-
-    assert view.transformation_frame.value_spinbox.isEnabled()
-
-
-def test_UI_GIVEN_change_to_scalar_value_WHEN_creating_new_transformation_THEN_ui_values_spinbox_is_disabled(
-    qtbot, component, model
-):
-    x = 1
-    y = 0
-    z = 0
-    value = np.array([1, 0, 2.0])
-
-    transform = component.add_translation(QVector3D(x, y, z), name="transform")
-    transform.values = create_corresponding_value_dataset(value)
-
-    view = EditTranslation(parent=None, transformation=transform, model=model)
-    view.transformation_frame.magnitude_widget.field_type = FieldType.scalar_dataset
-    qtbot.addWidget(view)
-
-    assert not view.transformation_frame.value_spinbox.isEnabled()
