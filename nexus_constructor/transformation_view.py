@@ -46,6 +46,8 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.magnitude_widget.units_line_edit.textChanged.connect(
             self.save_magnitude
         )
+        if self.model:
+            self.model.signals.transformation_changed.connect(self.update_depends_on_ui)
 
     def _fill_in_existing_fields(self, current_vector):
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
@@ -58,12 +60,7 @@ class EditTransformation(QGroupBox):
                 self.transformation.values, self.transformation_frame.magnitude_widget
             )
         self.transformation_frame.magnitude_widget.units = self.transformation.units
-        if self.transformation.depends_on:
-            self.transformation_frame.depends_on_text_box.setText(
-                self.transformation.depends_on.absolute_path
-            )
-        else:
-            self.transformation_frame.depends_on_text_box.setText(".")
+        self.update_depends_on_ui()
 
     def disable(self):
         for ui_element in self.transformation_frame.spinboxes + [
@@ -84,6 +81,14 @@ class EditTransformation(QGroupBox):
             self.transformation_frame.magnitude_widget,
         ]:
             ui_element.setEnabled(True)
+
+    def update_depends_on_ui(self):
+        if self.transformation.depends_on:
+            self.transformation_frame.depends_on_text_box.setText(
+                self.transformation.depends_on.absolute_path
+            )
+        else:
+            self.transformation_frame.depends_on_text_box.setText(".")
 
     def save_magnitude(self):
         self.transformation.values = self.transformation_frame.magnitude_widget.value
