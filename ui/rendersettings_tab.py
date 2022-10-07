@@ -71,7 +71,13 @@ class RenderSettingsTab(QWidget):
         # Separador.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         # Separador.setLineWidth(1)
         Separador.setStyleSheet(
-            "background-color: rgba(240,240,240,0); border-width: 1px; border-style: solid; border-color: rgba(240,240,240,0) rgba(240,240,240,0) rgba(230,230,230,1) rgba(240,240,240,0);border-top-style:none;"
+            """
+            background-color: rgba(240,240,240,0);
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgba(240,240,240,0) rgba(240,240,240,0) rgba(230,230,230,1) rgba(240,240,240,0);
+            border-top-style:none;
+            """
         )
 
         # self.renderSettingsLayout.addWidget(Separador)
