@@ -18,9 +18,6 @@ from nexus_constructor.instrument_view.qentity_utils import MATERIAL_DICT
 
 
 class CustomColorDialog(QColorDialog):
-    # def __init__(self):
-    #     super().__init__()
-
     def closeEvent(self, *args, **kwargs):
         super(QColorDialog, self).closeEvent(*args, **kwargs)
 
@@ -152,44 +149,4 @@ class RenderSettingsTab(QWidget):
                 color_state, color_type, color_dialog.currentColor()
             )
         )
-        # color_dialog.show()
         color_dialog.exec()
-
-    # def _pick_color(self, component_type, shading_type):
-    #     if component_type == "ground":
-    #         entities = self.sceneWidget.component_entities["_ground"].entities
-    #         for e in entities:
-    #             for c in e.components():
-    #                 if isinstance(c, Qt3DExtras.QPhongMaterial):
-    #                     break
-    #
-    #
-    #
-    #         if not isinstance(c, Qt3DExtras.QPhongMaterial):
-    #             return
-    #         self.current_ambient = deepcopy(c.ambient())
-    #         self.current_diffuse = deepcopy(c.diffuse())
-    #
-    #     self.color_dialog = CustomColorDialog(self)
-    #     self.color_dialog.currentColorChanged.connect(lambda: self._update_color(
-    #         e, c, shading_type
-    #     ))
-    #     self.color_dialog.show()
-    #     self.color_dialog.exec()
-    #     print('all the way')
-    #     self.color_dialog.close()
-    #
-    #
-    # def _update_color(self, e, c, shading_type):
-    #     if shading_type == "ambient":
-    #         self.current_ambient = self.color_dialog.selectedColor()
-    #     elif shading_type == "diffuse":
-    #         self.current_diffuse = self.color_dialog.selectedColor()
-    #
-    #     new_material = Qt3DExtras.QPhongMaterial(
-    #         ambient = self.current_ambient,
-    #         diffuse = self.current_diffuse,
-    #     )
-    #
-    #     e.removeComponent(c)
-    #     e.addComponent(new_material)

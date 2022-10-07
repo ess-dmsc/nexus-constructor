@@ -470,4 +470,3 @@ class Gnomon:
             )
             entity.default_material = neutron_material
             entity.material_family = neutron_material_family
-            # entity.hoover_material = neutron_hoover_material

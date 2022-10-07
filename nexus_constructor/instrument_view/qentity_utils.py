@@ -53,20 +53,7 @@ MATERIAL_DICT = {
             "highlights": QColor("grey"),
             "alpha": 0.75,
         },
-    },  # NXsource overlaps with beam_material??
-    # "NXsource": {
-    #     "material_type": Qt3DExtras.QPhongAlphaMaterial,
-    #     "normal_state": {
-    #         "shadows": QColor("blue"),
-    #         "highlights": QColor("lightblue"),
-    #         "alpha": 0.5,
-    #     },
-    #     "hoover_state": {
-    #         "shadows": QColor("blue"),
-    #         "highlights": QColor("lightblue"),
-    #         "alpha": 0.75,
-    #     },
-    # },
+    },
     "x_material": {
         "material_type": Qt3DExtras.QPhongMaterial,
         "normal_state": {
