@@ -45,17 +45,21 @@ class Gnomon:
         self.y_text_vector = QVector3D(-0.4, text_translation, 0)
         self.z_text_vector = QVector3D(-0.5, -0.5, text_translation)
 
-        diffuse_color = QColor("grey")
-
-        self.x_material = create_material(
-            AxisColors.X.value, diffuse_color, root_entity, remove_shininess=True
-        )
-        self.y_material = create_material(
-            AxisColors.Y.value, diffuse_color, root_entity, remove_shininess=True
-        )
-        self.z_material = create_material(
-            AxisColors.Z.value, diffuse_color, root_entity, remove_shininess=True
-        )
+        (
+            self.x_material,
+            self.x_hoover_material,
+            self.x_material_family,
+        ) = create_material("x_material", root_entity, remove_shininess=True)
+        (
+            self.y_material,
+            self.y_hoover_material,
+            self.y_material_family,
+        ) = create_material("y_material", root_entity, remove_shininess=True)
+        (
+            self.z_material,
+            self.z_hoover_material,
+            self.z_material_family,
+        ) = create_material("z_material", root_entity, remove_shininess=True)
 
         self.num_neutrons = 9
 
@@ -197,11 +201,11 @@ class Gnomon:
         x_cone_matrix, y_cone_matrix, z_cone_matrix = self.create_cone_matrices(
             self.gnomon_cylinder_length
         )
-
-        for matrix, material in [
-            (x_cone_matrix, self.x_material),
-            (y_cone_matrix, self.y_material),
-            (z_cone_matrix, self.z_material),
+        self.cone_entities = []
+        for matrix, material, material_family in [
+            (x_cone_matrix, self.x_material, self.x_material_family),
+            (y_cone_matrix, self.y_material, self.y_material_family),
+            (z_cone_matrix, self.z_material, self.z_material_family),
         ]:
             cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
 
@@ -210,11 +214,15 @@ class Gnomon:
             cone_transformation = Qt3DCore.QTransform(self.gnomon_root_entity)
             cone_transformation.setMatrix(matrix)
 
-            create_qentity(
-                [cone_mesh, cone_transformation, material],
-                self.gnomon_root_entity,
-                False,
+            self.cone_entities.append(
+                create_qentity(
+                    [cone_mesh, cone_transformation, material],
+                    self.gnomon_root_entity,
+                    False,
+                )
             )
+            self.cone_entities[-1].default_material = material
+            self.cone_entities[-1].material_family = material_family
 
     def create_gnomon_cylinders(self):
         """
@@ -223,10 +231,11 @@ class Gnomon:
         x_axis_matrix, y_axis_matrix, z_axis_matrix = self.create_cylinder_matrices(
             self.gnomon_cylinder_length
         )
-        for matrix, material in [
-            (x_axis_matrix, self.x_material),
-            (y_axis_matrix, self.y_material),
-            (z_axis_matrix, self.z_material),
+        self.cylinder_entities = []
+        for matrix, material, material_family in [
+            (x_axis_matrix, self.x_material, self.x_material_family),
+            (y_axis_matrix, self.y_material, self.y_material_family),
+            (z_axis_matrix, self.z_material, self.z_material_family),
         ]:
             axis_mesh = Qt3DExtras.QCylinderMesh(self.gnomon_root_entity)
 
@@ -235,11 +244,15 @@ class Gnomon:
             axis_transformation = Qt3DCore.QTransform(self.gnomon_root_entity)
             axis_transformation.setMatrix(matrix)
 
-            create_qentity(
-                [axis_mesh, axis_transformation, material],
-                self.gnomon_root_entity,
-                False,
+            self.cylinder_entities.append(
+                create_qentity(
+                    [axis_mesh, axis_transformation, material],
+                    self.gnomon_root_entity,
+                    False,
+                )
             )
+            self.cylinder_entities[-1].default_material = material
+            self.cylinder_entities[-1].material_family = material_family
 
     @staticmethod
     def set_axis_label_text(text_entity, text_label, text_color):
@@ -366,14 +379,16 @@ class Gnomon:
             cylinder_mesh, 1.5, self.neutron_animation_length, 2
         )
         self.set_beam_transform(cylinder_transform, self.neutron_animation_length)
-        beam_material = create_material(
-            QColor("blue"), QColor("lightblue"), self.gnomon_root_entity, alpha=0.5
+        beam_material, beam_hoover_material, beam_material_family = create_material(
+            "beam_material", self.gnomon_root_entity
         )
-        create_qentity(
+        entity = create_qentity(
             [cylinder_mesh, beam_material, cylinder_transform],
             self.gnomon_root_entity,
             False,
         )
+        entity.default_material = beam_material
+        entity.material_family = beam_material_family
 
     @staticmethod
     def set_neutron_animation_properties(
@@ -437,10 +452,14 @@ class Gnomon:
                 time_span_offsets[i],
             )
 
-            neutron_material = create_material(
-                QColor("black"), QColor("grey"), self.gnomon_root_entity
-            )
+            (
+                neutron_material,
+                neutron_hoover_material,
+                neutron_material_family,
+            ) = create_material("neutron_material", self.gnomon_root_entity)
 
-            create_qentity(
+            entity = create_qentity(
                 [mesh, neutron_material, transform], self.gnomon_root_entity, False
             )
+            entity.default_material = neutron_material
+            entity.material_family = neutron_material_family

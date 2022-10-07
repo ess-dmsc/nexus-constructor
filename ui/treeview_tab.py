@@ -177,8 +177,12 @@ class ComponentTreeViewTab(QWidget):
         self._set_button_state()
 
     def on_zoom_item(self):
-        selected = self.component_tree_view.selectedIndexes()[0]
-        component = selected.internalPointer()
-        self.sceneWidget.zoom_to_component(
-            self.sceneWidget.get_entity(component.absolute_path), self.sceneWidget.view.camera()
-        )
+        try:
+            selected = self.component_tree_view.selectedIndexes()[0]
+            component = selected.internalPointer()
+            self.sceneWidget.zoom_to_component(
+                self.sceneWidget.get_entity(component.absolute_path),
+                self.sceneWidget.view.camera(),
+            )
+        except IndexError:
+            pass

@@ -34,6 +34,7 @@ from nexus_constructor.instrument_view.instrument_zooming_3d_window import (
     InstrumentZooming3DWindow,
 )
 from nexus_constructor.instrument_view.off_renderer import OffMesh
+from nexus_constructor.instrument_view.qentity_utils import create_material
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNexus
 from nexus_constructor.model.group import Group
@@ -396,6 +397,10 @@ class InstrumentView(QWidget):
             for key in self.component_entities.keys():
                 entity = self.component_entities[key]
                 for e in entity.entities:
+                    if isinstance(e, tuple):
+                        e = e[0]
+                    if not e.hoover_material:
+                        continue
                     try:
                         if key == name:
                             e.clicked = True
@@ -433,6 +438,8 @@ class InstrumentView(QWidget):
         for key in self.component_entities.keys():
             entity = self.component_entities[key]
             for e in entity.entities:
+                if isinstance(e, tuple):
+                    e = e[0]
                 if e == component:
                     name = key
 
@@ -466,6 +473,35 @@ class InstrumentView(QWidget):
         self.iterate_tree(root_index, name)
         new_selection_index = component_model.find_index_of_group(self.target_child)
         component_tree_view.setCurrentIndex(new_selection_index)
+
+    def updateRenderedMaterials(self, material_name, color_state):
+        for parent_entity in [
+            self.component_root_entity,
+            self.axes_root_entity,
+            self.gnomon_root_entity,
+        ]:
+            for entity in parent_entity.children():
+                try:
+                    material_family = entity.material_family
+                except Exception:
+                    continue
+                if material_family == material_name:
+                    (
+                        new_default_material,
+                        new_hoover_material,
+                        new_material_family,
+                    ) = create_material(
+                        material_name,
+                        parent_entity,
+                    )
+                    entity.default_material = new_default_material
+                    entity.hoover_material = new_hoover_material
+                    if entity.clicked or entity.inside:
+                        entity.switch_to_normal()
+                        entity.switch_to_highlight()
+                    else:
+                        entity.switch_to_highlight()
+                        entity.switch_to_normal()
 
     def add_transformation(self, component):
         """

@@ -5,6 +5,8 @@ from PySide6.Qt3DExtras import Qt3DExtras
 from PySide6.Qt3DRender import Qt3DRender
 from PySide6.QtCore import Qt
 
+from nexus_constructor.instrument_view.qentity_utils import Entity
+
 
 class InstrumentZooming3DWindow(Qt3DExtras.Qt3DWindow):
     def __init__(self, component_root_entity, main_window):
@@ -43,13 +45,16 @@ class InstrumentZooming3DWindow(Qt3DExtras.Qt3DWindow):
         if event.button() == Qt.LeftButton:
             self.last_press_time = time.time()
             for e in self.component_root_entity.children():
+                if not isinstance(e, Entity):
+                    continue
                 try:
                     if e.inside:
                         e.clicked = True
                         self.main_window.model.signals.entity_selected.emit(e)
                     elif not e.inside:
-                        e.removeComponent(e.hoover_material)
-                        e.addComponent(e.true_material)
+                        if e.hoover_material:
+                            e.removeComponent(e.hoover_material)
+                            e.addComponent(e.default_material)
                         e.clicked = False
                 except Exception:
                     pass

@@ -9,9 +9,6 @@ from PySide6.QtGui import QColor, QMatrix4x4, QVector3D
 
 from nexus_constructor.instrument_view.off_renderer import OffMesh
 from nexus_constructor.instrument_view.qentity_utils import (
-    MATERIAL_ALPHA,
-    MATERIAL_COLORS,
-    MATERIAL_DIFFUSE_COLORS,
     create_material,
     create_qentity,
 )
@@ -25,7 +22,11 @@ class EntityCollection(ABC):
         self.entities: List[
             Union[Qt3DCore.QEntity, Tuple[Qt3DCore.QEntity, Callable]]
         ] = []
-        self.default_material: Qt3DRender.QMaterial = self._create_default_material()
+        (
+            self.default_material,
+            self.hoover_material,
+            self.material_family,
+        ) = self._create_default_material()
 
     def create_entities(self):
         raise NotImplementedError()
@@ -44,10 +45,8 @@ class EntityCollection(ABC):
 
     def _create_default_material(self) -> Qt3DRender.QMaterial:
         return create_material(
-            MATERIAL_COLORS.get(self.nx_class, QColor("black")),
-            MATERIAL_DIFFUSE_COLORS.get(self.nx_class, QColor("grey")),
+            "DEFAULT",
             self.root_entity,
-            MATERIAL_ALPHA.get(self.nx_class),
         )
 
 
@@ -56,15 +55,19 @@ class OffMeshEntityCollection(EntityCollection):
         super().__init__(root_entity, nx_class)
         self.entities: List[Qt3DCore.QEntity] = []
         self._mesh = mesh
-        if nx_class not in MATERIAL_COLORS:
-            self.default_material = Qt3DExtras.QGoochMaterial(
-                cool=QColor("#9f9f9f"), warm=QColor("#dbdbdb")
-            )
+        (
+            self.default_material,
+            self.hoover_material,
+            self.material_family,
+        ) = create_material(nx_class, root_entity)
 
     def create_entities(self):
         self.entities.append(
             create_qentity([self._mesh, self.default_material], self.root_entity)
         )
+        self.entities[-1].default_material = self.default_material
+        self.entities[-1].hoover_material = self.hoover_material
+        self.entities[-1].material_family = self.material_family
 
     def add_transformation(self, transformation: Qt3DCore.QComponent):
         for entity in self.entities:
@@ -130,16 +133,24 @@ class NeutronSourceEntityCollection(EntityCollection):
             cylinder_mesh, self._source_radius, self._source_length
         )
         cone_transform.setMatrix(self._get_cylinder_transformation_matrix())
+        (
+            cylinder_material,
+            cylinder_hoover_material,
+            cylinder_material_family,
+        ) = create_material("beam_material", self.root_entity)
 
         self.entities.append(
             (
                 create_qentity(
-                    [cylinder_mesh, self.default_material, cone_transform],
+                    [cylinder_mesh, cylinder_material, cone_transform],
                     self.root_entity,
                 ),
                 self._get_cylinder_transformation_matrix(),
             )
         )
+        self.entities[-1][0].default_material = cylinder_material
+        self.entities[-1][0].hoover_material = cylinder_hoover_material
+        self.entities[-1][0].material_family = cylinder_material_family
 
     def _setup_neutrons(self):
         for i in range(self._num_neutrons):
@@ -150,12 +161,16 @@ class NeutronSourceEntityCollection(EntityCollection):
             transform.setMatrix(
                 self._get_sphere_transformation_matrix(self._neutron_offsets[i])
             )
-            neutron_material = create_material(
-                QColor("black"), QColor("grey"), self.root_entity
-            )
+            (
+                neutron_material,
+                neutron_hoover_material,
+                neutron_material_family,
+            ) = create_material("neutron_material", self.root_entity)
             entity = create_qentity(
-                [mesh, neutron_material, transform], self.root_entity
+                [mesh, neutron_material, transform], self.root_entity, False
             )
+            entity.default_material = neutron_material
+            entity.material_family = neutron_material_family
             self.entities.append(
                 (
                     entity,
@@ -203,10 +218,14 @@ class GroundEntityCollection(EntityCollection):
         nx_class = "none"
         super().__init__(root_entity, nx_class)
         self.entities: List[Qt3DCore.QEntity] = []
-        if nx_class not in MATERIAL_COLORS:
-            self.default_material = Qt3DExtras.QPhongMaterial(
-                ambient=QColor("#f8dd9e"), diffuse=QColor("#b69442")
-            )
+        self.default_material = Qt3DExtras.QPhongMaterial(
+            ambient=QColor("#f8dd9e"), diffuse=QColor("#b69442")
+        )
+        (
+            self.default_material,
+            self.hoover_material,
+            self.material_family,
+        ) = create_material("ground", root_entity)
 
     def create_entities(self):
         self._mesh = Qt3DExtras.QPlaneMesh(self.root_entity)
@@ -221,6 +240,8 @@ class GroundEntityCollection(EntityCollection):
                 False,
             )
         )
+        self.entities[-1].default_material = self.default_material
+        self.entities[-1].material_family = self.material_family
 
     def add_transformation(self, transformation: Qt3DCore.QComponent):
         for entity in self.entities:

@@ -177,6 +177,9 @@ class QtOFFGeometry(Qt3DCore.QGeometry):
 
         faces, vertices = repeat_shape_over_positions(model, positions)
 
+        if len(faces) < 1000:
+            use_progress_bar = False
+
         triangles = convert_faces_into_triangles(
             faces,
             ProgressBar(len(faces), "Shape conversion progress")
