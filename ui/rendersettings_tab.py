@@ -64,10 +64,10 @@ class RenderSettingsTab(QWidget):
         self.colorBoxLayout.addWidget(self.hooverShadowsBtn, 1, 0)
         self.colorBoxLayout.addWidget(self.hooverHighlightsBtn, 1, 1)
 
-        Separador = QFrame()
-        Separador.setFrameShape(QFrame.HLine)
-        Separador.setLineWidth(0.01)
-        Separador.setStyleSheet(
+        separator_line = QFrame()
+        separator_line.setFrameShape(QFrame.HLine)
+        separator_line.setLineWidth(0.01)
+        separator_line.setStyleSheet(
             """
             background-color: rgba(240,240,240,0);
             border-width: 1px;
@@ -78,7 +78,7 @@ class RenderSettingsTab(QWidget):
         )
 
         self.renderSettingsLayout.addLayout(self.switchMeshLayout)
-        self.renderSettingsLayout.addWidget(Separador)
+        self.renderSettingsLayout.addWidget(separator_line)
         self.renderSettingsLayout.addWidget(self.material_combobox)
         self.renderSettingsLayout.addLayout(self.colorBoxLayout)
 
