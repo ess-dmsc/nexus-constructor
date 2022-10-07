@@ -1,3 +1,5 @@
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QCheckBox,
     QColorDialog,
@@ -38,12 +40,19 @@ class RenderSettingsTab(QWidget):
             ("hoover_state", "highlights"),
         ]
 
+        self.subTitle_1 = QLabel("Mesh Settings")
+
         self.switchMeshesLabel = QLabel("Toggle high resolution mesh: ")
         self.switchMeshesBox = QCheckBox()
         self.switchMeshesBox.stateChanged.connect(self.sceneWidget.update_meshes)
 
         self.switchMeshLayout.addWidget(self.switchMeshesLabel)
         self.switchMeshLayout.addWidget(self.switchMeshesBox)
+
+        self.normalShadowsLabel = QLabel("Shadows")
+        self.normalHighlightsLabel = QLabel("Highlights")
+        self.hooverShadowsLabel = QLabel("Hoover Shadows")
+        self.hooverHighlightsLabel = QLabel("Hoover Highlights")
 
         self.normalShadowsBtn = QPushButton("")
         self.normalHighlightsBtn = QPushButton("")
@@ -54,15 +63,22 @@ class RenderSettingsTab(QWidget):
         self.hooverShadowsBtn.clicked.connect(lambda: self._pick_color(2))
         self.hooverHighlightsBtn.clicked.connect(lambda: self._pick_color(3))
 
+        self.subTitle_2 = QLabel("Material Color Settings")
+
         self.material_combobox = QComboBox()
         self.material_combobox.currentIndexChanged.connect(self.updateColorBoxes)
         for key in MATERIAL_DICT.keys():
             self.material_combobox.addItem(key)
 
-        self.colorBoxLayout.addWidget(self.normalShadowsBtn, 0, 0)
-        self.colorBoxLayout.addWidget(self.normalHighlightsBtn, 0, 1)
-        self.colorBoxLayout.addWidget(self.hooverShadowsBtn, 1, 0)
-        self.colorBoxLayout.addWidget(self.hooverHighlightsBtn, 1, 1)
+        self.colorBoxLayout.addWidget(self.normalShadowsLabel, 0, 0)
+        self.colorBoxLayout.addWidget(self.normalHighlightsLabel, 0, 1)
+        self.colorBoxLayout.addWidget(self.hooverShadowsLabel, 2, 0)
+        self.colorBoxLayout.addWidget(self.hooverHighlightsLabel, 2, 1)
+
+        self.colorBoxLayout.addWidget(self.normalShadowsBtn, 1, 0)
+        self.colorBoxLayout.addWidget(self.normalHighlightsBtn, 1, 1)
+        self.colorBoxLayout.addWidget(self.hooverShadowsBtn, 3, 0)
+        self.colorBoxLayout.addWidget(self.hooverHighlightsBtn, 3, 1)
 
         separator_line = QFrame()
         separator_line.setFrameShape(QFrame.HLine)
@@ -77,9 +93,21 @@ class RenderSettingsTab(QWidget):
             """
         )
 
+        subtitle_font = QFont("Arial", 11, QFont.Bold)
+        self.subTitle_1.setFont(subtitle_font)
+        self.subTitle_2.setFont(subtitle_font)
+
+        self.renderSettingsLayout.setAlignment(Qt.AlignTop)
+        self.switchMeshLayout.setAlignment(Qt.AlignTop)
+        self.colorBoxLayout.setAlignment(Qt.AlignTop)
+
+        self.renderSettingsLayout.addWidget(self.subTitle_1, alignment=Qt.AlignTop)
         self.renderSettingsLayout.addLayout(self.switchMeshLayout)
-        self.renderSettingsLayout.addWidget(separator_line)
-        self.renderSettingsLayout.addWidget(self.material_combobox)
+        self.renderSettingsLayout.addWidget(separator_line, alignment=Qt.AlignTop)
+        self.renderSettingsLayout.addWidget(self.subTitle_2, alignment=Qt.AlignTop)
+        self.renderSettingsLayout.addWidget(
+            self.material_combobox, alignment=Qt.AlignTop
+        )
         self.renderSettingsLayout.addLayout(self.colorBoxLayout)
 
         self.setLayout(self.renderSettingsLayout)
