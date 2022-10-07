@@ -1,4 +1,4 @@
-from typing import Any, List, Union
+from typing import Any, List, Tuple, Union
 
 from PySide6.Qt3DCore import Qt3DCore
 from PySide6.Qt3DExtras import Qt3DExtras
@@ -185,7 +185,7 @@ def create_material(
     material_name: str,
     parent: Qt3DCore.QEntity,
     remove_shininess: bool = False,
-) -> tuple[
+) -> Tuple[
     Union[
         Union[
             Qt3DExtras.QPhongAlphaMaterial,
