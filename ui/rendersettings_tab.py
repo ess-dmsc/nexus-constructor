@@ -1,7 +1,11 @@
 from PySide6.QtWidgets import (
+    QCheckBox,
     QColorDialog,
     QComboBox,
+    QFrame,
     QGridLayout,
+    QHBoxLayout,
+    QLabel,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -24,6 +28,7 @@ class RenderSettingsTab(QWidget):
         super().__init__()
         self.setParent(parent)
         self.renderSettingsLayout = QVBoxLayout()
+        self.switchMeshLayout = QHBoxLayout()
         self.colorBoxLayout = QGridLayout()
         self.sceneWidget = scene_widget
         self.boxTypeTuples = [
@@ -33,8 +38,12 @@ class RenderSettingsTab(QWidget):
             ("hoover_state", "highlights"),
         ]
 
-        self.switchMeshesBtn = QPushButton("Switch")
-        self.switchMeshesBtn.clicked.connect(self.sceneWidget.update_meshes)
+        self.switchMeshesLabel = QLabel("Toggle high resolution mesh: ")
+        self.switchMeshesBox = QCheckBox()
+        self.switchMeshesBox.stateChanged.connect(self.sceneWidget.update_meshes)
+
+        self.switchMeshLayout.addWidget(self.switchMeshesLabel)
+        self.switchMeshLayout.addWidget(self.switchMeshesBox)
 
         self.normalShadowsBtn = QPushButton("")
         self.normalHighlightsBtn = QPushButton("")
@@ -55,7 +64,19 @@ class RenderSettingsTab(QWidget):
         self.colorBoxLayout.addWidget(self.hooverShadowsBtn, 1, 0)
         self.colorBoxLayout.addWidget(self.hooverHighlightsBtn, 1, 1)
 
-        self.renderSettingsLayout.addWidget(self.switchMeshesBtn)
+        Separador = QFrame()
+        Separador.setFrameShape(QFrame.HLine)
+        # Separador.setFrameStyle(QFrame.Plain)
+        Separador.setLineWidth(0.01)
+        # Separador.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        # Separador.setLineWidth(1)
+        Separador.setStyleSheet(
+            "background-color: rgba(240,240,240,0); border-width: 1px; border-style: solid; border-color: rgba(240,240,240,0) rgba(240,240,240,0) rgba(230,230,230,1) rgba(240,240,240,0);border-top-style:none;"
+        )
+
+        # self.renderSettingsLayout.addWidget(Separador)
+        self.renderSettingsLayout.addLayout(self.switchMeshLayout)
+        self.renderSettingsLayout.addWidget(Separador)
         self.renderSettingsLayout.addWidget(self.material_combobox)
         self.renderSettingsLayout.addLayout(self.colorBoxLayout)
 
@@ -101,7 +122,7 @@ class RenderSettingsTab(QWidget):
                 color_state, color_type, color_dialog.currentColor()
             )
         )
-        color_dialog.show()
+        # color_dialog.show()
         color_dialog.exec()
 
     # def _pick_color(self, component_type, shading_type):
