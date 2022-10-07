@@ -478,10 +478,8 @@ class InstrumentView(QWidget):
         for entity in self.component_root_entity.children():
             try:
                 material_family = entity.material_family
-                print(material_family)
             except Exception:
                 continue
-
             if material_family == material_name:
                 (
                     new_default_material,
@@ -489,19 +487,16 @@ class InstrumentView(QWidget):
                     new_material_family,
                 ) = create_material(
                     material_name,
-                    self.root_entity,
+                    self.component_root_entity,
                 )
-            for c in entity.components():
-                if isinstance(
-                    c,
-                    (
-                        Qt3DExtras.QPhongMaterial,
-                        Qt3DExtras.QPhongAlphaMaterial,
-                        Qt3DExtras.QGoochMaterial,
-                    ),
-                ):
-                    entity.removeComponent(c)
-            entity.addComponent(new_default_material)
+                entity.default_material = new_default_material
+                entity.hoover_material = new_hoover_material
+                if entity.clicked or entity.inside:
+                    entity.switch_to_normal()
+                    entity.switch_to_highlight()
+                else:
+                    entity.switch_to_highlight()
+                    entity.switch_to_normal()
 
     def add_transformation(self, component):
         """
