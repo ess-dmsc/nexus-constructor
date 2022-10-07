@@ -201,11 +201,11 @@ class Gnomon:
         x_cone_matrix, y_cone_matrix, z_cone_matrix = self.create_cone_matrices(
             self.gnomon_cylinder_length
         )
-
-        for matrix, material in [
-            (x_cone_matrix, self.x_material),
-            (y_cone_matrix, self.y_material),
-            (z_cone_matrix, self.z_material),
+        self.cone_entities = []
+        for matrix, material, material_family in [
+            (x_cone_matrix, self.x_material, self.x_material_family),
+            (y_cone_matrix, self.y_material, self.y_material_family),
+            (z_cone_matrix, self.z_material, self.z_material_family),
         ]:
             cone_mesh = Qt3DExtras.QConeMesh(self.gnomon_root_entity)
 
@@ -214,11 +214,15 @@ class Gnomon:
             cone_transformation = Qt3DCore.QTransform(self.gnomon_root_entity)
             cone_transformation.setMatrix(matrix)
 
-            create_qentity(
-                [cone_mesh, cone_transformation, material],
-                self.gnomon_root_entity,
-                False,
+            self.cone_entities.append(
+                create_qentity(
+                    [cone_mesh, cone_transformation, material],
+                    self.gnomon_root_entity,
+                    False,
+                )
             )
+            self.cone_entities[-1].default_material = material
+            self.cone_entities[-1].material_family = material_family
 
     def create_gnomon_cylinders(self):
         """

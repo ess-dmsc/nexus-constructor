@@ -475,28 +475,33 @@ class InstrumentView(QWidget):
         component_tree_view.setCurrentIndex(new_selection_index)
 
     def updateRenderedMaterials(self, material_name, color_state):
-        for entity in self.component_root_entity.children():
-            try:
-                material_family = entity.material_family
-            except Exception:
-                continue
-            if material_family == material_name:
-                (
-                    new_default_material,
-                    new_hoover_material,
-                    new_material_family,
-                ) = create_material(
-                    material_name,
-                    self.component_root_entity,
-                )
-                entity.default_material = new_default_material
-                entity.hoover_material = new_hoover_material
-                if entity.clicked or entity.inside:
-                    entity.switch_to_normal()
-                    entity.switch_to_highlight()
-                else:
-                    entity.switch_to_highlight()
-                    entity.switch_to_normal()
+        for parent_entity in [
+            self.component_root_entity,
+            self.axes_root_entity,
+            self.gnomon_root_entity,
+        ]:
+            for entity in parent_entity.children():
+                try:
+                    material_family = entity.material_family
+                except Exception:
+                    continue
+                if material_family == material_name:
+                    (
+                        new_default_material,
+                        new_hoover_material,
+                        new_material_family,
+                    ) = create_material(
+                        material_name,
+                        parent_entity,
+                    )
+                    entity.default_material = new_default_material
+                    entity.hoover_material = new_hoover_material
+                    if entity.clicked or entity.inside:
+                        entity.switch_to_normal()
+                        entity.switch_to_highlight()
+                    else:
+                        entity.switch_to_highlight()
+                        entity.switch_to_normal()
 
     def add_transformation(self, component):
         """
