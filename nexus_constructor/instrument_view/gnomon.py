@@ -49,17 +49,23 @@ class Gnomon:
             self.x_material,
             self.x_hoover_material,
             self.x_material_family,
-        ) = create_material("x_material", root_entity, remove_shininess=True)
+        ) = create_material(
+            "x_material", root_entity, remove_shininess=True
+        )  # type: ignore
         (
             self.y_material,
             self.y_hoover_material,
             self.y_material_family,
-        ) = create_material("y_material", root_entity, remove_shininess=True)
+        ) = create_material(
+            "y_material", root_entity, remove_shininess=True
+        )  # type: ignore
         (
             self.z_material,
             self.z_hoover_material,
             self.z_material_family,
-        ) = create_material("z_material", root_entity, remove_shininess=True)
+        ) = create_material(
+            "z_material", root_entity, remove_shininess=True
+        )  # type: ignore
 
         self.num_neutrons = 9
 

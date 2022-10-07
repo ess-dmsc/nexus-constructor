@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Union
 
 from PySide6.Qt3DCore import Qt3DCore
 from PySide6.Qt3DExtras import Qt3DExtras
@@ -181,45 +181,21 @@ class Entity(Qt3DCore.QEntity):
                 self.addComponent(new_mesh)
 
 
-# def create_material(
-#     ambient: QColor,
-#     diffuse: QColor,
-#     parent: Qt3DCore.QEntity,
-#     alpha: float = None,
-#     remove_shininess: bool = False,
-# ) -> Qt3DRender.QMaterial:
-#     """
-#     Creates a material and then sets its ambient, diffuse, alpha (if provided) properties. Sets shininess to zero if
-#     instructed.
-#     :param ambient: The desired ambient colour of the material.
-#     :param diffuse: The desired diffuse colour of the material.
-#     :param alpha: The desired alpha value of the material. Optional argument as not all material-types have this
-#                   property.
-#     :param remove_shininess: Boolean indicating whether or not to remove shininess. This is used for the gnomon.
-#     :return A material that is now able to be added to an entity.
-#     """
-#
-#     if alpha is not None:
-#         material = Qt3DExtras.QPhongAlphaMaterial(parent)
-#         material.setAlpha(alpha)
-#     else:
-#         material = Qt3DExtras.QPhongMaterial(parent)
-#
-#     if remove_shininess:
-#         material.setShininess(0)
-#
-#     material.setAmbient(ambient)
-#     material.setDiffuse(diffuse)
-#
-#     return material
-
-
 def create_material(
     material_name: str,
     parent: Qt3DCore.QEntity,
     remove_shininess: bool = False,
-) -> Tuple[
-    Union[Union[Qt3DExtras.QPhongAlphaMaterial, Qt3DExtras.QGoochMaterial], Any], Any
+) -> tuple[
+    Union[
+        Union[
+            Qt3DExtras.QPhongAlphaMaterial,
+            Qt3DExtras.QPhongMaterial,
+            Qt3DExtras.QGoochMaterial,
+        ],
+        Any,
+    ],
+    Any,
+    str,
 ]:
     if material_name not in MATERIAL_DICT.keys():
         normal_material = MATERIAL_DICT["DEFAULT"]["material_type"].__call__(parent)
