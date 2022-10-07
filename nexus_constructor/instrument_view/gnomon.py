@@ -49,23 +49,17 @@ class Gnomon:
             self.x_material,
             self.x_hoover_material,
             self.x_material_family,
-        ) = create_material(
-            "x_material", root_entity, remove_shininess=True
-        )  # type: ignore
+        ) = create_material("x_material", root_entity, remove_shininess=True)
         (
             self.y_material,
             self.y_hoover_material,
             self.y_material_family,
-        ) = create_material(
-            "y_material", root_entity, remove_shininess=True
-        )  # type: ignore
+        ) = create_material("y_material", root_entity, remove_shininess=True)
         (
             self.z_material,
             self.z_hoover_material,
             self.z_material_family,
-        ) = create_material(
-            "z_material", root_entity, remove_shininess=True
-        )  # type: ignore
+        ) = create_material("z_material", root_entity, remove_shininess=True)
 
         self.num_neutrons = 9
 
@@ -395,7 +389,6 @@ class Gnomon:
         )
         entity.default_material = beam_material
         entity.material_family = beam_material_family
-        # entity.hoover_material = beam_hoover_material
 
     @staticmethod
     def set_neutron_animation_properties(
