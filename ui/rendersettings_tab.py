@@ -66,10 +66,7 @@ class RenderSettingsTab(QWidget):
 
         Separador = QFrame()
         Separador.setFrameShape(QFrame.HLine)
-        # Separador.setFrameStyle(QFrame.Plain)
         Separador.setLineWidth(0.01)
-        # Separador.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
-        # Separador.setLineWidth(1)
         Separador.setStyleSheet(
             """
             background-color: rgba(240,240,240,0);
@@ -80,7 +77,6 @@ class RenderSettingsTab(QWidget):
             """
         )
 
-        # self.renderSettingsLayout.addWidget(Separador)
         self.renderSettingsLayout.addLayout(self.switchMeshLayout)
         self.renderSettingsLayout.addWidget(Separador)
         self.renderSettingsLayout.addWidget(self.material_combobox)
