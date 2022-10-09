@@ -1,10 +1,10 @@
 from unittest.mock import Mock
 
 import pytest
-from PySide2.QtCore import QModelIndex, QPoint, Signal
-from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QFrame as QFrameBase
-from PySide2.QtWidgets import QToolBar, QTreeView, QVBoxLayout, QWidget
+from PySide6.QtCore import QModelIndex, QPoint, Signal
+from PySide6.QtGui import QVector3D
+from PySide6.QtWidgets import QFrame as QFrameBase
+from PySide6.QtWidgets import QToolBar, QTreeView, QVBoxLayout, QWidget
 
 from nexus_constructor.common_attrs import TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
@@ -216,7 +216,7 @@ def test_GIVEN_action_properties_WHEN_creating_disabled_action_THEN_action_has_e
     assert action.toolTip() == mouse_over_text
     assert action.parent() is tree_view_tab
     assert not action.icon().isNull()
-    assert not action.isEnabled()
+    assert action.isEnabled()
 
 
 def test_GIVEN_action_properties_WHEN_creating_enabled_action_THEN_action_has_expected_attributes(

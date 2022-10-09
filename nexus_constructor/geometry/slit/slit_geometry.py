@@ -1,6 +1,6 @@
 from typing import List
 
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
 from nexus_constructor.model.component import Component
@@ -9,10 +9,14 @@ from nexus_constructor.model.geometry import OFFGeometryNoNexus
 
 class SlitGeometry:
     def __init__(self, component: Component):
-        gaps: tuple = (
-            float(component["x_gap"].values) if "x_gap" in component else None,
-            float(component["y_gap"].values) if "y_gap" in component else None,
-        )
+        gaps: tuple
+        if component["x_gap"].values and component["y_gap"].values:
+            gaps = (
+                float(component["x_gap"].values) if "x_gap" in component else None,
+                float(component["y_gap"].values) if "y_gap" in component else None,
+            )
+        else:
+            gaps = (None, None)
         self._units = self._get_units(component)
         self.vertices: List[QVector3D] = []
         self.faces: List[List[int]]

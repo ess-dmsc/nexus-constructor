@@ -1,6 +1,6 @@
 import pytest
 from mock import Mock
-from PySide2.QtWidgets import QLabel, QListWidget
+from PySide6.QtWidgets import QLabel, QListWidget
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel

@@ -4,11 +4,11 @@
 # licensing of 'ui/pixel_options.ui' applies.
 #
 # Created: Wed Aug 14 09:30:56 2019
-#      by: pyside2-uic  running on PySide2 5.13.0
+#      by: pyside2-uic  running on PySide6 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 
 class Ui_PixelOptionsWidget(object):

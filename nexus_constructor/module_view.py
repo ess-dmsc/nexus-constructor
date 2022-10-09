@@ -1,5 +1,5 @@
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_utils import find_field_type
@@ -13,9 +13,7 @@ STATIC_DATASETS = "dataset"
 class ModuleView(QGroupBox):
     def __init__(self, module, parent: QWidget):
         super().__init__(
-            module.writer_module.upper()
-            if module.writer_module == STATIC_DATASETS
-            else module.writer_module,
+            module.writer_module,
             parent,
         )
         self.setFixedHeight(65)
@@ -56,9 +54,7 @@ class ModuleView(QGroupBox):
 class ModuleViewEditable(QGroupBox):
     def __init__(self, module, parent: QWidget, model: Model):
         super().__init__(
-            module.writer_module.upper()
-            if module.writer_module == STATIC_DATASETS
-            else module.writer_module,
+            module.writer_module,
             parent,
         )
         layout = QVBoxLayout()
@@ -104,11 +100,7 @@ class ModuleViewEditable(QGroupBox):
             StreamMode.value for StreamMode in StreamModules
         ]:
             self.module.writer_module = self.field_widget.value.writer_module
-            self.setTitle(
-                self.module.writer_module.upper()
-                if self.module.writer_module == STATIC_DATASETS
-                else self.module.writer_module
-            )
+            self.setTitle(self.module.writer_module)
             self.module.source = self.field_widget.value.source  # type: ignore
             self.module.topic = self.field_widget.value.topic  # type: ignore
             self.module.attributes.set_attribute_value(

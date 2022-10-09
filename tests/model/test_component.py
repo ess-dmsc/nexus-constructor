@@ -1,5 +1,5 @@
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.model.component import TRANSFORMS_GROUP_NAME, Component
 from nexus_constructor.model.module import Link, NS10Stream
@@ -69,10 +69,10 @@ def test_component_as_dict_contains_transformations():
     test_component.depends_on = zeroth_transform
     dictionary_output = test_component.as_dict([])
 
-    assert dictionary_output["children"][0]["name"] == TRANSFORMS_GROUP_NAME
+    assert dictionary_output["children"][1]["name"] == TRANSFORMS_GROUP_NAME
     child_names = [
         child["config"]["name"]
-        for child in dictionary_output["children"][0]["children"]
+        for child in dictionary_output["children"][1]["children"]
     ]
     assert zeroth_transform_name in child_names
     assert first_transform_name in child_names

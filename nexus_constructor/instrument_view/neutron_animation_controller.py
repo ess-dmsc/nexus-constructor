@@ -1,5 +1,5 @@
-from PySide2.QtCore import Property, QObject, Signal
-from PySide2.QtGui import QMatrix4x4, QVector3D
+from PySide6.QtCore import Property, QObject, Signal
+from PySide6.QtGui import QMatrix4x4, QVector3D
 
 
 class NeutronAnimationController(QObject):

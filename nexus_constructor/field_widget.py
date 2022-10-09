@@ -4,9 +4,9 @@ from functools import partial
 from typing import Any, List, Union
 
 import numpy as np
-from PySide2.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
-from PySide2.QtGui import QValidator
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QEvent, QObject, QStringListModel, Qt, Signal
+from PySide6.QtGui import QValidator
+from PySide6.QtWidgets import (
     QComboBox,
     QCompleter,
     QDialog,
@@ -71,7 +71,6 @@ class FieldNameLineEdit(QLineEdit):
 class FieldWidget(QFrame):
     # Used for deletion of field
     something_clicked = Signal()
-    enable_3d_value_spinbox = Signal(bool)
 
     def dataset_type_changed(self, _):
         self.value_line_edit.validator().dataset_type_combo = self.value_type_combo
@@ -418,7 +417,6 @@ class FieldWidget(QFrame):
         self.edit_dialog = QDialog(parent=self)
         self.edit_dialog.setModal(True)
         self._set_up_value_validator(False)
-        self.enable_3d_value_spinbox.emit(not self.field_type_is_scalar())
         if self.streams_widget and self.streams_widget._old_schema:
             self._node_parent.add_stream_module(self.streams_widget._old_schema)
         if self.field_type == FieldType.scalar_dataset:
@@ -433,6 +431,9 @@ class FieldWidget(QFrame):
                 self.edit_dialog,
                 show_only_f142_stream=self._show_only_f142_stream,
                 node_parent=self._node_parent,
+            )
+            self.streams_widget.ok_button.clicked.connect(
+                self._emit_current_item_changed_in_parent
             )
             self.edit_button.clicked.connect(self.streams_widget.update_schema_combo)
             self.streams_widget.ok_validator.is_valid.connect(

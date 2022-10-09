@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME
 from nexus_constructor.geometry.disk_chopper.chopper_details import ChopperDetails

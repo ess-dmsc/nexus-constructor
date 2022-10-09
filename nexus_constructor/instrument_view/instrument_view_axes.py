@@ -1,11 +1,10 @@
 import struct
 from typing import List
 
-from PySide2 import QtCore
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.Qt3DRender import Qt3DRender
+from PySide6 import QtCore
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.Qt3DRender import Qt3DRender
 
-from nexus_constructor.instrument_view.axis_colors import AxisColors
 from nexus_constructor.instrument_view.line_geometry import LineGeometry
 from nexus_constructor.instrument_view.qentity_utils import (
     create_material,
@@ -21,10 +20,8 @@ class InstrumentViewAxes(object):
         :param line_length: The length of the line in the axes.
         """
         vertices: List = [0 for _ in range(3)]
-
-        for i, color in enumerate(
-            [AxisColors.X.value, AxisColors.Y.value, AxisColors.Z.value]
-        ):
+        self.entities = []
+        for i, material_name in enumerate(["x_material", "y_material", "z_material"]):
             mesh = Qt3DRender.QGeometryRenderer(component_root_entity)
 
             line_vertices = vertices[:]
@@ -35,8 +32,14 @@ class InstrumentViewAxes(object):
             )
 
             self.set_mesh_properties(mesh, geometry)
-            material = create_material(color, color, component_root_entity)
-            create_qentity([mesh, material], component_root_entity)
+            material, hoover_material, material_family = create_material(
+                material_name, component_root_entity
+            )
+            self.entities.append(
+                create_qentity([mesh, material], component_root_entity, False)
+            )
+            self.entities[-1].default_material = material
+            self.entities[-1].material_family = material_family
 
     @staticmethod
     def create_data_array(line_vertices: List[int]):

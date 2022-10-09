@@ -1,5 +1,5 @@
 import numpy as np
-from PySide2.QtGui import QVector3D
+from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
 from nexus_constructor.model.component import Component

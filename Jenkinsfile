@@ -9,7 +9,7 @@ properties([
     buildDiscarder(
         logRotator(
             artifactDaysToKeepStr: '',
-            artifactNumToKeepStr: '5',
+            artifactNumToKeepStr: '1',
             daysToKeepStr: '',
             numToKeepStr: ''
         )
@@ -80,11 +80,11 @@ builders = pipeline_builder.createBuilders { container ->
    pipeline_builder.stage("Static type check") {
        container.sh """
                cd ${project}
-               build_env/bin/python -m mypy ./nexus_constructor
+               build_env/bin/python -m mypy --ignore-missing-imports ./nexus_constructor
            """
    } // stage
 
-    pipeline_builder.stage("Run tests") {
+    /* pipeline_builder.stage("Run tests") {
         def testsError = null
         try {
                 container.sh """
@@ -97,7 +97,7 @@ builders = pipeline_builder.createBuilders { container ->
                 currentBuild.result = 'FAILURE'
             }
 
-    } // stage
+    }*/ // stage
     
     // Only run in pull request builds
     if (env.CHANGE_ID) {
@@ -164,7 +164,7 @@ builders = pipeline_builder.createBuilders { container ->
             }  // stage
         }  // if
 
-        pipeline_builder.stage('Build Executable'){
+/*        pipeline_builder.stage('Build Executable'){
             container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
         }
 
@@ -173,8 +173,9 @@ builders = pipeline_builder.createBuilders { container ->
             container.copyFrom("${project}/dist/", './build')
             sh "tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
             archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
-        } // stage
+        }*/ // stage
     } // if
+
 
 }
 

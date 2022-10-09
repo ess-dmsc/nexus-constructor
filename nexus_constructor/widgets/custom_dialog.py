@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QDialog, QMessageBox
+from PySide6.QtWidgets import QDialog, QMessageBox
 
 
 class CustomDialog(QDialog):

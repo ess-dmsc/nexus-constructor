@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 import attr
 import numpy as np
-from PySide2.Qt3DCore import Qt3DCore
-from PySide2.QtGui import QMatrix4x4, QTransform, QVector3D
+from PySide6.Qt3DCore import Qt3DCore
+from PySide6.QtGui import QMatrix4x4, QTransform, QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
@@ -106,6 +106,16 @@ class Component(Group):
             self.depends_on.deregister_dependent(self)
 
         self._depends_on = new_depends_on
+        try:
+            self[CommonAttrs.DEPENDS_ON] = Dataset(
+                parent_node=self,
+                name=CommonAttrs.DEPENDS_ON,
+                values=self._depends_on.absolute_path,
+            )
+        except AttributeError:
+            logging.debug(
+                f"NeXus Constructor cannot display depends_on for {self.name} in tree structure."
+            )
         if new_depends_on is not None:
             new_depends_on.register_dependent(self)
 
@@ -510,7 +520,7 @@ class Component(Group):
                 }
             )
         try:
-            if self.depends_on is not None:
+            if self.depends_on is not None and CommonAttrs.DEPENDS_ON not in self:
                 dictionary[CommonKeys.CHILDREN].append(
                     {
                         CommonKeys.MODULE: DATASET,

@@ -1,6 +1,6 @@
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtWebEngineWidgets import QWebEngineView
-from PySide2.QtWidgets import QDialog
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtWidgets import QDialog
 
 from nexus_constructor.model import GroupContainer
 from nexus_constructor.widgets import ClassDropDownList, DescriptionEdit, GroupNameEdit
@@ -288,12 +288,20 @@ class Ui_AddComponentDialog(QDialog):
         self.verticalLayout_2.addWidget(self.fieldsBox)
         self.verticalLayout_2.setStretch(5, 1)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
-        self.webEngineView = QWebEngineView(self.widget)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
+        self.gridLayout_4.setColumnStretch(0, 1)
+        self.gridLayout_4.setColumnStretch(1, 1)
+        self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
+        self.set_web_engine_view(sizePolicy)
+        self.retranslateUi()
+        QtCore.QMetaObject.connectSlotsByName(self)
+
+    def set_web_engine_view(self, sizePolicy):
+        self.webEngineView = QWebEngineView(self.widget)
         sizePolicy.setHeightForWidth(
             self.webEngineView.sizePolicy().hasHeightForWidth()
         )
@@ -301,12 +309,6 @@ class Ui_AddComponentDialog(QDialog):
         self.webEngineView.setProperty("url", QtCore.QUrl("about:blank"))
         self.webEngineView.setObjectName("webEngineView")
         self.gridLayout_4.addWidget(self.webEngineView, 0, 1, 1, 1)
-        self.gridLayout_4.setColumnStretch(0, 1)
-        self.gridLayout_4.setColumnStretch(1, 1)
-        self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
-
-        self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         self.setWindowTitle(

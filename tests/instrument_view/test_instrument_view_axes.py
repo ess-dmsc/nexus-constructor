@@ -1,7 +1,7 @@
 import struct
 
 from mock import Mock
-from PySide2.Qt3DRender import Qt3DRender
+from PySide6.Qt3DRender import Qt3DRender
 
 from nexus_constructor.instrument_view.instrument_view_axes import InstrumentViewAxes
 

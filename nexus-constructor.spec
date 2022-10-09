@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-import PySide2
+import PySide6
 import os
 
 block_cipher = None
@@ -10,10 +10,10 @@ added_files = [
     ("definitions/base_classes/*.nxdl.xml", "definitions/base_classes"),
 ]
 
-if os.path.isdir(os.path.join(PySide2.__path__[0], "Qt", "plugins", "renderers")):
+if os.path.isdir(os.path.join(PySide6.__path__[0], "Qt", "plugins", "renderers")):
     added_files.append((
-        os.path.join(PySide2.__path__[0], "Qt", "plugins", "renderers"),
-        "PySide2/Qt/plugins/renderers",
+        os.path.join(PySide6.__path__[0], "Qt", "plugins", "renderers"),
+        "PySide6/Qt/plugins/renderers",
     ))
 
 # Be careful about removing things from this list.
@@ -58,7 +58,7 @@ a = Analysis(
     pathex=["/home/matt/git/nexus-constructor"],
     binaries=[],
     datas=added_files,
-    hiddenimports=["PySide2.QtXml"],
+    hiddenimports=["PySide6.QtXml"],
     hookspath=[],
     runtime_hooks=[],
     excludes=exclude,

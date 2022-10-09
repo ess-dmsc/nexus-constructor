@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 
-from PySide2.QtCore import QMetaObject, QSize
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QMetaObject, QSize
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
     QApplication,
     QDoubleSpinBox,
     QFormLayout,
@@ -51,15 +52,18 @@ class UiTransformation:
         self.magnitude_widget.setFrameShape(QFrame.NoFrame)
         self.magnitude_widget.setMinimumHeight(40)
 
-        self.ui_placeholder_layout = QFormLayout()
+        self.ui_placeholder_layout = QVBoxLayout()
 
-        self.value_spinbox = QDoubleSpinBox(transformation)
-        self.value_spinbox.setToolTip("Placeholder value for 3D view to use")
-        self.value_spinbox.setDecimals(8)
-        self.value_spinbox.setMaximumSize(QSize(100, 16777215))
-        self.ui_placeholder_layout.addRow(
-            "Value to use in 3D view:", self.value_spinbox
-        )
+        self.depends_on_text_box = QLineEdit(transformation)
+        self.depends_on_text_box.setToolTip("depends_on for transformation.")
+        self.depends_on_text_box.setMaximumSize(QSize(3000, 16777215))
+        self.depends_on_text_box.setMinimumWidth(250)
+        depends_on_font = QFont()
+        depends_on_font.setBold(True)
+        depends_on_label = QLabel("depends_on")
+        depends_on_label.setFont(depends_on_font)
+        self.ui_placeholder_layout.addWidget(depends_on_label)
+        self.ui_placeholder_layout.addWidget(self.depends_on_text_box)
 
         self.setup_name_layout()
         self.setup_vector_layout(transformation)
@@ -118,7 +122,6 @@ class UiTransformation:
             self.x_spinbox,
             self.y_spinbox,
             self.z_spinbox,
-            self.value_spinbox,
         ]
         for spinbox in self.spinboxes:
             spinbox.setRange(-10000000, 10000000)

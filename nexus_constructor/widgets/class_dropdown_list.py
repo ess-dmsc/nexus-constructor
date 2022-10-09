@@ -1,18 +1,19 @@
-from PySide2 import QtWidgets
-from PySide2.QtGui import QValidator, QBrush
+from functools import partial
+
+from PySide6 import QtWidgets
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QBrush, QValidator
+
 from nexus_constructor.component_type import (
-    NX_CLASSES,
     COMPONENT_TYPES,
     ENTRY_CLASS_NAME,
+    NX_CLASSES,
 )
+from nexus_constructor.model import Group, GroupContainer
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
-from nexus_constructor.widgets.dropdown_list import DropDownList
-from PySide2.QtCore import Signal
-from nexus_constructor.model import GroupContainer, Group
-from PySide2.QtCore import Qt
 from nexus_constructor.ui_utils import validate_general_widget
-from functools import partial
+from nexus_constructor.widgets.dropdown_list import DropDownList
 
 
 class NXClassValidator(QValidator):

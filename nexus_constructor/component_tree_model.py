@@ -2,10 +2,10 @@ import pickle
 from json import loads
 from typing import List, Optional, Tuple, Union
 
-import PySide2.QtGui
-from PySide2.QtCore import QAbstractItemModel, QByteArray, QMimeData, QModelIndex, Qt
-from PySide2.QtGui import QVector3D
-from PySide2.QtWidgets import QMessageBox
+import PySide6.QtGui
+from PySide6.QtCore import QAbstractItemModel, QByteArray, QMimeData, QModelIndex, Qt
+from PySide6.QtGui import QVector3D
+from PySide6.QtWidgets import QMessageBox
 
 from nexus_constructor.common_attrs import (
     NX_TRANSFORMATIONS,
@@ -23,6 +23,7 @@ from nexus_constructor.model.module import (
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import ValueTypes
+from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.unique_name import generate_unique_name
 
 
@@ -44,8 +45,33 @@ class NexusTreeModel(QAbstractItemModel):
     def replace_model(self, model):
         self.model = model
 
+    def find_index_of_group(self, group: Group) -> QModelIndex:
+        abs_path = group.absolute_path.split("/")[2:]
+        sub_tree_root = self.model.entry
+        for item in abs_path:
+            sub_tree_root = sub_tree_root[item]
+        if not sub_tree_root or not sub_tree_root.parent_node:
+            return self.createIndex(0, 0, self.model.entry)
+        return self.index_from_component(sub_tree_root)
+
     def columnCount(self, parent: QModelIndex) -> int:
         return 1
+
+    def find_component_of(self, index: QModelIndex):
+        if index.isValid():
+            item = index.internalPointer()
+            if isinstance(item, Component):
+                return index
+            parent_item = item.parent_node
+            if parent_item:
+                parent_index = self.createIndex(parent_item.row(), 0, parent_item)
+                next_index = self.find_component_of(parent_index)
+                if isinstance(next_index.internalPointer(), Component):
+                    return next_index
+            if item:
+                if item.name == item.absolute_path.split("/")[1]:
+                    return self.createIndex(0, 0, item)
+        return QModelIndex()
 
     def parent(self, index: QModelIndex):
         if index.isValid():
@@ -72,7 +98,7 @@ class NexusTreeModel(QAbstractItemModel):
         index = self.createIndex(row, column, parent_item.children[row])
         return index
 
-    def index_from_component(self, component: Component):
+    def index_from_component(self, component: Group):
         row = component.parent_node.children.index(component)
         return self.createIndex(row, 0, component)
 
@@ -113,7 +139,7 @@ class NexusTreeModel(QAbstractItemModel):
             "node/transformation",
         ]
 
-    def supportedDropActions(self) -> PySide2.QtCore.Qt.DropActions:
+    def supportedDropActions(self) -> PySide6.QtCore.Qt.DropActions:
         return Qt.DropAction.MoveAction | Qt.DropAction.CopyAction
 
     def mimeData(self, indexes):
@@ -526,7 +552,7 @@ class NexusTreeModel(QAbstractItemModel):
         component.parent_node.children.pop(component.row())
         self.endRemoveRows()
         if component.name != TRANSFORMATIONS and isinstance(component, Component):
-            self.model.signals.component_removed.emit(component.name)
+            self.model.signals.component_removed.emit(component.absolute_path)
         elif removed_components_in_group:
             for c_name in removed_components_in_group:
                 self.model.signals.component_removed.emit(c_name)
@@ -534,7 +560,7 @@ class NexusTreeModel(QAbstractItemModel):
     def _remove_child_components(self, group: Group, removed_components: List[str]):
         for child in group.children:
             if isinstance(child, Component):
-                removed_components.append(child.name)
+                removed_components.append(child.absolute_path)
                 self.model.remove_component(child)
             elif isinstance(child, Group):
                 self._remove_child_components(child, removed_components)
@@ -576,6 +602,8 @@ class NexusTreeModel(QAbstractItemModel):
     ):  # TODO: this function is a bit shaky and needs an update in a future PR.
         try:
             component = self.current_nxs_obj[0].parent_component  # type: ignore
+            if not isinstance(component, Component):
+                component = self.current_nxs_obj[0].parent_component  # type: ignore
         except AttributeError:
             print("Not able to update link rows.")
             return
@@ -584,7 +612,11 @@ class NexusTreeModel(QAbstractItemModel):
             component_index = self.index(i, 0, QModelIndex())
             transformations_index = self.index(1, 0, component_index)
             transformations = transformations_index.internalPointer()
-            if transformations and transformations.has_link:
+            if (
+                transformations
+                and isinstance(transformations, TransformationsList)
+                and transformations.has_link
+            ):
                 transformation_rows = self.rowCount(transformations_index)
                 link_index = self.index(
                     transformation_rows - 1, 0, transformations_index

@@ -1,11 +1,9 @@
-# In general libraries should not be pinned to specific versions
-attrs
-h5py
 nexusformat
-numpy-stl
-pint
-xmltodict
 numpy
+numpy-stl
+open3d
+pint
+PySide6
 pytest-qt
+xmltodict
 ess-streaming-data-types >= 0.9.5
-PySide2

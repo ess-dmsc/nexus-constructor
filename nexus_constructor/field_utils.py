@@ -13,7 +13,7 @@ from nexus_constructor.utils.required_component_fields import required_component
 from nexus_constructor.validators import FieldType
 
 if TYPE_CHECKING:
-    from PySide2.QtWidgets import QFrame  # noqa: F401
+    from PySide6.QtWidgets import QFrame  # noqa: F401
 
     from nexus_constructor.model.module import HS01Stream  # noqa: F401
     from nexus_constructor.model.value_type import ValueType  # noqa: F401
@@ -116,7 +116,12 @@ def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Call
     elif isinstance(item, Link):
         return update_existing_link_field
     else:
-        logging.debug(
-            f"Object {item} not handled as field - could be used for other parts of UI instead"
-        )
+        try:
+            logging.debug(
+                f"Object {item.name} not handled as field - could be used for other parts of UI instead."  # type: ignore
+            )
+        except Exception:
+            logging.debug(
+                "Encountered object that is not handled as field - could be used for other parts of UI instead."
+            )
     return None

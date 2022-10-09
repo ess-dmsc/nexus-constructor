@@ -4,13 +4,17 @@ from functools import partial
 from os import path
 from typing import Callable, List
 
-from PySide2.QtCore import Qt, QUrl, Signal
-from PySide2.QtGui import QKeyEvent, QVector3D
-from PySide2.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
+from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtGui import QKeyEvent, QVector3D
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
 
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
-from nexus_constructor.component_type import COMPONENT_TYPES, PIXEL_COMPONENT_TYPES
+from nexus_constructor.component_type import (
+    COMPONENT_TYPES,
+    PIXEL_COMPONENT_TYPES,
+    STREAM_MODULE_GROUPS,
+)
 from nexus_constructor.field_utils import (
     add_required_component_fields,
     get_fields_with_update_functions,
@@ -49,6 +53,7 @@ from ui.add_component import Ui_AddComponentDialog
 
 class AddComponentDialog(Ui_AddComponentDialog):
     nx_class_changed = Signal("QVariant")
+    suggest_group_name_from_parent_fields = Signal("QVariant")
 
     def __init__(
         self,
@@ -63,12 +68,17 @@ class AddComponentDialog(Ui_AddComponentDialog):
     ):
         self._tree_view_updater = tree_view_updater
         self._scene_widget = scene_widget
-        self._group_to_edit_backup = deepcopy(group_to_edit)
+        self._group_to_edit_backup: Group = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
         file_dir = path.dirname(__file__)
         self.local_url_root = path.join(
-            file_dir, "..", "nx-class-documentation", "html"
+            file_dir,
+            "..",
+            "nx-class-documentation",
+            "html",
+            "classes",
+            "base_classes",
         )
         super().__init__(parent, self._group_container)
         super().setupUi()
@@ -118,6 +128,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def _cancel_new_group(self):
         if self._confirm_cancel():
+            group, _ = self.component_model.current_nxs_obj
+            if isinstance(group, Group):
+                self._refresh_tree(group)
+            else:
+                self._refresh_tree(self._group_to_edit_backup)
             self.close()
 
     def _cancel_edit_group(self):
@@ -130,12 +145,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
             else:
                 self.model.entry = self._group_to_edit_backup  # type: ignore
                 self.component_model.tree_root = self.model.entry
+            self._refresh_tree(self._group_to_edit_backup)
             self.close()
 
-    def close(self) -> bool:
+    def _refresh_tree(self, group: Group):
         if self._tree_view_updater:
-            self._tree_view_updater()
-        return super().close()
+            self._tree_view_updater(group)
 
     def _handle_class_change(self):
         c_nx_class = self.componentTypeComboBox.currentText()
@@ -171,14 +186,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         # Disable by default as component name will be missing at the very least.
         self.ok_button.setEnabled(False)
-
-        # Set default URL to nexus base classes in web view
-        local_url_index = QUrl.fromLocalFile(
-            path.join(self.local_url_root, "index.html")
-        )
-        self.webEngineView.setUrl(local_url_index)
         self.descriptionPlainTextEdit.setText(self._group_container.group.description)
-
         self.placeholder_checkbox.stateChanged.connect(self._disable_fields_and_buttons)
         self.meshRadioButton.clicked.connect(self.show_mesh_fields)
         self.boxRadioButton.clicked.connect(self.show_box_fields)
@@ -232,6 +240,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.fieldsListWidget,
         )
         self.nx_class_changed.connect(self.__add_required_fields)
+        self.suggest_group_name_from_parent_fields.connect(
+            self.nameLineEdit.update_possible_fields
+        )
 
         c_group = self._group_container.group
 
@@ -315,6 +326,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.change_pixel_options_visibility()
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.ok_validator.validate_field_widget_list()
+
+        self._set_html_docs_and_possible_fields(self._group_to_edit_backup.nx_class)
 
     def set_pixel_related_changes(self):
         """
@@ -434,7 +447,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         return field
 
     def select_field(self, widget):
-        self.fieldsListWidget.setItemSelected(widget, True)
+        widget.setSelected(True)
 
     def remove_field(self):
         for item in self.fieldsListWidget.selectedItems():
@@ -454,18 +467,32 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.placeholder_checkbox.setChecked(False)
         if not c_nx_class or c_nx_class not in self.nx_component_classes:
             return
-        class_html = path.join(
-            self.local_url_root, "classes", "base_classes", f"{c_nx_class}.html"
-        )
-        local_url_class = QUrl.fromLocalFile(class_html)
-        self.webEngineView.setUrl(local_url_class)
+        self._set_html_docs_and_possible_fields(c_nx_class)
 
         self.possible_fields = self.nx_component_classes[c_nx_class]
         try:
-            possible_field_names, _ = zip(*self.possible_fields)
+            possible_field_names, _, _ = zip(*self.possible_fields)
             self.nx_class_changed.emit(possible_field_names)
         except ValueError:
             self.nx_class_changed.emit([])
+
+    def _set_html_docs_and_possible_fields(self, c_nx_class):
+        nx_class_docs_to_display = c_nx_class
+        if c_nx_class in STREAM_MODULE_GROUPS or not c_nx_class:
+            nx_class_docs_to_display = self._group_parent.nx_class
+        if self._group_parent:
+            possible_fields = self.nx_component_classes[self._group_parent.nx_class]
+            possible_field_names, _, _ = zip(*possible_fields)
+            possible_field_names = sorted(possible_field_names)
+            self.suggest_group_name_from_parent_fields.emit(possible_field_names)
+        else:
+            self.suggest_group_name_from_parent_fields.emit([])
+        class_html = path.join(
+            self.local_url_root,
+            f"{nx_class_docs_to_display}.html",
+        )
+        local_url_class = QUrl.fromLocalFile(class_html)
+        self.webEngineView.setUrl(local_url_class)
 
     def mesh_file_picker(self):
         """
@@ -605,6 +632,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: The geometry object.
         """
         c_group = self._group_container.group
+        old_group_name = c_group.name
+        self.nameLineEdit.set_new_group_name()
         group_children = []
         for child in c_group.children:
             if isinstance(child, Group):
@@ -616,7 +645,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.write_description_to_group(c_group)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
-            self._scene_widget.delete_component(c_group.name)
+            self._scene_widget.delete_component(old_group_name)
             self.component_model.model.append_component(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)

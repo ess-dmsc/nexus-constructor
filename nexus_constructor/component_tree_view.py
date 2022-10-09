@@ -1,6 +1,6 @@
 from typing import Dict, Union
 
-from PySide2.QtCore import (
+from PySide6.QtCore import (
     QAbstractItemModel,
     QModelIndex,
     QObject,
@@ -9,8 +9,8 @@ from PySide2.QtCore import (
     Qt,
     Signal,
 )
-from PySide2.QtGui import QPainter, QPixmap, QRegion
-from PySide2.QtWidgets import (
+from PySide6.QtGui import QPainter, QPixmap, QRegion
+from PySide6.QtWidgets import (
     QFrame,
     QSizePolicy,
     QStyledItemDelegate,
@@ -105,6 +105,9 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         painter.drawPixmap(option.rect, pixmap)
         if index in self.parent().selectedIndexes():
             fill_selection(option, painter)
+            group = model.find_component_of(index).internalPointer()
+            if group:
+                self.model.signals.component_selected.emit(group.absolute_path)
 
     def createEditor(
         self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
