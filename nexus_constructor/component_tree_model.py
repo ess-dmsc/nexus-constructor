@@ -130,13 +130,7 @@ class NexusTreeModel(QAbstractItemModel):
         elif isinstance(
             parent_item, (Transformation, FileWriterModule, LinkTransformation)
         ):
-            return (
-                Qt.ItemIsSelectable
-                | Qt.ItemIsEnabled
-                | Qt.ItemIsEditable
-                | Qt.ItemIsDragEnabled
-                | Qt.ItemIsDropEnabled
-            )
+            return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
         return (
             Qt.ItemIsSelectable
             | Qt.ItemIsEnabled
@@ -172,9 +166,17 @@ class NexusTreeModel(QAbstractItemModel):
         if isinstance(drag_item, Group):
             if drop_item and drag_item.absolute_path in drop_item.absolute_path:
                 return False
-            if isinstance(drop_item, Component):
+            if (
+                isinstance(drop_item, Component)
+                and drop_item
+                and not drop_item.group_placeholder
+            ):
                 return True
-            elif isinstance(drop_item, Group):
+            elif (
+                isinstance(drop_item, Group)
+                and drop_item
+                and not drop_item.group_placeholder
+            ):
                 return True
             else:
                 return False

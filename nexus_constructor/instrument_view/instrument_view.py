@@ -179,6 +179,7 @@ class InstrumentView(QWidget):
             self.component_entities[new_path] = self.component_entities.pop(old_path)
         if old_path in self.components.keys():
             self.components[new_path] = self.components.pop(old_path)
+            self.transformations[new_path] = self.transformations.pop(old_path)
 
     def create_ground(self):
         """
