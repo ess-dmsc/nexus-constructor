@@ -208,7 +208,10 @@ def test_get_flags_component():
     index = test_component_tree_model.createIndex(0, 0, test_instrument.children[0])
 
     assert test_component_tree_model.flags(index) == (
-        Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+        Qt.ItemIsEnabled
+        | Qt.ItemIsSelectable
+        | Qt.ItemIsDropEnabled
+        | Qt.ItemIsDragEnabled
     )
 
 
@@ -222,7 +225,7 @@ def test_get_flags_component_info():
 
     assert (
         test_component_tree_model.flags(index)
-        == Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
+        == Qt.ItemIsEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsDragEnabled
     )
 
 
@@ -236,7 +239,11 @@ def test_get_flags_transformation_list():
     index = test_component_tree_model.createIndex(0, 0, transformation_group)
 
     assert (
-        test_component_tree_model.flags(index) == Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        test_component_tree_model.flags(index)
+        == Qt.ItemIsEnabled
+        | Qt.ItemIsSelectable
+        | Qt.ItemIsDragEnabled
+        | Qt.ItemIsDropEnabled
     )
 
 
@@ -257,6 +264,7 @@ def test_get_flags_other():
         | Qt.ItemIsSelectable
         | Qt.ItemIsEditable
         | Qt.ItemIsDropEnabled
+        | Qt.ItemIsDragEnabled
     )
 
 

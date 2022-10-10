@@ -169,9 +169,9 @@ class NexusTreeModel(QAbstractItemModel):
             return False
         if drag_item == drop_item and row == -1:
             return False
-        if drag_item.absolute_path in drop_item.absolute_path:
-            return False
         if isinstance(drag_item, Group):
+            if drop_item and drag_item.absolute_path in drop_item.absolute_path:
+                return False
             if isinstance(drop_item, Component):
                 return True
             elif isinstance(drop_item, Group):
