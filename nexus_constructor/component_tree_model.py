@@ -156,9 +156,6 @@ class NexusTreeModel(QAbstractItemModel):
 
     def mimeData(self, indexes):
         index = indexes[0]
-        print("--")
-        # print(index.internalPointer().absolute_path)
-        # print(type(index.internalPointer()))
         mimedata = QMimeData()
         data = QByteArray(pickle.dumps(index.internalPointer()))
         mimedata.setData("moving/group", data)
@@ -206,7 +203,6 @@ class NexusTreeModel(QAbstractItemModel):
                 name = child.name
                 old_absolute_path = old_prefix + "/" + name
                 new_absolute_path = new_prefix + "/" + name
-                print("from {} to {}".format(old_absolute_path, new_absolute_path))
                 self.path_translation_dict[new_absolute_path] = old_absolute_path
                 self.model.signals.path_name_changed.emit(
                     old_absolute_path, new_absolute_path
