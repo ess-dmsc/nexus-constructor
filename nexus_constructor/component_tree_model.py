@@ -1,8 +1,9 @@
+import pickle
 from json import loads
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import PySide6.QtGui
-from PySide6.QtCore import QAbstractItemModel, QModelIndex, Qt
+from PySide6.QtCore import QAbstractItemModel, QByteArray, QMimeData, QModelIndex, Qt
 from PySide6.QtGui import QVector3D
 from PySide6.QtWidgets import QMessageBox
 
@@ -40,6 +41,7 @@ class NexusTreeModel(QAbstractItemModel):
         self.current_nxs_obj: Optional[
             Tuple[Union[Group, FileWriterModule], QModelIndex]
         ] = (self.model.entry, None)
+        self.path_translation_dict: Dict[str, str] = {}
 
     def replace_model(self, model):
         self.model = model
@@ -110,41 +112,180 @@ class NexusTreeModel(QAbstractItemModel):
             isinstance(parent_item, Group)
             and parent_item.nx_class == NX_TRANSFORMATIONS
         ):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return (
+                Qt.ItemIsEnabled
+                | Qt.ItemIsSelectable
+                | Qt.ItemIsDragEnabled
+                | Qt.ItemIsDropEnabled
+            )
         elif isinstance(parent_item, Component):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            return (
+                Qt.ItemIsEnabled
+                | Qt.ItemIsSelectable
+                | Qt.ItemIsDropEnabled
+                | Qt.ItemIsDragEnabled
+            )
         elif isinstance(parent_item, ComponentInfo):
-            return Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
+            return Qt.ItemIsEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsDragEnabled
         elif isinstance(
             parent_item, (Transformation, FileWriterModule, LinkTransformation)
         ):
-            return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+            return (
+                Qt.ItemIsSelectable
+                | Qt.ItemIsEnabled
+                | Qt.ItemIsEditable
+                | Qt.ItemIsDragEnabled
+                | Qt.ItemIsDropEnabled
+            )
         return (
             Qt.ItemIsSelectable
             | Qt.ItemIsEnabled
             | Qt.ItemIsEditable
             | Qt.ItemIsDropEnabled
+            | Qt.ItemIsDragEnabled
         )
 
     def mimeTypes(self):
         return [
             "streaming/writer_module",
+            "moving/group",
         ]
 
     def supportedDropActions(self) -> PySide6.QtCore.Qt.DropActions:
         return Qt.DropAction.MoveAction | Qt.DropAction.CopyAction
 
+    def mimeData(self, indexes):
+        index = indexes[0]
+        print("--")
+        # print(index.internalPointer().absolute_path)
+        # print(type(index.internalPointer()))
+        mimedata = QMimeData()
+        data = QByteArray(pickle.dumps(index.internalPointer()))
+        mimedata.setData("moving/group", data)
+        self._stored_index = index
+        return mimedata
+
+    def canDropMimeData(self, mimedata, action, row, column, parentIndex):
+        drag_item = self._stored_index.internalPointer()
+        drop_item = parentIndex.internalPointer()
+        if isinstance(drag_item, Group) and drag_item.nx_class == NX_TRANSFORMATIONS:
+            return False
+        if drag_item == drop_item and row == -1:
+            return False
+        if drag_item.absolute_path in drop_item.absolute_path:
+            return False
+        if isinstance(drag_item, Group):
+            if isinstance(drop_item, Component):
+                return True
+            elif isinstance(drop_item, Group):
+                return True
+            else:
+                return False
+        return False
+
+    def update_all_absolute_paths(self, parentIndex):
+        node = parentIndex.internalPointer()
+        while node.parent_node is not None:
+            node = node.parent_node
+        self.recursive_path_updater(node)
+
+    def recursive_path_updater(self, node):
+        for child in node.children:
+            if isinstance(child, Group):
+                _ = child.absolute_path
+                self.recursive_path_updater(child)
+            else:
+                try:
+                    _ = child.absolute_path
+                except Exception:
+                    pass
+
+    def recursive_path_namer(self, node, old_prefix, new_prefix):
+        for child in node.children:
+            if isinstance(child, Group):
+                name = child.name
+                old_absolute_path = old_prefix + "/" + name
+                new_absolute_path = new_prefix + "/" + name
+                print("from {} to {}".format(old_absolute_path, new_absolute_path))
+                self.path_translation_dict[new_absolute_path] = old_absolute_path
+                self.model.signals.path_name_changed.emit(
+                    old_absolute_path, new_absolute_path
+                )
+                self.recursive_path_namer(child, old_absolute_path, new_absolute_path)
+
+    def create_path_translation_dict(self, drag_child_item, drop_item):
+        self.path_translation_dict = {}
+        drag_child_name = drag_child_item.absolute_path
+        old_prefix = drag_child_name  # .replace('/'+drag_child_item.name, "")
+        new_prefix = drop_item.absolute_path + "/" + drag_child_item.name
+        self.recursive_path_namer(drag_child_item, old_prefix, new_prefix)
+
     def dropMimeData(self, mimedata, action, row, column, parentIndex):
-        module_config = loads(mimedata.text())
-        insert_location = len(parentIndex.data().children)
-        if row != -1:
-            insert_location = row
-        new_module = create_fw_module_object(
-            module_config["module"], module_config["config"], parentIndex.data()
-        )
-        self.beginInsertRows(QModelIndex(), insert_location, insert_location)
-        parentIndex.data().children.insert(insert_location, new_module)
-        self.endInsertRows()
+        if mimedata.hasFormat("moving/group"):
+            # selected_child_item = pickle.loads(mimedata.data("random/general"))
+            drag_child_index = self._stored_index
+            drag_child_item = self._stored_index.internalPointer()
+            drag_child_name = drag_child_item.absolute_path
+            drop_index = parentIndex
+            drop_item = parentIndex.internalPointer()
+            drop_item_name = drop_item.absolute_path
+            drop_between = True
+            if row == -1:
+                drop_between = False
+
+            self.create_path_translation_dict(drag_child_item, drop_item)
+            drag_parent = self.parent(drag_child_index)
+            remove_index = self._get_row_of_child(drag_child_item)
+            self.beginRemoveRows(drag_parent, remove_index, remove_index)
+            drag_group_parent: Group = drag_parent.internalPointer()
+            children = drag_group_parent.children
+            children.pop(remove_index)
+            self.endRemoveRows()
+
+            if drop_between:
+                print(
+                    "Dropping {} between {} and {} in group {}".format(
+                        drag_child_name, row, row + 1, drop_item_name
+                    )
+                )
+                drop_parent = drop_index
+                self.beginInsertRows(drop_parent, row, row)
+                group_parent: Group = drop_parent.internalPointer()  # type: ignore
+                children = group_parent.children
+                children.insert(row, drag_child_item)
+                self.endInsertRows()
+            else:
+                print(
+                    "Dropping {} inside the group {}".format(
+                        drag_child_name, drop_item_name
+                    )
+                )
+                drop_parent = drop_index
+                insert_location = len(drop_parent.data().children)
+                self.beginInsertRows(drop_parent, insert_location, insert_location)
+                group_parent: Group = drop_parent.internalPointer()  # type: ignore
+                children = group_parent.children
+                children.insert(insert_location, drag_child_item)
+                self.endInsertRows()
+
+            drag_child_item.parent_node = drop_parent.internalPointer()
+            new_absolute_path = drag_child_item.absolute_path
+            self.update_all_absolute_paths(drop_index)
+            self.model.signals.path_name_changed.emit(
+                drag_child_name, new_absolute_path
+            )
+            self.model.signals.group_edited.emit(drop_parent, True)
+        elif mimedata.hasFormat("streaming/writer_module"):
+            module_config = loads(mimedata.text())
+            insert_location = len(parentIndex.data().children)
+            if row != -1:
+                insert_location = row
+            new_module = create_fw_module_object(
+                module_config["module"], module_config["config"], parentIndex.data()
+            )
+            self.beginInsertRows(QModelIndex(), insert_location, insert_location)
+            parentIndex.data().children.insert(insert_location, new_module)
+            self.endInsertRows()
         return True
 
     def rowCount(self, parent: QModelIndex) -> int:

@@ -61,6 +61,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         )
         self.model.signals.component_selected.connect(self.sceneWidget.select_component)
         self.model.signals.entity_selected.connect(self.sceneWidget.select_entity)
+        self.model.signals.path_name_changed.connect(self.sceneWidget.update_path_name)
 
     def onOpenAboutWindow(self, instance):
         if self.checkWindowOpen(instance, self._registered_windows):

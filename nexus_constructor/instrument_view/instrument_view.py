@@ -174,6 +174,12 @@ class InstrumentView(QWidget):
 
         self.view.camera().setViewCenter(self.current_camera_settings["viewcenter"])
 
+    def update_path_name(self, old_path: str, new_path: str):
+        if old_path in self.component_entities.keys():
+            self.component_entities[new_path] = self.component_entities.pop(old_path)
+        if old_path in self.components.keys():
+            self.components[new_path] = self.components.pop(old_path)
+
     def create_ground(self):
         """
         Method for creating the ground entity
