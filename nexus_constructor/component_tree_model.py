@@ -212,13 +212,12 @@ class NexusTreeModel(QAbstractItemModel):
     def create_path_translation_dict(self, drag_child_item, drop_item):
         self.path_translation_dict = {}
         drag_child_name = drag_child_item.absolute_path
-        old_prefix = drag_child_name  # .replace('/'+drag_child_item.name, "")
+        old_prefix = drag_child_name
         new_prefix = drop_item.absolute_path + "/" + drag_child_item.name
         self.recursive_path_namer(drag_child_item, old_prefix, new_prefix)
 
     def dropMimeData(self, mimedata, action, row, column, parentIndex):
         if mimedata.hasFormat("moving/group"):
-            # selected_child_item = pickle.loads(mimedata.data("random/general"))
             drag_child_index = self._stored_index
             drag_child_item = self._stored_index.internalPointer()
             drag_child_name = drag_child_item.absolute_path
