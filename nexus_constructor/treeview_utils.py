@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 from PySide6.QtCore import QModelIndex, Qt
 from PySide6.QtGui import QAction, QColor, QIcon
-from PySide6.QtWidgets import QFrame, QLabel, QToolBar, QTreeView, QWidget
+from PySide6.QtWidgets import QFrame, QLabel, QToolBar, QToolButton, QTreeView, QWidget
 
 from nexus_constructor.common_attrs import NX_TRANSFORMATIONS, TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel
@@ -183,7 +183,13 @@ def set_enabled_and_raise(action: QAction, value: bool):
         value: bool
             True to enable action and raise associated QToolButton.
     """
-    pass
+    action.setEnabled(value)
+    for widget in action.associatedWidgets():
+        if isinstance(widget, QToolButton):
+            widget.setAutoRaise(not value)
+            # Change background color to pale gray if button is enabled
+            color = "#d7d6d5" if value else "white"
+            widget.setStyleSheet(f"background-color: {color}")
 
 
 def handle_number_of_items_selected_is_not_one(
