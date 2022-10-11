@@ -31,6 +31,7 @@ from nexus_constructor.model.module import (
 )
 from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
+from nexus_constructor.transformations_list import TransformationsList
 
 TRANSFORMATION_MAP = {
     "translation": TransformationType.TRANSLATION,
@@ -228,6 +229,9 @@ class TransformationReader:
         Uses the information contained in the JSON dictionary to construct a list of Transformations.
         :param json_transformations: A list of JSON transformation entries.
         """
+        self.parent_component.stored_transforms = TransformationsList(
+            self.parent_component
+        )
         for json_transformation in json_transformations:
             is_nx_log = (
                 CommonKeys.TYPE in json_transformation
@@ -337,3 +341,4 @@ class TransformationReader:
                 self._transforms_with_dependencies[
                     TransformId(self.parent_component.name, name)
                 ] = (transform, None)
+            self.parent_component.stored_transforms.append(transform)
