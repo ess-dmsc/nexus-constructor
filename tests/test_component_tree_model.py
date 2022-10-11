@@ -225,7 +225,7 @@ def test_get_flags_component_info():
 
     assert (
         test_component_tree_model.flags(index)
-        == Qt.ItemIsEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsDragEnabled
+        == Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
     )
 
 
