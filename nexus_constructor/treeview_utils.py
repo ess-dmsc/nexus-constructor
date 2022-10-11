@@ -184,7 +184,7 @@ def set_enabled_and_raise(action: QAction, value: bool):
             True to enable action and raise associated QToolButton.
     """
     action.setEnabled(value)
-    for widget in action.associatedWidgets():
+    for widget in action.associatedObjects():
         if isinstance(widget, QToolButton):
             widget.setAutoRaise(not value)
             # Change background color to pale gray if button is enabled
