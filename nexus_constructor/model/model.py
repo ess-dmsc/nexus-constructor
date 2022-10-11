@@ -22,6 +22,7 @@ class Signals(QObject):
     group_edited = Signal(QModelIndex, bool)
     component_selected = Signal(str)
     entity_selected = Signal("QVariant")
+    path_name_changed = Signal(str, str)
 
 
 class Model:

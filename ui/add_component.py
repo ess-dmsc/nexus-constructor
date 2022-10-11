@@ -298,6 +298,7 @@ class Ui_AddComponentDialog(QDialog):
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
         self.set_web_engine_view(sizePolicy)
         self.retranslateUi()
+        self.descriptionPlainTextEdit.setFocus()
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def set_web_engine_view(self, sizePolicy):

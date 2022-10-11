@@ -1,6 +1,6 @@
 import pickle
 from json import loads
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import PySide6.QtGui
 from PySide6.QtCore import QAbstractItemModel, QByteArray, QMimeData, QModelIndex, Qt
@@ -41,6 +41,7 @@ class NexusTreeModel(QAbstractItemModel):
         self.current_nxs_obj: Optional[
             Tuple[Union[Group, FileWriterModule], QModelIndex]
         ] = (self.model.entry, None)
+        self.path_translation_dict: Dict[str, str] = {}
 
     def replace_model(self, model):
         self.model = model
@@ -111,9 +112,19 @@ class NexusTreeModel(QAbstractItemModel):
             isinstance(parent_item, Group)
             and parent_item.nx_class == NX_TRANSFORMATIONS
         ):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return (
+                Qt.ItemIsEnabled
+                | Qt.ItemIsSelectable
+                | Qt.ItemIsDragEnabled
+                | Qt.ItemIsDropEnabled
+            )
         elif isinstance(parent_item, Component):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            return (
+                Qt.ItemIsEnabled
+                | Qt.ItemIsSelectable
+                | Qt.ItemIsDropEnabled
+                | Qt.ItemIsDragEnabled
+            )
         elif isinstance(parent_item, ComponentInfo):
             return Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
         elif isinstance(parent_item, Transformation):
@@ -131,11 +142,13 @@ class NexusTreeModel(QAbstractItemModel):
             | Qt.ItemIsEnabled
             | Qt.ItemIsEditable
             | Qt.ItemIsDropEnabled
+            | Qt.ItemIsDragEnabled
         )
 
     def mimeTypes(self):
         return [
             "streaming/writer_module",
+            "moving/group",
             "node/transformation",
         ]
 
@@ -144,31 +157,138 @@ class NexusTreeModel(QAbstractItemModel):
 
     def mimeData(self, indexes):
         index = indexes[0]
+        mimedata = QMimeData()
+        data = QByteArray(pickle.dumps(index.internalPointer()))
         if isinstance(index.internalPointer(), Transformation):
-            mimedata = QMimeData()
-            self._stored_transform_index = index
-            data = QByteArray(pickle.dumps(index.internalPointer()))
             mimedata.setData("node/transformation", data)
-            return mimedata
+        else:
+            mimedata.setData("moving/group", data)
+        self._stored_index = index
+        return mimedata
 
     def canDropMimeData(self, mimedata, action, row, column, parentIndex):
-        parent_item = parentIndex.internalPointer()
+        drag_item = self._stored_index.internalPointer()
+        drop_item = parentIndex.internalPointer()
         if mimedata.hasFormat("node/transformation"):
-            if isinstance(parent_item, Transformation):
-                if parent_item.parent_component.stored_transforms.has_link:
+            if isinstance(drop_item, Transformation):
+                if drop_item.parent_component.stored_transforms.has_link:  # type: ignore
                     return False
                 return True
             else:
                 return False
-        elif isinstance(parent_item, LinkTransformation):
+        elif isinstance(drag_item, Group) and drag_item.nx_class == NX_TRANSFORMATIONS:
             return False
-        else:
-            return True
+        if drag_item == drop_item and row == -1:
+            return False
+        if isinstance(drag_item, Group):
+            if drop_item and drag_item.absolute_path in drop_item.absolute_path:
+                return False
+            if (
+                isinstance(drop_item, Component)
+                and drop_item
+                and not drop_item.group_placeholder
+            ):
+                return True
+            elif (
+                isinstance(drop_item, Group)
+                and drop_item
+                and not drop_item.group_placeholder
+            ):
+                return True
+            else:
+                return False
+        return False
+
+    def update_all_absolute_paths(self, parentIndex):
+        node = parentIndex.internalPointer()
+        while node.parent_node is not None:
+            node = node.parent_node
+        self.recursive_path_updater(node)
+
+    def recursive_path_updater(self, node):
+        for child in node.children:
+            if isinstance(child, Group):
+                _ = child.absolute_path
+                self.recursive_path_updater(child)
+            else:
+                try:
+                    _ = child.absolute_path
+                except Exception:
+                    pass
+
+    def recursive_path_namer(self, node, old_prefix, new_prefix):
+        for child in node.children:
+            if isinstance(child, Group):
+                name = child.name
+                old_absolute_path = old_prefix + "/" + name
+                new_absolute_path = new_prefix + "/" + name
+                self.path_translation_dict[new_absolute_path] = old_absolute_path
+                self.model.signals.path_name_changed.emit(
+                    old_absolute_path, new_absolute_path
+                )
+                self.recursive_path_namer(child, old_absolute_path, new_absolute_path)
+
+    def create_path_translation_dict(self, drag_child_item, drop_item):
+        self.path_translation_dict = {}
+        drag_child_name = drag_child_item.absolute_path
+        old_prefix = drag_child_name
+        new_prefix = drop_item.absolute_path + "/" + drag_child_item.name
+        self.recursive_path_namer(drag_child_item, old_prefix, new_prefix)
 
     def dropMimeData(self, mimedata, action, row, column, parentIndex):
-        if mimedata.hasFormat("node/transformation"):
+        if mimedata.hasFormat("moving/group"):
+            drag_child_index = self._stored_index
+            drag_child_item = self._stored_index.internalPointer()
+            drag_child_name = drag_child_item.absolute_path
+            drop_index = parentIndex
+            drop_item = parentIndex.internalPointer()
+            drop_item_name = drop_item.absolute_path
+            drop_between = True
+            if row == -1:
+                drop_between = False
+
+            self.create_path_translation_dict(drag_child_item, drop_item)
+            drag_parent = self.parent(drag_child_index)
+            remove_index = self._get_row_of_child(drag_child_item)
+            self.beginRemoveRows(drag_parent, remove_index, remove_index)
+            drag_group_parent: Group = drag_parent.internalPointer()
+            children = drag_group_parent.children
+            children.pop(remove_index)
+            self.endRemoveRows()
+
+            drop_parent = drop_index
+            group_parent: Group = drop_parent.internalPointer()  # type: ignore
+            children = group_parent.children
+            if drop_between:
+                print(
+                    "Dropping {} between {} and {} in group {}".format(
+                        drag_child_name, row, row + 1, drop_item_name
+                    )
+                )
+                self.beginInsertRows(drop_parent, row, row)
+                children.insert(row, drag_child_item)
+                self.endInsertRows()
+            else:
+                print(
+                    "Dropping {} inside the group {}".format(
+                        drag_child_name, drop_item_name
+                    )
+                )
+                insert_location = len(drop_parent.data().children)
+                self.beginInsertRows(drop_parent, insert_location, insert_location)
+                children.insert(insert_location, drag_child_item)
+                self.endInsertRows()
+
+            drag_child_item.parent_node = drop_parent.internalPointer()
+            new_absolute_path = drag_child_item.absolute_path
+            self.update_all_absolute_paths(drop_index)
+            self.model.signals.path_name_changed.emit(
+                drag_child_name, new_absolute_path
+            )
+            self.model.signals.group_edited.emit(drop_parent, True)
+        elif mimedata.hasFormat("node/transformation"):
             selected_child_item = pickle.loads(mimedata.data("node/transformation"))
-            selected_child_index = self._stored_transform_index
+            selected_child_index = self._stored_index
 
             component_index = self.parent(parentIndex)
 
@@ -185,7 +305,7 @@ class NexusTreeModel(QAbstractItemModel):
             parent = self.parent(selected_child_index)
             remove_index = self._get_row_of_child(selected_child_item)
             self.beginRemoveRows(parent, remove_index, remove_index)
-            group_parent: Group = parent.internalPointer()
+            group_parent: Group = parent.internalPointer()  # type: ignore
             children = group_parent.children
             children.pop(remove_index)
             self.endRemoveRows()
@@ -230,24 +350,10 @@ class NexusTreeModel(QAbstractItemModel):
                     )
                     t.register_dependent(transformation_list[i - 1])
             transformation_list[-1].depends_on = None
-
-            # Check structure
-            print("<<<<<>>>>>")
-            for t in transformation_list:
-                print(t.name)
-                print(t.vector)
-                print(t.ui_value)
-                try:
-                    print(t.depends_on.name)
-                except Exception:
-                    print("No depends")
-                print("-------")
-                print("-------")
-
             self.model.signals.transformation_changed.emit()
             self.model.signals.group_edited.emit(component_index, True)
             return True
-        else:
+        elif mimedata.hasFormat("streaming/writer_module"):
             module_config = loads(mimedata.text())
             insert_location = len(parentIndex.data().children)
             if row != -1:
@@ -258,7 +364,7 @@ class NexusTreeModel(QAbstractItemModel):
             self.beginInsertRows(QModelIndex(), insert_location, insert_location)
             parentIndex.data().children.insert(insert_location, new_module)
             self.endInsertRows()
-            return True
+        return True
 
     def rowCount(self, parent: QModelIndex) -> int:
         if not parent.isValid():
