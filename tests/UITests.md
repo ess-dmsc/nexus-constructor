@@ -88,56 +88,38 @@ of the cubes bottom faces.
 
 ## Validating Component Names
 
-Click the 'Add component' button.  
+Select 'entry (NXentry)' in the tree and click the 'Group' button.
+Now create and add a 'NXsample' with the name 'Sample' by choosing 'NXSample from the group type list.
+Add another group under 'entry (NXentry)'.
 Select a Cylinder geometry and leave the other options untouched.  
 Try to name this new component "Sample".
 - The text field will accept the name "Sampl"  
-- Once you try to type in the remaining "e" a red cross will appear.
-- Placing your mouse over the cross will show a message saying that component names must be unique.
-
-Remove focus from the text field by selecting a different field or by moving the mouse out of the window.
-- The red cross disappear and the message will no longer be accessible.
-- The component name will still be "Sampl".
-
-Change the name back to its default and click "Add" without changing any of the other options.  
+- Once you try to type in the remaining "e", the line edit will turn red.
+- Placing your mouse over the line edit will show a message saying that group name of a group must be unique
+  for all groups with the same parent group.
+- Change the name to "Sample2" and the line edit should turn white again.
+It should now be possible to add another sample by setting the nexus class to 'NXSample'
 Expand the component details box in the left-hand-side of the main window.  
-- Repeat the steps above and you should observe the same behaviour.
-
-Change the name back to its default again.  
-Expand the component details box.  
-Click the 'Full editor' button.  
 - Repeat the steps above and you should observe the same behaviour.
 
 ## Validating Units 
 
-Click the 'Add component' button.  
-Press 'Continue' without changing any of the other options.  
-Click the 'Choose file' button next to the 'Geometry file:' textbox.  
-Open cube.stl from the repo's `~/tests` directory.  
+Click the 'Add component' button. 
+Set the component name to "Sample3".
+Choose the group type as 'NXsample' again.
+Set the geometry to a mesh file.
+Click the 'Browse...' button next to the 'CAD file:' textbox.  
+Open cube.off from the repo's `~/tests` directory.  
 - The 'OK' button on the 'Select Units' window will start out enabled because the default units are valid.
 
 Enter gibberish into the unit text field.
-- A red cross will appear next to the text field.
+- The units line edit should turn red.
 - The 'OK' button will be disabled.
-- Placing your mouse over the red cross will cause an invalid units message to appear.
+- Placing your mouse over the red line edit will cause an invalid units message to appear.
 
 Replace the gibberish with some valid units.
-- The red cross will disappear and the mouse-over message will no longer be accessible.
+- The red line edit will turn back to white and the mouse-over message will no longer be accessible.
 - The 'OK' button will become enabled again.
-
-Close the 'Select Units' and 'Add Detector' windows.  
-Click 'Add component' again.  
-Select Cylinder geometry and click 'Continue'. The other options can be left as their defaults.
-- The 'Add' button will start out enabled because the default units are valid.
-
-Enter gibberish into the unit text field.
-- A red cross will appear next to the text field.
-- The 'Add' button will be disabled.
-- Placing your mouse over the red cross will cause an invalid units message to appear.
-
-Replace the gibberish with some valid units.
-- The red cross will disappear and the mouse-over message will no longer be accessible.
-- The 'Add' button will become enabled again.
 
 ## Transform ordering
 
