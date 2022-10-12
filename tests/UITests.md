@@ -97,10 +97,10 @@ Try to name this new component "Sample".
 - Once you try to type in the remaining "e", the line edit will turn red.
 - Placing your mouse over the line edit will show a message saying that group name of a group must be unique
   for all groups with the same parent group.
-- Change the name to "Sample2" and the line edit should turn white again.
+- Change the name to "Sample2", and the line edit should turn white again.
 It should now be possible to add another sample by setting the nexus class to 'NXSample'
 Expand the component details box in the left-hand-side of the main window.  
-- Repeat the steps above and you should observe the same behaviour.
+- Repeat the steps above, and you should observe the same behaviour.
 
 ## Validating Units 
 
@@ -118,40 +118,40 @@ Enter gibberish into the unit text field.
 - Placing your mouse over the red line edit will cause an invalid units message to appear.
 
 Replace the gibberish with some valid units.
-- The red line edit will turn back to white and the mouse-over message will no longer be accessible.
+- The red line edit will turn back to white, and the mouse-over message will no longer be accessible.
 - The 'OK' button will become enabled again.
 
 ## Transform ordering 
 
 First and foremost, add two component groups to the NeXus tree under 'entry (NXentry)',
-for example two NXsample components called my_sample and other_sample.
+The two components should be of type NXsample and called "my_sample" and "other_sample".
 
 Add a rotation and translation to my_sample, by first clicking the "Rotation" button and then
 the "Translation" button. 
-- There should now be a 'transformations (NXtransformations)' under the my_sample component group.
+- There should now be a 'transformations (NXtransformations)' under the "my_sample" component group.
 - Expanding the transformations group should show a rotation widget and a translation widget, in that order.
 - The "depends_on" in the rotation widget should say "/entry/my_sample/transformations/translation".
 
 Put the values 45 degrees and 2 m in the rotation and translation widgets, respectively.
 - The instrument view should be updated accordingly.
 
-Now add a translation to the other_sample component group. Put the value -1 in the translation widget.
+Now add a translation to the "other_sample" component group. Put the value -1 in the translation widget.
 - Confirm that the instrument view updates the coordinates of other_sample to (0, 0, -1).
 
-Add a "Link" to the transformations by for example selecting other_sample and clicking the Link button.
-- Confirm that a Link widget is added to the transformations group of other_sample.
+Add a "Link" to the transformations by for example selecting "other_sample" and clicking the Link button.
+- Confirm that a Link widget is added to the transformations group of "other_sample".
 
-Select the my_sample component in the list under "Select component".
+Select the "my_sample" component in the list under "Select component".
 - Once leaving the Link widget, confirm that the instrument view now clearly indicates a dependency
-from other_sample to my_sample. 
+from "other_sample" to "my_sample". 
   - The "depends_on" in the translation widget of the other_sample should now
   show "/entry/my_sample/transformations/rotation".
     
-Rename rotation transformation in my_sample to my_rotation and confirm that the depends_on is
-updated correctly in other_sample.
+Rename rotation transformation in "my_sample" to "my_rotation" and confirm that the "depends_on" is
+updated correctly in "other_sample".
 
 Finally, make sure that deleting the transformations groups in both sample components
-puts them in the original spot in the origin i.e. (0, 0, 0). .
+puts them in the original spot in the origin, i.e. (0, 0, 0).
 
 ## Saving to file and loading from file
 
@@ -180,13 +180,13 @@ The content of the file should be the same.
 ## Removing a group from the instrument view and NeXus tree view
 
 In the instrument you created above, add a group 'wrong_sample (NXsample)' under 'entry (NXentry)'
-Add a translation -10 to the "wrong_sample". Try to delete the wrong_sample group and confirm
-that it disappears both from the NeXus tree view and the instrument 3D view.
+Add a translation -10 to the "wrong_sample". Try to delete the "wrong_sample" group and confirm
+that it disappears both from the NeXus tree view, and the instrument 3D view.
 
 ## Drag and drop groups in the NeXus tree
 
-Load your "my_file.json" from above and add a group monitor_2 of type NXmonitor under 'entry (NXentry)'.
+Load your "my_file.json" from above and add a group "monitor_2" of type NXmonitor under 'entry (NXentry)'.
 This is of course wrong, the monitor should be put under 'instrument (NXinstrument)'.
-Correct this by selecting the monitor_2 group and dragging it from the entry group to the instrument group
-by dragging it inside of the 'instrument (NXinstrument)' structure in the tree view.
+Correct this by selecting the "monitor_2" group and dragging it from the entry group to the instrument group
+by dragging it inside the 'instrument (NXinstrument)' structure in the tree view.
 Confirm that this actually worked correctly.
