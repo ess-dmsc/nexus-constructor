@@ -121,7 +121,7 @@ Replace the gibberish with some valid units.
 - The red line edit will turn back to white, and the mouse-over message will no longer be accessible.
 - The 'OK' button will become enabled again.
 
-## Transform ordering 
+## Transformations
 
 First and foremost, add two component groups to the NeXus tree under 'entry (NXentry)',
 The two components should be of type NXsample and called "my_sample" and "other_sample".
@@ -133,7 +133,8 @@ the "Translation" button.
 - The "depends_on" in the rotation widget should say "/entry/my_sample/transformations/translation".
 
 Put the values 45 degrees and 2 m in the rotation and translation widgets, respectively.
-- The instrument view should be updated accordingly.
+- The instrument view should be updated accordingly. First a rotation around the x-axis
+  followed by a translation in the z-direction.
 
 Now add a translation to the "other_sample" component group. Put the value -1 in the translation widget.
 - Confirm that the instrument view updates the coordinates of other_sample to (0, 0, -1).
@@ -175,7 +176,7 @@ Now save the file as "my_file.json" in some directory of your choice.
 Load it and confirm that the instrument you created above is loaded in the NeXus tree view and
 rendered correctly in the instrument view window.
 Re-save the file into "my_file_2.json" and compare it to "my_file.json" in a text editor.
-The content of the file should be the same.
+The content of the files should be the same.
 
 ## Removing a group from the instrument view and NeXus tree view
 
