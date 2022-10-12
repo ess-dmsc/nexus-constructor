@@ -60,7 +60,7 @@ Select 'Detector' and 'Mesh' as geometry.
 Click the 'Browse...' button next to the 'CAD file:' textbox.
 Open cube_colored.off from the repo's `~/tests` directory. When prompted, select "cm" as unit.
 - Choosing 'Entire shape' should populate with 6 empty numbered table columns in a scrollable list.
-The first column in the table should be 'Pixel ID for face #0:' and the last one 'Pixel ID for face #5:'.
+The first column in the table should be 'Pixel ID for face #0:', and the last one 'Pixel ID for face #5:'.
 - Switch to 'No Pixels' and name the 'NXdetector' to detector. Press the 'Add group' button that now should be enabled.
 - The NeXus tree structure should now be populated with a 'detector (NXdetector)' child to 'entry (NXentry)'.
 - Select the 'detector (NXdetector)' in the tree. The zoom button should be enabled. Press it and you should be able 
@@ -75,7 +75,7 @@ Double click the 'translation' child of the transformations group and add 0.5 m 
 Select 'entry (NXentry)' in the tree and click the 'Group' button again.
 - Select 'Monitor' as group type under 'Components', name it 'monitor' and select 'Cylinder' as geometry.
 - Instead of the file selector controls of before, a 'Cylinder options' section should be present.
-- It should contain textboxes for height, radius, and x, y, z components of the Cartesian coordinate system.
+- It should contain text boxes for height, radius, and x, y, z components of the Cartesian coordinate system.
 - Set the cylinders axis direction to (x=1, y=1, z=0), its height to 3, its radius to 1 and unit to "cm". 
   Finally, press the 'Add group' button.
 - Now, Add a translation with values (x=-2.5, y=0.5, z=-0.5) to 'monitor (NXmonitor)' under 'entry (NXentry)'.
