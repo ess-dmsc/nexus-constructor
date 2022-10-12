@@ -632,7 +632,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         :return: The geometry object.
         """
         c_group = self._group_container.group
-        old_group_name = c_group.name
+        old_group_name = c_group.absolute_path
         self.nameLineEdit.set_new_group_name()
         group_children = []
         for child in c_group.children:
