@@ -11,7 +11,7 @@ as a failure of that test.
 
 ## Starting the application
 
-Run the application (`python main.py` in the root directory).
+Run the application (`python nexus-constructor.py` in the root directory).
 - The main application window should appear, split into two sections.
 - On the left, there should be a QTabWidget labelled "Nexus Structure" containing line edit fields, buttons, checkboxes and 
   a NeXus tree structure with only "entry (NXentry)".
@@ -121,145 +121,72 @@ Replace the gibberish with some valid units.
 - The red line edit will turn back to white and the mouse-over message will no longer be accessible.
 - The 'OK' button will become enabled again.
 
-## Transform ordering
+## Transform ordering 
 
-In the Components section, click the box labelled 'Name:Cube detector'.
-- The box should expand revealing name and transform editors, as well as 'Full editor' and 'delete'
-buttons.
-- The components delete button, and the delete button of its translation should be disabled and
-greyed out.
-- Hovering over these buttons should display a tooltip explaining why.
+First and foremost, add two component groups to the NeXus tree under 'entry (NXentry)',
+for example two NXsample components called my_sample and other_sample.
 
+Add a rotation and translation to my_sample, by first clicking the "Rotation" button and then
+the "Translation" button. 
+- There should now be a 'transformations (NXtransformations)' under the my_sample component group.
+- Expanding the transformations group should show a rotation widget and a translation widget, in that order.
+- The "depends_on" in the rotation widget should say "/entry/my_sample/transformations/translation".
 
-In the Components section, click the box labelled 'Name:Monitor'.
-- It should expand, revealing a textbox for editing the component name, transform controls,
-containing the translate and rotate values entered in the previous screen, and buttons marked 'Full
-editor' and 'delete'.
-- The translate should be above the rotate.
+Put the values 45 degrees and 2 m in the rotation and translation widgets, respectively.
+- The instrument view should be updated accordingly.
 
-Rename the transform in 'Cube detector' to just 'translate'.
-- The name change should be reflected in 'Monitor's second transform parent dropdown.
+Now add a translation to the other_sample component group. Put the value -1 in the translation widget.
+- Confirm that the instrument view updates the coordinates of other_sample to (0, 0, -1).
 
-Set the monitors 'transform parent' to 'Sample'.
-- The graphic of the cylinder should align its right face with the right face of the sample cube.
-- The delete buttons of 'Cube detector' and its transform should no longer be greyed out or show
-tooltips on hover.
+Add a "Link" to the transformations by for example selecting other_sample and clicking the Link button.
+- Confirm that a Link widget is added to the transformations group of other_sample.
 
-Click the 'Move up' button on the translate in Monitor.
-- Nothing should happen.
+Select the my_sample component in the list under "Select component".
+- Once leaving the Link widget, confirm that the instrument view now clearly indicates a dependency
+from other_sample to my_sample. 
+  - The "depends_on" in the translation widget of the other_sample should now
+  show "/entry/my_sample/transformations/rotation".
+    
+Rename rotation transformation in my_sample to my_rotation and confirm that the depends_on is
+updated correctly in other_sample.
 
-Click the 'Move down' button on the rotate in Monitor.
-- Nothing should happen.
+Finally, make sure that deleting the transformations groups in both sample components
+puts them in the original spot in the origin i.e. (0, 0, 0). .
 
-Click the 'Move down' button on the translate in Monitor.
-- It should swap places with the rotate.
-- The cylinder in the visualisation should move upwards and to the right.
+## Saving to file and loading from file
 
-Click the 'Move up' button on the translate (now at the bottom of the list) in Monitor.
-- It should swap places with the rotate.
-- The cylinder in the visualisation should move back down and left to align again with the cube.
+Create a NeXus tree structure that contains the following structure groups under 'entry (NXentry)':
 
-Click the 'Delete' button on the rotation.
-- The rotation should disappear from the transforms section.
-- The cylinder visualisation should now point upwards and to the right, with its lower/left end face
-still level with the upper rear of the cubes.
+ - instrument (NXinstrument)
+ - sample (NXsample)
 
-## Editor window
+Add a translation to sample of -1 in the z-direction.
+Define the geometry of the sample to a box with the dimension (0.2, 0.5, 1.0) meters.
 
-Click the 'Full editor' button for the Monitor.
-- A component editor window should appear, containing the same transform values as the main window,
-and the cylinder geometry/pixel data values entered earlier.
+In the instrument group add following groups:
+- detector (NXdetector)
+- monitor (NXmonitor)
+- chopper (NXdisk_chopper) with 'slits': 1, radius: 0.4 m, slit_edges to (-45, 45) degrees and
+slit_height to 0.1 m.
+  
+Try to add some appropriate transformations to each component in the instrument group.
+  
+Now save the file as "my_file.json" in some directory of your choice.
+Load it and confirm that the instrument you created above is loaded in the NeXus tree view and
+rendered correctly in the instrument view window.
+Re-save the file into "my_file_2.json" and compare it to "my_file.json" in a text editor.
+The content of the file should be the same.
 
-Add an exclamation mark to the monitor name in the new window, and tab out of the textbox.
-- The updated name should be present in the main window too.
+## Removing a group from the instrument view and NeXus tree view
 
-Remove the ! in the main window's textbox, and tab out of the textbox.
-- The editor window's textbox should reflect the change.
+In the instrument you created above, add a group 'wrong_sample (NXsample)' under 'entry (NXentry)'
+Add a translation -10 to the "wrong_sample". Try to delete the wrong_sample group and confirm
+that it disappears both from the NeXus tree view and the instrument 3D view.
 
-Click the 'add rotation' button in the editor window.
-- A set of rotation editor fields should appear in both windows.
+## Drag and drop groups in the NeXus tree
 
-Click the new rotations delete button in the main window.
-- The fields should disappear from both windows.
-
-Set the radius of the cylinder to 2.
-- The cylinder's visualisation in the main window should double in radius.
-
-## Saving to file
-
-Close the editor window.
-In the menu bar, select 'File' > 'Save', and save to a new file called 'gc_ui_test.json'.
-In the menu bar, select 'File' > 'Export to FileWriter', and save to a new file called
-'fw_ui_test.json'.
-In the menu bar, select 'File' > 'Export to NeXus file', and save to a new file called
-'ui_test.nxs'.
-- These files should have all been created on disk.
-
-Open gc_ui_test.json in a text editor.
-- It should contain a json object at its root, with a child element called 'components'.
-- Searching the document should return one hit for each of the following:
-  - `"name": "Cube detector"`
-  - `"name": "Sample"`
-  - `"name": "Monitor"`
-
-Open fw_ui_test.json in a text editor.
-- It should contain a json object at its root, with a child element called 'nexus_structure'.
-- Searching the document should return one hit for each of the following:
-  - `"name": "Cube detector"`
-  - `"name": "Sample"`
-  - `"name": "Monitor"`
-
-Open ui_test.nxs in HDFView.
-- It should contain groups called 'Sample', 'Monitor', and 'instrument' as children of the root
-group 'entry'.
-- 'instrument' should contain another group called 'Cube detector'.
-
-## Removing components
-
-Set Monitor's transform parent to 'Cube Detector'.
-- Cube Detector's delete button should grey out, and clicking it result in nothing.
-
-Click Monitor's delete button.
-- Monitor should vanish from the components list.
-- The cylinder in the 3D view should vanish too.
-- Cube Detector's delete button should be enabled.
-
-Click Cube Detector's delete button.
-- It should also disappear from the components list.
-- It's green cube should no longer be in the visualisation.
-
-## Sample details
-
-- There should be no delete button or transform controls in the Sample box in the components list.
-- Clicking it's full editor button will open an editor window without pixel or transform fields.
-
-## Loading json
-
-Change the sample's name to 'lone sample'.
-In the menu bar, select 'File' > 'Open' and select 'gc_ui_test.json'.
-- Three components should exist in the components box, named 'Sample', 'Cube Detector', and
-'Monitor'.
-- The green detector cube should reappear a cube's distance to the sample cube's right.
-- The monitor cylinder should reappear with its larger radius, to the left of the sample cube,
-pointing up and to the right.
-
-Close and re-open the Nexus Constructor.
-In the menu bar, select 'File' > 'Open' and select 'fw_ui_test.json'.
-- Three components should exist in the components box, named 'Sample', 'Cube Detector', and
-'Monitor'.
-- The green detector cube should reappear a cube's distance to the sample cube's right.
-- The monitor cylinder should reappear with its larger radius, to the left of the sample cube,
-pointing up and to the right.
-
-## Other validation
-
-Expand the component sections for Cube detector and Monitor.
-- The first 'transform parent' dropdown in Cube detector should only show 'Sample' and
-'Monitor' as options.
-- The first 'transform parent' dropdown in Monitor should only show 'Sample' and 'Cube
-Detector' as options.
-
-Set the transform parent of Monitor to Cube Detector.
-Attempt to set Cube Detector's transform parent to Monitor.
-- The drop down in Cube Detector should revert to its previous value.
-- Tooltext should appear explaining that this loop is invalid.
+Load your "my_file.json" from above and add a group monitor_2 of type NXmonitor under 'entry (NXentry)'.
+This is of course wrong, the monitor should be put under 'instrument (NXinstrument)'.
+Correct this by selecting the monitor_2 group and dragging it from the entry group to the instrument group
+by dragging it inside of the 'instrument (NXinstrument)' structure in the tree view.
+Confirm that this actually worked correctly.
