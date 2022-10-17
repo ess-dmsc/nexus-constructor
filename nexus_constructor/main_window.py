@@ -231,7 +231,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         field_attrs_dialog = FieldAttrsDialog()
         field_attrs_dialog.setWindowTitle("Attribute Viewer")
         field_attrs_dialog.fill_existing_attrs(
-            selected_object, [CommonAttrs.DEPENDS_ON]  # type: ignore
+            selected_object, [CommonAttrs.DEPENDS_ON]
         )
         field_attrs_dialog.add_button.setVisible(False)
         field_attrs_dialog.remove_button.setVisible(False)
