@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Union
+from typing import Any, List, Union
 
 import numpy as np
 from PySide6.QtWidgets import (
@@ -16,7 +16,8 @@ from PySide6.QtWidgets import (
 
 from nexus_constructor.array_dataset_table_widget import ArrayDatasetTableWidget
 from nexus_constructor.common_attrs import ARRAY, SCALAR, CommonAttrs
-from nexus_constructor.model.module import Dataset
+from nexus_constructor.model import Group
+from nexus_constructor.model.module import FileWriterModule
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import AttributeNameValidator, FieldValueValidator
@@ -32,9 +33,14 @@ def _get_human_readable_type(new_value: Any):
     elif isinstance(new_value, float):
         return ValueTypes.DOUBLE
     else:
-        return next(
-            key for key, value in VALUE_TYPE_TO_NP.items() if value == new_value.dtype
-        )
+        try:
+            return next(
+                key
+                for key, value in VALUE_TYPE_TO_NP.items()
+                if value == new_value.dtype
+            )
+        except AttributeError:
+            return None
 
 
 class FieldAttrsDialog(QDialog):
@@ -49,14 +55,21 @@ class FieldAttrsDialog(QDialog):
         self.add_button.clicked.connect(self.__add_attr)
         self.remove_button = QPushButton("Remove attr")
         self.remove_button.clicked.connect(self._remove_attrs)
+        self.close_button = QPushButton("Close")
+        self.close_button.clicked.connect(self.close)
 
-        self.layout().addWidget(self.list_widget, 0, 0, 2, 1)
+        self.layout().addWidget(self.list_widget, 0, 0, 3, 1)
         self.layout().addWidget(self.add_button, 0, 1)
         self.layout().addWidget(self.remove_button, 1, 1)
+        self.layout().addWidget(self.close_button, 2, 1)
 
-    def fill_existing_attrs(self, existing_dataset: Dataset):
+    def fill_existing_attrs(
+        self,
+        existing_dataset: Union[FileWriterModule, Group],
+        attributes_exclude: List = ATTRS_EXCLUDELIST,
+    ):
         for attr in existing_dataset.attributes:
-            if attr.name not in ATTRS_EXCLUDELIST:
+            if attr.name not in attributes_exclude:
                 frame = FieldAttrFrame(attr)
                 self._add_attr(existing_frame=frame)
 
@@ -77,6 +90,16 @@ class FieldAttrsDialog(QDialog):
     def _remove_attrs(self):
         for index in self.list_widget.selectedIndexes():
             self.list_widget.takeItem(index.row())
+
+    def set_view_only(self, label: str, set_visibility: bool):
+        for index in range(self.list_widget.count()):
+            item = self.list_widget.item(index)
+            widget = self.list_widget.itemWidget(item)
+            widget.array_edit_button.setText(label)
+            widget.dialog.add_row_button.setVisible(set_visibility)
+            widget.dialog.remove_row_button.setVisible(set_visibility)
+            widget.dialog.add_column_button.setVisible(set_visibility)
+            widget.dialog.remove_column_button.setVisible(set_visibility)
 
     def get_attrs(self):
         attrs_list = []
@@ -209,5 +232,8 @@ class FieldAttrFrame(QFrame):
         else:
             self.type_changed(ARRAY)
             self.dialog.model.array = new_value
-            self.dialog.model.update_array_dtype(new_value.dtype)
+            try:
+                self.dialog.model.update_array_dtype(new_value.dtype)
+            except AttributeError:
+                pass
         self.dtype_changed(None)

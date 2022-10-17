@@ -88,6 +88,7 @@ def set_button_states(
     new_translation_action: QAction,
     create_link_action: QAction,
     zoom_action: QAction,
+    show_attrs_action: QAction,
     edit_component_action: QAction,
 ):
     """
@@ -98,6 +99,7 @@ def set_button_states(
     :param new_translation_action: The action for creating a new translation.
     :param create_link_action: The action for creating a link.
     :param zoom_action: The action for zooming on a component.
+    :param show_attrs_action: The action for showing the attributes list.
     :param edit_component_action: The action for editing a component.
     """
     selection_indices = component_tree_view.selectedIndexes()
@@ -109,6 +111,7 @@ def set_button_states(
             new_rotation_action,
             new_translation_action,
             zoom_action,
+            show_attrs_action,
             edit_component_action,
         )
     else:
@@ -118,6 +121,13 @@ def set_button_states(
         allowed_transformation_action = is_transformation_action_allowed(
             selected_object
         )
+        has_attributes = (
+            True
+            if not isinstance(selected_object, LinkTransformation)
+            and selected_object.attributes
+            else False
+        )
+        set_enabled_and_raise(show_attrs_action, has_attributes)
         set_enabled_and_raise(zoom_action, selected_object_is_component)
         is_transform_group = False
         if selected_object_is_group:

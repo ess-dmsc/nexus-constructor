@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List
+from typing import Dict, List, Union
 from weakref import WeakKeyDictionary
 
 from PySide6.QtCore import Qt
@@ -13,6 +13,9 @@ from nexus_constructor.ui_utils import file_dialog, show_warning_dialog
 from ui.main_window import Ui_MainWindow
 
 from .about_window import AboutWindow
+from .common_attrs import CommonAttrs
+from .field_attrs import FieldAttrsDialog
+from .model.module import FileWriterModule
 
 NEXUS_FILE_TYPES = {"NeXus Files": ["nxs", "nex", "nx5"]}
 JSON_FILE_TYPES = {"JSON Files": ["json", "JSON"]}
@@ -119,6 +122,17 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         except IndexError:
             print("Select a valid group in the NeXus tree view before editing.")
 
+    def show_attributes_list_window(self):
+        try:
+            selected_component = (
+                self.component_tree_view_tab.component_tree_view.selectedIndexes()[
+                    0
+                ].internalPointer()
+            )
+            self._show_attributes_list_window(selected_component)
+        except IndexError:
+            print("Select a valid group or module.")
+
     def create_new_json_template(self):
         msg = QMessageBox.question(
             None,
@@ -210,6 +224,19 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             tree_view_updater=self._update_model,
         )
         self.add_component_window.show()
+
+    def _show_attributes_list_window(
+        self, selected_object: Union[Group, FileWriterModule]
+    ):
+        field_attrs_dialog = FieldAttrsDialog()
+        field_attrs_dialog.setWindowTitle("Attribute Viewer")
+        field_attrs_dialog.fill_existing_attrs(
+            selected_object, [CommonAttrs.DEPENDS_ON]  # type: ignore
+        )
+        field_attrs_dialog.add_button.setVisible(False)
+        field_attrs_dialog.remove_button.setVisible(False)
+        field_attrs_dialog.set_view_only("View Array", False)
+        field_attrs_dialog.show()
 
     def _update_model(self, selected_group: Group):
         self.component_tree_view_tab.set_up_model(self.model)
