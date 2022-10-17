@@ -333,7 +333,6 @@ class JSONReader:
                 self.model.entry[nexus_object.name] = nexus_object
             if isinstance(nexus_object, Group):
                 nexus_object.group_placeholder = use_placeholder
-
         return nexus_object
 
     def _add_object_warning(self, missing_info, parent_node):

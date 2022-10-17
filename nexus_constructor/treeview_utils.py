@@ -122,10 +122,7 @@ def set_button_states(
             selected_object
         )
         has_attributes = (
-            True
-            if not isinstance(selected_object, LinkTransformation)
-            and selected_object.attributes
-            else False
+            True if not isinstance(selected_object, LinkTransformation) else False
         )
         set_enabled_and_raise(show_attrs_action, has_attributes)
         set_enabled_and_raise(zoom_action, selected_object_is_component)

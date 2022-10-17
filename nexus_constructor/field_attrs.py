@@ -2,6 +2,7 @@ from functools import partial
 from typing import Any, List, Union
 
 import numpy as np
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
@@ -55,7 +56,7 @@ class FieldAttrsDialog(QDialog):
         self.add_button.clicked.connect(self.__add_attr)
         self.remove_button = QPushButton("Remove attr")
         self.remove_button.clicked.connect(self._remove_attrs)
-        self.close_button = QPushButton("Close")
+        self.close_button = QPushButton("OK")
         self.close_button.clicked.connect(self.close)
 
         self.layout().addWidget(self.list_widget, 0, 0, 3, 1)
@@ -72,6 +73,9 @@ class FieldAttrsDialog(QDialog):
             if attr.name not in attributes_exclude:
                 frame = FieldAttrFrame(attr)
                 self._add_attr(existing_frame=frame)
+
+    def add_update_signal(self):
+        self.close_button.clicked.connect(self.update_attributes)
 
     def __add_attr(self):
         """
@@ -90,6 +94,9 @@ class FieldAttrsDialog(QDialog):
     def _remove_attrs(self):
         for index in self.list_widget.selectedIndexes():
             self.list_widget.takeItem(index.row())
+
+    def update_attributes(self):
+        self.update_attributes_signal.emit(self.get_attrs())
 
     def set_view_only(self, label: str, set_visibility: bool):
         for index in range(self.list_widget.count()):
@@ -125,6 +132,8 @@ class FieldAttrsDialog(QDialog):
                 tooltip_on_reject="Attribute name is not valid",
             )
         )
+
+    update_attributes_signal = Signal(tuple)
 
 
 class FieldAttrFrame(QFrame):
