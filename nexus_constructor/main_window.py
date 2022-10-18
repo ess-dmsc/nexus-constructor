@@ -232,7 +232,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self, selected_object: Union[Group, FileWriterModule]
     ):
         field_attrs_dialog = FieldAttrsDialog(self)
-        ATTRIBUTES_SKIPPED_LIST = [CommonAttrs.DEPENDS_ON]
         field_attrs_dialog.fill_existing_attrs(selected_object, ATTRIBUTES_SKIPPED_LIST)
         if isinstance(selected_object, Transformation):
             field_attrs_dialog.setWindowTitle("Attribute Viewer")

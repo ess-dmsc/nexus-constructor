@@ -219,13 +219,12 @@ class FieldAttrFrame(QFrame):
 
     @property
     def value(self) -> Union[np.generic, np.ndarray]:
-
         if self.is_scalar:
-            if self.dtype == VALUE_TYPE_TO_NP[ValueTypes.STRING] or isinstance(
-                self.dtype, str
-            ):
+            if self.dtype == ValueTypes.STRING:
                 return self.attr_value_lineedit.text()
-            return self.dtype(VALUE_TYPE_TO_NP[self.attr_value_lineedit.text()])
+            value = self.attr_value_lineedit.text()
+            type_cast = VALUE_TYPE_TO_NP[self.attr_dtype_combo.currentText()]
+            return type_cast(value) if value else ""
         return np.squeeze(self.dialog.model.array)
 
     @value.setter
