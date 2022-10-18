@@ -56,6 +56,7 @@ class ComponentTreeViewTab(QWidget):
         self.component_tree_view.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.component_tool_bar = QToolBar("Actions", self)
+        self.component_tool_bar.setMinimumWidth(480)
         self.new_component_action = create_and_add_toolbar_action(
             "new_component.png",
             "Group",
@@ -92,6 +93,16 @@ class ComponentTreeViewTab(QWidget):
             self.component_tool_bar,
             self,
         )
+
+        self.show_attrs_action = create_and_add_toolbar_action(
+            "attributes.png",
+            "Attributes",
+            self.parent().show_attributes_list_window,
+            self.component_tool_bar,
+            self,
+        )
+        self.component_tool_bar.insertSeparator(self.show_attrs_action)
+
         self.zoom_action = create_and_add_toolbar_action(
             "zoom.svg",
             "Zoom",
@@ -138,6 +149,7 @@ class ComponentTreeViewTab(QWidget):
             self.new_translation_action,
             self.create_link_action,
             self.zoom_action,
+            self.show_attrs_action,
             self.edit_component_action,
         )
 

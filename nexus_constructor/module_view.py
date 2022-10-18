@@ -66,6 +66,7 @@ class ModuleViewEditable(QGroupBox):
         self.model = model
         self._set_existing_items()
         layout.addWidget(self.field_widget)
+        self.field_widget.attrs_button.setVisible(False)
         self.setLayout(layout)
 
     def _set_existing_items(self):

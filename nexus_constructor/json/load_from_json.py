@@ -199,6 +199,7 @@ class JSONReader:
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        self.model.entry.attributes = self.entry_node.attributes
         for child in self.entry_node.children:
             if isinstance(child, (Dataset, Link, Group)):
                 self.model.entry[child.name] = child
@@ -333,7 +334,6 @@ class JSONReader:
                 self.model.entry[nexus_object.name] = nexus_object
             if isinstance(nexus_object, Group):
                 nexus_object.group_placeholder = use_placeholder
-
         return nexus_object
 
     def _add_object_warning(self, missing_info, parent_node):

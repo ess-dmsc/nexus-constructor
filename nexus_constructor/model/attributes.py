@@ -34,6 +34,11 @@ class Attributes(list):
             return _get_item(self, attribute_name).values
         return None
 
+    def get_attribute(self, attribute_name: str):
+        if self.contains_attribute(attribute_name):
+            return _get_item(self, attribute_name)
+        return None
+
     def contains_attribute(self, attribute_name):
         result = _get_item(self, attribute_name)
         return True if result is not None else False
