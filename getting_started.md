@@ -19,14 +19,14 @@ You will be shown the main window of the application (pictured below) which cont
 
 You can move around the 3D view by using the arrow keys to move, click+drag to pan, and pgup/down to zoom.
 
-![](resources/images/startup_pic.png)
+![](resources/images/startup_pict.png)
 
 
 ## Adding components
 
 Click the "Group" button.
 
-![](resources/images/add_group.png)
+![](resources/images/add_group_pic.png)
 
 
 In this screen, we are given options to set what type of component it is, its shape, as well as being able to add fields to describe it further.
