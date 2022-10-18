@@ -17,7 +17,7 @@ Firstly, either download the [latest release](https://github.com/ess-dmsc/nexus-
 
 You will be shown the main window of the application (pictured below) which contains a list of *components* which comprise the beamline, and a 3D view visualising the components listed with their respective shape and position.
 
-The sample component is added by default, and is indicated by the red cube. You can move around the 3D view by using the arrow keys to move, click+drag to pan, and pgup/down to zoom.
+You can move around the 3D view by using the arrow keys to move, click+drag to pan, and pgup/down to zoom.
 
 ![](resources/images/startup_pic.png)
 
@@ -55,16 +55,16 @@ Set the data type of the field by selecting the type combo and selecting "String
 
 ![](resources/images/select_type.png)
 
-Hit the "Add component" button to save it (Note: you can edit this component once saved by selecting it in the list and using the "Edit component" button near to the add button).
-You will notice in the 3d view there is a new cube which has been added that is black. Currently it overlaps the sample, to remedy this we should add a transformation to the newly added source component.
+Hit the "Add group" button to save it (Note: you can edit this component once saved by selecting it in the list and using the "Edit component" button near to the add button).
+You will notice in the 3d view there is a new cube which has been added that is grey. To move the source away from the origin we will add a transformation to the newly added source component.
 
 #### Setting translation on the source
 
-To the right of the "Add component" button in the main window toolbar, three additional controls can be used to add transformations to a component. Here we have the option to translate, rotate and link to another component's transformations.
+To the right of the "Group" button in the main window toolbar, three additional controls can be used to add transformations to a component. Here we have the option to translate, rotate and link to another component's transformations.
 
-Select the source component in the list by clicking it, then click the "add translation" button.
+Select the source component in the list by clicking it, then click the "Translation" button.
 
-You will see upon adding a new translation the black cube gets shifted to the right immediately. This is because of the default vector specified in the translation. By default the field is disabled, but to edit these fields simply click on it. When finished editing, clicking elsewhere in the list will save the changes.
+You will see upon adding a new translation the cube gets moves immediately. This is because of the default vector specified in the translation. By default the field is disabled, but to edit these fields simply click on it. When finished editing, clicking elsewhere in the list will save the changes.
 
 ![](resources/images/positive_translation.png)
 
@@ -77,7 +77,7 @@ The beam direction is conventionally along the z-axis, so use a vector of (0,0,1
 
 *Detectors* are a key component of any beamline. A detector comprised of an array of detecting pixels can be used to infer the angle that the neutrons/muons/photons scattered from the sample.
 
-Enter the "Add component" dialog and select "NXdetector" as the component type. Notice pixel data options appear.
+Enter the "Add group" dialog and select "NXdetector" as the component type. Notice pixel data options appear.
 
 In this example our detector is comprised of a 16x16 grid of pixels.
 
