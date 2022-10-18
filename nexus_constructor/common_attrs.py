@@ -10,6 +10,7 @@ class CommonAttrs:
     VECTOR = "vector"
     UNITS = "units"
     VERTICES = "vertices"
+    OFFSET = "offset"
 
 
 class CommonKeys:

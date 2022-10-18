@@ -30,7 +30,7 @@ from nexus_constructor.model.module import (
     create_fw_module_object,
 )
 from nexus_constructor.model.transformation import Transformation
-from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
+from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.transformations_list import TransformationsList
 
 TRANSFORMATION_MAP = {
@@ -176,7 +176,7 @@ class TransformationReader:
         :return: The value of the attribute if is is found in the list, otherwise the failure value is returned.
         """
         attribute = _find_attribute_from_list_or_dict(attribute_name, attributes_list)
-        if not attribute:
+        if not attribute and attribute_name not in [CommonAttrs.OFFSET]:
             self.warnings.append(
                 TransformDependencyMissing(
                     f"Unable to find {attribute_name} attribute in transformation"
@@ -330,6 +330,11 @@ class TransformationReader:
                 depends_on=temp_depends_on,
                 values=values,
             )
+            offset = self._find_attribute_in_list(CommonAttrs.OFFSET, name, attributes)
+            if offset:
+                transform.attributes.set_attribute_value(
+                    CommonAttrs.OFFSET, offset, ValueTypes.FLOAT
+                )
             if depends_on not in DEPENDS_ON_IGNORE:
                 depends_on_id = TransformId(
                     *get_component_and_transform_name(depends_on)

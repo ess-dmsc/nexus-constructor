@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtGui import QVector3D
 from PySide6.QtWidgets import QFrame, QGroupBox, QWidget
 
-from nexus_constructor.common_attrs import TransformationType
+from nexus_constructor.common_attrs import CommonAttrs, TransformationType
 from nexus_constructor.component_tree_model import LinkTransformation
 from nexus_constructor.field_utils import find_field_type
 from nexus_constructor.model.component import Component
@@ -60,6 +60,9 @@ class EditTransformation(QGroupBox):
                 self.transformation.values, self.transformation_frame.magnitude_widget
             )
         self.transformation_frame.magnitude_widget.units = self.transformation.units
+        offset = self.transformation.attributes.get_attribute_value(CommonAttrs.OFFSET)
+        if offset:
+            self.transformation_frame.offset_box.setValue(offset)
         self.update_depends_on_ui()
 
     def disable(self):
@@ -106,9 +109,17 @@ class EditTransformation(QGroupBox):
             self.transformation.name = self.transformation_frame.name_line_edit.text()
             self.model.signals.transformation_changed.emit()
 
+    def save_offset(self):
+        offset_value = self.transformation_frame.offset_box.value()
+        if offset_value:
+            self.transformation.attributes.set_attribute_value(
+                CommonAttrs.OFFSET, offset_value
+            )
+
     def save_all_changes(self):
         self.save_transformation_name()
         self.save_transformation_vector()
+        self.save_offset()
         self.save_magnitude()
 
 
@@ -120,6 +131,7 @@ class EditTranslation(EditTransformation):
         )
         self.transformation_frame.vector_label.setText("Direction")
         self.transformation_frame.value_label.setText("Distance (m)")
+        self.transformation_frame.offset_label.setText("Offset (m)")
         self.setTitle(TransformationType.TRANSLATION)
 
 
@@ -131,6 +143,7 @@ class EditRotation(EditTransformation):
         )
         self.transformation_frame.vector_label.setText("Rotation Axis")
         self.transformation_frame.value_label.setText("Angle (°)")
+        self.transformation_frame.offset_label.setText("Offset (°)")
         self.setTitle(TransformationType.ROTATION)
 
 
