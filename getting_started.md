@@ -129,3 +129,21 @@ We now have a very basic example of a beamline instrument visualised in 3D as we
 To save to a JSON file, open the file menu and click "Save to filewriter JSON". This will bring up a file dialog in order to save the file.
 
 To open a JSON file, open the file menu and click "Open from filewriter JSON". The constructor will then load in all components and their fields from a given file.
+
+## Render settings
+
+In the render settings tab, it is possible to change if the program should render the full geometries or just the convex hulls for large geometries.
+It is also possible to change the colours of materials.
+
+![](resources/images/default_render.png)
+
+### Show high resolution
+
+By default, any large geometry loaded won't be fully rendered. The convex hull of the geometry will be shown instead to improve performance. 
+After meshes have been loaded, the toggle high resolution checkbox will trigger the program to load and render the full geometries of all objects. This may take a long time and might crash the program if the computer lacks enough available memory and video memory.
+
+### Colour settings
+
+Choosing a material class in the dropdown menu makes it possible to change the used colour palette. By pressing the colour rectangles, a colour picker will open where colour can be chosen.
+
+![](resources/images/changed_color.png)
