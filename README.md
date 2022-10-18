@@ -13,7 +13,7 @@ from the detector and other beamline apparatus during an experiment.
 
 There is a ["Getting Started" guide](getting_started.md) to help new users.
 
-![NeXus Constructor](resources/images/nc_screenshot.png)
+![NeXus Constructor](resources/images/main_pic.png)
 
 Although the application may be useful to other institutions using NeXus, the NeXus Constructor is being
 developed as part of the software suite for the
