@@ -234,7 +234,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         field_attrs_dialog = FieldAttrsDialog(self)
         ATTRIBUTES_SKIPPED_LIST = [CommonAttrs.DEPENDS_ON]
         field_attrs_dialog.fill_existing_attrs(selected_object, ATTRIBUTES_SKIPPED_LIST)
-        if isinstance(selected_object, (Group, Transformation)):
+        if isinstance(selected_object, Transformation):
             field_attrs_dialog.setWindowTitle("Attribute Viewer")
             field_attrs_dialog.add_button.setVisible(False)
             field_attrs_dialog.remove_button.setVisible(False)
