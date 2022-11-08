@@ -32,6 +32,7 @@ class WriterModules(Enum):
     TDCTIME = "tdct"
     NS10 = "ns10"
     HS01 = "hs01"
+    SE00 = "se00"
     SENV = "senv"
     LINK = "link"
     DATASET = "dataset"
@@ -44,6 +45,7 @@ class StreamModules(Enum):
     EV44 = "ev44"
     TDCTIME = "tdct"
     NS10 = "ns10"
+    SE00 = "se00"
     SENV = "senv"
     ADAR = "ADAr"
     HS01 = "hs01"
@@ -83,6 +85,11 @@ class StreamModule(FileWriterModule):
 @attr.s
 class NS10Stream(StreamModule):
     writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
+
+
+@attr.s
+class SE00Stream(StreamModule):
+    writer_module = attr.ib(type=str, default=WriterModules.SE00.value, init=False)
 
 
 @attr.s
@@ -265,6 +272,7 @@ class WriterModuleClasses(Enum):
     TDCTIME = TDCTStream
     NS10 = NS10Stream
     HS01 = HS01Stream
+    SE00 = SE00Stream
     SENV = SENVStream
     LINK = Link
     DATASET = Dataset
@@ -291,7 +299,9 @@ def create_fw_module_object(mod_type, configuration, parent_node):
     fw_mod_class = module_class_dict[mod_type]
     if mod_type in [
         WriterModules.NS10.value,
+        WriterModules.SE00.value,
         WriterModules.SENV.value,
+        WriterModules.SE00.value,
         WriterModules.TDCTIME.value,
         WriterModules.EV42.value,
         WriterModules.EV44.value,

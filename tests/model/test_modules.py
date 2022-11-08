@@ -10,6 +10,7 @@ from nexus_constructor.model.module import (
     F142Stream,
     Link,
     NS10Stream,
+    SE00Stream,
     SENVStream,
     TDCTStream,
 )
@@ -96,6 +97,7 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
 @pytest.mark.parametrize(
     "stream",
     [
+        SE00Stream(parent_node=None, source=source, topic=topic),
         SENVStream(parent_node=None, source=source, topic=topic),
         TDCTStream(parent_node=None, source=source, topic=topic),
         NS10Stream(parent_node=None, source=source, topic=topic),
