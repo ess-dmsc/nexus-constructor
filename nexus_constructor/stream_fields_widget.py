@@ -36,6 +36,7 @@ from nexus_constructor.model.module import (
     HS01Shape,
     HS01Stream,
     NS10Stream,
+    SE00Stream,
     SENVStream,
     StreamModule,
     StreamModules,
@@ -495,9 +496,11 @@ class StreamFieldsWidget(QDialog):
             self.show_advanced_options_button.setVisible(True)
         elif schema == WriterModules.NS10.value:
             self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
-        elif (
-            schema == WriterModules.TDCTIME.value or schema == WriterModules.SENV.value
-        ):
+        elif schema in [
+            WriterModules.TDCTIME.value,
+            WriterModules.SE00.value,
+            WriterModules.SENV.value,
+        ]:
             self._set_edits_visible(True, False)
 
     def _show_array_size_table(self, show: bool):
@@ -569,6 +572,8 @@ class StreamFieldsWidget(QDialog):
                 self.record_advanced_ev42_values(stream)
         elif current_schema == WriterModules.NS10.value:
             stream = NS10Stream(parent_node=parent, source=source, topic=topic)
+        elif current_schema == WriterModules.SE00.value:
+            stream = SE00Stream(parent_node=parent, source=source, topic=topic)
         elif current_schema == WriterModules.SENV.value:
             stream = SENVStream(parent_node=parent, source=source, topic=topic)
         elif current_schema == WriterModules.HS01.value:
