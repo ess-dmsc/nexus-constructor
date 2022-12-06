@@ -74,6 +74,7 @@ def _load_off_geometry(
     file: Union[BinaryIO, TextIO],
     mult_factor: float,
     geometry: OFFGeometryNoNexus = OFFGeometryNoNexus(),
+    units: str = "m",
 ) -> OFFGeometry:
     """
     Loads geometry from an OFF file into an OFFGeometry instance.
@@ -92,6 +93,7 @@ def _load_off_geometry(
     ]
     geometry.faces = faces
     geometry.colors = face_colors
+    geometry.units = units
     logging.info("OFF loaded")
     return geometry
 

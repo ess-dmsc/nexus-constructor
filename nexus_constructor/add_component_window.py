@@ -403,6 +403,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.cad_file_name = component_shape.file_path
                 self.meshRadioButton.setChecked(True)
                 self.meshRadioButton.clicked.emit()
+                self.unitsLineEdit.setText(component_shape.units)
                 if component_shape.file_path:
                     self.fileLineEdit.setText(component_shape.file_path)
             elif isinstance(component_shape, CylindricalGeometry):
