@@ -5,6 +5,7 @@ from PySide6.QtGui import QVector3D
 from nexus_constructor.common_attrs import SHAPE_GROUP_NAME, CommonAttrs
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.geometry import OFFGeometryNoNexus
+from nexus_constructor.unit_utils import METRES, calculate_unit_conversion_factor
 
 
 class SlitGeometry:
@@ -34,6 +35,9 @@ class SlitGeometry:
 
     def _create_vertices(self):
         x_gap, y_gap = self._gaps
+        factor = calculate_unit_conversion_factor(self._units, METRES)
+        x_gap *= factor
+        y_gap *= factor
 
         if x_gap:
             x_1 = 0.0
@@ -49,7 +53,7 @@ class SlitGeometry:
             dy = y_gap / 2
             slit_thickness = y_gap * 2
         else:
-            slit_thickness = 0.02
+            slit_thickness = 0.02 * factor
             dy = half_side_length
 
         slit_matrix = [
