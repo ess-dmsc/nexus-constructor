@@ -230,9 +230,10 @@ class BoxGeometry(Group):
 
     @property
     def off_geometry(self) -> OFFGeometry:
-        x = self._size[1] / 2
-        y = self._size[2] / 2
-        z = self._size[0] / 2
+        factor = calculate_unit_conversion_factor(self.units, METRES)
+        x = factor * self._size[1] / 2
+        y = factor * self._size[2] / 2
+        z = factor * self._size[0] / 2
         return OFFGeometryNoNexus(
             vertices=[
                 QVector3D(-x, -y, z),
