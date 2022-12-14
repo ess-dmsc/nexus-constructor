@@ -227,12 +227,16 @@ class Transformation(Dataset):
         nexus_dataset = nexus_node.create_dataset(self.name, data=temp_values)
         for attribute in self.attributes:
             try:
-                nexus_dataset.attrs[attribute.name] = attribute.values
-            except TypeError as e:
                 if attribute.name == CommonAttrs.DEPENDS_ON:
-                    nexus_dataset.attrs[attribute.name] = "."
+                    if self.depends_on:
+                        attribute_str = self.depends_on.absolute_path
+                    else:
+                        attribute_str = "."
+                    nexus_dataset.attrs[CommonAttrs.DEPENDS_ON] = attribute_str
                 else:
-                    error_collector.append(str(e))
+                    nexus_dataset.attrs[attribute.name] = attribute.values
+            except TypeError as e:
+                error_collector.append(f"for attribute {attribute.name}: {str(e)}.")
 
     def _set_transformation_values(self):
         if isinstance(self.values, StreamModule):
