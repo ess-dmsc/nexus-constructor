@@ -220,7 +220,19 @@ class Transformation(Dataset):
         return return_dict
 
     def as_nexus(self, nexus_node, error_collector: List[str]):
-        pass
+        if not isinstance(self.values, Dataset):
+            return
+        temp_values = np.array(self.values.values)  # type: ignore
+        temp_values.astype(np.float64).dtype
+        nexus_dataset = nexus_node.create_dataset(self.name, data=temp_values)
+        for attribute in self.attributes:
+            try:
+                nexus_dataset.attrs[attribute.name] = attribute.values
+            except TypeError as e:
+                if attribute.name == CommonAttrs.DEPENDS_ON:
+                    nexus_dataset.attrs[attribute.name] = "."
+                else:
+                    error_collector.append(str(e))
 
     def _set_transformation_values(self):
         if isinstance(self.values, StreamModule):
