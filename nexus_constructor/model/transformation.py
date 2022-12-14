@@ -219,6 +219,9 @@ class Transformation(Dataset):
 
         return return_dict
 
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        pass
+
     def _set_transformation_values(self):
         if isinstance(self.values, StreamModule):
             nx_log = Group(name=self.name, parent_node=self)  # type: ignore

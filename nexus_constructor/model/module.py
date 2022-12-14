@@ -60,6 +60,9 @@ class FileWriterModule(ABC):
     def as_dict(self, error_collector: List[str]):
         raise NotImplementedError()
 
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        pass
+
     @property
     def absolute_path(self):
         return get_absolute_path(self)
@@ -195,6 +198,11 @@ class Dataset(FileWriterModule):
                 error_collector
             )
         return return_dict
+
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        nexus_dataset = nexus_node.create_dataset(self.name, data=self.values)
+        for attribute in self.attributes:
+            nexus_dataset.attrs[attribute.name] = attribute.values
 
     def _cast_to_type(self, data):
         return JsonSerialisableType.from_type(self.type)(data)

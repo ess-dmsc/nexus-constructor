@@ -2,6 +2,7 @@ import json
 from typing import Dict, List, Union
 from weakref import WeakKeyDictionary
 
+import h5py
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
@@ -43,6 +44,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.export_to_compressed_filewriter_JSON_action.triggered.connect(
             self.save_to_compressed_filewriter_json
         )
+        self.export_to_nexus_action.triggered.connect(self._save_to_nexus_file)
         self.show_action_labels.triggered.connect(
             lambda: self.on_show_action_labels(self.show_action_labels.isChecked())
         )
@@ -149,6 +151,24 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self._setup_model_signals()
             self.component_tree_view_tab.replace_model(self.model)
             self._update_views()
+
+    def _save_to_nexus_file(self):
+        filename = file_dialog(
+            True, "Save Tree Structure as NeXus File", NEXUS_FILE_TYPES
+        )
+        if filename:
+            if not filename.endswith(
+                tuple(
+                    *NEXUS_FILE_TYPES.values(),
+                )
+            ):
+                filename += ".nxs"
+            error_collector: List[str] = []
+            file = h5py.File(filename, "w")
+            self.model.as_nexus(file, error_collector)
+            if error_collector:
+                show_errors_message(error_collector)
+            file.close()
 
     def save_to_compressed_filewriter_json(self):
         self._save_to_filewriter_json(True)

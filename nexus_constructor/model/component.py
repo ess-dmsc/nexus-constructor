@@ -534,3 +534,6 @@ class Component(Group):
         except AttributeError:
             pass
         return dictionary
+
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        super().as_nexus(nexus_node, error_collector)
