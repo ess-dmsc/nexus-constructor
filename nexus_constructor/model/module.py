@@ -3,6 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Union
 
 import attr
+import h5py
 import numpy as np
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
@@ -164,6 +165,10 @@ class Link(FileWriterModule):
             CommonKeys.MODULE: self.writer_module,
             NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.source},
         }
+
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        if self.source and self.name:
+            nexus_node[self.name] = h5py.SoftLink(self.source)
 
 
 @attr.s
