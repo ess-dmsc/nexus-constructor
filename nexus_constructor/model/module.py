@@ -28,6 +28,7 @@ LINK = "link"
 
 class WriterModules(Enum):
     F142 = "f142"
+    F144 = "f144"
     EV42 = "ev42"
     EV44 = "ev44"
     TDCTIME = "tdct"
@@ -42,6 +43,7 @@ class WriterModules(Enum):
 
 class StreamModules(Enum):
     F142 = "f142"
+    F144 = "f144"
     EV42 = "ev42"
     EV44 = "ev44"
     TDCTIME = "tdct"
@@ -151,6 +153,11 @@ class F142Stream(StreamModule):
         if self.cue_interval:
             module_dict[NodeType.CONFIG][CUE_INTERVAL] = self.cue_interval
         return module_dict
+
+
+@attr.s
+class F144Stream(F142Stream):
+    writer_module = attr.ib(type=str, default=WriterModules.F144.value, init=False)
 
 
 @attr.s
@@ -280,6 +287,7 @@ class HS01Stream(StreamModule):
 
 class WriterModuleClasses(Enum):
     F142 = F142Stream
+    F144 = F144Stream
     EV42 = EV42Stream
     EV44 = EV44Stream
     TDCTIME = TDCTStream
@@ -326,17 +334,17 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             source=configuration[SOURCE],
             parent_node=parent_node,
         )
-    elif mod_type == WriterModules.F142.value:
-        f142_type = None
+    elif mod_type in [WriterModules.F142.value, WriterModules.F144.value]:
+        schema_type = None
         if CommonKeys.TYPE in configuration:
-            f142_type = configuration[CommonKeys.TYPE]
+            schema_type = configuration[CommonKeys.TYPE]
         elif CommonKeys.DATA_TYPE in configuration:
-            f142_type = configuration[CommonKeys.DATA_TYPE]
+            schema_type = configuration[CommonKeys.DATA_TYPE]
         fw_mod_obj = fw_mod_class(
             topic=configuration[TOPIC],
             source=configuration[SOURCE],
             parent_node=parent_node,
-            type=f142_type,
+            type=schema_type,
         )
         if ARRAY_SIZE in configuration:
             fw_mod_obj.array_size = configuration[ARRAY_SIZE]
@@ -364,6 +372,7 @@ def create_fw_module_object(mod_type, configuration, parent_node):
 
     if mod_type in [
         WriterModules.F142.value,
+        WriterModules.F144.value,
         WriterModules.EV42.value,
         WriterModules.EV44.value,
     ]:
