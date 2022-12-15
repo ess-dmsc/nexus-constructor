@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
@@ -49,3 +49,6 @@ class LinkTransformation:
             target.depends_on = value.depends_on
             return
         target.depends_on = None
+
+    def as_nexus(self, nexu_node, error_collector: List[str]):
+        pass

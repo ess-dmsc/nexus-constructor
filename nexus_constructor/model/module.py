@@ -3,6 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Union
 
 import attr
+import h5py
 import numpy as np
 
 from nexus_constructor.common_attrs import CommonKeys, NodeType
@@ -59,6 +60,9 @@ class FileWriterModule(ABC):
 
     def as_dict(self, error_collector: List[str]):
         raise NotImplementedError()
+
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        pass
 
     @property
     def absolute_path(self):
@@ -162,6 +166,10 @@ class Link(FileWriterModule):
             NodeType.CONFIG: {CommonKeys.NAME: self.name, SOURCE: self.source},
         }
 
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        if self.source and self.name:
+            nexus_node[self.name] = h5py.SoftLink(self.source)
+
 
 @attr.s
 class Dataset(FileWriterModule):
@@ -195,6 +203,11 @@ class Dataset(FileWriterModule):
                 error_collector
             )
         return return_dict
+
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        nexus_dataset = nexus_node.create_dataset(self.name, data=self.values)
+        for attribute in self.attributes:
+            nexus_dataset.attrs[attribute.name] = attribute.values
 
     def _cast_to_type(self, data):
         return JsonSerialisableType.from_type(self.type)(data)

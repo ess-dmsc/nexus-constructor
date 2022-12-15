@@ -184,6 +184,13 @@ class Group:
         )
         return return_dict
 
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        nx_group = nexus_node.create_group(self.name)
+        for attribute in self.attributes:
+            nx_group.attrs[attribute.name] = attribute.values
+        for child in self.children:
+            child.as_nexus(nx_group, error_collector)
+
     def set_possible_stream_modules(self, possible_stream_modules: List[str]):
         self.possible_stream_modules = possible_stream_modules.copy()
 
