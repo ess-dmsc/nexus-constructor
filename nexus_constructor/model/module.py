@@ -89,7 +89,14 @@ class NS10Stream(StreamModule):
 
 @attr.s
 class SE00Stream(StreamModule):
+    type = attr.ib(type=str)
     writer_module = attr.ib(type=str, default=WriterModules.SE00.value, init=False)
+
+    def as_dict(self, error_collector: List[str]):
+        module_dict = StreamModule.as_dict(self, error_collector)
+        if self.type:
+            module_dict[NodeType.CONFIG][CommonKeys.DATA_TYPE] = self.type
+        return module_dict
 
 
 @attr.s
@@ -299,9 +306,7 @@ def create_fw_module_object(mod_type, configuration, parent_node):
     fw_mod_class = module_class_dict[mod_type]
     if mod_type in [
         WriterModules.NS10.value,
-        WriterModules.SE00.value,
         WriterModules.SENV.value,
-        WriterModules.SE00.value,
         WriterModules.TDCTIME.value,
         WriterModules.EV42.value,
         WriterModules.EV44.value,
@@ -312,6 +317,18 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             topic=configuration[TOPIC],
             source=configuration[SOURCE],
             parent_node=parent_node,
+        )
+    elif mod_type == WriterModules.SE00.value:
+        se00_type = None
+        if CommonKeys.TYPE in configuration:
+            se00_type = configuration[CommonKeys.TYPE]
+        elif CommonKeys.DATA_TYPE in configuration:
+            se00_type = configuration[CommonKeys.DATA_TYPE]
+        fw_mod_obj = fw_mod_class(
+            topic=configuration[TOPIC],
+            source=configuration[SOURCE],
+            parent_node=parent_node,
+            type=se00_type,
         )
     elif mod_type == WriterModules.F142.value:
         f142_type = None
