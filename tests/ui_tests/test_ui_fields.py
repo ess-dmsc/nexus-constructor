@@ -110,6 +110,28 @@ def test_ui_stream_field_GIVEN_f142_is_selected_WHEN_advanced_options_are_clicke
     )
 
 
+def test_ui_stream_field_GIVEN_f144_is_selected_WHEN_advanced_options_are_clicked_THEN_f144_group_box_is_shown(
+    qtbot,
+):
+    listwidget = QListWidget()
+    listwidget.field_name_edit = QLabel()
+    field = FieldWidget(None, POSSIBLE_FIELDS, listwidget)
+    field_name = "test"
+    field.name = field_name
+
+    stream_fields_widget = StreamFieldsWidget(field)
+    stream_fields_widget.schema_combo.setCurrentText("f144")
+
+    qtbot.addWidget(stream_fields_widget)
+
+    stream_fields_widget.f142_advanced_group_box.setVisible = Mock()
+    stream_fields_widget._show_advanced_options(True)
+
+    stream_fields_widget.f142_advanced_group_box.setVisible.assert_called_once_with(
+        True
+    )
+
+
 def test_ui_stream_field_GIVEN_ev42_is_selected_WHEN_advanced_options_are_clicked_THEN_ev42_group_box_is_shown(
     qtbot,
 ):
