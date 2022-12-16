@@ -1,5 +1,5 @@
 from functools import partial
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 from PySide6.QtCore import Qt
@@ -33,6 +33,7 @@ from nexus_constructor.model.module import (
     EV42Stream,
     EV44Stream,
     F142Stream,
+    F144Stream,
     HS01Shape,
     HS01Stream,
     NS10Stream,
@@ -292,7 +293,7 @@ class StreamFieldsWidget(QDialog):
 
         self._old_schema = None
         self.__add_items_to_schema_combo()
-        self.schema_combo.setCurrentText(StreamModules.F142.value)
+        self.schema_combo.setCurrentText(StreamModules.F144.value)
         self.ok_button.clicked.connect(self._update_possible_stream_modules)
 
         self.layout().addWidget(self.schema_label, 0, 0)
@@ -345,7 +346,9 @@ class StreamFieldsWidget(QDialog):
     def __add_items_to_schema_combo(self):
         self.schema_combo.clear()
         if self._show_only_f142_stream:
-            self.schema_combo.addItems([StreamModules.F142.value])
+            self.schema_combo.addItems(
+                [StreamModules.F142.value, StreamModules.F144.value]
+            )
         elif self._node_parent:
             possible_stream_modules = (
                 self._node_parent.get_possible_stream_modules().copy()
@@ -451,7 +454,7 @@ class StreamFieldsWidget(QDialog):
 
     def _show_advanced_options(self, show):
         schema = self.schema_combo.currentText()
-        if schema == WriterModules.F142.value:
+        if schema in [WriterModules.F142.value, WriterModules.F144.value]:
             self.f142_advanced_group_box.setVisible(show)
         elif schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
             self.ev42_advanced_group_box.setVisible(show)
@@ -475,7 +478,7 @@ class StreamFieldsWidget(QDialog):
         self.value_units_label.setVisible(False)
         self.value_units_edit.setVisible(False)
         self._show_array_size_table(False)
-        if schema == WriterModules.F142.value:
+        if schema in [WriterModules.F142.value, WriterModules.F144.value]:
             self.value_units_label.setVisible(True)
             self.value_units_edit.setVisible(True)
             self._set_edits_visible(True, True)
@@ -554,6 +557,21 @@ class StreamFieldsWidget(QDialog):
                 stream.array_size = array_size
             if self.advanced_options_enabled:
                 self.record_advanced_f142_values(stream)
+        elif current_schema == WriterModules.F144.value:
+            value_units = self.value_units_edit.text()
+            array_size = self.array_size_spinbox.value()
+            stream = F144Stream(
+                parent_node=parent,
+                source=source,
+                topic=topic,
+                type=type,
+                value_units=value_units,
+                array_size=array_size,
+            )
+            if array_size:
+                stream.array_size = array_size
+            if self.advanced_options_enabled:
+                self.record_advanced_f142_values(stream)
         elif current_schema == WriterModules.ADAR.value:
             array_size = []
             if self.array_size_placeholder.isChecked():
@@ -606,9 +624,9 @@ class StreamFieldsWidget(QDialog):
         stream.edge_type = edge_type
         stream.error_type = error_type
 
-    def record_advanced_f142_values(self, stream: F142Stream):
+    def record_advanced_f142_values(self, stream: Union[F142Stream, F144Stream]):
         """
-        Save the advanced f142 properties to the stream data object.
+        Save the advanced f142/f144 properties to the stream data object.
         :param stream: The stream data object to be modified.
         """
         stream.chunk_size = self.f142_chunk_size_spinner.value()
@@ -643,7 +661,7 @@ class StreamFieldsWidget(QDialog):
         self.ev42_chunk_size_spinner.setValue(field.chunk_size)
         self.ev42_cue_interval_spinner.setValue(field.cue_interval)
 
-    def fill_in_existing_f142_fields(self, field: F142Stream):
+    def fill_in_existing_f142_fields(self, field: Union[F142Stream, F144Stream]):
         """
         Fill in specific existing f142 fields into the new UI field.
         :param field: The stream group
@@ -665,7 +683,7 @@ class StreamFieldsWidget(QDialog):
             self._show_advanced_options(True)
             self._fill_existing_advanced_f142_fields(field)
 
-    def _fill_existing_advanced_f142_fields(self, field: F142Stream):
+    def _fill_existing_advanced_f142_fields(self, field: Union[F142Stream, F144Stream]):
         """
         Fill the advanced fields in the interface with the existing f142 stream data.
         :param field: The f412 stream data object.
@@ -694,7 +712,7 @@ class StreamFieldsWidget(QDialog):
         self.topic_validator.validate(field.topic, 0)
         self.source_line_edit.setText(field.source)
         self.source_validator.validate(field.source, 0)
-        if schema == WriterModules.F142.value:
+        if schema in [WriterModules.F142.value, WriterModules.F144.value]:
             self.fill_in_existing_f142_fields(field)
         elif schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
             self.fill_in_existing_ev42_fields(field)

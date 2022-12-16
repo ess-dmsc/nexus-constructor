@@ -127,7 +127,10 @@ class ModuleViewEditable(QGroupBox):
                 table_value = array_size_table.item(0, i)
                 if table_value:
                     self.module.array_size.append(int(table_value.text()))
-        elif self.module.writer_module == StreamModules.F142.value:
+        elif self.module.writer_module in [
+            StreamModules.F142.value,
+            StreamModules.F144.value,
+        ]:
             self.field_widget.streams_widget.record_advanced_f142_values(self.module)
         elif self.module.writer_module in [
             StreamModules.EV42.value,
