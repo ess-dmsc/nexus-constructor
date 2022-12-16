@@ -97,7 +97,6 @@ def test_GIVEN_dataset_with_array_value_WHEN_adding_dataset_THEN_dataset_object_
 @pytest.mark.parametrize(
     "stream",
     [
-        SE00Stream(parent_node=None, source=source, topic=topic),
         SENVStream(parent_node=None, source=source, topic=topic),
         TDCTStream(parent_node=None, source=source, topic=topic),
         NS10Stream(parent_node=None, source=source, topic=topic),
@@ -109,6 +108,20 @@ def test_streams_with_name_source_and_topic(stream):
     stream_dict = stream.as_dict([])["config"]
     assert stream_dict["topic"] == topic
     assert stream_dict["source"] == source
+
+
+def test_se00_stream_optional_settings():
+    type = "double"
+    stream = SE00Stream(
+        parent_node=None,
+        source=source,
+        topic=topic,
+        type=type,
+    )
+    stream_dict = stream.as_dict([])["config"]
+    assert stream_dict["topic"] == topic
+    assert stream_dict["source"] == source
+    assert stream_dict["dtype"] == type
 
 
 def test_f142_stream_optional_settings():
