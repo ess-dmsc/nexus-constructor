@@ -293,7 +293,7 @@ class StreamFieldsWidget(QDialog):
 
         self._old_schema = None
         self.__add_items_to_schema_combo()
-        self.schema_combo.setCurrentText(StreamModules.F142.value)
+        self.schema_combo.setCurrentText(StreamModules.F144.value)
         self.ok_button.clicked.connect(self._update_possible_stream_modules)
 
         self.layout().addWidget(self.schema_label, 0, 0)
