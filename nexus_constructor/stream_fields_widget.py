@@ -62,6 +62,19 @@ F142_TYPES = [
     "string",
 ]
 
+SE00_TYPES = [
+    "byte",
+    "ubyte",
+    "short",
+    "ushort",
+    "int",
+    "uint",
+    "long",
+    "ulong",
+    "float",
+    "double",
+]
+
 
 def check_if_advanced_options_should_be_enabled(advanced_fields) -> bool:
     """
@@ -477,6 +490,7 @@ class StreamFieldsWidget(QDialog):
         self.show_advanced_options_button.setChecked(False)
         self.value_units_label.setVisible(False)
         self.value_units_edit.setVisible(False)
+        self.type_combo.clear()
         self._show_array_size_table(False)
         if schema in [WriterModules.F142.value, WriterModules.F144.value]:
             self.value_units_label.setVisible(True)
@@ -484,6 +498,8 @@ class StreamFieldsWidget(QDialog):
             self._set_edits_visible(True, True)
             self.show_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
+            self.type_combo.addItems(F142_TYPES)
+            self.type_combo.setCurrentText("double")
         elif schema in [WriterModules.EV42.value, WriterModules.EV44.value]:
             self._set_edits_visible(True, False)
             self.show_advanced_options_button.setVisible(True)
@@ -501,9 +517,10 @@ class StreamFieldsWidget(QDialog):
             self._set_edits_visible(True, False, "nicos/<device>/<parameter>")
         elif schema == WriterModules.SE00.value:
             self._set_edits_visible(True, True)
+            self.type_combo.addItems(SE00_TYPES)
+            self.type_combo.setCurrentText("double")
         elif schema in [
             WriterModules.TDCTIME.value,
-            WriterModules.SE00.value,
             WriterModules.SENV.value,
         ]:
             self._set_edits_visible(True, False)
