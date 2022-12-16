@@ -28,7 +28,7 @@ from nexus_constructor.model.geometry import (
 )
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import F142Stream, Link
+from nexus_constructor.model.module import F142Stream, F144Stream, Link
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
@@ -1922,6 +1922,52 @@ def test_UI_GIVEN_group_with_basic_f142_field_WHEN_editing_component_THEN_topic_
     assert widget.streams_widget.type_combo.currentText() == pvtype
 
 
+def test_UI_GIVEN_group_with_basic_f144_field_WHEN_editing_component_THEN_topic_and_source_are_correct(
+    qtbot,
+):
+    component, model, treeview_model = create_group_with_component(
+        "chopper1", "test_component_editing_f144_stream_field"
+    )
+    entry = Entry()
+    field_name = "stream1"
+    stream_group = Group(parent_node=entry, name=field_name)
+    entry.children.append(entry)
+
+    topic = "topic1"
+    pvname = "source1"
+    pvtype = "double"
+
+    stream = F144Stream(
+        parent_node=stream_group, topic=topic, source=pvname, type=pvtype
+    )
+
+    stream_group.children.append(stream)
+
+    dialog = AddComponentDialog(
+        model=model,
+        component_model=treeview_model,
+        group_to_edit=stream_group,
+        nx_classes=NX_CLASS_DEFINITIONS,
+        parent=None,
+        scene_widget=None,
+        initial_edit=False,
+    )
+    dialog.pixel_options = Mock(spec=PixelOptions)
+    qtbot.addWidget(dialog)
+
+    widget = dialog.fieldsListWidget.itemWidget(dialog.fieldsListWidget.item(0))
+
+    stream = widget.value
+    assert stream.topic == topic
+    assert stream.source == pvname
+    assert stream.type == pvtype
+
+    assert widget.streams_widget.topic_line_edit.text() == topic
+    assert widget.streams_widget.schema_combo.currentText() == "f144"
+    assert widget.streams_widget.source_line_edit.text() == pvname
+    assert widget.streams_widget.type_combo.currentText() == pvtype
+
+
 def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_shape_radio_is_checked(
     qtbot,
     model,
@@ -2101,6 +2147,34 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     assert streams_widget.isEnabled()
 
     streams_widget._schema_type_changed("f142")
+
+    assert streams_widget.topic_label.isEnabled()
+    assert streams_widget.topic_line_edit.isEnabled()
+    assert streams_widget.source_label.isEnabled()
+    assert streams_widget.source_line_edit.isEnabled()
+    assert streams_widget.type_label.isEnabled()
+    assert streams_widget.type_combo.isEnabled()
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f144_THEN_stream_dialog_shown_with_correct_options(
+    qtbot, add_component_dialog
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget._schema_type_changed("f144")
 
     assert streams_widget.topic_label.isEnabled()
     assert streams_widget.topic_line_edit.isEnabled()
@@ -2293,6 +2367,43 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_and_type_
     assert streams_widget.array_size_spinbox.isVisible()
 
 
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f144_and_type_to_double_THEN_stream_dialog_shown_with_array_size_option(
+    qtbot, add_component_dialog
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget.schema_combo.setCurrentText("f144")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
+
+    assert streams_widget.topic_label.isVisible()
+    assert streams_widget.topic_line_edit.isVisible()
+    assert streams_widget.source_label.isVisible()
+    assert streams_widget.source_line_edit.isVisible()
+    assert streams_widget.type_label.isVisible()
+    assert streams_widget.type_combo.isVisible()
+
+    assert streams_widget.array_size_label.isVisible()
+    assert streams_widget.array_size_spinbox.isVisible()
+
+
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(
     qtbot, add_component_dialog
 ):
@@ -2316,6 +2427,44 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stre
     assert streams_widget.isEnabled()
 
     streams_widget.schema_combo.setCurrentText("f142")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+
+    streams_widget.array_radio.setChecked(True)
+    streams_widget.array_radio.clicked.emit()
+
+    array_size = 2
+    streams_widget.array_size_spinbox.setValue(array_size)
+
+    stream = streams_widget.get_stream_module(None)
+
+    assert stream.array_size == array_size
+
+
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f144_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(
+    qtbot, add_component_dialog
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+
+    name = "test"
+
+    field.field_name_edit.setText(name)
+
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+
+    assert field.edit_dialog.isEnabled()
+
+    streams_widget = field.streams_widget
+    assert streams_widget.isEnabled()
+
+    streams_widget.schema_combo.setCurrentText("f144")
     streams_widget.schema_combo.currentTextChanged.emit(
         streams_widget.schema_combo.currentText()
     )

@@ -211,6 +211,9 @@ class Group:
         if module in [StreamModules.EV42.value, StreamModules.EV44.value]:
             modify_list(StreamModules.EV42.value)
             modify_list(StreamModules.EV44.value)
+        elif module in [StreamModules.F142.value, StreamModules.F144.value]:
+            modify_list(StreamModules.F142.value)
+            modify_list(StreamModules.F144.value)
         elif module in [StreamModules.SENV.value, StreamModules.SE00.value]:
             modify_list(StreamModules.SENV.value)
             modify_list(StreamModules.SE00.value)
