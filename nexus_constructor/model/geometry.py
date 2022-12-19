@@ -178,6 +178,8 @@ class BoxGeometry(Group):
     Box geometry shape.
     """
 
+    _detector: Optional[np.array] = None
+
     def __init__(
         self,
         length: float,
@@ -191,6 +193,16 @@ class BoxGeometry(Group):
         self._units = units
         self.nx_class = GEOMETRY_NX_CLASS
         self._create_datasets_and_add_to_shape_group()
+
+    @property
+    def detector_number(self) -> List[int]:
+        if self._detector is None:
+            return None
+        return self._detector.tolist()
+
+    @detector_number.setter
+    def detector_number(self, pixel_ids: List[int]):
+        self._detector = np.array(pixel_ids)
 
     def _create_datasets_and_add_to_shape_group(self):
         group = Group(name=SHAPE_GROUP_NAME)
