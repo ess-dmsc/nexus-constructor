@@ -566,6 +566,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.boxWidthLineEdit.value(),
                 self.boxHeightLineEdit.value(),
                 self.unitsLineEdit.text(),
+                pixel_data=pixel_data,
             )
         elif self.meshRadioButton.isChecked() and self.cad_file_name:
             mesh_geometry = OFFGeometryNoNexus()

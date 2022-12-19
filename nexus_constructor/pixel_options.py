@@ -261,16 +261,21 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         if isinstance(shape, OFFGeometryNexus):
             self._fill_off_geometry_pixel_mapping(shape)
 
-        elif not isinstance(shape, BoxGeometry):
-            detector_number = shape.detector_number
-            n_cylinders = shape.cylinders.size // 3
-
-            if n_cylinders > 1:
-                self.create_pixel_mapping_table(n_cylinders, "cylinder")
-                # TODO: Restore pixel mapping in the case of multiple cylinders
-
+        else:
+            if isinstance(shape, BoxGeometry):
+                detector_number = shape.detector_number
+                n_shapes = len(shape.size) // 3
+                shape_type = "box"
             else:
-                self.create_pixel_mapping_table(n_cylinders, "cylinder")
+                detector_number = shape.detector_number
+                n_shapes = shape.cylinders.size // 3
+                shape_type = "cylinder"
+
+            if n_shapes > 1:
+                self.create_pixel_mapping_table(n_shapes, shape_type)
+                # TODO: Restore pixel mapping in the case of multiple cylinders
+            else:
+                self.create_pixel_mapping_table(n_shapes, shape_type)
                 item = QTableWidgetItem()
                 item.setData(Qt.DisplayRole, detector_number[0])
                 self.pixel_mapping_table_widget.setItem(0, 1, item)
@@ -551,7 +556,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         Creates a table of pixel mapping widgets.
         :param n_items: The number of widgets to create.
         :param text: The label to be displayed next to the id cel.
-        This is either faces or cylinders.
+        This is either faces, boxes or cylinders.
         """
         self.reset_pixel_mapping_table()
         self.pixel_mapping_table_widget.setColumnCount(2)

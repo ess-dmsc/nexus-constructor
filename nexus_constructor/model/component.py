@@ -338,7 +338,10 @@ class Component(Group):
         if SHAPE_GROUP_NAME in self:
             return self[SHAPE_GROUP_NAME], None
         if GEOMETRY_GROUP_NAME in self:
-            return self[GEOMETRY_GROUP_NAME], None
+            return (
+                self[GEOMETRY_GROUP_NAME],
+                self._create_transformation_vectors_for_pixel_offsets(),
+            )
         return NoShapeGeometry(), None
 
     def remove_shape(self):
@@ -380,9 +383,14 @@ class Component(Group):
         width: float = 1.0,
         height: float = 1.0,
         units: str = "m",
+        pixel_data=None,
     ) -> BoxGeometry:
         self.remove_shape()
         geometry = BoxGeometry(length, width, height, GEOMETRY_GROUP_NAME, units)
+        if isinstance(pixel_data, PixelMapping):
+            geometry.detector_number = get_detector_number_from_pixel_mapping(
+                pixel_data
+            )
         self[GEOMETRY_GROUP_NAME] = geometry
         return geometry
 
