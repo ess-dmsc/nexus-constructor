@@ -226,20 +226,20 @@ NXDL Schema.</p>
 <p>In this example fragment of an NXDL application definition,
 the <code class="docutils literal notranslate"><span class="pre">pixel_shape</span></code> could be represented by <em>either</em>
 <code class="docutils literal notranslate"><span class="pre">NXoff_geometry</span></code> or <code class="docutils literal notranslate"><span class="pre">NXcylindrical_geometry</span></code>.</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>    <span class="nt">&lt;choice</span> <span class="na">name=</span><span class="s">&quot;pixel_shape&quot;</span><span class="nt">&gt;</span>
-<span class="linenos"> 2</span>      <span class="nt">&lt;group</span> <span class="na">type=</span><span class="s">&quot;NXoff_geometry&quot;</span><span class="nt">&gt;</span>
-<span class="linenos"> 3</span>        <span class="nt">&lt;doc&gt;</span>
-<span class="linenos"> 4</span>          Shape description of each pixel. Use only if all pixels in the detector
-<span class="linenos"> 5</span>          are of uniform shape.
-<span class="linenos"> 6</span>        <span class="nt">&lt;/doc&gt;</span>
-<span class="linenos"> 7</span>      <span class="nt">&lt;/group&gt;</span>
-<span class="linenos"> 8</span>      <span class="nt">&lt;group</span> <span class="na">type=</span><span class="s">&quot;NXcylindrical_geometry&quot;</span><span class="nt">&gt;</span>
-<span class="linenos"> 9</span>        <span class="nt">&lt;doc&gt;</span>
-<span class="linenos">10</span>          Shape description of each pixel. Use only if all pixels in the detector
-<span class="linenos">11</span>          are of uniform shape and require being described by cylinders.
-<span class="linenos">12</span>        <span class="nt">&lt;/doc&gt;</span>
-<span class="linenos">13</span>      <span class="nt">&lt;/group&gt;</span>
-<span class="linenos">14</span>    <span class="nt">&lt;/choice&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="w">    </span><span class="nt">&lt;choice</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;pixel_shape&quot;</span><span class="nt">&gt;</span>
+<span class="linenos"> 2</span><span class="w">      </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;NXoff_geometry&quot;</span><span class="nt">&gt;</span>
+<span class="linenos"> 3</span><span class="w">        </span><span class="nt">&lt;doc&gt;</span>
+<span class="linenos"> 4</span><span class="w">          </span>Shape<span class="w"> </span>description<span class="w"> </span>of<span class="w"> </span>each<span class="w"> </span>pixel.<span class="w"> </span>Use<span class="w"> </span>only<span class="w"> </span>if<span class="w"> </span>all<span class="w"> </span>pixels<span class="w"> </span>in<span class="w"> </span>the<span class="w"> </span>detector
+<span class="linenos"> 5</span><span class="w">          </span>are<span class="w"> </span>of<span class="w"> </span>uniform<span class="w"> </span>shape.
+<span class="linenos"> 6</span><span class="w">        </span><span class="nt">&lt;/doc&gt;</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="nt">&lt;/group&gt;</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;NXcylindrical_geometry&quot;</span><span class="nt">&gt;</span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="nt">&lt;doc&gt;</span>
+<span class="linenos">10</span><span class="w">          </span>Shape<span class="w"> </span>description<span class="w"> </span>of<span class="w"> </span>each<span class="w"> </span>pixel.<span class="w"> </span>Use<span class="w"> </span>only<span class="w"> </span>if<span class="w"> </span>all<span class="w"> </span>pixels<span class="w"> </span>in<span class="w"> </span>the<span class="w"> </span>detector
+<span class="linenos">11</span><span class="w">          </span>are<span class="w"> </span>of<span class="w"> </span>uniform<span class="w"> </span>shape<span class="w"> </span>and<span class="w"> </span>require<span class="w"> </span>being<span class="w"> </span>described<span class="w"> </span>by<span class="w"> </span>cylinders.
+<span class="linenos">12</span><span class="w">        </span><span class="nt">&lt;/doc&gt;</span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">&lt;/group&gt;</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">&lt;/choice&gt;</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">&#64;name</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">choice</span></code> element specifies the name that
@@ -353,7 +353,7 @@ not be useful).</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; <a href="copyright.html">Copyright</a> 1996-2022, NIAC, https://www.nexusformat.org.
+        &#169; <a href="copyright.html">Copyright</a> 1996-2023, NIAC, https://www.nexusformat.org.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
