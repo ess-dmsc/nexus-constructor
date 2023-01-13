@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QItemDelegate,
     QLineEdit,
+    QPushButton,
     QStyleOptionViewItem,
     QTableView,
     QToolBar,
@@ -52,6 +53,11 @@ class ArrayDatasetTableWidget(QWidget):
 
         self.layout().addWidget(self.toolbox)
         self.layout().addWidget(self.view)
+
+        if parent:
+            edit_dlg_ok_button = QPushButton("Done")
+            edit_dlg_ok_button.clicked.connect(self.parent().close)
+            self.layout().addWidget(edit_dlg_ok_button)
 
 
 class ArrayDatasetTableModel(QAbstractTableModel):

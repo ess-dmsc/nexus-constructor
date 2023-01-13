@@ -423,7 +423,7 @@ class FieldWidget(QFrame):
             self.set_visibility(True, False, False, True)
         elif self.field_type == FieldType.array_dataset:
             self.set_visibility(False, False, True, True)
-            self.table_view = ArrayDatasetTableWidget()
+            self.table_view = ArrayDatasetTableWidget(parent=self.edit_dialog)
             self._set_edit_button_state(True)
         elif self.field_type == FieldType.kafka_stream:
             self.set_visibility(False, False, True, False, show_name_line_edit=True)
