@@ -112,50 +112,50 @@ Either version of this file is acceptable.</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot; ?&gt;</span>
 <span class="linenos"> 2</span><span class="cm">&lt;!-- Attributes --&gt;</span>
 <span class="linenos"> 3</span><span class="nt">&lt;Attributes</span>
-<span class="linenos"> 4</span>    <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-<span class="linenos"> 5</span>    <span class="na">xsi:noNamespaceSchemaLocation=</span>
-<span class="linenos"> 6</span>    <span class="s">&quot;https://github.com/areaDetector/ADCore/blob/master/iocBoot/NDAttributes.xsd&quot;</span>
-<span class="linenos"> 7</span>    <span class="nt">&gt;</span>
-<span class="linenos"> 8</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;AcquireTime&quot;</span>         
-<span class="linenos"> 9</span>               <span class="na">type=</span><span class="s">&quot;EPICS_PV&quot;</span> 
-<span class="linenos">10</span>               <span class="na">source=</span><span class="s">&quot;13SIM1:cam1:AcquireTime&quot;</span>      
-<span class="linenos">11</span>               <span class="na">dbrtype=</span><span class="s">&quot;DBR_NATIVE&quot;</span>  
-<span class="linenos">12</span>               <span class="na">description=</span><span class="s">&quot;Camera acquire time&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">13</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;ImageCounter&quot;</span>        
-<span class="linenos">14</span>               <span class="na">type=</span><span class="s">&quot;PARAM&quot;</span>    
-<span class="linenos">15</span>               <span class="na">source=</span><span class="s">&quot;ARRAY_COUNTER&quot;</span>                
-<span class="linenos">16</span>               <span class="na">datatype=</span><span class="s">&quot;INT&quot;</span>        
-<span class="linenos">17</span>               <span class="na">description=</span><span class="s">&quot;Image counter&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">18</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;calc1_val&quot;</span>           
-<span class="linenos">19</span>               <span class="na">type=</span><span class="s">&quot;EPICS_PV&quot;</span> 
-<span class="linenos">20</span>               <span class="na">source=</span><span class="s">&quot;prj:userCalc1.VAL&quot;</span>            
-<span class="linenos">21</span>               <span class="na">datatype=</span><span class="s">&quot;DBR_NATIVE&quot;</span> 
-<span class="linenos">22</span>               <span class="na">description=</span><span class="s">&quot;some calculation result&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">23</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;calc2_val&quot;</span>           
-<span class="linenos">24</span>               <span class="na">type=</span><span class="s">&quot;EPICS_PV&quot;</span> 
-<span class="linenos">25</span>               <span class="na">source=</span><span class="s">&quot;prj:userCalc2.VAL&quot;</span>            
-<span class="linenos">26</span>               <span class="na">datatype=</span><span class="s">&quot;DBR_NATIVE&quot;</span> 
-<span class="linenos">27</span>               <span class="na">description=</span><span class="s">&quot;another calculation result&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">28</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;MaxSizeX&quot;</span>            
-<span class="linenos">29</span>               <span class="na">type=</span><span class="s">&quot;PARAM&quot;</span>    
-<span class="linenos">30</span>               <span class="na">source=</span><span class="s">&quot;MAX_SIZE_X&quot;</span>                   
-<span class="linenos">31</span>               <span class="na">datatype=</span><span class="s">&quot;INT&quot;</span>        
-<span class="linenos">32</span>               <span class="na">description=</span><span class="s">&quot;Detector X size&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">33</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;MaxSizeY&quot;</span>            
-<span class="linenos">34</span>               <span class="na">type=</span><span class="s">&quot;PARAM&quot;</span>    
-<span class="linenos">35</span>               <span class="na">source=</span><span class="s">&quot;MAX_SIZE_Y&quot;</span>                   
-<span class="linenos">36</span>               <span class="na">datatype=</span><span class="s">&quot;INT&quot;</span>        
-<span class="linenos">37</span>               <span class="na">description=</span><span class="s">&quot;Detector Y size&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">38</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;CameraModel&quot;</span>         
-<span class="linenos">39</span>               <span class="na">type=</span><span class="s">&quot;PARAM&quot;</span>    
-<span class="linenos">40</span>               <span class="na">source=</span><span class="s">&quot;MODEL&quot;</span>                        
-<span class="linenos">41</span>               <span class="na">datatype=</span><span class="s">&quot;STRING&quot;</span>     
-<span class="linenos">42</span>               <span class="na">description=</span><span class="s">&quot;Camera model&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">43</span>    <span class="nt">&lt;Attribute</span> <span class="na">name=</span><span class="s">&quot;CameraManufacturer&quot;</span>  
-<span class="linenos">44</span>               <span class="na">type=</span><span class="s">&quot;PARAM&quot;</span>    
-<span class="linenos">45</span>               <span class="na">source=</span><span class="s">&quot;MANUFACTURER&quot;</span>                 
-<span class="linenos">46</span>               <span class="na">datatype=</span><span class="s">&quot;STRING&quot;</span>     
-<span class="linenos">47</span>               <span class="na">description=</span><span class="s">&quot;Camera manufacturer&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="na">xsi:noNamespaceSchemaLocation=</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="s">&quot;https://github.com/areaDetector/ADCore/blob/master/iocBoot/NDAttributes.xsd&quot;</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">&gt;</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;AcquireTime&quot;</span><span class="w">         </span>
+<span class="linenos"> 9</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;EPICS_PV&quot;</span><span class="w"> </span>
+<span class="linenos">10</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;13SIM1:cam1:AcquireTime&quot;</span><span class="w">      </span>
+<span class="linenos">11</span><span class="w">               </span><span class="na">dbrtype=</span><span class="s">&quot;DBR_NATIVE&quot;</span><span class="w">  </span>
+<span class="linenos">12</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;Camera acquire time&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ImageCounter&quot;</span><span class="w">        </span>
+<span class="linenos">14</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;PARAM&quot;</span><span class="w">    </span>
+<span class="linenos">15</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;ARRAY_COUNTER&quot;</span><span class="w">                </span>
+<span class="linenos">16</span><span class="w">               </span><span class="na">datatype=</span><span class="s">&quot;INT&quot;</span><span class="w">        </span>
+<span class="linenos">17</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;Image counter&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;calc1_val&quot;</span><span class="w">           </span>
+<span class="linenos">19</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;EPICS_PV&quot;</span><span class="w"> </span>
+<span class="linenos">20</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;prj:userCalc1.VAL&quot;</span><span class="w">            </span>
+<span class="linenos">21</span><span class="w">               </span><span class="na">datatype=</span><span class="s">&quot;DBR_NATIVE&quot;</span><span class="w"> </span>
+<span class="linenos">22</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;some calculation result&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;calc2_val&quot;</span><span class="w">           </span>
+<span class="linenos">24</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;EPICS_PV&quot;</span><span class="w"> </span>
+<span class="linenos">25</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;prj:userCalc2.VAL&quot;</span><span class="w">            </span>
+<span class="linenos">26</span><span class="w">               </span><span class="na">datatype=</span><span class="s">&quot;DBR_NATIVE&quot;</span><span class="w"> </span>
+<span class="linenos">27</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;another calculation result&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">28</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;MaxSizeX&quot;</span><span class="w">            </span>
+<span class="linenos">29</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;PARAM&quot;</span><span class="w">    </span>
+<span class="linenos">30</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;MAX_SIZE_X&quot;</span><span class="w">                   </span>
+<span class="linenos">31</span><span class="w">               </span><span class="na">datatype=</span><span class="s">&quot;INT&quot;</span><span class="w">        </span>
+<span class="linenos">32</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;Detector X size&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">33</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;MaxSizeY&quot;</span><span class="w">            </span>
+<span class="linenos">34</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;PARAM&quot;</span><span class="w">    </span>
+<span class="linenos">35</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;MAX_SIZE_Y&quot;</span><span class="w">                   </span>
+<span class="linenos">36</span><span class="w">               </span><span class="na">datatype=</span><span class="s">&quot;INT&quot;</span><span class="w">        </span>
+<span class="linenos">37</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;Detector Y size&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">38</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;CameraModel&quot;</span><span class="w">         </span>
+<span class="linenos">39</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;PARAM&quot;</span><span class="w">    </span>
+<span class="linenos">40</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;MODEL&quot;</span><span class="w">                        </span>
+<span class="linenos">41</span><span class="w">               </span><span class="na">datatype=</span><span class="s">&quot;STRING&quot;</span><span class="w">     </span>
+<span class="linenos">42</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;Camera model&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">43</span><span class="w">    </span><span class="nt">&lt;Attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;CameraManufacturer&quot;</span><span class="w">  </span>
+<span class="linenos">44</span><span class="w">               </span><span class="na">type=</span><span class="s">&quot;PARAM&quot;</span><span class="w">    </span>
+<span class="linenos">45</span><span class="w">               </span><span class="na">source=</span><span class="s">&quot;MANUFACTURER&quot;</span><span class="w">                 </span>
+<span class="linenos">46</span><span class="w">               </span><span class="na">datatype=</span><span class="s">&quot;STRING&quot;</span><span class="w">     </span>
+<span class="linenos">47</span><span class="w">               </span><span class="na">description=</span><span class="s">&quot;Camera manufacturer&quot;</span><span class="nt">/&gt;</span>
 <span class="linenos">48</span><span class="nt">&lt;/Attributes&gt;</span>
 </pre></div>
 </div>
@@ -178,36 +178,36 @@ It will be fine (at least a good starting point) as it is,
 even if you add PVs (a.k.a. <em>ndattribute</em>) to the attributes.xml file.</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot; ?&gt;</span>
 <span class="linenos"> 2</span><span class="nt">&lt;hdf5_layout&gt;</span>
-<span class="linenos"> 3</span>  <span class="nt">&lt;group</span> <span class="na">name=</span><span class="s">&quot;entry&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos"> 4</span>    <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;NX_class&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;NXentry&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos"> 5</span>    <span class="nt">&lt;group</span> <span class="na">name=</span><span class="s">&quot;instrument&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos"> 6</span>      <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;NX_class&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;NXinstrument&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos"> 7</span>      <span class="nt">&lt;group</span> <span class="na">name=</span><span class="s">&quot;detector&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos"> 8</span>        <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;NX_class&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;NXdetector&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos"> 9</span>        <span class="nt">&lt;dataset</span> <span class="na">name=</span><span class="s">&quot;data&quot;</span> <span class="na">source=</span><span class="s">&quot;detector&quot;</span> <span class="na">det_default=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos">10</span>          <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;NX_class&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;SDS&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">11</span>          <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;signal&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">12</span>          <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;target&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;/entry/instrument/detector/data&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">13</span>        <span class="nt">&lt;/dataset&gt;</span> 
-<span class="linenos">14</span>        <span class="nt">&lt;group</span> <span class="na">name=</span><span class="s">&quot;NDAttributes&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos">15</span>          <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;NX_class&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;NXcollection&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">16</span>          <span class="nt">&lt;dataset</span> <span class="na">name=</span><span class="s">&quot;ColorMode&quot;</span> <span class="na">source=</span><span class="s">&quot;ndattribute&quot;</span> <span class="na">ndattribute=</span><span class="s">&quot;ColorMode&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">17</span>        <span class="nt">&lt;/group&gt;</span>          <span class="cm">&lt;!-- end group NDAttribute --&gt;</span> 
-<span class="linenos">18</span>      <span class="nt">&lt;/group&gt;</span>            <span class="cm">&lt;!-- end group detector --&gt;</span> 
-<span class="linenos">19</span>      <span class="nt">&lt;group</span> <span class="na">name=</span><span class="s">&quot;NDAttributes&quot;</span> <span class="na">ndattr_default=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos">20</span>        <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;NX_class&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;NXcollection&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">21</span>      <span class="nt">&lt;/group&gt;</span>            <span class="cm">&lt;!-- end group NDAttribute (default) --&gt;</span> 
-<span class="linenos">22</span>      <span class="nt">&lt;group</span> <span class="na">name=</span><span class="s">&quot;performance&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos">23</span>        <span class="nt">&lt;dataset</span> <span class="na">name=</span><span class="s">&quot;timestamp&quot;</span> <span class="na">source=</span><span class="s">&quot;ndattribute&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">24</span>      <span class="nt">&lt;/group&gt;</span>            <span class="cm">&lt;!-- end group performance --&gt;</span> 
-<span class="linenos">25</span>    <span class="nt">&lt;/group&gt;</span>              <span class="cm">&lt;!-- end group instrument --&gt;</span> 
-<span class="linenos">26</span>    <span class="nt">&lt;group</span> <span class="na">name=</span><span class="s">&quot;data&quot;</span><span class="nt">&gt;</span> 
-<span class="linenos">27</span>      <span class="nt">&lt;attribute</span> <span class="na">name=</span><span class="s">&quot;NX_class&quot;</span> <span class="na">source=</span><span class="s">&quot;constant&quot;</span> <span class="na">value=</span><span class="s">&quot;NXdata&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span> 
-<span class="linenos">28</span>      <span class="nt">&lt;hardlink</span> <span class="na">name=</span><span class="s">&quot;data&quot;</span> <span class="na">target=</span><span class="s">&quot;/entry/instrument/detector/data&quot;</span><span class="nt">/&gt;</span>
-<span class="linenos">29</span>      <span class="cm">&lt;!-- The &quot;target&quot; attribute in /entry/instrument/detector/data is used to </span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;entry&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NX_class&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;NXentry&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;instrument&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos"> 6</span><span class="w">      </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NX_class&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;NXinstrument&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;detector&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NX_class&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;NXdetector&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="nt">&lt;dataset</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;data&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;detector&quot;</span><span class="w"> </span><span class="na">det_default=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos">10</span><span class="w">          </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NX_class&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;SDS&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">11</span><span class="w">          </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;signal&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;int&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">12</span><span class="w">          </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;target&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;/entry/instrument/detector/data&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">13</span><span class="w">        </span><span class="nt">&lt;/dataset&gt;</span><span class="w"> </span>
+<span class="linenos">14</span><span class="w">        </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NDAttributes&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos">15</span><span class="w">          </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NX_class&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;NXcollection&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">16</span><span class="w">          </span><span class="nt">&lt;dataset</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ColorMode&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;ndattribute&quot;</span><span class="w"> </span><span class="na">ndattribute=</span><span class="s">&quot;ColorMode&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">&lt;/group&gt;</span><span class="w">          </span><span class="cm">&lt;!-- end group NDAttribute --&gt;</span><span class="w"> </span>
+<span class="linenos">18</span><span class="w">      </span><span class="nt">&lt;/group&gt;</span><span class="w">            </span><span class="cm">&lt;!-- end group detector --&gt;</span><span class="w"> </span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NDAttributes&quot;</span><span class="w"> </span><span class="na">ndattr_default=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos">20</span><span class="w">        </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NX_class&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;NXcollection&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">&lt;/group&gt;</span><span class="w">            </span><span class="cm">&lt;!-- end group NDAttribute (default) --&gt;</span><span class="w"> </span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;performance&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos">23</span><span class="w">        </span><span class="nt">&lt;dataset</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;timestamp&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;ndattribute&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">&lt;/group&gt;</span><span class="w">            </span><span class="cm">&lt;!-- end group performance --&gt;</span><span class="w"> </span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">&lt;/group&gt;</span><span class="w">              </span><span class="cm">&lt;!-- end group instrument --&gt;</span><span class="w"> </span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;data&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">&lt;attribute</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;NX_class&quot;</span><span class="w"> </span><span class="na">source=</span><span class="s">&quot;constant&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;NXdata&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;string&quot;</span><span class="nt">/&gt;</span><span class="w"> </span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">&lt;hardlink</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;data&quot;</span><span class="w"> </span><span class="na">target=</span><span class="s">&quot;/entry/instrument/detector/data&quot;</span><span class="nt">/&gt;</span>
+<span class="linenos">29</span><span class="w">      </span><span class="cm">&lt;!-- The &quot;target&quot; attribute in /entry/instrument/detector/data is used to </span>
 <span class="linenos">30</span><span class="cm">           tell Nexus utilities that this is a hardlink --&gt;</span>
-<span class="linenos">31</span>    <span class="nt">&lt;/group&gt;</span>              <span class="cm">&lt;!-- end group data --&gt;</span> 
-<span class="linenos">32</span>  <span class="nt">&lt;/group&gt;</span>                <span class="cm">&lt;!-- end group entry --&gt;</span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">&lt;/group&gt;</span><span class="w">              </span><span class="cm">&lt;!-- end group data --&gt;</span><span class="w"> </span>
+<span class="linenos">32</span><span class="w">  </span><span class="nt">&lt;/group&gt;</span><span class="w">                </span><span class="cm">&lt;!-- end group entry --&gt;</span>
 <span class="linenos">33</span><span class="nt">&lt;/hdf5_layout&gt;</span>
 </pre></div>
 </div>
@@ -328,7 +328,7 @@ additional metadata.</p>
 <span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">datetime</span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="k">def</span> <span class="nf">write_nexus_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="p">{}):</span>
-<span class="linenos"> 6</span>    <span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 7</span><span class="sd">    write the image to a NeXus HDF5 data file</span>
 <span class="linenos"> 8</span>
 <span class="linenos"> 9</span><span class="sd">    Parameters</span>
@@ -388,7 +388,7 @@ additional metadata.</p>
 <span class="linenos">63</span>
 <span class="linenos">64</span>    
 <span class="linenos">65</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<span class="linenos">66</span>    <span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
+<span class="linenos">66</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
 <span class="linenos">67</span>    <span class="kn">import</span> <span class="nn">epics</span>
 <span class="linenos">68</span>    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;13SIM1:&quot;</span>
 <span class="linenos">69</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;image1:ArrayData&quot;</span><span class="p">)</span>
@@ -467,7 +467,7 @@ using <em>nexusformat</em>:</p>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="k">def</span> <span class="nf">write_nexus_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="p">{}):</span>
-<span class="linenos"> 6</span>    <span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 7</span><span class="sd">    write the image to a NeXus HDF5 data file</span>
 <span class="linenos"> 8</span>
 <span class="linenos"> 9</span><span class="sd">    Parameters</span>
@@ -498,7 +498,7 @@ using <em>nexusformat</em>:</p>
 <span class="linenos">34</span>
 <span class="linenos">35</span>    
 <span class="linenos">36</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<span class="linenos">37</span>    <span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
+<span class="linenos">37</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;demonstrate how to use this code&quot;&quot;&quot;</span>
 <span class="linenos">38</span>    <span class="kn">import</span> <span class="nn">epics</span>
 <span class="linenos">39</span>    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;13SIM1:&quot;</span>
 <span class="linenos">40</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s2">&quot;image1:ArrayData&quot;</span><span class="p">)</span>
@@ -725,7 +725,7 @@ get the data to a plot.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; <a href="../../copyright.html">Copyright</a> 1996-2022, NIAC, https://www.nexusformat.org.
+        &#169; <a href="../../copyright.html">Copyright</a> 1996-2023, NIAC, https://www.nexusformat.org.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>

@@ -366,29 +366,29 @@ The following is an example of such a file for
 the simple NeXus file shown above.</p>
 <div class="compound">
 <p class="rubric" id="fig-verysimple-nxdl-xml">A very simple NeXus Definition Language (NXDL) file</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">&lt;?xml version=&quot;1.0&quot; ?&gt;</span> 
-<span class="linenos"> 2</span><span class="nt">&lt;definition</span> 
-<span class="linenos"> 3</span>  <span class="na">xmlns=</span><span class="s">&quot;http://definition.nexusformat.org/nxdl/3.1&quot;</span> 
-<span class="linenos"> 4</span>  <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-<span class="linenos"> 5</span>  <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://definition.nexusformat.org/nxdl/3.1 ../nxdl.xsd&quot;</span>
-<span class="linenos"> 6</span>  <span class="na">category=</span><span class="s">&quot;base&quot;</span>
-<span class="linenos"> 7</span>  <span class="na">name=</span><span class="s">&quot;verysimple&quot;</span>
-<span class="linenos"> 8</span>  <span class="na">version=</span><span class="s">&quot;1.0&quot;</span>
-<span class="linenos"> 9</span>  <span class="na">type=</span><span class="s">&quot;group&quot;</span> <span class="na">extends=</span><span class="s">&quot;NXobject&quot;</span><span class="nt">&gt;</span>
-<span class="linenos">10</span>  
-<span class="linenos">11</span>  <span class="nt">&lt;doc&gt;</span>
-<span class="linenos">12</span>    A very simple NeXus NXDL file
-<span class="linenos">13</span>  <span class="nt">&lt;/doc&gt;</span>
-<span class="linenos">14</span>  <span class="nt">&lt;group</span> <span class="na">type=</span><span class="s">&quot;NXentry&quot;</span><span class="nt">&gt;</span>
-<span class="linenos">15</span>    <span class="nt">&lt;group</span> <span class="na">type=</span><span class="s">&quot;NXdata&quot;</span><span class="nt">&gt;</span>
-<span class="linenos">16</span>      <span class="nt">&lt;field</span> <span class="na">name=</span><span class="s">&quot;counts&quot;</span> <span class="na">type=</span><span class="s">&quot;NX_INT&quot;</span>  <span class="na">units=</span><span class="s">&quot;NX_UNITLESS&quot;</span><span class="nt">&gt;</span>
-<span class="linenos">17</span>        <span class="nt">&lt;doc&gt;</span>counts recorded by detector<span class="nt">&lt;/doc&gt;</span>
-<span class="linenos">18</span>      <span class="nt">&lt;/field&gt;</span>
-<span class="linenos">19</span>      <span class="nt">&lt;field</span> <span class="na">name=</span><span class="s">&quot;two_theta&quot;</span> <span class="na">type=</span><span class="s">&quot;NX_FLOAT&quot;</span> <span class="na">units=</span><span class="s">&quot;NX_ANGLE&quot;</span><span class="nt">&gt;</span>
-<span class="linenos">20</span>        <span class="nt">&lt;doc&gt;</span>rotation angle of detector arm<span class="nt">&lt;/doc&gt;</span>
-<span class="linenos">21</span>      <span class="nt">&lt;/field&gt;</span>
-<span class="linenos">22</span>    <span class="nt">&lt;/group&gt;</span>
-<span class="linenos">23</span>  <span class="nt">&lt;/group&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">&lt;?xml version=&quot;1.0&quot; ?&gt;</span><span class="w"> </span>
+<span class="linenos"> 2</span><span class="nt">&lt;definition</span><span class="w"> </span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="na">xmlns=</span><span class="s">&quot;http://definition.nexusformat.org/nxdl/3.1&quot;</span><span class="w"> </span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://definition.nexusformat.org/nxdl/3.1 ../nxdl.xsd&quot;</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="na">category=</span><span class="s">&quot;base&quot;</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="na">name=</span><span class="s">&quot;verysimple&quot;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="na">version=</span><span class="s">&quot;1.0&quot;</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="na">type=</span><span class="s">&quot;group&quot;</span><span class="w"> </span><span class="na">extends=</span><span class="s">&quot;NXobject&quot;</span><span class="nt">&gt;</span>
+<span class="linenos">10</span><span class="w">  </span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">&lt;doc&gt;</span>
+<span class="linenos">12</span><span class="w">    </span>A<span class="w"> </span>very<span class="w"> </span>simple<span class="w"> </span>NeXus<span class="w"> </span>NXDL<span class="w"> </span>file
+<span class="linenos">13</span><span class="w">  </span><span class="nt">&lt;/doc&gt;</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;NXentry&quot;</span><span class="nt">&gt;</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">&lt;group</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;NXdata&quot;</span><span class="nt">&gt;</span>
+<span class="linenos">16</span><span class="w">      </span><span class="nt">&lt;field</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;counts&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;NX_INT&quot;</span><span class="w">  </span><span class="na">units=</span><span class="s">&quot;NX_UNITLESS&quot;</span><span class="nt">&gt;</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">&lt;doc&gt;</span>counts<span class="w"> </span>recorded<span class="w"> </span>by<span class="w"> </span>detector<span class="nt">&lt;/doc&gt;</span>
+<span class="linenos">18</span><span class="w">      </span><span class="nt">&lt;/field&gt;</span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">&lt;field</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;two_theta&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;NX_FLOAT&quot;</span><span class="w"> </span><span class="na">units=</span><span class="s">&quot;NX_ANGLE&quot;</span><span class="nt">&gt;</span>
+<span class="linenos">20</span><span class="w">        </span><span class="nt">&lt;doc&gt;</span>rotation<span class="w"> </span>angle<span class="w"> </span>of<span class="w"> </span>detector<span class="w"> </span>arm<span class="nt">&lt;/doc&gt;</span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">&lt;/field&gt;</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">&lt;/group&gt;</span>
+<span class="linenos">23</span><span class="w">  </span><span class="nt">&lt;/group&gt;</span>
 <span class="linenos">24</span><span class="nt">&lt;/definition&gt;</span>
 </pre></div>
 </div>
@@ -419,9 +419,9 @@ called an application-programmer interface or API.</p>
 would contain lines similar to the following:</p>
 <div class="compound">
 <p class="rubric" id="fig-ex-simple-c">Simple example of reading data using the NeXus API</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">NXopendata</span><span class="w"> </span><span class="p">(</span><span class="n">fileID</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;wavelength&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">2</span><span class="n">NXgetdata</span><span class="w"> </span><span class="p">(</span><span class="n">fileID</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">3</span><span class="n">NXclosedata</span><span class="w"> </span><span class="p">(</span><span class="n">fileID</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">NXopendata</span><span class="w"> </span><span class="p">(</span><span class="n">fileID</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;wavelength&quot;</span><span class="p">);</span>
+<span class="linenos">2</span><span class="n">NXgetdata</span><span class="w"> </span><span class="p">(</span><span class="n">fileID</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="p">);</span>
+<span class="linenos">3</span><span class="n">NXclosedata</span><span class="w"> </span><span class="p">(</span><span class="n">fileID</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -571,7 +571,7 @@ NeXus Application Programmer Interface (NAPI) as well as the technical infrastru
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; <a href="copyright.html">Copyright</a> 1996-2022, NIAC, https://www.nexusformat.org.
+        &#169; <a href="copyright.html">Copyright</a> 1996-2023, NIAC, https://www.nexusformat.org.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
