@@ -480,6 +480,8 @@ class Component(Group):
 
     def __flatten_list(self, list_to_flat):
         flat_list = []
+        if list_to_flat and not isinstance(list_to_flat[0], list):
+            return list_to_flat
         for sublist in list_to_flat:
             flat_list += sublist
         return flat_list
