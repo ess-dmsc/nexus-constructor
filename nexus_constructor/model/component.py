@@ -478,6 +478,12 @@ class Component(Group):
             ValueTypes.INT,
         )
 
+    def __flatten_list(self, list_to_flat):
+        flat_list = []
+        for sublist in list_to_flat:
+            flat_list += sublist
+        return flat_list
+
     def _create_transformation_vectors_for_pixel_offsets(
         self,
     ) -> Optional[List[QVector3D]]:
@@ -487,8 +493,14 @@ class Component(Group):
         try:
             units = self.get_field_attribute(X_PIXEL_OFFSET, CommonAttrs.UNITS)
             unit_conversion_factor = calculate_unit_conversion_factor(units, METRES)
-            x_offsets = self.get_field_value(X_PIXEL_OFFSET) * unit_conversion_factor
-            y_offsets = self.get_field_value(Y_PIXEL_OFFSET) * unit_conversion_factor
+            x_offsets = (
+                np.array(self.get_field_value(X_PIXEL_OFFSET)) * unit_conversion_factor
+            )
+            y_offsets = (
+                np.array(self.get_field_value(Y_PIXEL_OFFSET)) * unit_conversion_factor
+            )
+            x_offsets = x_offsets.tolist()
+            y_offsets = y_offsets.tolist()
         except AttributeError:
             logging.info(
                 "In pixel_shape_component expected to find x_pixel_offset and y_pixel_offset datasets"
@@ -500,10 +512,16 @@ class Component(Group):
             z_offsets = np.zeros_like(x_offsets)
         if not isinstance(x_offsets, list):
             x_offsets = x_offsets.flatten()
+        else:
+            x_offsets = self.__flatten_list(x_offsets)
         if not isinstance(y_offsets, list):
             y_offsets = y_offsets.flatten()
+        else:
+            y_offsets = self.__flatten_list(y_offsets)
         if not isinstance(z_offsets, list):
             z_offsets = z_offsets.flatten()
+        else:
+            z_offsets = self.__flatten_list(z_offsets)
         # offsets datasets can be 2D to match dimensionality of detector, so flatten to 1D
         return [QVector3D(x, y, z) for x, y, z in zip(x_offsets, y_offsets, z_offsets)]
 
