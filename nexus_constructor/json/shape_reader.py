@@ -5,6 +5,7 @@ from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
+    GEOMETRY_GROUP_NAME,
     GEOMETRY_NX_CLASS,
     NX_BOX,
     OFF_GEOMETRY_NX_CLASS,
@@ -536,8 +537,10 @@ class ShapeReader:
         Attempts to find and write pixel information to the component.
         :param children: The JSON children list for the component.
         """
+        print(self.shape_info)
         shape_has_pixel_grid = (
             self.shape_info[CommonKeys.NAME] == PIXEL_SHAPE_GROUP_NAME
+            or self.shape_info[CommonKeys.NAME] == GEOMETRY_GROUP_NAME
         )
 
         self._get_detector_number(children, shape_has_pixel_grid)
@@ -572,7 +575,9 @@ class ShapeReader:
                 self.component.set_field_value(
                     DETECTOR_NUMBER, detector_number, detector_number_dtype
                 )
-                if self.shape and isinstance(self.shape, CylindricalGeometry):
+                if self.shape and isinstance(
+                    self.shape, (CylindricalGeometry, BoxGeometry)
+                ):
                     self.shape.detector_number = detector_number
 
     def _handle_mapping(self, children: List[Dict]):
