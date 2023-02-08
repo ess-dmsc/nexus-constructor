@@ -13,7 +13,7 @@ flake8==3.9.1
 isort==5.7.0
 
 # Static type checking.
-mypy==0.812
+mypy
 
 # Testing
 pytest
