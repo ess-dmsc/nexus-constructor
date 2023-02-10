@@ -4,7 +4,6 @@ from PySide6.Qt3DRender import Qt3DRender
 from PySide6.QtCore import QPropertyAnimation
 from PySide6.QtGui import QColor, QFont, QMatrix4x4, QVector3D, QVector4D
 
-from nexus_constructor.instrument_view.axis_colors import AxisColors
 from nexus_constructor.instrument_view.neutron_animation_controller import (
     NeutronAnimationController,
 )
@@ -174,10 +173,9 @@ class Gnomon:
         x_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
         y_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
         z_axis_text = Qt3DExtras.QText2DEntity(self.gnomon_root_entity)
-        self.set_axis_label_text(x_axis_text, "X", AxisColors.X.value)
-        # Pass "green" rather than the Y axis enum value because otherwise the text is too bright
+        self.set_axis_label_text(x_axis_text, "X", QColor("red"))
         self.set_axis_label_text(y_axis_text, "Y", QColor("green"))
-        self.set_axis_label_text(z_axis_text, "Z", AxisColors.Z.value)
+        self.set_axis_label_text(z_axis_text, "Z", QColor("blue"))
         (
             x_label_matrix,
             y_label_matrix,
