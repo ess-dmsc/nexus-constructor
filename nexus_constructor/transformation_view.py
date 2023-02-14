@@ -111,7 +111,7 @@ class EditTransformation(QGroupBox):
 
     def save_offset(self):
         offset_value = self.transformation_frame.offset_box.value()
-        if offset_value:
+        if offset_value is not None:
             self.transformation.attributes.set_attribute_value(
                 CommonAttrs.OFFSET, offset_value
             )
