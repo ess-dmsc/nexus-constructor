@@ -48,7 +48,7 @@ builders = pipeline_builder.createBuilders { container ->
                 cd ${pipeline_builder.project}
                 export LC_ALL=en_US.utf-8
                 export LANG=en_US.utf-8
-                build_env/bin/python -m black .
+                python -m black .
                 git config user.email 'dm-jenkins-integration@esss.se'
                 git config user.name 'cow-bot'
                 git status -s
@@ -66,7 +66,7 @@ builders = pipeline_builder.createBuilders { container ->
     pipeline_builder.stage("${container.key}: Static Analysis (flake8)") {
         container.sh """
         cd ${pipeline_builder.project}
-        python -m flake8 --exclude build_env,definitions,nx-class-documentation
+        python -m flake8 --exclude definitions,nx-class-documentation
         """
     } // stage
 
