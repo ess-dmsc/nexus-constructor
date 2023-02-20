@@ -24,7 +24,6 @@ container_build_nodes = [
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
 
 builders = pipeline_builder.createBuilders { container ->
-
     pipeline_builder.stage("Checkout") {
         dir(pipeline_builder.project) {
             scm_vars = checkout scm
@@ -33,26 +32,20 @@ builders = pipeline_builder.createBuilders { container ->
         container.copyTo(pipeline_builder.project, pipeline_builder.project)
     }  // stage
 
-    pipeline_builder.stage("Create virtualenv") {
+    pipeline_builder.stage("${container.key}: Dependencies") {
         container.sh """
-            cd ${project}
-            python3.6 -m venv build_env
+	    which python
+	    python --version
+	    python -m pip install --user -r ${pipeline_builder.project}/requirements-dev.txt
+	    python -m pip install --user -r ${pipeline_builder.project}/requirements-jenkins.txt
         """
     } // stage
 
-    pipeline_builder.stage("Install requirements") {
-        container.sh """
-            cd ${project}
-            build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements-jenkins.txt
-            """
-    } // stage
-
     if (env.CHANGE_ID) {
-        pipeline_builder.stage("Check formatting") {
+        pipeline_builder.stage("${container.key}: Formatting (black)") {
             try {
                 container.sh """
-                cd ${project}
+                cd ${pipeline_builder.project}
                 export LC_ALL=en_US.utf-8
                 export LANG=en_US.utf-8
                 build_env/bin/python -m black .
@@ -70,17 +63,17 @@ builders = pipeline_builder.createBuilders { container ->
         } // stage
     }
 
-    pipeline_builder.stage("Run Linter") {
+    pipeline_builder.stage("${container.key}: Static Analysis (flake8)") {
         container.sh """
-                cd ${project}
-                build_env/bin/flake8 --exclude build_env,definitions,nx-class-documentation
+                cd ${pipeline_builder.project}
+                python -m flake8 --exclude build_env,definitions,nx-class-documentation
             """
     } // stage
 
    pipeline_builder.stage("Static type check") {
        container.sh """
-               cd ${project}
-               build_env/bin/python -m mypy --ignore-missing-imports ./nexus_constructor
+               cd ${pipeline_builder.project}
+               python -m mypy --ignore-missing-imports ./nexus_constructor
            """
    } // stage
 
@@ -88,8 +81,8 @@ builders = pipeline_builder.createBuilders { container ->
         def testsError = null
         try {
                 container.sh """
-                    cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --ignore=tests/ui_tests
+                    cd ${pipeline_builder.project}
+                    python -m pytest -s ./tests --ignore=build_env --ignore=tests/ui_tests
                 """
             }
             catch(err) {
@@ -104,7 +97,7 @@ builders = pipeline_builder.createBuilders { container ->
         def diffError = false
         pipeline_builder.stage("Verify NeXus HTML") {
             container.sh """
-                python3.6 -m venv nexus_doc_venv
+                python -m venv nexus_doc_venv
                 source nexus_doc_venv/bin/activate
                 pip --proxy ${https_proxy} install --upgrade pip
                 pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
@@ -134,7 +127,7 @@ builders = pipeline_builder.createBuilders { container ->
                 container.sh """
                     export LC_ALL=en_US.utf-8
                     export LANG=en_US.utf-8
-                    cd ${project}
+                    cd ${pipeline_builder.project}
                     rm -rf nx-class-documentation/html
                     cp -r ../nexus_doc/manual/build/html nx-class-documentation/
                     git config user.email 'dm-jenkins-integration@esss.se'
@@ -165,7 +158,9 @@ builders = pipeline_builder.createBuilders { container ->
         }  // if
 
 /*        pipeline_builder.stage('Build Executable'){
-            container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
+            container.sh """
+                cd ${pipeline_builder.project}
+	        pyinstaller --noconfirm nexus-constructor.spec"
         }
 
         pipeline_builder.stage('Archive Executable') {
