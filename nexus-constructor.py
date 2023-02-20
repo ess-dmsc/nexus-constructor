@@ -1,6 +1,5 @@
 """
 Entry script for the nexus constructor application.
-Requires Python 3.6+
 """
 import argparse
 import logging
