@@ -16,6 +16,7 @@ from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
+from nexus_constructor.component_type import make_dictionary_of_class_definitions
 from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
@@ -33,8 +34,7 @@ from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
 from nexus_constructor.widgets import CustomDialog as QDialog
-from tests.test_utils import NX_CLASS_DEFINITIONS
-from tests.ui_tests.ui_test_utils import (
+from ui_tests.ui_test_utils import (
     RED_LINE_EDIT_STYLE_SHEET,
     VALID_CUBE_OFF_FILE,
     VALID_OCTA_OFF_FILE,
@@ -43,11 +43,15 @@ from tests.ui_tests.ui_test_utils import (
     systematic_button_press,
 )
 
+NX_CLASS_DEFINITIONS = make_dictionary_of_class_definitions(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "definitions")
+)[1]
+
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
-WRONG_EXTENSION_FILE_PATH = os.path.join(BASE_PATH, "..", "..", "requirements.txt")
+WRONG_EXTENSION_FILE_PATH = os.path.join(BASE_PATH, "..", "requirements.txt")
 NONEXISTENT_FILE_PATH = "doesntexist.off"
-VALID_CUBE_MESH_FILE_PATH = os.path.join(BASE_PATH, "..", "cube.off")
-VALID_OCTA_MESH_FILE_PATH = os.path.join(BASE_PATH, "..", "octa.off")
+VALID_CUBE_MESH_FILE_PATH = os.path.join(BASE_PATH, "cube.off")
+VALID_OCTA_MESH_FILE_PATH = os.path.join(BASE_PATH, "octa.off")
 
 UNIQUE_COMPONENT_NAME = "AUniqueName"
 NONUNIQUE_COMPONENT_NAME = "sample"

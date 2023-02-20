@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QListWidget
 from nexus_constructor.field_attrs import FieldAttrFrame, FieldAttrsDialog
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
-from tests.ui_tests.ui_test_utils import show_and_close_window
+from ui_tests.ui_test_utils import show_and_close_window
 
 
 def get_attribute_widget(index: int, list_widget: QListWidget) -> FieldAttrFrame:
