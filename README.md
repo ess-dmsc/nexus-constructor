@@ -21,14 +21,14 @@ developed as part of the software suite for the
 [this (open access) paper](https://iopscience.iop.org/article/10.1088/1748-0221/13/10/T10001)
 for more information on the ESS software.
 
-Currently tested on Windows 10, Ubuntu 18.04/19.10 and CentOS 7, it should also work on other Linux distributions.
+The NeXus Constructor should work on MacOS, Linux and Windows; however, none of the current developers use Windows, so occasionally there are issues on Windows - if you find one then please let us know!
 
 ### Installing dependencies
 
 Binary packages for release versions can be downloaded on the [releases page](https://github.com/ess-dmsc/nexus-constructor/releases),
 or to run the latest development version please follow the instructions below.
 
-Python 3.6 or greater is required. https://www.python.org/downloads/
+Python 3.8 or greater is required. https://www.python.org/downloads/
 
 It is **HIGHLY** recommended that a virtual environment is created for running the nexus-constructor.
 
@@ -37,6 +37,7 @@ repository. They can be installed from a terminal by running
 ```
 pip install -r requirements.txt
 ```
+For MacOS Ventura, it is currently necessary to install libomp manually, e.g. via brew, MacPorts, etc.
 
 ### Usage
 
