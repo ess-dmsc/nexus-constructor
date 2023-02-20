@@ -34,10 +34,10 @@ builders = pipeline_builder.createBuilders { container ->
 
     pipeline_builder.stage("${container.key}: Dependencies") {
         container.sh """
-	    which python
-	    python --version
-	    python -m pip install --user -r ${pipeline_builder.project}/requirements-dev.txt
-	    python -m pip install --user -r ${pipeline_builder.project}/requirements-jenkins.txt
+        which python
+        python --version
+        python -m pip install --user -r ${pipeline_builder.project}/requirements-dev.txt
+        python -m pip install --user -r ${pipeline_builder.project}/requirements-jenkins.txt
         """
     } // stage
 
@@ -152,26 +152,10 @@ builders = pipeline_builder.createBuilders { container ->
                         '''
                      }  // withEnv
                 }  // withCredentials
-
                 error 'Updating NeXus HTML documentation'
             }  // stage
         }  // if
-
-/*        pipeline_builder.stage('Build Executable'){
-            container.sh """
-                cd ${pipeline_builder.project}
-	        pyinstaller --noconfirm nexus-constructor.spec"
-        }
-
-        pipeline_builder.stage('Archive Executable') {
-            def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-            container.copyFrom("${project}/dist/", './build')
-            sh "tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
-            archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
-        }*/ // stage
     } // if
-
-
 }
 
 def get_macos_pipeline() {
@@ -179,7 +163,7 @@ def get_macos_pipeline() {
         node('macos') {
             cleanWs()
             dir("${project}") {
-                stage('Checkout') {
+                stage('MacOS: Checkout') {
                     try {
                         checkout scm
                     } catch (e) {
@@ -195,10 +179,16 @@ def get_macos_pipeline() {
                         pip --proxy=${https_proxy} install -r requirements-dev.txt
                     """
                 } // stage
-                stage('Run tests') {
+                stage('MacOS: Run non-ui tests') {
                     sh """
                         source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
                         python -m pytest tests -s
+                    """
+                } // stage
+                stage('MacOS: Run ui tests') {
+                    sh """
+                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                        python -m pytest ui_tests -s
                     """
                 } // stage
             } // dir
