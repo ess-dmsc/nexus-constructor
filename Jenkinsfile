@@ -77,12 +77,12 @@ builders = pipeline_builder.createBuilders { container ->
 //           """
 //   } // stage
 
-    /* pipeline_builder.stage("Run tests") {
+    pipeline_builder.stage("${container.key}: Run non-ui tests") {
         def testsError = null
         try {
                 container.sh """
                     cd ${pipeline_builder.project}
-                    python -m pytest -s ./tests --ignore=build_env --ignore=tests/ui_tests
+                    python -m pytest tests -s
                 """
             }
             catch(err) {
@@ -90,7 +90,7 @@ builders = pipeline_builder.createBuilders { container ->
                 currentBuild.result = 'FAILURE'
             }
 
-    }*/ // stage
+    } // stage
     
     // Only run in pull request builds
     if (env.CHANGE_ID) {
@@ -198,7 +198,7 @@ def get_macos_pipeline() {
                 stage('Run tests') {
                     sh """
                         source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                        python -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/
+                        python -m pytest tests -s
                     """
                 } // stage
             } // dir
