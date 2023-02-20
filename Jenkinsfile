@@ -65,30 +65,30 @@ builders = pipeline_builder.createBuilders { container ->
 
     pipeline_builder.stage("${container.key}: Static Analysis (flake8)") {
         container.sh """
-                cd ${pipeline_builder.project}
-                python -m flake8 --exclude build_env,definitions,nx-class-documentation
-            """
+        cd ${pipeline_builder.project}
+        python -m flake8 --exclude build_env,definitions,nx-class-documentation
+        """
     } // stage
 
 //   pipeline_builder.stage("Static type check") {
 //       container.sh """
-//               cd ${pipeline_builder.project}
-//               python -m mypy --ignore-missing-imports ./nexus_constructor
-//           """
+//       cd ${pipeline_builder.project}
+//       python -m mypy --ignore-missing-imports ./nexus_constructor
+//       """
 //   } // stage
 
     pipeline_builder.stage("${container.key}: Run non-ui tests") {
         def testsError = null
         try {
-                container.sh """
-                    cd ${pipeline_builder.project}
-                    python -m pytest tests -s
-                """
-            }
-            catch(err) {
-                testsError = err
-                currentBuild.result = 'FAILURE'
-            }
+            container.sh """
+            cd ${pipeline_builder.project}
+            python -m pytest tests -s
+            """
+        }
+        catch(err) {
+            testsError = err
+            currentBuild.result = 'FAILURE'
+        }
 
     } // stage
     
@@ -97,24 +97,24 @@ builders = pipeline_builder.createBuilders { container ->
         def diffError = false
         pipeline_builder.stage("Verify NeXus HTML") {
             container.sh """
-                python -m venv nexus_doc_venv
-                source nexus_doc_venv/bin/activate
-                pip --proxy ${https_proxy} install --upgrade pip
-                pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
+            python -m venv nexus_doc_venv
+            source nexus_doc_venv/bin/activate
+            pip --proxy ${https_proxy} install --upgrade pip
+            pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
     
-                mkdir nexus_doc
-                cd nexus_doc
-                export SOURCE_DIR=../${project}/definitions
-                python ../${project}/definitions/utils/build_preparation.py ../${project}/definitions
-                make
+            mkdir nexus_doc
+            cd nexus_doc
+            export SOURCE_DIR=../${project}/definitions
+            python ../${project}/definitions/utils/build_preparation.py ../${project}/definitions
+            make
             """
     
             try {
                 container.sh """
-                    diff \
-                        --recursive \
-                        ${project}/nx-class-documentation/html \
-                        nexus_doc/manual/build/html
+                diff \
+                    --recursive \
+                    ${project}/nx-class-documentation/html \
+                    nexus_doc/manual/build/html
                 """
             } catch (e) {
                 echo 'Caught exception after diff error, setting variable'
@@ -125,16 +125,16 @@ builders = pipeline_builder.createBuilders { container ->
         if (diffError) {
             pipeline_builder.stage("Update NeXus HTML") {
                 container.sh """
-                    export LC_ALL=en_US.utf-8
-                    export LANG=en_US.utf-8
-                    cd ${pipeline_builder.project}
-                    rm -rf nx-class-documentation/html
-                    cp -r ../nexus_doc/manual/build/html nx-class-documentation/
-                    git config user.email 'dm-jenkins-integration@esss.se'
-                    git config user.name 'cow-bot'
-                    git status --ignored
-                    git add --force nx-class-documentation
-                    git commit -m 'Update NeXus HTML documentation'
+                export LC_ALL=en_US.utf-8
+                export LANG=en_US.utf-8
+                cd ${pipeline_builder.project}
+                rm -rf nx-class-documentation/html
+                cp -r ../nexus_doc/manual/build/html nx-class-documentation/
+                git config user.email 'dm-jenkins-integration@esss.se'
+                git config user.name 'cow-bot'
+                git status --ignored
+                git add --force nx-class-documentation
+                git commit -m 'Update NeXus HTML documentation'
                 """
             
                 // Push any changes resulting from formatting
@@ -146,10 +146,10 @@ builders = pipeline_builder.createBuilders { container ->
                     )
                 ]) {
                     withEnv(["PROJECT=${pipeline_builder.project}"]) {
-                        container.sh '''
-                            cd $PROJECT
-                            git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/$PROJECT.git HEAD:$CHANGE_BRANCH
-                        '''
+                        container.sh """
+                        cd $PROJECT
+                        git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/$PROJECT.git HEAD:$CHANGE_BRANCH
+                        """
                      }  // withEnv
                 }  // withCredentials
                 error 'Updating NeXus HTML documentation'
@@ -172,23 +172,23 @@ def get_macos_pipeline() {
                 } // stage
                 stage('Setup') {
                     sh """
-                        mkdir -p ~/virtualenvs
-                        /opt/local/bin/python3.6 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
-                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                        pip --proxy=${https_proxy} install --upgrade pip
-                        pip --proxy=${https_proxy} install -r requirements-dev.txt
+                    mkdir -p ~/virtualenvs
+                    /opt/local/bin/python3.6 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
+                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                    pip --proxy=${https_proxy} install --upgrade pip
+                    pip --proxy=${https_proxy} install -r requirements-dev.txt
                     """
                 } // stage
                 stage('MacOS: Run non-ui tests') {
                     sh """
-                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                        python -m pytest tests -s
+                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                    python -m pytest tests -s
                     """
                 } // stage
                 stage('MacOS: Run ui tests') {
                     sh """
-                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                        python -m pytest ui_tests -s
+                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
+                    python -m pytest ui_tests -s
                     """
                 } // stage
             } // dir
