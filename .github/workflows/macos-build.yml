@@ -28,6 +28,9 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8 --exclude definitions,nx-class-documentation
-    - name: Test with pytest
+    - name: Run non-ui tests
       run: |
         pytest tests
+    - name: Run ui tests
+      run: |
+        pytest ui_tests
