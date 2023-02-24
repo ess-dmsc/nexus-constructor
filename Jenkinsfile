@@ -20,11 +20,12 @@ container_build_nodes = [
   'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11')
 ]
 
+// JENKINS IS ONLY USED TO AUTOMATE THE FORMATTING AND UPDATING THE NEXUS DOCS
+// THE ACTUALLY "BUILDING" IS DONE VIA GITHUB ACTIONS
 
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
 
 builders = pipeline_builder.createBuilders { container ->
-
     pipeline_builder.stage("Checkout") {
         dir(pipeline_builder.project) {
             scm_vars = checkout scm
@@ -33,29 +34,23 @@ builders = pipeline_builder.createBuilders { container ->
         container.copyTo(pipeline_builder.project, pipeline_builder.project)
     }  // stage
 
-    pipeline_builder.stage("Create virtualenv") {
+    pipeline_builder.stage("${container.key}: Dependencies") {
         container.sh """
-            cd ${project}
-            python3.6 -m venv build_env
+        which python
+        python --version
+        python -m pip install --user -r ${pipeline_builder.project}/requirements-dev.txt
+        python -m pip install --user -r ${pipeline_builder.project}/requirements-jenkins.txt
         """
     } // stage
 
-    pipeline_builder.stage("Install requirements") {
-        container.sh """
-            cd ${project}
-            build_env/bin/pip --proxy ${https_proxy} install --upgrade pip
-            build_env/bin/pip --proxy ${https_proxy} install -r requirements-jenkins.txt
-            """
-    } // stage
-
     if (env.CHANGE_ID) {
-        pipeline_builder.stage("Check formatting") {
+        pipeline_builder.stage("${container.key}: Formatting (black)") {
             try {
                 container.sh """
-                cd ${project}
+                cd ${pipeline_builder.project}
                 export LC_ALL=en_US.utf-8
                 export LANG=en_US.utf-8
-                build_env/bin/python -m black .
+                python -m black .
                 git config user.email 'dm-jenkins-integration@esss.se'
                 git config user.name 'cow-bot'
                 git status -s
@@ -69,59 +64,30 @@ builders = pipeline_builder.createBuilders { container ->
             }
         } // stage
     }
-
-    pipeline_builder.stage("Run Linter") {
-        container.sh """
-                cd ${project}
-                build_env/bin/flake8 --exclude build_env,definitions,nx-class-documentation
-            """
-    } // stage
-
-   pipeline_builder.stage("Static type check") {
-       container.sh """
-               cd ${project}
-               build_env/bin/python -m mypy --ignore-missing-imports ./nexus_constructor
-           """
-   } // stage
-
-    /* pipeline_builder.stage("Run tests") {
-        def testsError = null
-        try {
-                container.sh """
-                    cd ${project}
-                    build_env/bin/python -m pytest -s ./tests --ignore=build_env --ignore=tests/ui_tests
-                """
-            }
-            catch(err) {
-                testsError = err
-                currentBuild.result = 'FAILURE'
-            }
-
-    }*/ // stage
     
     // Only run in pull request builds
     if (env.CHANGE_ID) {
         def diffError = false
         pipeline_builder.stage("Verify NeXus HTML") {
             container.sh """
-                python3.6 -m venv nexus_doc_venv
-                source nexus_doc_venv/bin/activate
-                pip --proxy ${https_proxy} install --upgrade pip
-                pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
+            python -m venv nexus_doc_venv
+            source nexus_doc_venv/bin/activate
+            pip --proxy ${https_proxy} install --upgrade pip
+            pip --proxy ${https_proxy} install -r ${project}/definitions/requirements.txt
     
-                mkdir nexus_doc
-                cd nexus_doc
-                export SOURCE_DIR=../${project}/definitions
-                python ../${project}/definitions/utils/build_preparation.py ../${project}/definitions
-                make
+            mkdir nexus_doc
+            cd nexus_doc
+            export SOURCE_DIR=../${project}/definitions
+            python ../${project}/definitions/utils/build_preparation.py ../${project}/definitions
+            make
             """
     
             try {
                 container.sh """
-                    diff \
-                        --recursive \
-                        ${project}/nx-class-documentation/html \
-                        nexus_doc/manual/build/html
+                diff \
+                    --recursive \
+                    ${project}/nx-class-documentation/html \
+                    nexus_doc/manual/build/html
                 """
             } catch (e) {
                 echo 'Caught exception after diff error, setting variable'
@@ -132,16 +98,16 @@ builders = pipeline_builder.createBuilders { container ->
         if (diffError) {
             pipeline_builder.stage("Update NeXus HTML") {
                 container.sh """
-                    export LC_ALL=en_US.utf-8
-                    export LANG=en_US.utf-8
-                    cd ${project}
-                    rm -rf nx-class-documentation/html
-                    cp -r ../nexus_doc/manual/build/html nx-class-documentation/
-                    git config user.email 'dm-jenkins-integration@esss.se'
-                    git config user.name 'cow-bot'
-                    git status --ignored
-                    git add --force nx-class-documentation
-                    git commit -m 'Update NeXus HTML documentation'
+                export LC_ALL=en_US.utf-8
+                export LANG=en_US.utf-8
+                cd ${pipeline_builder.project}
+                rm -rf nx-class-documentation/html
+                cp -r ../nexus_doc/manual/build/html nx-class-documentation/
+                git config user.email 'dm-jenkins-integration@esss.se'
+                git config user.name 'cow-bot'
+                git status --ignored
+                git add --ignore-removal --force nx-class-documentation
+                git commit -m 'Update NeXus HTML documentation'
                 """
             
                 // Push any changes resulting from formatting
@@ -153,63 +119,17 @@ builders = pipeline_builder.createBuilders { container ->
                     )
                 ]) {
                     withEnv(["PROJECT=${pipeline_builder.project}"]) {
-                        container.sh '''
-                            cd $PROJECT
-                            git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/$PROJECT.git HEAD:$CHANGE_BRANCH
-                        '''
+                        container.sh """
+                        cd ${pipeline_builder.project}
+                        git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/${pipeline_builder.project}.git HEAD:$CHANGE_BRANCH
+                        """
                      }  // withEnv
                 }  // withCredentials
-
                 error 'Updating NeXus HTML documentation'
             }  // stage
         }  // if
-
-/*        pipeline_builder.stage('Build Executable'){
-            container.sh "cd ${project} && build_env/bin/pyinstaller --noconfirm nexus-constructor.spec"
-        }
-
-        pipeline_builder.stage('Archive Executable') {
-            def git_commit_short = scm_vars.GIT_COMMIT.take(7)
-            container.copyFrom("${project}/dist/", './build')
-            sh "tar czvf nexus-constructor_linux_${git_commit_short}.tar.gz ./build "
-            archiveArtifacts artifacts: 'nexus-constructor*.tar.gz', fingerprint: true
-        }*/ // stage
     } // if
-
-
 }
-
-def get_macos_pipeline() {
-    return {
-        node('macos') {
-            cleanWs()
-            dir("${project}") {
-                stage('Checkout') {
-                    try {
-                        checkout scm
-                    } catch (e) {
-                        failure_function(e, 'MacOSX / Checkout failed')
-                    } // catch
-                } // stage
-                stage('Setup') {
-                    sh """
-                        mkdir -p ~/virtualenvs
-                        /opt/local/bin/python3.6 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
-                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                        pip --proxy=${https_proxy} install --upgrade pip
-                        pip --proxy=${https_proxy} install -r requirements-dev.txt
-                    """
-                } // stage
-                stage('Run tests') {
-                    sh """
-                        source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                        python -m pytest . -s --ignore=definitions/ --ignore=tests/ui_tests/
-                    """
-                } // stage
-            } // dir
-        } // node
-    } // return
-} // def
 
 node("docker") {
     cleanWs()
@@ -224,6 +144,5 @@ node("docker") {
         }
     }
 
-    builders['macOS'] = get_macos_pipeline()
     parallel builders
 }

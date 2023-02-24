@@ -28,7 +28,7 @@ from nexus_constructor.pixel_options import (
     PixelOptions,
     data_is_an_array_with_more_than_one_element,
 )
-from tests.ui_tests.ui_test_utils import (
+from ui_tests.ui_test_utils import (
     CORRECT_CUBE_FACES,
     CORRECT_OCTA_FACES,
     VALID_CUBE_OFF_FILE,
