@@ -30,4 +30,4 @@ jobs:
         flake8 --exclude definitions,nx-class-documentation
     - name: Test with pytest
       run: |
-        pytest
+        pytest tests
