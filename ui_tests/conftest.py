@@ -23,7 +23,8 @@ def model() -> Model:
 @pytest.fixture(scope="function")
 def mock_pixel_options():
     """
-    Creates a mock of the PixelOptions widget. Used for some basic testing of AddComponentDialog behaviour that requires
+    Creates a mock of the PixelOptions widget.
+    Used for some basic testing of AddComponentDialog behaviour that requires
     interaction with the PixelOptions. Testing of the PixelOptions behaviour takes place in a dedicated file.
     """
     pixel_options = Mock(spec=PixelOptions)
