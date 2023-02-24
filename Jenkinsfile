@@ -20,6 +20,8 @@ container_build_nodes = [
   'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11')
 ]
 
+// JENKINS IS ONLY USED TO AUTOMATE THE FORMATTING AND UPDATING THE NEXUS DOCS
+// THE ACTUALLY "BUILDING" IS DONE VIA GITHUB ACTIONS
 
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
 
@@ -62,35 +64,6 @@ builders = pipeline_builder.createBuilders { container ->
             }
         } // stage
     }
-
-    pipeline_builder.stage("${container.key}: Static Analysis (flake8)") {
-        container.sh """
-        cd ${pipeline_builder.project}
-        python -m flake8 --exclude definitions,nx-class-documentation
-        """
-    } // stage
-
-//   pipeline_builder.stage("Static type check") {
-//       container.sh """
-//       cd ${pipeline_builder.project}
-//       python -m mypy --ignore-missing-imports ./nexus_constructor
-//       """
-//   } // stage
-
-    pipeline_builder.stage("${container.key}: Run non-ui tests") {
-        def testsError = null
-        try {
-            container.sh """
-            cd ${pipeline_builder.project}
-            python -m pytest tests -s
-            """
-        }
-        catch(err) {
-            testsError = err
-            currentBuild.result = 'FAILURE'
-        }
-
-    } // stage
     
     // Only run in pull request builds
     if (env.CHANGE_ID) {
@@ -158,44 +131,6 @@ builders = pipeline_builder.createBuilders { container ->
     } // if
 }
 
-def get_macos_pipeline() {
-    return {
-        node('macos') {
-            cleanWs()
-            dir("${project}") {
-                stage('MacOS: Checkout') {
-                    try {
-                        checkout scm
-                    } catch (e) {
-                        failure_function(e, 'MacOSX / Checkout failed')
-                    } // catch
-                } // stage
-                stage('Setup') {
-                    sh """
-                    mkdir -p ~/virtualenvs
-                    /opt/local/bin/python3.6 -m venv ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}
-                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                    pip --proxy=${https_proxy} install --upgrade pip
-                    pip --proxy=${https_proxy} install -r requirements-dev.txt
-                    """
-                } // stage
-                stage('MacOS: Run non-ui tests') {
-                    sh """
-                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                    python -m pytest tests -s
-                    """
-                } // stage
-                stage('MacOS: Run ui tests') {
-                    sh """
-                    source ~/virtualenvs/${pipeline_builder.project}-${pipeline_builder.branch}/bin/activate
-                    python -m pytest ui_tests -s
-                    """
-                } // stage
-            } // dir
-        } // node
-    } // return
-} // def
-
 node("docker") {
     cleanWs()
 
@@ -209,6 +144,5 @@ node("docker") {
         }
     }
 
-    builders['macOS'] = get_macos_pipeline()
     parallel builders
 }
