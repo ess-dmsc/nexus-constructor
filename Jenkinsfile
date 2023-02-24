@@ -120,8 +120,8 @@ builders = pipeline_builder.createBuilders { container ->
                 ]) {
                     withEnv(["PROJECT=${pipeline_builder.project}"]) {
                         container.sh """
-                        cd $PROJECT
-                        git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/$PROJECT.git HEAD:$CHANGE_BRANCH
+                        cd ${pipeline_builder.project}
+                        git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/${pipeline_builder.project}.git HEAD:$CHANGE_BRANCH
                         """
                      }  // withEnv
                 }  // withCredentials
