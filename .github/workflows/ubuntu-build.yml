@@ -23,7 +23,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt install libgl1-mesa-glx
+        sudo apt install libegl-dev
         python -m pip install --upgrade pip
         pip install -r requirements-dev.txt
     - name: Lint with flake8
