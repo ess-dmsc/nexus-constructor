@@ -282,9 +282,6 @@ class StreamFieldsWidget(QDialog):
         self.type_combo.addItems(F142_TYPES)
         self.type_combo.setCurrentText("double")
 
-        self.value_units_edit = QLineEdit()
-        self.value_units_label = QLabel("Value Units:")
-
         self.show_advanced_options_button = QPushButton(
             text="Show/hide advanced options"
         )
@@ -317,11 +314,6 @@ class StreamFieldsWidget(QDialog):
 
         self.layout().addWidget(self.source_label, 2, 0)
         self.layout().addWidget(self.source_line_edit, 2, 1)
-
-        self.layout().addWidget(self.value_units_label, 3, 0)
-        self.layout().addWidget(self.value_units_edit, 3, 1)
-        self.value_units_label.setVisible(False)
-        self.value_units_edit.setVisible(False)
 
         self.layout().addWidget(self.type_label, 4, 0)
         self.layout().addWidget(self.type_combo, 4, 1)
@@ -488,13 +480,9 @@ class StreamFieldsWidget(QDialog):
         self.hs01_advanced_dialog.setVisible(False)
         self.show_advanced_options_button.setVisible(False)
         self.show_advanced_options_button.setChecked(False)
-        self.value_units_label.setVisible(False)
-        self.value_units_edit.setVisible(False)
         self.type_combo.clear()
         self._show_array_size_table(False)
         if schema in [WriterModules.F142.value, WriterModules.F144.value]:
-            self.value_units_label.setVisible(True)
-            self.value_units_edit.setVisible(True)
             self._set_edits_visible(True, True)
             self.show_advanced_options_button.setVisible(True)
             self.f142_advanced_group_box.setVisible(False)
@@ -548,7 +536,7 @@ class StreamFieldsWidget(QDialog):
         else:
             self.source_line_edit.setPlaceholderText("")
 
-    def get_stream_module(self, parent) -> StreamModule:
+    def get_stream_module(self, parent, value_units=None) -> StreamModule:
         """
         Create the stream module
         :return: The created stream module
@@ -560,7 +548,6 @@ class StreamFieldsWidget(QDialog):
         type = self.type_combo.currentText()
         current_schema = self.schema_combo.currentText()
         if current_schema == WriterModules.F142.value:
-            value_units = self.value_units_edit.text()
             array_size = self.array_size_spinbox.value()
             stream = F142Stream(
                 parent_node=parent,
@@ -575,7 +562,6 @@ class StreamFieldsWidget(QDialog):
             if self.advanced_options_enabled:
                 self.record_advanced_f142_values(stream)
         elif current_schema == WriterModules.F144.value:
-            value_units = self.value_units_edit.text()
             array_size = self.array_size_spinbox.value()
             stream = F144Stream(
                 parent_node=parent,
@@ -691,8 +677,6 @@ class StreamFieldsWidget(QDialog):
         else:
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
-        if field.value_units is not None:
-            self.value_units_edit.setText(field.value_units)
 
         if check_if_advanced_options_should_be_enabled(
             [field.chunk_size, field.cue_interval]

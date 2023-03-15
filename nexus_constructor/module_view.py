@@ -132,6 +132,8 @@ class ModuleViewEditable(QGroupBox):
             StreamModules.F144.value,
         ]:
             self.field_widget.streams_widget.record_advanced_f142_values(self.module)
+            # copy the units also as a config parameter to the f14x module
+            self.module.value_units = self.field_widget.units
         elif self.module.writer_module in [
             StreamModules.EV42.value,
             StreamModules.EV44.value,

@@ -25,7 +25,12 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.module import (
+    Dataset,
+    FileWriterModule,
+    Link,
+    StreamModule,
+)
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -352,7 +357,9 @@ class FieldWidget(QFrame):
                 values=array,
             )
         elif self.field_type == FieldType.kafka_stream:
-            return_object = self.streams_widget.get_stream_module(self._node_parent)
+            return_object = self.streams_widget.get_stream_module(
+                self._node_parent, value_units=self.units
+            )
         elif self.field_type == FieldType.link:
             return_object = Link(
                 parent_node=self._node_parent,
@@ -535,7 +542,7 @@ class FieldWidget(QFrame):
         elif self.field_type == FieldType.kafka_stream:
             if self.streams_widget:
                 self.old_streams_settings = self.streams_widget.get_stream_module(
-                    self._node_parent
+                    self._node_parent, value_units=self.units
                 )
             self.edit_dialog.setLayout(QFormLayout())
             self.edit_dialog.layout().addWidget(self.streams_widget)
