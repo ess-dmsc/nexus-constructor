@@ -2408,6 +2408,34 @@ def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f144_and_type_
     assert streams_widget.array_size_spinbox.isVisible()
 
 
+def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f144_WHEN_units_modified_in_FieldWidget_THEN_correct_value_units_in_nexus_file(
+    qtbot, add_component_dialog
+):
+    qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
+    field = add_component_dialog.fieldsListWidget.itemWidget(
+        add_component_dialog.fieldsListWidget.item(0)
+    )
+    name = "test"
+    field.field_name_edit.setText(name)
+    field.field_type_combo.setCurrentText(FieldType.kafka_stream.value)
+    field.field_type_combo.currentTextChanged.emit(field.field_type_combo.currentText())
+    qtbot.mouseClick(field.edit_button, Qt.LeftButton)
+    streams_widget = field.streams_widget
+    streams_widget.schema_combo.setCurrentText("f144")
+    streams_widget.schema_combo.currentTextChanged.emit(
+        streams_widget.schema_combo.currentText()
+    )
+    streams_widget.topic_line_edit.setText("topic")
+    streams_widget.source_line_edit.setText("source")
+    qtbot.mouseClick(streams_widget.ok_button, Qt.LeftButton)
+    qtbot.mouseClick(add_component_dialog.ok_button, Qt.LeftButton)
+
+    units = "ns"
+    assert not field.value.value_units
+    field.units_line_edit.setText(units)
+    assert field.value.value_units == units
+
+
 def test_UI_GIVEN_field_widget_with_stream_type_and_schema_set_to_f142_THEN_stream_dialog_shown_with_array_size_option_and_correct_value_in_nexus_file(
     qtbot, add_component_dialog
 ):
