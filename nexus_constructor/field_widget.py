@@ -292,6 +292,12 @@ class FieldWidget(QFrame):
         self.streams_widget.schema_combo.currentTextChanged.connect(
             self.streams_widget._schema_type_changed
         )
+        self.units_line_edit.setReadOnly(True)
+        self.units_line_edit.setStyleSheet("""
+            QLineEdit {
+                background: LightGray;
+            }
+        """)
 
     def _open_edit_dialog_if_stream(self):
         if self.field_type == FieldType.kafka_stream and self.isVisible():
