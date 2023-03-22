@@ -23,7 +23,6 @@ def test_component_set_description_correctly_sets_description():
 
 
 def test_component_set_field_with_numpy_array_correctly_sets_field_value():
-
     comp = Component("comp4")
     data = [[1], [2]]
     dtype = ValueTypes.INT

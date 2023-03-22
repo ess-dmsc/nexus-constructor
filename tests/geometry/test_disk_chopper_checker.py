@@ -92,7 +92,6 @@ def fields_dict(
     radius_dataset,
     slit_height_dataset,
 ):
-
     return {
         SLITS_NAME: slits_dataset,
         SLIT_EDGES_NAME: slit_edges_dataset,
@@ -377,7 +376,6 @@ def test_GIVEN_nothing_WHEN_calling_get_chopper_details_THEN_expected_chopper_de
 def test_chopper_checker_GIVEN_different_ways_of_writing_radians_WHEN_creating_chopper_details_THEN_slit_edges_array_has_expected_values(
     chopper_checker, slit_edges_dataset, units_attribute
 ):
-
     slit_edges_dataset.value = create_dataset(
         SLIT_EDGES_NAME, ValueTypes.FLOAT, RADIANS_EDGES_ARR
     )
@@ -406,7 +404,6 @@ def test_GIVEN_failed_conversion_WHEN_validating_chopper_THEN_data_can_be_conver
 def test_GIVEN_units_arent_recognised_by_pint_WHEN_validating_units_THEN_units_are_valid_returns_false(
     units_dict, field
 ):
-
     units_dict[field] = "burger"
     assert not _units_are_valid(units_dict)
 
@@ -415,7 +412,6 @@ def test_GIVEN_units_arent_recognised_by_pint_WHEN_validating_units_THEN_units_a
 def test_GIVEN_units_have_wrong_dimensionality_WHEN_validating_units_THEN_units_are_valid_returns_false(
     units_dict, field
 ):
-
     units_dict[field] = "nanoseconds"
     assert not _units_are_valid(units_dict)
 
@@ -424,7 +420,6 @@ def test_GIVEN_units_have_wrong_dimensionality_WHEN_validating_units_THEN_units_
 def test_GIVEN_units_have_wrong_magnitude_WHEN_validating_units_THEN_units_are_valid_returns_false(
     units_dict, field
 ):
-
     units_dict[field] = "2 " + units_dict[field]
     assert not _units_are_valid(units_dict)
 
@@ -435,7 +430,6 @@ def test_GIVEN_units_have_wrong_magnitude_WHEN_validating_units_THEN_units_are_v
 def test_GIVEN_fields_have_wrong_type_WHEN_validating_fields_THEN_data_has_correct_type_returns_false(
     chopper_checker, field
 ):
-
     chopper_checker.fields_dict[field].type = ValueTypes.STRING
     assert not chopper_checker._data_has_correct_type()
 
@@ -444,7 +438,6 @@ def test_GIVEN_fields_have_wrong_type_WHEN_validating_fields_THEN_data_has_corre
 def test_GIVEN_missing_units_WHEN_validating_chopper_THEN_required_fields_present_returns_false(
     chopper_checker, field
 ):
-
     chopper_checker.fields_dict[field].attributes.set_attribute_value(
         CommonAttrs.UNITS, ""
     )
@@ -467,7 +460,6 @@ def test_GIVEN_qlistwidget_WHEN_initialising_chopper_checker_THEN_fields_dict_co
 def test_GIVEN_units_input_WHEN_checking_required_fields_are_present_THEN_units_dict_contents_matches_widgets(
     chopper_checker, radius_dataset, slit_height_dataset, slit_edges_dataset
 ):
-
     chopper_checker.required_fields_present()
 
     assert chopper_checker.units_dict[

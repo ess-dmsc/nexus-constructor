@@ -7,7 +7,6 @@ from nexus_constructor.instrument_view.neutron_animation_controller import (
 
 
 def test_GIVEN_target_WHEN_calling_set_target_THEN_target_changed_to_new_value():
-
     mock_target = Mock()
 
     neutron_animation_controller = NeutronAnimationController(0, 0, None)
@@ -17,7 +16,6 @@ def test_GIVEN_target_WHEN_calling_set_target_THEN_target_changed_to_new_value()
 
 
 def test_GIVEN_nothing_WHEN_calling_get_target_THEN_target_returned():
-
     mock_target = Mock()
 
     neutron_animation_controller = NeutronAnimationController(0, 0, None)
@@ -27,7 +25,6 @@ def test_GIVEN_nothing_WHEN_calling_get_target_THEN_target_returned():
 
 
 def test_GIVEN_distance_WHEN_calling_set_distance_THEN_distance_changed_to_new_value():
-
     new_distance = 6
 
     neutron_animation_controller = NeutronAnimationController(0, 0, None)
@@ -37,7 +34,6 @@ def test_GIVEN_distance_WHEN_calling_set_distance_THEN_distance_changed_to_new_v
 
 
 def test_GIVEN_distance_WHEN_calling_set_distance_THEN_update_matrix_is_called():
-
     new_distance = 6
 
     neutron_animation_controller = NeutronAnimationController(0, 0, None)
@@ -48,7 +44,6 @@ def test_GIVEN_distance_WHEN_calling_set_distance_THEN_update_matrix_is_called()
 
 
 def test_GIVEN_distance_WHEN_calling_set_distance_THEN_distance_changed_signal_emitted():
-
     new_distance = 6
 
     neutron_animation_controller = NeutronAnimationController(0, 0, None)
@@ -59,7 +54,6 @@ def test_GIVEN_distance_WHEN_calling_set_distance_THEN_distance_changed_signal_e
 
 
 def test_GIVEN_nothing_WHEN_calling_get_distance_THEN_distance_returned():
-
     new_distance = 6
 
     neutron_animation_controller = NeutronAnimationController(0, 0, None)
@@ -69,7 +63,6 @@ def test_GIVEN_nothing_WHEN_calling_get_distance_THEN_distance_returned():
 
 
 def test_GIVEN_offset_and_distance_WHEN_calling_update_matrix_THEN_correct_matrix_created():
-
     x_offset = 2
     y_offset = 2
     distance = 2
@@ -83,7 +76,6 @@ def test_GIVEN_offset_and_distance_WHEN_calling_update_matrix_THEN_correct_matri
 
 
 def test_GIVEN_target_WHEN_calling_update_matrix_THEN_set_matrix_called():
-
     mock_target = Mock()
     mock_target.setMatrix = Mock()
 

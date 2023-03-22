@@ -252,35 +252,30 @@ def inspect_signal(result, expected):
 
 
 def test_GIVEN_valid_name_units_and_file_WHEN_using_ok_validator_THEN_true_signal_is_emitted():
-
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
     validator.validate_ok()
 
 
 def test_GIVEN_invalid_name_WHEN_using_ok_validator_THEN_false_signal_is_emitted():
-
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
     validator.set_name_valid(False)
 
 
 def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_unchecked_THEN_false_signal_is_emitted():
-
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
     validator.set_units_valid(False)
 
 
 def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_checked_THEN_false_signal_is_emitted():
-
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=False))
     validator.set_file_valid(False)
 
 
 def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_checked_THEN_true_signal_is_emitted():
-
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     mock_no_geometry_button.isChecked = Mock(return_value=True)
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
@@ -288,7 +283,6 @@ def test_GIVEN_invalid_units_WHEN_using_ok_validator_with_no_geometry_button_che
 
 
 def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_THEN_true_signal_is_emitted():
-
     validator, mock_mesh_button, mock_no_geometry_button = create_content_ok_validator()
     mock_mesh_button.isChecked = Mock(return_value=False)
     validator.is_valid.connect(lambda x: inspect_signal(x, expected=True))
@@ -296,7 +290,6 @@ def test_GIVEN_invalid_file_WHEN_using_ok_validator_with_mesh_button_unchecked_T
 
 
 def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
-
     validator = NullableIntValidator()
     assert validator.validate("", 0) == QValidator.Acceptable
 
@@ -305,13 +298,11 @@ def test_GIVEN_empty_string_WHEN_using_nullable_int_validator_THEN_returns_accep
 def test_GIVEN_nonemptry_string_WHEN_using_nullable_int_validator_THEN_returns_invalid(
     invalid_input,
 ):
-
     validator = NullableIntValidator()
     assert validator.validate(invalid_input, 0)[0] == QValidator.State.Invalid
 
 
 def test_GIVEN_integer_WHEN_using_nullable_int_validator_THEN_returns_acceptable():
-
     validator = NullableIntValidator()
     assert validator.validate("5", 0)[0] == QValidator.State.Acceptable
 
@@ -539,7 +530,6 @@ def test_GIVEN_valid_file_extensions_WHEN_validating_nexus_filename_for_filewrit
 def test_GIVEN_valid_broker_and_filename_WHEN_validating_ok_button_for_command_dialog_THEN_validator_emits_true(
     broker_valid, file_valid, expected
 ):
-
     validator = CommandDialogOKValidator()
     validator.is_valid = Mock()
 

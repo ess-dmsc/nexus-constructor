@@ -56,7 +56,6 @@ class DiskChopperGeometryCreator:
     """
 
     def __init__(self, chopper_details: ChopperDetails):
-
         self.points: List[Point] = []
         self.faces: List[List[int]] = []
         self.resolution = RESOLUTION
@@ -80,7 +79,6 @@ class DiskChopperGeometryCreator:
     def get_intermediate_angle_values_from_resolution_array(
         resolution_angles: np.ndarray, first_angle: float, second_angle: float
     ) -> np.ndarray:
-
         # Slice the array to obtain an array of intermediate angles between the two slit edges.
         if second_angle > first_angle:
             return resolution_angles[
@@ -148,7 +146,6 @@ class DiskChopperGeometryCreator:
         prev_back = first_back
 
         for angle in intermediate_angles:
-
             current_back, current_front = self.create_cake_slice(
                 angle, prev_back, prev_front, r
             )
@@ -200,7 +197,6 @@ class DiskChopperGeometryCreator:
         self.resolution_angles = self.create_resolution_angles(self.resolution)
 
         for i in range(1, len(self._slit_edges)):
-
             # Create four points for the current slit edge
             (
                 current_upper_front,

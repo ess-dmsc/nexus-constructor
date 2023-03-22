@@ -68,7 +68,6 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_faces_THEN_correct_detector_fac
 def test_GIVEN_single_id_WHEN_calling_detector_faces_THEN_list_is_not_returned(
     pixel_mapping,
 ):
-
     pixel_id = 3
     pixel_mapping.pixel_ids = [pixel_id]
     assert get_detector_faces_from_pixel_mapping(pixel_mapping) == [(0, pixel_id)]
@@ -77,7 +76,6 @@ def test_GIVEN_single_id_WHEN_calling_detector_faces_THEN_list_is_not_returned(
 def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_number_list_is_returned(
     pixel_mapping,
 ):
-
     expected_numbers = [id for id in pixel_mapping.pixel_ids if id is not None]
 
     assert get_detector_number_from_pixel_mapping(pixel_mapping) == expected_numbers
@@ -86,7 +84,6 @@ def test_GIVEN_list_of_ids_WHEN_calling_detector_number_THEN_correct_detector_nu
 def test_GIVEN_single_id_WHEN_calling_detector_number_THEN_list_is_not_returned(
     pixel_mapping,
 ):
-
     pixel_id = 3
     pixel_mapping.pixel_ids = [pixel_id]
     assert get_detector_number_from_pixel_mapping(pixel_mapping) == [pixel_id]
@@ -148,7 +145,6 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_z_offsets_THEN_z_offsets_are_a
 def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detector_ids_THEN_correct_grid_is_returned(
     pixel_grid, direction, corner
 ):
-
     pixel_grid.rows = 2
     pixel_grid.columns = 3
     pixel_grid.count_direction = direction
@@ -164,7 +160,6 @@ def test_GIVEN_direction_and_initial_count_corner_WHEN_calling_pixel_grid_detect
 def test_GIVEN_one_by_one_pixel_grid_when_calling_offset_functions_THEN_offsets_and_pixel_id_are_scalars(
     pixel_grid,
 ):
-
     pixel_grid.rows = 1
     pixel_grid.columns = 1
 
