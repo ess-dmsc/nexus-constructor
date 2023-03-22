@@ -15,18 +15,19 @@ from pytestqt.qtbot import QtBot
 from nexus_constructor import component_type
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.common_attrs import CommonAttrs
-from nexus_constructor.component_tree_model import NexusTreeModel as ComponentTreeModel
-from nexus_constructor.component_type import make_dictionary_of_class_definitions
-from nexus_constructor.geometry.pixel_data import PixelData, PixelGrid, PixelMapping
+from nexus_constructor.component_tree_model import \
+    NexusTreeModel as ComponentTreeModel
+from nexus_constructor.component_type import \
+    make_dictionary_of_class_definitions
+from nexus_constructor.geometry.pixel_data import (PixelData, PixelGrid,
+                                                   PixelMapping)
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.main_window import MainWindow
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.entry import Entry
-from nexus_constructor.model.geometry import (
-    CylindricalGeometry,
-    OFFGeometryNexus,
-    OFFGeometryNoNexus,
-)
+from nexus_constructor.model.geometry import (CylindricalGeometry,
+                                              OFFGeometryNexus,
+                                              OFFGeometryNoNexus)
 from nexus_constructor.model.group import Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import F142Stream, F144Stream, Link
@@ -34,14 +35,11 @@ from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.validators import FieldType, PixelValidator
 from nexus_constructor.widgets import CustomDialog as QDialog
-from ui_tests.ui_test_utils import (
-    RED_LINE_EDIT_STYLE_SHEET,
-    VALID_CUBE_OFF_FILE,
-    VALID_OCTA_OFF_FILE,
-    WHITE_LINE_EDIT_STYLE_SHEET,
-    show_and_close_window,
-    systematic_button_press,
-)
+from ui_tests.ui_test_utils import (RED_LINE_EDIT_STYLE_SHEET,
+                                    VALID_CUBE_OFF_FILE, VALID_OCTA_OFF_FILE,
+                                    WHITE_LINE_EDIT_STYLE_SHEET,
+                                    show_and_close_window,
+                                    systematic_button_press)
 
 NX_CLASS_DEFINITIONS = make_dictionary_of_class_definitions(
     os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "definitions")
@@ -79,7 +77,6 @@ NO_PIXEL_OPTIONS = dict()
 ALL_COMPONENT_TYPES = dict()
 
 for i, component_class in enumerate(list(NX_CLASS_DEFINITIONS.keys())):
-
     ALL_COMPONENT_TYPES[component_class] = i
 
     if component_class in component_type.PIXEL_COMPONENT_TYPES:
@@ -217,7 +214,6 @@ def mock_pixel_validator(add_component_dialog, mock_pixel_options):
 
 @pytest.fixture(scope="function")
 def mock_component():
-
     nexus_file = h5py.File("test_file", mode="x", driver="core", backing_store=False)
     test_group = nexus_file.create_group("test_component_group")
     mock_component = Mock(spec=Component, group=test_group, shape=(None, None))
@@ -521,7 +517,6 @@ def edit_component_with_pixel_fields(
 def test_UI_GIVEN_nothing_WHEN_clicking_add_component_button_THEN_add_component_window_is_shown(
     qtbot,
 ):
-
     template = QMainWindow()
     # window = MainWindow(Instrument(NexusWrapper("test")))
     # Disabled whilst working on model change
@@ -682,7 +677,6 @@ def test_UI_GIVEN_class_without_pixel_fields_WHEN_selecting_nxclass_for_componen
 def test_UI_GIVEN_user_changes_shape_WHEN_adding_component_THEN_validity_is_reassessed(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
     )
@@ -698,7 +692,6 @@ def test_UI_GIVEN_user_changes_shape_WHEN_adding_component_THEN_validity_is_reas
 def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_generated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     make_pixel_options_appear(
         qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog
     )
@@ -721,7 +714,6 @@ def test_UI_GIVEN_cylinder_shape_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapp
 def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN_pixel_mapping_list_is_regenerated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     make_pixel_options_appear(
         qtbot,
         add_component_dialog.CylinderRadioButton,
@@ -744,7 +736,6 @@ def test_UI_GIVEN_increasing_cylinder_count_WHEN_user_chooses_pixel_mapping_THEN
 def test_UI_GIVEN_same_mesh_file_twice_WHEN_user_selects_file_THEN_mapping_list_remains_the_same(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
@@ -773,7 +764,6 @@ def test_UI_GIVEN_same_mesh_file_twice_WHEN_user_selects_file_THEN_mapping_list_
 def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mapping_list_is_not_generated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
     )
@@ -791,7 +781,6 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_giving_mesh_file_THEN_mappi
 def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_changing_cylinder_count_THEN_mapping_list_is_not_generated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
     )
@@ -804,7 +793,6 @@ def test_UI_GIVEN_pixel_options_are_not_visible_WHEN_changing_cylinder_count_THE
 def test_UI_GIVEN_invalid_file_WHEN_giving_mesh_file_THEN_mapping_list_is_not_generated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
@@ -862,7 +850,6 @@ def test_UI_GIVEN_valid_name_WHEN_choosing_component_name_THEN_background_become
 def test_UI_GIVEN_valid_input_WHEN_adding_component_with_no_shape_THEN_add_component_window_closes(
     qtbot, add_component_dialog
 ):
-
     # Setting a valid nexus class.
     add_component_dialog.componentTypeComboBox.setCurrentText("NXsample")
 
@@ -935,7 +922,6 @@ def test_UI_GIVEN_valid_input_WHEN_adding_component_with_cylinder_shape_THEN_add
 def test_UI_GIVEN_no_input_WHEN_adding_component_with_no_shape_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog
 ):
-
     # The Add Component button is disabled because no input was given
     assert not add_component_dialog.ok_button.isEnabled()
 
@@ -983,7 +969,6 @@ def test_UI_GIVEN_file_that_doesnt_exist_WHEN_adding_component_with_mesh_shape_T
 def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shape_THEN_file_path_box_has_red_background(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1058,7 +1043,6 @@ def test_UI_GIVEN_no_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_co
 def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1081,7 +1065,6 @@ def test_UI_GIVEN_nonexistent_file_path_WHEN_adding_component_with_mesh_shape_TH
 def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1104,7 +1087,6 @@ def test_UI_GIVEN_file_with_wrong_extension_WHEN_adding_component_with_mesh_shap
 def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_has_red_background(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1119,7 +1101,6 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_
 def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_has_red_background(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1134,7 +1115,6 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_units
 def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_units_box_has_white_background(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1179,7 +1159,6 @@ def test_UI_GIVEN_valid_units_WHEN_adding_component_with_mesh_shape_THEN_add_com
 def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1205,7 +1184,6 @@ def test_UI_GIVEN_no_units_WHEN_adding_component_with_mesh_shape_THEN_add_compon
 def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1231,7 +1209,6 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_mesh_shape_THEN_add_c
 def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
@@ -1249,7 +1226,6 @@ def test_UI_GIVEN_invalid_units_WHEN_adding_component_with_cylinder_shape_THEN_a
 def test_UI_GIVEN_mesh_shape_selected_WHEN_choosing_shape_THEN_relevant_fields_are_visible(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1265,7 +1241,6 @@ def test_UI_GIVEN_mesh_shape_selected_WHEN_choosing_shape_THEN_relevant_fields_a
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fields_are_visible(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a cylinder shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
@@ -1282,7 +1257,6 @@ def test_UI_GIVEN_cylinder_shape_selected_WHEN_choosing_shape_THEN_relevant_fiel
 def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_mapping_list_remains_empty(
     qtbot, add_component_dialog, no_pixels_class, mock_pixel_options
 ):
-
     # Mimic the user selecting a mesh shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.meshRadioButton
@@ -1308,7 +1282,6 @@ def test_UI_GIVEN_file_chosen_WHEN_pixel_mapping_options_not_visible_THEN_pixel_
 def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mapping_widget_isnt_populated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
@@ -1324,7 +1297,6 @@ def test_UI_GIVEN_invalid_off_file_WHEN_creating_pixel_mapping_THEN_pixel_mappin
 def test_UI_GIVEN_cylinder_shape_selected_WHEN_adding_component_THEN_default_values_are_correct(
     qtbot, add_component_dialog
 ):
-
     # Mimic the user selecting a cylinder shape
     systematic_button_press(
         qtbot, add_component_dialog, add_component_dialog.CylinderRadioButton
@@ -1397,7 +1369,6 @@ def test_UI_GIVEN_stream_field_selected_and_edit_button_pressed_THEN_edit_dialog
 def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_data_THEN_add_component_button_is_enabled(
     qtbot, add_component_dialog, mock_pixel_validator
 ):
-
     # Deceive the AddComponentDialog into thinking valid pixel info was given
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
@@ -1422,7 +1393,6 @@ def test_UI_GIVEN_user_provides_valid_pixel_configuration_WHEN_entering_pixel_da
 def test_UI_GIVEN_user_provides_invalid_pixel_grid_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog, mock_pixel_validator
 ):
-
     # Deceive the AddComponentDialog into thinking an invalid Pixel Grid was given
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
@@ -1447,7 +1417,6 @@ def test_UI_GIVEN_user_provides_invalid_pixel_grid_WHEN_entering_pixel_data_THEN
 def test_UI_GIVEN_user_provides_invalid_pixel_mapping_WHEN_entering_pixel_data_THEN_add_component_button_is_disabled(
     qtbot, add_component_dialog, mock_pixel_validator
 ):
-
     # Deceive the AddComponentDialog into thinking an invalid Pixel Mapping was given
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
@@ -1472,7 +1441,6 @@ def test_UI_GIVEN_user_provides_invalid_pixel_mapping_WHEN_entering_pixel_data_T
 def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_been_generated_THEN_new_pixel_mapping_list_is_generated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     make_pixel_options_appear(
         qtbot, add_component_dialog.meshRadioButton, add_component_dialog
     )
@@ -1499,7 +1467,6 @@ def test_UI_GIVEN_user_presses_cylinder_button_WHEN_mesh_pixel_mapping_list_has_
 def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_been_generated_WHEN_new_pixel_mapping_list_is_generated(
     qtbot, add_component_dialog, mock_pixel_options
 ):
-
     make_pixel_options_appear(
         qtbot, add_component_dialog.CylinderRadioButton, add_component_dialog
     )
@@ -1527,7 +1494,6 @@ def test_UI_GIVEN_user_presses_mesh_button_WHEN_cylinder_pixel_mapping_list_has_
 def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
     qtbot, add_component_dialog, mock_pixel_options, mock_component
 ):
-
     make_pixel_options_appear(
         qtbot,
         add_component_dialog.meshRadioButton,
@@ -1563,7 +1529,6 @@ def test_UI_GIVEN_pixel_grid_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_i
 def test_UI_GIVEN_pixel_mapping_is_entered_WHEN_adding_nxdetector_THEN_pixel_data_is_stored_in_component(
     qtbot, add_component_dialog, mock_pixel_options, mock_component
 ):
-
     make_pixel_options_appear(
         qtbot,
         add_component_dialog.meshRadioButton,
@@ -1738,7 +1703,6 @@ def test_UI_GIVEN_component_with_cylinder_shape_WHEN_editing_component_THEN_cyli
 def test_UI_GIVEN_component_with_scalar_field_WHEN_editing_component_THEN_field_appears_in_fields_list_with_correct_value(
     qtbot,
 ):
-
     component, model, treeview_model = create_group_with_component(
         "chopper1", "test_component_editing_scalar_field"
     )
@@ -2068,7 +2032,6 @@ def test_UI_GIVEN_component_with_off_shape_WHEN_editing_component_THEN_mesh_data
 def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
     qtbot, add_component_dialog
 ):
-
     qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
     field = add_component_dialog.fieldsListWidget.itemWidget(
         add_component_dialog.fieldsListWidget.item(0)
@@ -2095,7 +2058,6 @@ def test_UI_GIVEN_field_widget_with_string_type_THEN_value_property_is_correct(
 def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(
     qtbot, add_component_dialog
 ):
-
     qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
     field = add_component_dialog.fieldsListWidget.itemWidget(
         add_component_dialog.fieldsListWidget.item(0)
@@ -2113,7 +2075,6 @@ def test_UI_GIVEN_field_widget_with_stream_type_THEN_stream_dialog_shown(
 def test_UI_GIVEN_field_widget_with_link_THEN_link_target_and_name_is_correct(
     qtbot, add_component_dialog
 ):
-
     qtbot.mouseClick(add_component_dialog.addFieldPushButton, Qt.LeftButton)
     field = add_component_dialog.fieldsListWidget.itemWidget(
         add_component_dialog.fieldsListWidget.item(0)
@@ -2797,7 +2758,6 @@ def test_UI_GIVEN_pixel_mapping_WHEN_editing_cylinder_component_with_no_pixel_da
 def test_UI_GIVEN_previous_transformations_WHEN_editing_component_THEN_transformation_changed_signal_is_emitted(
     edit_component_dialog,
 ):
-
     transformation_mock = Mock()
     edit_component_dialog.signals.transformation_changed = transformation_mock
     edit_component_dialog.on_ok()
@@ -2807,7 +2767,6 @@ def test_UI_GIVEN_previous_transformations_WHEN_editing_component_THEN_transform
 def test_UI_GIVEN_creating_component_WHEN_pressing_ok_THEN_transformation_changed_signal_isnt_emitted(
     add_component_dialog, qtbot
 ):
-
     transformation_mock = Mock()
     add_component_dialog.signals.transformation_changed = transformation_mock
 
