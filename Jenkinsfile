@@ -113,7 +113,7 @@ builders = pipeline_builder.createBuilders { container ->
                 // Push any changes resulting from formatting
                 withCredentials([
                     gitUsernamePassword(
-                        credentialsId: 'dmsc-gitlab-username-with-token',
+                        credentialsId: 'cow-bot-username-with-token',
                         gitToolName: 'Default'
                     )
                 ]) {
