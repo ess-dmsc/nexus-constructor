@@ -4,7 +4,6 @@ from nexus_constructor.unit_utils import METRES, calculate_unit_conversion_facto
 
 
 def test_unit_conversion_factor():
-
     # List of units and their expected value in metres
     units = [("cm", 0.01), ("km", 1000), ("m", 1.0), ("inch", 0.0254), ("foot", 0.3048)]
 

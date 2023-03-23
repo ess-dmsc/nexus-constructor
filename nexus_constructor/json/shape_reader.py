@@ -74,7 +74,6 @@ class ShapeReader:
             return ""
 
     def add_shape_to_component(self):
-
         shape_type = self._get_shape_type()
 
         # An error message means the shape object couldn't be made

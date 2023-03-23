@@ -5,7 +5,6 @@ from nexus_constructor.instrument_view.gnomon import Gnomon
 
 
 def test_GIVEN_cylinder_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_properties_set():
-
     mock_cylinder_mesh = Mock()
     length = 20
 
@@ -17,7 +16,6 @@ def test_GIVEN_cylinder_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_p
 
 
 def test_GIVEN_cylinder_length_WHEN_calling_create_cylinder_matrices_THEN_correct_matrices_returned():
-
     length = 10
     half_length = length * 0.5
 
@@ -41,7 +39,6 @@ def test_GIVEN_cylinder_length_WHEN_calling_create_cylinder_matrices_THEN_correc
 
 
 def test_GIVEN_cone_length_WHEN_calling_create_cone_matrices_THEN_correct_matrices_returned():
-
     length = 8
 
     expected_x = QMatrix4x4()
@@ -64,7 +61,6 @@ def test_GIVEN_cone_length_WHEN_calling_create_cone_matrices_THEN_correct_matric
 
 
 def test_GIVEN_mesh_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_properties_set():
-
     cylinder_mesh = Mock()
     length = 20
     radius = length * 0.05
@@ -77,7 +73,6 @@ def test_GIVEN_mesh_and_length_WHEN_calling_configure_gnomon_cylinder_THEN_prope
 
 
 def test_GIVEN_length_WHEN_calling_create_cylinder_matrices_THEN_correct_matrices_returned():
-
     length = 8
 
     expected_x = QMatrix4x4()
@@ -102,7 +97,6 @@ def test_GIVEN_length_WHEN_calling_create_cylinder_matrices_THEN_correct_matrice
 
 
 def test_GIVEN_length_WHEN_calling_create_cone_matrices_THEN_correct_matrices_returned():
-
     length = 8
 
     expected_x = QMatrix4x4()
@@ -125,7 +119,6 @@ def test_GIVEN_length_WHEN_calling_create_cone_matrices_THEN_correct_matrices_re
 
 
 def test_GIVEN_vectors_WHEN_calling_create_axis_label_matrices_THEN_correct_matrices_returned():
-
     vectors = [QVector3D(1, 0, 0), QVector3D(0, 1, 0), QVector3D(0, 0, 1)]
 
     expected_x = QMatrix4x4()
@@ -144,7 +137,6 @@ def test_GIVEN_vectors_WHEN_calling_create_axis_label_matrices_THEN_correct_matr
 
 
 def test_GIVEN_mesh_and_length_WHEN_calling_configure_gnomon_cone_THEN_properties_set():
-
     cone_mesh = Mock()
     gnomon_cylinder_length = 10
 
@@ -156,7 +148,6 @@ def test_GIVEN_mesh_and_length_WHEN_calling_configure_gnomon_cone_THEN_propertie
 
 
 def test_GIVEN_entity_label_and_color_WHEN_calling_set_axis_label_text_THEN_properties_set():
-
     text_entity = Mock()
     text_label = "X"
     text_color = "green"
@@ -171,7 +162,6 @@ def test_GIVEN_entity_label_and_color_WHEN_calling_set_axis_label_text_THEN_prop
 
 
 def test_GIVEN_view_matrix_and_vector_WHEN_calling_create_billboard_transformation_THEN_corect_matrix_returned():
-
     view_matrix = QMatrix4x4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
     text_vector = QVector3D(10, 10, 10)
 
@@ -185,7 +175,6 @@ def test_GIVEN_view_matrix_and_vector_WHEN_calling_create_billboard_transformati
 
 
 def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_properties_THEN_properties_set():
-
     mock_neutron_animation_controller = Mock()
     animation_distance = 15
     time_span_offset = 5
@@ -211,7 +200,6 @@ def test_GIVEN_animation_parameters_WHEN_calling_set_neutron_animation_propertie
 
 
 def test_GIVEN_cylinder_dimensions_WHEN_calling_set_cylinder_mesh_dimensions_THEN_dimensions_set():
-
     radius = 2
     length = 10
     rings = 2
@@ -226,7 +214,6 @@ def test_GIVEN_cylinder_dimensions_WHEN_calling_set_cylinder_mesh_dimensions_THE
 
 
 def test_GIVEN_cylinder_transform_WHEN_calling_set_beam_transform_THEN_matrix_set():
-
     neutron_animation_length = 15
 
     expected_matrix = QMatrix4x4()
@@ -242,7 +229,6 @@ def test_GIVEN_cylinder_transform_WHEN_calling_set_beam_transform_THEN_matrix_se
 
 
 def test_GIVEN_radius_WHEN_calling_set_sphere_mesh_radius_THEN_radius_set():
-
     radius = 2
     mock_sphere_mesh = Mock()
 

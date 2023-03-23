@@ -27,7 +27,6 @@ class NullableIntValidator(QIntValidator):
     """
 
     def __init__(self, bottom=None):
-
         super().__init__()
 
         if bottom is not None:
@@ -59,7 +58,6 @@ class UnitValidator(QValidator):
         self.expected_dimensionality = expected_dimensionality
 
     def validate(self, input: str, pos: int):
-
         if not (
             units_are_recognised(input)
             and (

@@ -282,8 +282,21 @@ class StreamFieldsWidget(QDialog):
         self.type_combo.addItems(F142_TYPES)
         self.type_combo.setCurrentText("double")
 
-        self.value_units_edit = QLineEdit()
         self.value_units_label = QLabel("Value Units:")
+        self.value_units_edit = QLineEdit()
+        if getattr(self.parent().parent(), "units_line_edit", None):
+            self.parent().parent().units_line_edit.textChanged.connect(
+                self.value_units_edit.setText
+            )
+            self.value_units_edit.setText(self.parent().parent().units)
+        self.value_units_edit.setReadOnly(True)
+        self.value_units_edit.setStyleSheet(
+            """
+            QLineEdit {
+                background: LightGray;
+            }
+        """
+        )
 
         self.show_advanced_options_button = QPushButton(
             text="Show/hide advanced options"
@@ -691,9 +704,6 @@ class StreamFieldsWidget(QDialog):
         else:
             self.array_radio.setChecked(False)
             self.scalar_radio.setChecked(True)
-        if field.value_units is not None:
-            self.value_units_edit.setText(field.value_units)
-
         if check_if_advanced_options_should_be_enabled(
             [field.chunk_size, field.cue_interval]
         ):
