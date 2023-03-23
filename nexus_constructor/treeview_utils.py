@@ -69,7 +69,6 @@ def create_and_add_toolbar_action(
 
 
 def is_transformation_action_allowed(selected_object):
-
     if isinstance(selected_object, (Component, Transformation)):
         return True
     elif (

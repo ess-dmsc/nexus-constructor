@@ -73,7 +73,6 @@ def create_two_points():
 def test_GIVEN_three_values_WHEN_creating_point_THEN_point_is_initialised_correctly(
     point,
 ):
-
     assert point.x == pytest.approx(POINT_X)
     assert point.y == pytest.approx(POINT_Y)
     assert point.z == pytest.approx(POINT_Z)
@@ -556,9 +555,7 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_connec
     arrow_z = geometry_creator.z + geometry_creator.arrow_size
 
     for face in geometry_creator.faces:
-
         if len(face) == 3:
-
             first_point = geometry_creator.points[face[1]]
             second_point = geometry_creator.points[face[2]]
 
@@ -587,14 +584,11 @@ def test_GIVEN_chopper_details_WHEN_creating_disk_chopper_mesh_THEN_faces_with_f
     back_z = -geometry_creator.z
 
     for face in geometry_creator.faces:
-
         num_points_on_front = 0
         num_points_on_back = 0
 
         if len(face) == 4:
-
             for point_index in face:
-
                 if np.isclose(geometry_creator.points[point_index].z, front_z):
                     num_points_on_front += 1
                 if np.isclose(geometry_creator.points[point_index].z, back_z):

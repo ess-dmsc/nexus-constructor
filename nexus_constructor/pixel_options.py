@@ -65,7 +65,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         self.current_mapping_filename = None
 
     def setupUi(self, parent_widget):
-
         super().setupUi(parent_widget)
 
         self._pixel_validator = PixelValidator(
@@ -135,7 +134,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
 
         # Check that x offset is more than one value
         if data_is_an_array_with_more_than_one_element(x_pixel_offset):
-
             # Set the number of rows and the row height
             n_rows, row_height = self._get_row_information(y_pixel_offset)
             self.row_count_spin_box.setValue(n_rows)
@@ -482,7 +480,6 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         :return: A PixelData object or None.
         """
         if self.single_pixel_radio_button.isChecked():
-
             return PixelGrid(
                 rows=self.row_count_spin_box.value(),
                 columns=self.column_count_spin_box.value(),

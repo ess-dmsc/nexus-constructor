@@ -3,26 +3,49 @@ from typing import List, Tuple, Union
 
 import numpy as np
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFormLayout,
-                               QFrame, QGridLayout, QGroupBox, QHeaderView,
-                               QLabel, QLineEdit, QPushButton, QRadioButton,
-                               QSpinBox, QTableWidget, QTableWidgetItem,
-                               QVBoxLayout)
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFormLayout,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QRadioButton,
+    QSpinBox,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+)
 
 from nexus_constructor.array_dataset_table_widget import ValueDelegate
-from nexus_constructor.common_attrs import (AD_ARRAY_SIZE_PLACEHOLDER, ARRAY,
-                                            SCALAR)
+from nexus_constructor.common_attrs import AD_ARRAY_SIZE_PLACEHOLDER, ARRAY, SCALAR
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import (ADC_PULSE_DEBUG, CHUNK_SIZE,
-                                            CUE_INTERVAL, ADARStream,
-                                            EV42Stream, EV44Stream, F142Stream,
-                                            F144Stream, HS01Shape, HS01Stream,
-                                            NS10Stream, SE00Stream, SENVStream,
-                                            StreamModule, StreamModules,
-                                            TDCTStream, WriterModules)
+from nexus_constructor.model.module import (
+    ADC_PULSE_DEBUG,
+    CHUNK_SIZE,
+    CUE_INTERVAL,
+    ADARStream,
+    EV42Stream,
+    EV44Stream,
+    F142Stream,
+    F144Stream,
+    HS01Shape,
+    HS01Stream,
+    NS10Stream,
+    SE00Stream,
+    SENVStream,
+    StreamModule,
+    StreamModules,
+    TDCTStream,
+    WriterModules,
+)
 from nexus_constructor.ui_utils import validate_line_edit
-from nexus_constructor.validators import (NoEmptyStringValidator,
-                                          StreamWidgetValidator)
+from nexus_constructor.validators import NoEmptyStringValidator, StreamWidgetValidator
 from nexus_constructor.widgets.dropdown_list import DropDownList
 
 F142_TYPES = [
