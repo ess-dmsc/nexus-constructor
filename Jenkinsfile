@@ -111,6 +111,7 @@ builders = pipeline_builder.createBuilders { container ->
                 """
             
                 // Push any changes resulting from formatting
+                container.copyFrom(pipeline_builder.project, 'clang-formatted-code')
                 withCredentials([
                     gitUsernamePassword(
                         credentialsId: 'cow-bot-username-with-token',
@@ -118,8 +119,8 @@ builders = pipeline_builder.createBuilders { container ->
                     )
                 ]) {
                     withEnv(["PROJECT=${pipeline_builder.project}"]) {
-                        container.sh """
-                        cd ${pipeline_builder.project}
+                        sh """
+                        cd clang-formatted-code
                         git push https://github.com/ess-dmsc/${pipeline_builder.project}.git HEAD:$CHANGE_BRANCH
                         """
                      }  // withEnv
