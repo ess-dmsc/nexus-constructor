@@ -34,12 +34,14 @@ class SlitGeometry:
             return ""
 
     def _create_vertices(self):
-        x_gap, y_gap = self._gaps
-        factor = calculate_unit_conversion_factor(self._units, METRES)
-        x_gap *= factor
-        y_gap *= factor
+        if self._units:
+            factor = calculate_unit_conversion_factor(self._units, METRES)
+        else:
+            factor = 1.0
 
+        x_gap, y_gap = self._gaps
         if x_gap:
+            x_gap *= factor
             x_1 = 0.0
             x_2 = -1.0
             half_side_length = x_gap * 2
@@ -50,6 +52,7 @@ class SlitGeometry:
             dx = 0
             half_side_length = 0.05
         if y_gap:
+            y_gap *= factor
             dy = y_gap / 2
             slit_thickness = y_gap * 2
         else:
