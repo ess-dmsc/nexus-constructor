@@ -189,10 +189,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             error_collector: List[str] = []
             if save_compressed_file:
                 data_dump = json.dumps(
-                    self.model.as_dict(error_collector), separators=(",", ":")
+                    self.model.as_dict(error_collector),
+                    separators=(",", ":"),
+                    sort_keys=True,
                 )
             else:
-                data_dump = json.dumps(self.model.as_dict(error_collector), indent=2)
+                data_dump = json.dumps(
+                    self.model.as_dict(error_collector), indent=2, sort_keys=True
+                )
             if error_collector:
                 show_errors_message(error_collector)
                 return
