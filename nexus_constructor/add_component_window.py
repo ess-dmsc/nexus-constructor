@@ -33,7 +33,7 @@ from nexus_constructor.model.geometry import (
     OFFGeometryNoNexus,
 )
 from nexus_constructor.model.model import Model
-from nexus_constructor.model.module import Dataset, Link
+from nexus_constructor.model.module import Dataset, Link, FileWriter
 from nexus_constructor.pixel_options import PixelOptions
 from nexus_constructor.ui_utils import (
     file_dialog,
@@ -763,7 +763,7 @@ def add_fields_to_component(
     for i in range(fields_widget.count()):
         widget = fields_widget.itemWidget(fields_widget.item(i))
         try:
-            if not isinstance(widget.value, (Link, Dataset)):
+            if not isinstance(widget.value, (Link, Dataset, FileWriter)):
                 stream_module = deepcopy(widget.value)
                 stream_module.parent_node = component
                 component.children.append(stream_module)

@@ -20,6 +20,7 @@ from ui.treeview_tab import ComponentTreeViewTab
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.resize(1280, 720)
+        MainWindow.setStyleSheet("* {color: #000000;background-color: #999999;}")
         self.central_widget = QWidget(MainWindow)
 
         self.splitter = QSplitter(self.central_widget)

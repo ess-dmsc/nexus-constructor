@@ -43,6 +43,7 @@ from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     Dataset,
+    FileWriter,
     FileWriterModule,
     Link,
     StreamModule,
@@ -276,7 +277,7 @@ class JSONReader:
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]
             if (
-                module_type == WriterModules.DATASET.value
+                ( module_type == WriterModules.DATASET.value or module_type == WriterModules.FILEWRITER.value )
                 and json_object[NodeType.CONFIG][CommonKeys.NAME]
                 == CommonAttrs.DEPENDS_ON
             ):
