@@ -421,7 +421,7 @@ class FieldValueValidator(QValidator):
         """
         if not input and not self.scalar == FILEWRITER:  # More criteria here
             return self._emit_and_return(False)
-        if self.field_type_combo.currentText() == SCALAR:
+        if self.field_type_combo.currentText() == self.scalar:
             try:
                 VALUE_TYPE_TO_NP[self.dataset_type_combo.currentText()](input)
             except ValueError:

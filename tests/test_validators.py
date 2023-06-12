@@ -172,6 +172,19 @@ def test_GIVEN_valid_string_value_WHEN_validating_field_value_THEN_returns_accep
     assert validator.validate(strvalue, 0) == QValidator.Acceptable
     validator.is_valid.emit.assert_called_once_with(True)
 
+def test_GIVEN_valid_name_value_WHEN_validating_filewriter_THEN_returns_acceptable_and_emits_signal_with_true():
+    strvalue = "123a"
+
+    field_type_combo = DummyCombo(FieldType.filewriter.value)
+    dataset_type_combo = DummyCombo(ValueTypes.STRING)
+
+    validator = FieldValueValidator(
+        field_type_combo, dataset_type_combo, FieldType.filewriter.value
+    )
+    validator.is_valid = Mock()
+
+    assert validator.validate(strvalue, 0) == QValidator.Acceptable
+    validator.is_valid.emit.assert_called_once_with(True)
 
 def test_GIVEN_invalid_float_value_WHEN_validating_field_value_THEN_returns_intermediate_and_emits_signal_with_false():
     invalid_value = "sdfn"
