@@ -395,7 +395,6 @@ class FieldType(Enum):
     filewriter = "Filewriter"
 
 
-
 class FieldValueValidator(QValidator):
     """
     Validates the field value line edit to check that the entered string is castable to the selected numpy type.

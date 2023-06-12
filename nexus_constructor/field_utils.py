@@ -125,7 +125,7 @@ def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Call
         return update_existing_stream_field
     elif isinstance(item, Link):
         return update_existing_link_field
-    elif isinstance(item,FileWriter):
+    elif isinstance(item, FileWriter):
         return update_existing_filewriter_field
     else:
         try:

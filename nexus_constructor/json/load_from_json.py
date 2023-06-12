@@ -202,7 +202,7 @@ class JSONReader:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
         self.model.entry.attributes = self.entry_node.attributes
         for child in self.entry_node.children:
-            if isinstance(child, (Dataset, Link, Group)):
+            if isinstance(child, (Dataset, Link, FileWriter, Group)):
                 self.model.entry[child.name] = child
             else:
                 self.model.entry.children.append(child)
@@ -277,7 +277,7 @@ class JSONReader:
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]
             if (
-                ( module_type == WriterModules.DATASET.value or module_type == WriterModules.FILEWRITER.value )
+                (module_type == WriterModules.DATASET.value or module_type == WriterModules.FILEWRITER.value)
                 and json_object[NodeType.CONFIG][CommonKeys.NAME]
                 == CommonAttrs.DEPENDS_ON
             ):

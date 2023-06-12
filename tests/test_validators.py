@@ -172,6 +172,7 @@ def test_GIVEN_valid_string_value_WHEN_validating_field_value_THEN_returns_accep
     assert validator.validate(strvalue, 0) == QValidator.Acceptable
     validator.is_valid.emit.assert_called_once_with(True)
 
+
 def test_GIVEN_valid_name_value_WHEN_validating_filewriter_THEN_returns_acceptable_and_emits_signal_with_true():
     strvalue = "123a"
 
@@ -185,6 +186,7 @@ def test_GIVEN_valid_name_value_WHEN_validating_filewriter_THEN_returns_acceptab
 
     assert validator.validate(strvalue, 0) == QValidator.Acceptable
     validator.is_valid.emit.assert_called_once_with(True)
+
 
 def test_GIVEN_invalid_float_value_WHEN_validating_field_value_THEN_returns_intermediate_and_emits_signal_with_false():
     invalid_value = "sdfn"
