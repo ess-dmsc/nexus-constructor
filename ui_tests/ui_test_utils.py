@@ -7,7 +7,7 @@ from pytestqt.qtbot import QtBot
 RUNNING_ON_WINDOWS = sys.platform.startswith("win")
 
 RED_BACKGROUND = "{ background-color: #f6989d }"
-WHITE_BACKGROUND = "{ background-color: #FFFFFF }"
+WHITE_BACKGROUND = "{ background-color: #333333 }"  #   no longer white
 LINE_EDIT = "QLineEdit "
 SPIN_BOX = "QSpinBox "
 RED_LINE_EDIT_STYLE_SHEET = LINE_EDIT + RED_BACKGROUND
