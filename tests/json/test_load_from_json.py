@@ -45,7 +45,7 @@ def nexus_json_dictionary() -> dict:
                 "values":"NXinstrument"
               }],
               "children":[
-    
+
               ]
             },
             {
@@ -62,10 +62,16 @@ def nexus_json_dictionary() -> dict:
                   "type":"group",
                   "name":"transformations",
                   "children":[
-    
+
                   ]
                 }
               ]
+            },
+            {
+              "module": "filewriter",
+              "config": {
+                "name": "start_time"
+              }
             }
           ]
         }
@@ -117,7 +123,7 @@ def json_dict_with_component():
                       "type":"group",
                       "name":"transformations",
                       "children":[
-    
+
                       ]
                     }
                   ]
@@ -139,7 +145,7 @@ def json_dict_with_component():
                   "type":"group",
                   "name":"transformations",
                   "children":[
-    
+
                   ]
                 }
               ]
@@ -289,7 +295,7 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
                 "values":"NXinstrument"
               },
               "children":[
-    
+
               ]
             },
             {
@@ -306,7 +312,7 @@ def test_GIVEN_json_with_missing_value_WHEN_loading_from_json_THEN_json_loader_r
                   "type":"group",
                   "name":"transformations",
                   "children":[
-    
+
                   ]
                 }
               ]
