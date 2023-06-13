@@ -25,7 +25,13 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriter, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.module import (
+    Dataset,
+    FileWriter,
+    FileWriterModule,
+    Link,
+    StreamModule,
+)
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -456,7 +462,14 @@ class FieldWidget(QFrame):
             self.streams_widget.ok_validator.validate_ok()
             self.streams_widget.cancel_button.clicked.connect(self.reset_field_type)
         elif self.field_type == FieldType.link:
-            self.set_visibility(True, False, False, False, show_unit_line_edit=False, show_attrs_edit=False)
+            self.set_visibility(
+                True,
+                False,
+                False,
+                False,
+                show_unit_line_edit=False,
+                show_attrs_edit=False,
+            )
             self._set_up_value_validator(False)
         elif self.field_type == FieldType.filewriter:
             self.set_visibility(False, False, False, False, True, False, False)
@@ -488,9 +501,7 @@ class FieldWidget(QFrame):
         else:
             self.value_line_edit.setValidator(
                 FieldValueValidator(
-                    self.field_type_combo,
-                    self.value_type_combo,
-                    self.field_type.value
+                    self.field_type_combo, self.value_type_combo, self.field_type.value
                 )
             )
             tooltip_on_accept = "Value is cast-able to numpy type."

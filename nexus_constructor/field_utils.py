@@ -7,7 +7,13 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule, FileWriter
+from nexus_constructor.model.module import (
+    Dataset,
+    FileWriterModule,
+    Link,
+    StreamModule,
+    FileWriter,
+)
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.utils.required_component_fields import required_component_fields
 from nexus_constructor.validators import FieldType
