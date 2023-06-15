@@ -31,7 +31,10 @@ class ModuleView(QGroupBox):
             source = module.source if module.source else "not specified"
             self.layout.addWidget(self._get_label(f"link name: {name}   |  "))
             self.layout.addWidget(self._get_label(f"source: {source}"))
-        elif module.writer_module == WriterModules.DATASET.value:
+        elif (
+            module.writer_module == WriterModules.DATASET.value
+            or module.writer_module == WriterModules.FILEWRITER.value
+        ):
             name = module.name if module.name else "not specified"
             dtype = module.type if module.type else "not specified"
             self.layout.addWidget(self._get_label(f"dataset name: {name}   |  "))
@@ -76,6 +79,7 @@ class ModuleViewEditable(QGroupBox):
             or self.module.writer_module == WriterModules.LINK.value
             or self.module.writer_module
             in [StreamMode.value for StreamMode in StreamModules]
+            or self.module.writer_module == WriterModules.FILEWRITER.value
         ):
             update_function = find_field_type(module, [])
             if update_function is not None:

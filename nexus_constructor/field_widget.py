@@ -25,7 +25,13 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_attrs import FieldAttrsDialog
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.module import (
+    Dataset,
+    FileWriter,
+    FileWriterModule,
+    Link,
+    StreamModule,
+)
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP, ValueTypes
 from nexus_constructor.stream_fields_widget import StreamFieldsWidget
 from nexus_constructor.ui_utils import validate_line_edit
@@ -367,6 +373,12 @@ class FieldWidget(QFrame):
                 name=self.name,
                 source=self.value_line_edit.text(),
             )
+        elif self.field_type == FieldType.filewriter:
+            return_object = FileWriter(
+                parent_node=self._node_parent,
+                name=self.name,
+                type=dtype,
+            )
         else:
             logging.error(f"unknown field type: {self.name}")
             return None
@@ -459,6 +471,9 @@ class FieldWidget(QFrame):
                 show_attrs_edit=False,
             )
             self._set_up_value_validator(False)
+        elif self.field_type == FieldType.filewriter:
+            self.set_visibility(False, False, False, False, True, False, False)
+            self._set_up_value_validator(False)
 
     def reset_field_type(self):
         self.streams_widget.parentWidget().close()
@@ -486,9 +501,7 @@ class FieldWidget(QFrame):
         else:
             self.value_line_edit.setValidator(
                 FieldValueValidator(
-                    self.field_type_combo,
-                    self.value_type_combo,
-                    FieldType.scalar_dataset.value,
+                    self.field_type_combo, self.value_type_combo, self.field_type.value
                 )
             )
             tooltip_on_accept = "Value is cast-able to numpy type."

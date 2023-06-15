@@ -75,6 +75,7 @@ if __name__ == "__main__":
     if "help" in parser.parse_args():
         exit(0)
     logging.basicConfig(level=logging.INFO)
+    QApplication.setStyle("Fusion")
     QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     surfaceFormat = QSurfaceFormat()
     surfaceFormat.setSwapInterval(1)
