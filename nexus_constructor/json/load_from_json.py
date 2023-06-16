@@ -43,6 +43,7 @@ from nexus_constructor.model.group import TRANSFORMS_GROUP_NAME, Group
 from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import (
     Dataset,
+    FileWriter,
     FileWriterModule,
     Link,
     StreamModule,
@@ -201,7 +202,7 @@ class JSONReader:
         self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
         self.model.entry.attributes = self.entry_node.attributes
         for child in self.entry_node.children:
-            if isinstance(child, (Dataset, Link, Group)):
+            if isinstance(child, (Dataset, Link, FileWriter, Group)):
                 self.model.entry[child.name] = child
             else:
                 self.model.entry.children.append(child)
@@ -277,9 +278,10 @@ class JSONReader:
             module_type = json_object[CommonKeys.MODULE]
             if (
                 module_type == WriterModules.DATASET.value
-                and json_object[NodeType.CONFIG][CommonKeys.NAME]
-                == CommonAttrs.DEPENDS_ON
-            ):
+                or module_type == WriterModules.FILEWRITER.value
+            ) and json_object[NodeType.CONFIG][
+                CommonKeys.NAME
+            ] == CommonAttrs.DEPENDS_ON:
                 nexus_object = None
             elif module_type in [x.value for x in WriterModules]:
                 nexus_object = create_fw_module_object(

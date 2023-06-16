@@ -39,6 +39,7 @@ class WriterModules(Enum):
     LINK = "link"
     DATASET = "dataset"
     ADAR = "ADAr"
+    FILEWRITER = "filewriter"
 
 
 class StreamModules(Enum):
@@ -165,6 +166,26 @@ class F142Stream(StreamModule):
 @attr.s
 class F144Stream(F142Stream):
     writer_module = attr.ib(type=str, default=WriterModules.F144.value, init=False)
+
+
+@attr.s
+class FileWriter(FileWriterModule):
+    name = attr.ib(type=str)
+    type = attr.ib(type=str, default="string")
+    values = attr.ib(type=str, default=None)
+    writer_module = attr.ib(
+        type=str, default=WriterModules.FILEWRITER.value, init=False
+    )
+
+    def as_dict(self, error_collector: List[str]):
+        return {
+            CommonKeys.MODULE: self.writer_module,
+            NodeType.CONFIG: {CommonKeys.NAME: self.name},
+        }
+
+    def as_nexus(self, nexus_node, error_collector: List[str]):
+        nexus_dataset = nexus_node.create_dataset(self.name, data=self.name)
+        nexus_dataset.attrs[self.name] = self.name
 
 
 @attr.s
@@ -305,6 +326,7 @@ class WriterModuleClasses(Enum):
     LINK = Link
     DATASET = Dataset
     ADAR = ADARStream
+    FILEWRITER = FileWriter
 
 
 module_class_dict = dict(
@@ -372,6 +394,10 @@ def create_fw_module_object(mod_type, configuration, parent_node):
             name=configuration[CommonKeys.NAME],
             source=configuration[SOURCE],
             parent_node=parent_node,
+        )
+    elif mod_type == WriterModules.FILEWRITER.value:
+        fw_mod_obj = fw_mod_class(
+            name=configuration[CommonKeys.NAME], parent_node=parent_node, type="string"
         )
     elif mod_type == WriterModules.DATASET.value:
         if CommonKeys.DATA_TYPE in configuration:

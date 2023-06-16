@@ -7,7 +7,13 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.invalid_field_names import INVALID_FIELD_NAMES
 from nexus_constructor.model.group import Group
-from nexus_constructor.model.module import Dataset, FileWriterModule, Link, StreamModule
+from nexus_constructor.model.module import (
+    Dataset,
+    FileWriterModule,
+    Link,
+    StreamModule,
+    FileWriter,
+)
 from nexus_constructor.model.value_type import ValueTypes
 from nexus_constructor.utils.required_component_fields import required_component_fields
 from nexus_constructor.validators import FieldType
@@ -47,7 +53,17 @@ def __update_existing_dataset_field(field: Dataset, new_ui_field: FieldWidget):
     new_ui_field.value = field.values  # type: ignore
     new_ui_field.attrs = field
     units = field.attributes.get_attribute_value(CommonAttrs.UNITS)
-    new_ui_field.units = units
+    new_ui_field.units = units or ""
+
+
+def update_existing_filewriter_field(field: Dataset, new_ui_field: FieldWidget):
+    """
+    Fill in a UI filewriter field for an existing filewriter field in the component group
+    :param field: The dataset to copy into the ???value line edit
+    :param new_ui_field: The new UI field to fill in with existing data
+    """
+    new_ui_field.field_type = FieldType(FieldType.filewriter.value)
+    __update_existing_dataset_field(field, new_ui_field)
 
 
 def update_existing_scalar_field(field: Dataset, new_ui_field: FieldWidget):
@@ -69,7 +85,7 @@ def update_existing_stream_field(
     :param new_ui_field: The new UI field to fill in with existing data
     """
     new_ui_field.field_type = FieldType.kafka_stream
-    new_ui_field._old_schema = field.writer_module  # type: ignore
+    new_ui_field._old_schema = field.writer_module
     new_ui_field.streams_widget.update_existing_stream_info(field)
     new_ui_field.attrs = field
     units = field.attributes.get_attribute_value(CommonAttrs.UNITS)
@@ -115,6 +131,8 @@ def find_field_type(item: "ValueType", ignore_names=INVALID_FIELD_NAMES) -> Call
         return update_existing_stream_field
     elif isinstance(item, Link):
         return update_existing_link_field
+    elif isinstance(item, FileWriter):
+        return update_existing_filewriter_field
     else:
         try:
             logging.debug(

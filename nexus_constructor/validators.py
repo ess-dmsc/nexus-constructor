@@ -10,7 +10,7 @@ from PySide6.QtGui import QIntValidator, QValidator
 from PySide6.QtWidgets import QComboBox, QListWidget, QRadioButton, QWidget
 from stl import mesh
 
-from nexus_constructor.common_attrs import SCALAR
+from nexus_constructor.common_attrs import SCALAR, FILEWRITER
 from nexus_constructor.model.value_type import VALUE_TYPE_TO_NP
 from nexus_constructor.unit_utils import (
     units_are_expected_dimensionality,
@@ -392,6 +392,7 @@ class FieldType(Enum):
     array_dataset = "Array dataset"
     kafka_stream = "Kafka stream"
     link = "Link"
+    filewriter = "Filewriter"
 
 
 class FieldValueValidator(QValidator):
@@ -417,7 +418,7 @@ class FieldValueValidator(QValidator):
         :param pos: mouse position cursor(ignored, just here to satisfy overriding function)
         :return: QValidator state (Acceptable, Intermediate, Invalid) - returning intermediate because invalid stops the user from typing.
         """
-        if not input:  # More criteria here
+        if not input and not self.scalar == FILEWRITER:  # More criteria here
             return self._emit_and_return(False)
         if self.field_type_combo.currentText() == self.scalar:
             try:
