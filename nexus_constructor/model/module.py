@@ -173,7 +173,9 @@ class FileWriter(FileWriterModule):
     name = attr.ib(type=str)
     type = attr.ib(type=str, default="string")
     values = attr.ib(type=str, default=None)
-    writer_module = attr.ib(type=str, default=WriterModules.FILEWRITER.value, init=False)
+    writer_module = attr.ib(
+        type=str, default=WriterModules.FILEWRITER.value, init=False
+    )
 
     def as_dict(self, error_collector: List[str]):
         return {
@@ -395,9 +397,7 @@ def create_fw_module_object(mod_type, configuration, parent_node):
         )
     elif mod_type == WriterModules.FILEWRITER.value:
         fw_mod_obj = fw_mod_class(
-            name=configuration[CommonKeys.NAME],
-            parent_node=parent_node,
-            type="string"
+            name=configuration[CommonKeys.NAME], parent_node=parent_node, type="string"
         )
     elif mod_type == WriterModules.DATASET.value:
         if CommonKeys.DATA_TYPE in configuration:

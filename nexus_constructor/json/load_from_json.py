@@ -277,10 +277,11 @@ class JSONReader:
         elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
             module_type = json_object[CommonKeys.MODULE]
             if (
-                (module_type == WriterModules.DATASET.value or module_type == WriterModules.FILEWRITER.value)
-                and json_object[NodeType.CONFIG][CommonKeys.NAME]
-                == CommonAttrs.DEPENDS_ON
-            ):
+                module_type == WriterModules.DATASET.value
+                or module_type == WriterModules.FILEWRITER.value
+            ) and json_object[NodeType.CONFIG][
+                CommonKeys.NAME
+            ] == CommonAttrs.DEPENDS_ON:
                 nexus_object = None
             elif module_type in [x.value for x in WriterModules]:
                 nexus_object = create_fw_module_object(
