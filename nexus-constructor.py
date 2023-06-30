@@ -76,7 +76,9 @@ if __name__ == "__main__":
         exit(0)
     logging.basicConfig(level=logging.INFO)
     if sys.platform == "darwin":
-        QApplication.setStyle("Fusion")  # this helps macOS but causes Linux GUI to be unusable
+        QApplication.setStyle(
+            "Fusion"
+        )  # this helps macOS but causes Linux GUI to be unusable
     QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     surfaceFormat = QSurfaceFormat()
     surfaceFormat.setSwapInterval(1)
