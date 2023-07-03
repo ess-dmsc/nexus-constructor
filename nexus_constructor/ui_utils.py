@@ -1,4 +1,5 @@
 from typing import Optional
+from sys import platform
 
 import numpy as np
 from PySide6.QtCore import Qt
@@ -61,7 +62,10 @@ def validate_combobox_edit(
     :param tooltip_on_reject: Tooltip to display combobox edit is invalid.
     :return: None.
     """
-    colour = "#333333" if is_valid else "#f6989d"
+    colour = "#FFFFFF" if is_valid else "#f6989d"
+    if platform == "darwin" and colour == "#FFFFFF":
+        colour = "#333333"
+
     combobox_edit.setStyleSheet(f"QComboBox {{ background-color: {colour} }}")
     if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
         tooltip_on_reject += suggestion_callable()
@@ -86,7 +90,9 @@ def validate_line_edit(
     :param tooltip_on_reject: Tooltip to display if line edit is invalid.
     :return: None.
     """
-    colour = "#333333" if is_valid else "#f6989d"
+    colour = "#FFFFFF" if is_valid else "#f6989d"
+    if platform == "darwin" and colour == "#FFFFFF":
+        colour = "#333333"
     line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
     if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
         tooltip_on_reject += suggestion_callable()

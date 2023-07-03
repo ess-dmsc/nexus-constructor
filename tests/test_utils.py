@@ -24,7 +24,11 @@ def test_GIVEN_invalid_WHEN_validating_line_edit_THEN_line_edit_turns_red():
 def test_GIVEN_valid_WHEN_validating_line_edit_THEN_line_edit_turns_white():
     line_edit = DummyLineEdit()
     validate_line_edit(line_edit, True)
-    assert "background-color: #333333" in line_edit.stylesheet
+    assert (
+        "background-color: "
+        + ("#333333" if os.uname().sysname == "Darwin" else "#FFFFFF")
+        in line_edit.stylesheet
+    )
 
 
 def test_GIVEN_valid_WHEN_validating_line_edit_with_tooltip_THEN_line_edit_tooltip_is_changed():
