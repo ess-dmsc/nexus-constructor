@@ -37,7 +37,7 @@ class LineGeometry(Qt3DCore.QGeometry):
         self.position_attribute.setCount(2)
         self.addAttribute(self.position_attribute)
 
-        if platform == "darwin":
+        if platform == "darwin": #  this may no longer be needed
             normal = QVector3D.normal(QVector3D(0, 0, 0), QVector3D(0, 0, 0))
             normal_buffer_values = []
             # Need to have a normal for each vector
