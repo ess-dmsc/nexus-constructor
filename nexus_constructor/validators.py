@@ -418,7 +418,9 @@ class FieldValueValidator(QValidator):
         :param pos: mouse position cursor(ignored, just here to satisfy overriding function)
         :return: QValidator state (Acceptable, Intermediate, Invalid) - returning intermediate because invalid stops the user from typing.
         """
-        if not input and not self.scalar == FILEWRITER:  # More criteria here
+        if self.scalar == FILEWRITER:
+            return self._emit_and_return(True)
+        if not input:  # More criteria here
             return self._emit_and_return(False)
         if self.field_type_combo.currentText() == self.scalar:
             try:
