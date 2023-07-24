@@ -42,6 +42,9 @@ class PixelGrid(PixelData):
     The corner that counting starts in, and whether counting should first happen along rows or columns can be set with
     the 'count_direction' and 'initial_count_corner' attributes, which respectively take 'CountDirection' and 'Corner'
     Enum values.
+    If there are gaps between pixels at regular intervals, the number of pixels between two gaps is configured
+    via the 'gap_every_rows' / 'gap_every_columns' attributes, and the size of the gap is set with 'row_gap_height'
+    / 'column_gap_width'.
     """
 
     rows = attr.ib(default=1, type=int)
@@ -51,6 +54,10 @@ class PixelGrid(PixelData):
     first_id = attr.ib(default=0, type=int)
     count_direction = attr.ib(default=CountDirection.ROW, type=CountDirection)
     initial_count_corner = attr.ib(default=Corner.BOTTOM_LEFT, type=Corner)
+    gap_every_rows = attr.ib(default=0, type=int)
+    gap_every_columns = attr.ib(default=0, type=int)
+    row_gap_height = attr.ib(default=0, type=float)
+    column_gap_width = attr.ib(default=0, type=float)
 
 
 @attr.s
