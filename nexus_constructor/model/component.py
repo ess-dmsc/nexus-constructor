@@ -466,6 +466,20 @@ class Component(Group):
             np.array(get_detector_ids_from_pixel_grid(pixel_grid)),
             ValueTypes.INT,
         )
+        if pixel_grid.gap_every_rows and pixel_grid.row_gap_height:
+            self.attributes.set_attribute_value(
+                "pixelgrid_gap_every_rows", pixel_grid.gap_every_rows
+            )
+            self.attributes.set_attribute_value(
+                "pixelgrid_row_gap_height", pixel_grid.row_gap_height
+            )
+        if pixel_grid.gap_every_columns and pixel_grid.column_gap_width:
+            self.attributes.set_attribute_value(
+                "pixelgrid_gap_every_columns", pixel_grid.gap_every_columns
+            )
+            self.attributes.set_attribute_value(
+                "pixelgrid_column_gap_width", pixel_grid.column_gap_width
+            )
 
     def record_pixel_mapping(self, pixel_mapping: PixelMapping):
         """
