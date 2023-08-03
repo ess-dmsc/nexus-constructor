@@ -2,6 +2,7 @@ nexusformat
 numpy
 numpy-stl
 #lightgbm for macOS should instead be installed via (brew/port) install libomp (needed for open3d)
+urllib3<2.0
 open3d #installs a binary linked to homebrew; make a directory and symlink, e.g. ln -s /opt/local/lib/libomp/libomp.dylib /opt/homebrew/opt/libomp/lib/libomp.dylib
 pint<=0.21
 PySide6<6.4.0
