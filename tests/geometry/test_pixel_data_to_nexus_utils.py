@@ -34,16 +34,47 @@ EXPECTED_DETECTOR_IDS = {
 ROW_COL_VALS = [4, 7]
 
 
+@pytest.fixture(params=[0, 1, 4])
+def pixel_grid_gap_every_rows(request):
+    return request.param
+
+
+@pytest.fixture(params=[0, 1, 3])
+def pixel_grid_gap_every_columns(request):
+    return request.param
+
+
 @pytest.fixture(scope="function")
-def pixel_grid():
+def pixel_grid(pixel_grid_gap_every_rows, pixel_grid_gap_every_columns):
     return PixelGrid(
         rows=5,
+        columns=7,
+        row_height=0.873,
+        col_width=2.0 / 3,
+        first_id=0,
+        count_direction=CountDirection.ROW,
+        initial_count_corner=Corner.BOTTOM_LEFT,
+        gap_every_rows=pixel_grid_gap_every_rows,
+        gap_every_columns=pixel_grid_gap_every_columns,
+        row_gap_height=0.1,
+        column_gap_width=0.7,
+    )
+
+
+@pytest.fixture(scope="function")
+def pixel_grid_without_gaps():
+    return PixelGrid(
+        rows=3,
         columns=4,
         row_height=0.873,
         col_width=2.0 / 3,
         first_id=0,
         count_direction=CountDirection.ROW,
         initial_count_corner=Corner.BOTTOM_LEFT,
+        gap_every_rows=0,
+        gap_every_columns=3,
+        row_gap_height=0.1,
+        column_gap_width=0,
     )
 
 
@@ -89,11 +120,63 @@ def test_GIVEN_single_id_WHEN_calling_detector_number_THEN_list_is_not_returned(
     assert get_detector_number_from_pixel_mapping(pixel_mapping) == [pixel_id]
 
 
+def test_GIVEN_simple_pixel_grid_WHEN_calling_pixel_grid_offsets_THEN_correct_offset_lists_are_returned():
+    pixel_grid = PixelGrid(
+        rows=4,
+        columns=4,
+        row_height=0.9,
+        col_width=2.0 / 3,
+        first_id=0,
+        count_direction=CountDirection.ROW,
+        initial_count_corner=Corner.BOTTOM_LEFT,
+        gap_every_rows=2,
+        gap_every_columns=1,
+        row_gap_height=0.25,
+        column_gap_width=0.7,
+    )
+
+    expected_x_offsets = [
+        [
+            (pixel_grid.column_gap_width + pixel_grid.col_width) * -1.5,
+            (pixel_grid.column_gap_width + pixel_grid.col_width) * -0.5,
+            (pixel_grid.column_gap_width + pixel_grid.col_width) * 0.5,
+            (pixel_grid.column_gap_width + pixel_grid.col_width) * 1.5,
+        ]
+        for _ in range(pixel_grid.rows)
+    ]
+    expected_y_offsets = [
+        [
+            (1.5 * pixel_grid.row_height + 0.5 * pixel_grid.row_gap_height)
+            for _ in range(pixel_grid.columns)
+        ],
+        [
+            (0.5 * pixel_grid.row_height + 0.5 * pixel_grid.row_gap_height)
+            for _ in range(pixel_grid.columns)
+        ],
+        [
+            (-0.5 * pixel_grid.row_height + -0.5 * pixel_grid.row_gap_height)
+            for _ in range(pixel_grid.columns)
+        ],
+        [
+            (-1.5 * pixel_grid.row_height + -0.5 * pixel_grid.row_gap_height)
+            for _ in range(pixel_grid.columns)
+        ],
+    ]
+
+    assert np.allclose(
+        np.array(expected_x_offsets), get_x_offsets_from_pixel_grid(pixel_grid)
+    )
+    assert np.allclose(
+        np.array(expected_y_offsets), get_y_offsets_from_pixel_grid(pixel_grid)
+    )
+
+
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
 @pytest.mark.parametrize("columns", ROW_COL_VALS)
-def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_x_offsets_THEN_correct_x_offset_list_is_returned(
-    pixel_grid, rows, columns
+def test_GIVEN_pixel_grid_without_gaps_WHEN_calling_pixel_grid_x_offsets_THEN_correct_x_offset_list_is_returned(
+    pixel_grid_without_gaps, rows, columns
 ):
+    pixel_grid = pixel_grid_without_gaps
     pixel_grid.columns = columns
     pixel_grid.rows = rows
 
@@ -110,9 +193,48 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_x_offsets_THEN_correct_x_offse
 
 @pytest.mark.parametrize("rows", ROW_COL_VALS)
 @pytest.mark.parametrize("columns", ROW_COL_VALS)
-def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_y_offsets_THEN_correct_y_offset_list_is_returned(
+def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_x_offsets_THEN_correct_x_offset_list_is_returned(
     pixel_grid, rows, columns
 ):
+    pixel_grid.columns = columns
+    pixel_grid.rows = rows
+    number_of_column_gaps = (
+        (pixel_grid.columns - 1) // pixel_grid.gap_every_columns
+        if pixel_grid.gap_every_columns
+        else 0
+    )
+
+    offset_offset = ((pixel_grid.columns - 1) * pixel_grid.col_width / 2) + (
+        pixel_grid.column_gap_width * number_of_column_gaps / 2
+    )
+    expected_x_offsets = [
+        [0 for _ in range(pixel_grid.columns)] for _ in range(pixel_grid.rows)
+    ]
+    gap_counter = 0
+    for i in range(pixel_grid.columns):
+        for j in range(pixel_grid.rows):
+            expected_x_offsets[j][i] = (
+                (i * pixel_grid.col_width)
+                + gap_counter * pixel_grid.column_gap_width
+                - offset_offset
+            )
+        if (
+            pixel_grid.gap_every_columns > 0
+            and (i + 1) % pixel_grid.gap_every_columns == 0
+        ):
+            gap_counter += 1
+
+    assert np.allclose(
+        np.array(expected_x_offsets), get_x_offsets_from_pixel_grid(pixel_grid)
+    )
+
+
+@pytest.mark.parametrize("rows", ROW_COL_VALS)
+@pytest.mark.parametrize("columns", ROW_COL_VALS)
+def test_GIVEN_pixel_grid_without_gaps_WHEN_calling_pixel_grid_y_offsets_THEN_correct_y_offset_list_is_returned(
+    pixel_grid_without_gaps, rows, columns
+):
+    pixel_grid = pixel_grid_without_gaps
     pixel_grid.columns = columns
     pixel_grid.rows = rows
 
@@ -121,6 +243,41 @@ def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_y_offsets_THEN_correct_y_offse
         [(j * pixel_grid.row_height) - offset_offset for _ in range(pixel_grid.columns)]
         for j in reversed(range(pixel_grid.rows))
     ]
+
+    assert np.allclose(
+        np.array(expected_y_offsets), get_y_offsets_from_pixel_grid(pixel_grid)
+    )
+
+
+@pytest.mark.parametrize("rows", ROW_COL_VALS)
+@pytest.mark.parametrize("columns", ROW_COL_VALS)
+def test_GIVEN_pixel_grid_WHEN_calling_pixel_grid_y_offsets_THEN_correct_y_offset_list_is_returned(
+    pixel_grid, rows, columns
+):
+    pixel_grid.columns = columns
+    pixel_grid.rows = rows
+    number_of_row_gaps = (
+        (pixel_grid.rows - 1) // pixel_grid.gap_every_rows
+        if pixel_grid.gap_every_rows
+        else 0
+    )
+
+    offset_offset = ((pixel_grid.rows - 1) * pixel_grid.row_height / 2) + (
+        pixel_grid.row_gap_height * number_of_row_gaps / 2
+    )
+    expected_y_offsets = [
+        [0 for _ in range(pixel_grid.columns)] for _ in range(pixel_grid.rows)
+    ]
+    gap_counter = 0
+    for i in range(pixel_grid.rows):
+        for j in range(pixel_grid.columns):
+            expected_y_offsets[i][j] = (
+                offset_offset
+                - (i * pixel_grid.row_height)
+                - gap_counter * pixel_grid.row_gap_height
+            )
+        if pixel_grid.gap_every_rows > 0 and (i + 1) % pixel_grid.gap_every_rows == 0:
+            gap_counter += 1
 
     assert np.allclose(
         np.array(expected_y_offsets), get_y_offsets_from_pixel_grid(pixel_grid)

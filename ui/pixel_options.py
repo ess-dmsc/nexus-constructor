@@ -108,6 +108,39 @@ class Ui_PixelOptionsWidget(object):
         self.column_width_label = QtWidgets.QLabel(self.pixel_grid_group_box)
         self.column_width_label.setObjectName("columnWidthLabel")
         self.pixel_grid_group_box_layout.addWidget(self.column_width_label, 1, 2, 1, 1)
+        # gaps
+        self.gap_every_rows_label = QtWidgets.QLabel(self.pixel_grid_group_box)
+        self.gap_every_rows_label.setObjectName("gapEveryRowsLabel")
+        self.pixel_grid_group_box_layout.addWidget(
+            self.gap_every_rows_label, 2, 2, 1, 1
+        )
+        self.gap_every_rows_tail_label = QtWidgets.QLabel(self.pixel_grid_group_box)
+        self.gap_every_rows_tail_label.setObjectName("gapEveryRowsTailLabel")
+        self.pixel_grid_group_box_layout.addWidget(
+            self.gap_every_rows_tail_label, 2, 4, 1, 1
+        )
+        self.row_gap_height_label = QtWidgets.QLabel(self.pixel_grid_group_box)
+        self.row_gap_height_label.setObjectName("rowGapHeight")
+        self.pixel_grid_group_box_layout.addWidget(
+            self.row_gap_height_label, 3, 2, 1, 1
+        )
+        #
+        self.gap_every_columns_label = QtWidgets.QLabel(self.pixel_grid_group_box)
+        self.gap_every_columns_label.setObjectName("gapEveryColumnsLabel")
+        self.pixel_grid_group_box_layout.addWidget(
+            self.gap_every_columns_label, 4, 2, 1, 1
+        )
+        self.gap_every_columns_tail_label = QtWidgets.QLabel(self.pixel_grid_group_box)
+        self.gap_every_columns_tail_label.setObjectName("gapEveryColumnsTailLabel")
+        self.pixel_grid_group_box_layout.addWidget(
+            self.gap_every_columns_tail_label, 4, 4, 1, 1
+        )
+        self.column_gap_width_label = QtWidgets.QLabel(self.pixel_grid_group_box)
+        self.column_gap_width_label.setObjectName("columnGapWidth")
+        self.pixel_grid_group_box_layout.addWidget(
+            self.column_gap_width_label, 5, 2, 1, 1
+        )
+
         self.first_id_label = QtWidgets.QLabel(self.pixel_grid_group_box)
         self.first_id_label.setObjectName("firstIDLabel")
         self.pixel_grid_group_box_layout.addWidget(self.first_id_label, 2, 0, 1, 1)
@@ -132,7 +165,7 @@ class Ui_PixelOptionsWidget(object):
         self.start_counting_combo_box.addItem("")
         self.start_counting_combo_box.addItem("")
         self.pixel_grid_group_box_layout.addWidget(
-            self.start_counting_combo_box, 3, 2, 1, 2
+            self.start_counting_combo_box, 3, 1, 1, 1
         )
 
         self.count_first_combo_box = QtWidgets.QComboBox(self.pixel_grid_group_box)
@@ -141,7 +174,7 @@ class Ui_PixelOptionsWidget(object):
         self.count_first_combo_box.setInsertPolicy(QtWidgets.QComboBox.InsertAtCurrent)
         self.count_first_combo_box.setObjectName("countFirstComboBox")
         self.pixel_grid_group_box_layout.addWidget(
-            self.count_first_combo_box, 4, 2, 1, 2
+            self.count_first_combo_box, 4, 1, 1, 1
         )
 
         self.row_count_spin_box = QtWidgets.QSpinBox(self.pixel_grid_group_box)
@@ -179,6 +212,48 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_grid_group_box_layout.addWidget(
             self.column_width_spin_box, 1, 3, 1, 1
         )
+        # gaps
+        self.gap_every_rows_spin_box = QtWidgets.QSpinBox(self.pixel_grid_group_box)
+        self.gap_every_rows_spin_box.setMinimum(0)
+        self.gap_every_rows_spin_box.setSingleStep(1)
+        self.gap_every_rows_spin_box.setProperty("value", 0)
+        self.gap_every_rows_spin_box.setObjectName("gapEveryRowsSpinBox")
+        self.gap_every_rows_spin_box.setMaximum(10000000)
+        self.pixel_grid_group_box_layout.addWidget(
+            self.gap_every_rows_spin_box, 2, 3, 1, 1
+        )
+        self.row_gap_height_spin_box = QtWidgets.QDoubleSpinBox(
+            self.pixel_grid_group_box
+        )
+        self.row_gap_height_spin_box.setMinimum(0)
+        self.row_gap_height_spin_box.setSingleStep(0.01)
+        self.row_gap_height_spin_box.setProperty("value", 0)
+        self.row_gap_height_spin_box.setObjectName("rowGapHeightSpinBox")
+        self.row_gap_height_spin_box.setMaximum(1000000)
+        self.pixel_grid_group_box_layout.addWidget(
+            self.row_gap_height_spin_box, 3, 3, 1, 1
+        )
+        self.gap_every_columns_spin_box = QtWidgets.QSpinBox(self.pixel_grid_group_box)
+        self.gap_every_columns_spin_box.setMinimum(0)
+        self.gap_every_columns_spin_box.setSingleStep(1)
+        self.gap_every_columns_spin_box.setProperty("value", 0)
+        self.gap_every_columns_spin_box.setObjectName("gapEveryColumnsSpinBox")
+        self.gap_every_columns_spin_box.setMaximum(10000000)
+        self.pixel_grid_group_box_layout.addWidget(
+            self.gap_every_columns_spin_box, 4, 3, 1, 1
+        )
+        self.column_gap_width_spin_box = QtWidgets.QDoubleSpinBox(
+            self.pixel_grid_group_box
+        )
+        self.column_gap_width_spin_box.setMinimum(0)
+        self.column_gap_width_spin_box.setSingleStep(0.01)
+        self.column_gap_width_spin_box.setProperty("value", 0)
+        self.column_gap_width_spin_box.setObjectName("columnGapWidthSpinBox")
+        self.column_gap_width_spin_box.setMaximum(1000000)
+        self.pixel_grid_group_box_layout.addWidget(
+            self.column_gap_width_spin_box, 5, 3, 1, 1
+        )
+        #
         self.pixel_grid_page_layout.addWidget(self.pixel_grid_group_box)
 
     def retranslateUi(self, PixelOptionsWidget):
@@ -240,7 +315,7 @@ class Ui_PixelOptionsWidget(object):
             )
         )
         self.row_label.setText(
-            QtWidgets.QApplication.translate("PixelOptionsWidget", "Row:", None, -1)
+            QtWidgets.QApplication.translate("PixelOptionsWidget", "Rows:", None, -1)
         )
         self.row_height_label.setText(
             QtWidgets.QApplication.translate(
@@ -250,6 +325,32 @@ class Ui_PixelOptionsWidget(object):
         self.column_width_label.setText(
             QtWidgets.QApplication.translate(
                 "PixelOptionsWidget", "Column width:", None, -1
+            )
+        )
+        self.gap_every_rows_label.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Gap every", None, -1
+            )
+        )
+        self.gap_every_rows_tail_label.setText(
+            QtWidgets.QApplication.translate("PixelOptionsWidget", "rows", None, -1)
+        )
+        self.row_gap_height_label.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Row gap height:", None, -1
+            )
+        )
+        self.gap_every_columns_label.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Gap every", None, -1
+            )
+        )
+        self.gap_every_columns_tail_label.setText(
+            QtWidgets.QApplication.translate("PixelOptionsWidget", "columns", None, -1)
+        )
+        self.column_gap_width_label.setText(
+            QtWidgets.QApplication.translate(
+                "PixelOptionsWidget", "Column gap width:", None, -1
             )
         )
         self.first_id_label.setText(

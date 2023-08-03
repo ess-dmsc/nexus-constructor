@@ -57,10 +57,22 @@ def get_x_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     Returns an array of x-offsets. Each value in the array is the x position of a pixel instance defined in the
     PixelGrid.
     """
-    half_distance = grid.col_width / 2
-    end = half_distance * (grid.columns - 1)
+    if grid.gap_every_columns > 0:
+        total_width = (
+            grid.columns * grid.col_width
+            + ((grid.columns - 1) // grid.gap_every_columns) * grid.column_gap_width
+        )
+    else:
+        total_width = grid.columns * grid.col_width
 
-    offsets = np.linspace(start=-end, stop=end, num=grid.columns)
+    start = -total_width / 2 + grid.col_width / 2
+    offsets = np.zeros(grid.columns)
+    gap_counter = 0
+    for i in range(grid.columns):
+        offsets[i] = start + i * grid.col_width + gap_counter * grid.column_gap_width
+        # If there is a gap, increment the gap counter
+        if grid.gap_every_columns > 0 and (i + 1) % grid.gap_every_columns == 0:
+            gap_counter += 1
     return np.tile(offsets, (grid.rows, 1))
 
 
@@ -69,10 +81,22 @@ def get_y_offsets_from_pixel_grid(grid: PixelGrid) -> Union[np.ndarray, float]:
     Returns an array of y-offsets. Each value in the array is the y position of a pixel instance defined in the
     PixelGrid.
     """
-    half_distance = grid.row_height / 2
-    end = half_distance * (grid.rows - 1)
+    if grid.gap_every_rows > 0:
+        total_height = (
+            grid.rows * grid.row_height
+            + ((grid.rows - 1) // grid.gap_every_rows) * grid.row_gap_height
+        )
+    else:
+        total_height = grid.rows * grid.row_height
 
-    offsets = np.linspace(start=end, stop=-end, num=grid.rows)
+    start = total_height / 2 - grid.row_height / 2
+    offsets = np.zeros(grid.rows)
+    gap_counter = 0
+    for i in range(grid.rows):
+        offsets[i] = start - i * grid.row_height - gap_counter * grid.row_gap_height
+        # If there is a gap, increment the gap counter
+        if grid.gap_every_rows > 0 and (i + 1) % grid.gap_every_rows == 0:
+            gap_counter += 1
     return np.tile(offsets, (grid.columns, 1)).transpose()
 
 

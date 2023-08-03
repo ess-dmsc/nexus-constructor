@@ -154,6 +154,18 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
             self.start_counting_combo_box.setCurrentText(start_counting_text)
             self.count_first_combo_box.setCurrentText(count_along_text)
 
+            # Set pixel gap information from attributes
+            (
+                gap_every_rows,
+                gap_every_columns,
+                row_gap_height,
+                column_gap_width,
+            ) = self._get_pixel_gaps_information(component_to_edit)
+            self.gap_every_rows_spin_box.setValue(gap_every_rows)
+            self.gap_every_columns_spin_box.setValue(gap_every_columns)
+            self.row_gap_height_spin_box.setValue(row_gap_height)
+            self.column_gap_width_spin_box.setValue(column_gap_width)
+
         else:
             # If the pixel offset information represents a single pixel
             pass
@@ -248,6 +260,40 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         start_counting_text = " ".join(start_counting)
 
         return first_id, start_counting_text, count_along_text
+
+    @staticmethod
+    def _get_pixel_gaps_information(
+        component_to_edit: Component,
+    ) -> Tuple[Optional[int], Optional[int], Optional[float], Optional[float]]:
+        """
+        Loads pixel gap information from NXdetector custom attributes.
+        """
+        gap_every_rows = (
+            component_to_edit.attributes.get_attribute_value("pixelgrid_gap_every_rows")
+            or 0
+        )
+        gap_every_columns = (
+            component_to_edit.attributes.get_attribute_value(
+                "pixelgrid_gap_every_columns"
+            )
+            or 0
+        )
+        row_gap_height = (
+            component_to_edit.attributes.get_attribute_value("pixelgrid_row_gap_height")
+            or 0
+        )
+        column_gap_width = (
+            component_to_edit.attributes.get_attribute_value(
+                "pixelgrid_column_gap_width"
+            )
+            or 0
+        )
+        return (
+            int(gap_every_rows),
+            int(gap_every_columns),
+            float(row_gap_height),
+            float(column_gap_width),
+        )
 
     def _fill_entire_shape_fields(self, component_to_edit: Component):
         """
@@ -492,6 +538,10 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
                 initial_count_corner=INITIAL_COUNT_CORNER[
                     self.start_counting_combo_box.currentText()
                 ],
+                gap_every_rows=self.gap_every_rows_spin_box.value(),
+                gap_every_columns=self.gap_every_columns_spin_box.value(),
+                row_gap_height=self.row_gap_height_spin_box.value(),
+                column_gap_width=self.column_gap_width_spin_box.value(),
             )
 
         if self.entire_shape_radio_button.isChecked():
