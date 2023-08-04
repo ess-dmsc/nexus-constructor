@@ -9,7 +9,7 @@ class LinkTransformation:
     """
     Used for keeping track of links (depends_on) to transformations outside the
     current component and for keeping track of the parent transformation list
-    Not a "link" in the NeXus/HDF5 sense
+    Not a "link" in the NeXus/HDF5 sense so the name should be changed
     """
 
     def __init__(self, parent: TransformationsList):
