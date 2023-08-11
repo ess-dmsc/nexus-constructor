@@ -377,10 +377,11 @@ class JSONReader:
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
         depends_on = _find_depends_on_path(children_dict, component.name)
-        if depends_on not in [".", ""]:
+        if depends_on not in [".", "", None]:
             if depends_on[0] != "/":
-                if depends_on.split("/")[0].startswith('transform'):
-                    depends_on = depends_on.split("/")[1]
+                #   we are always in the NXtransformations group but the path could be anything
+                if len(depends_on.split("/")) == 2:
+                    depends_on = depends_on.split('/')[1]
                 depends_on = component.absolute_path + "/transformations/" + depends_on
 
         if depends_on not in DEPENDS_ON_IGNORE:

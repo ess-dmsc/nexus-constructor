@@ -120,10 +120,43 @@ def json_dict_with_component():
                   ],
                   "children":[
                     {
-                      "type":"group",
                       "name":"transformations",
+                      "type":"group",
                       "children":[
-
+                        {
+                          "module": "dataset",
+                          "config": {
+                              "name": "slit0",
+                              "values": 10.0,
+                              "type": "float"
+                          },
+                          "attributes": [
+                            {
+                                "name": "vector",
+                                "dtype": "float",
+                                "values": [
+                                    0.0,
+                                    0.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "name": "depends_on",
+                                "dtype": "string",
+                                "values": "."
+                            },
+                            {
+                                "name": "transformation_type",
+                                "dtype": "string",
+                                "values": "translation"
+                            },
+                            {
+                                "name": "units",
+                                "dtype": "string",
+                                "values": "metre"
+                            }
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -144,122 +177,7 @@ def json_dict_with_component():
                 {
                   "type":"group",
                   "name":"transformations",
-                  "children":[
-
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-    """
-    return json.loads(json_string)
-
-
-@pytest.fixture(scope="function")
-def json_dict_with_component_and_transform():
-    json_string = """
-    {
-      "children":[
-        {
-          "name":"entry",
-          "type":"group",
-          "attributes":[
-            {
-              "name":"NX_class",
-              "type":"String",
-              "values":"NXentry"
-            }
-          ],
-          "children":[
-            {
-              "name":"instrument",
-              "type":"group",
-              "attributes":[
-                {
-                  "name":"NX_class",
-                  "type":"String",
-                  "values":"NXinstrument"
-                }
-              ],
-              "children":[
-                {
-                  "name":"test_component",
-                  "type":"group",
-                  "attributes":[
-                    {
-                      "name":"NX_class",
-                      "type":"String",
-                      "values":"NXaperture"
-                    }
-                  ],
-                  "children":[
-                    {
-                      "module":"dataset",
-                      "attributes":[],
-                      "config":{
-                        "name":"depends_on",
-                        "type":"string",
-                        "values": "/entry/instrument/test_component/transformations/location"
-                      }
-                    },
-                    {
-                      "type":"group",
-                      "name":"transformations",
-                      "children":[
-                        {
-                          "module":"dataset",
-                          "config":{
-                            "type":"double",
-                            "values":1.0,
-                            "name":"location"
-                          },
-                          "attributes":[
-                            {
-                              "name":"units",
-                              "values":"m"
-                            },
-                            {
-                              "name":"transformation_type",
-                              "values":"translation"
-                            },
-                            {
-                              "name":"vector",
-                              "values":[
-                                0.0,
-                                0.0,
-                                0.0
-                              ],
-                              "type":"double"
-                            },
-                            {
-                              "name":"depends_on",
-                              "values":"."
-                            }
-                          ]
-                        }
-                      ],
-                      "attributes":[
-                        {
-                          "name":"NX_class",
-                          "values":"NXtransformations"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name":"sample",
-              "type":"group",
-              "attributes":[
-                {
-                  "name":"NX_class",
-                  "type":"String",
-                  "values":"NXsample"
+                  "children":[]
                 }
               ]
             }
@@ -382,9 +300,7 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     json_dict_with_component, json_reader
 ):
     component_class = "NXcrystal"
-    json_dict_with_component["children"][0]["children"][0]["children"][0]["attributes"][
-        0
-    ]["values"] = component_class
+    json_dict_with_component["children"][0]["children"][0]["children"][0]["attributes"][0]["values"] = component_class
     node = json_reader._read_json_object(
         json_dict_with_component["children"][0]["children"][0]
     )
@@ -420,6 +336,29 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
     json_reader._load_from_json_dict(json_dict_with_component)
 
     assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
+
+
+def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_THEN_model_updated(json_dict_with_component, json_reader):
+
+    depends_on_dataset_str = """
+    {
+      "module":"dataset",
+      "attributes":[],
+      "config":{
+        "type":"string",
+        "values": "/entry/instrument/test_component/transformations/slit0",
+        "name":"depends_on"
+      }
+    }
+    """
+    depends_on_dataset = json.loads(depends_on_dataset_str)
+
+    # Add depends_on dataset which points to a transformation which does not exist in the JSON
+    json_dict_with_component["children"][0]["children"][0]["children"][0][
+        "children"
+    ].append(depends_on_dataset)
+    json_reader._load_from_json_dict(json_dict_with_component)
+    assert json_reader.model.entry.children[0].children[0].stored_items[0].children[0].attributes[1].name == "depends_on"
 
 
 def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
