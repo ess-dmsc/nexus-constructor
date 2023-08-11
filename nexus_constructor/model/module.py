@@ -57,7 +57,8 @@ class StreamModules(Enum):
 
 @attr.s
 class FileWriterModule(ABC):
-    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    name: str = None
+    parent_node: str = None    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
     writer_module = attr.ib(type=str, init=False)
     parent_node = attr.ib(type="Group")
 
