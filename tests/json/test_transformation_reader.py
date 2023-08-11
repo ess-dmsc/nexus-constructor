@@ -128,6 +128,7 @@ PARENT_COMPONENT_NAME = "ParentComponentName"
 def transformation_reader(transformation_json):
     parent_component = Mock(spec=Component)
     parent_component.name = PARENT_COMPONENT_NAME
+    parent_component.absolute_path = "/entry/" + parent_component.name
     entry = [transformation_json]
     transforms_with_dependencies: Dict[
         TransformId, Tuple[Transformation, TransformId]

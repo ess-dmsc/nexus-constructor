@@ -306,7 +306,7 @@ class TransformationReader:
             depends_on = _find_attribute_from_list_or_dict(
                 CommonAttrs.DEPENDS_ON, attributes
             )
-            if depends_on not in [".", ""]:
+            if depends_on not in [".", "", None]:
                 if depends_on[0] != "/":
                     depends_on = self.parent_component.absolute_path + "/transformations/" + depends_on
 
