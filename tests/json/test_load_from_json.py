@@ -340,20 +340,20 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
 
 def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_THEN_model_updated(json_dict_with_component, json_reader):
 
+    # Add depends_on dataset which points to a transformation which does not exist in the JSON
     depends_on_dataset_str = """
     {
       "module":"dataset",
       "attributes":[],
       "config":{
         "type":"string",
-        "values": "/entry/instrument/test_component/transformations/slit0",
+        "values": "transformations/slit0",
         "name":"depends_on"
       }
     }
     """
     depends_on_dataset = json.loads(depends_on_dataset_str)
 
-    # Add depends_on dataset which points to a transformation which does not exist in the JSON
     json_dict_with_component["children"][0]["children"][0]["children"][0][
         "children"
     ].append(depends_on_dataset)
