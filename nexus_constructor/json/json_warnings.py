@@ -11,32 +11,32 @@ the expected warning is triggered without having to test exact warning string
 
 @attr.s
 class InvalidJson:
-    message = attr.ib(type=str)
+    message: str = attr.ib()
 
 
 @attr.s
 class InvalidShape:
-    message = attr.ib(type=str)
+    message: str = attr.ib()
 
 
 @attr.s
 class InvalidTransformation:
-    message = attr.ib(type=str)
+    message: str = attr.ib()
 
 
 @attr.s
 class TransformDependencyMissing:
-    message = attr.ib(type=str)
+    message: str = attr.ib()
 
 
 @attr.s
 class NameFieldMissing:
-    message = attr.ib(type=str)
+    message: str = attr.ib()
 
 
 @attr.s
 class NXClassAttributeMissing:
-    message = attr.ib(type=str)
+    message: str = attr.ib()
 
 
 JsonWarning = Union[

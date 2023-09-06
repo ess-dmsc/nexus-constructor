@@ -1,6 +1,6 @@
 from abc import ABC
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 import attr
 import h5py
@@ -11,7 +11,7 @@ from nexus_constructor.model.attributes import Attributes
 from nexus_constructor.model.helpers import get_absolute_path
 
 if TYPE_CHECKING:
-    from nexus_constructor.model.group import Group  # noqa: F401
+    from nexus_constructor.model.group import Group
 
 from nexus_constructor.model.value_type import JsonSerialisableType, ValueType
 
@@ -58,10 +58,10 @@ class StreamModules(Enum):
 @attr.s
 class FileWriterModule(ABC):
     name = ""
-    parent_node = ""
-    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
-    writer_module = attr.ib(type=str, init=False)
-    parent_node = attr.ib(type="Group")
+    attributes: Attributes = attr.ib(factory=Attributes, init=False)
+    writer_module: str = attr.ib(init=False)
+    parent_node: Optional["Group"] = attr.ib()
+    children = []
 
     def as_dict(self, error_collector: List[str]):
         raise NotImplementedError()
@@ -76,8 +76,8 @@ class FileWriterModule(ABC):
 
 @attr.s
 class StreamModule(FileWriterModule):
-    source = attr.ib(type=str)
-    topic = attr.ib(type=str)
+    source: str = attr.ib()
+    topic: str = attr.ib()
 
     def as_dict(self, error_collector: List[str]):
         return_dict = {
@@ -93,13 +93,13 @@ class StreamModule(FileWriterModule):
 
 @attr.s
 class NS10Stream(StreamModule):
-    writer_module = attr.ib(type=str, default=WriterModules.NS10.value, init=False)
+    writer_module: str = attr.ib(default=WriterModules.NS10.value, init=False)
 
 
 @attr.s
 class SE00Stream(StreamModule):
-    type = attr.ib(type=str)
-    writer_module = attr.ib(type=str, default=WriterModules.SE00.value, init=False)
+    type: str = attr.ib()
+    writer_module: str = attr.ib(default=WriterModules.SE00.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -110,20 +110,20 @@ class SE00Stream(StreamModule):
 
 @attr.s
 class SENVStream(StreamModule):
-    writer_module = attr.ib(type=str, default=WriterModules.SENV.value, init=False)
+    writer_module: str = attr.ib(default=WriterModules.SENV.value, init=False)
 
 
 @attr.s
 class TDCTStream(StreamModule):
-    writer_module = attr.ib(type=str, default=WriterModules.TDCTIME.value, init=False)
+    writer_module: str = attr.ib(default=WriterModules.TDCTIME.value, init=False)
 
 
 @attr.s
 class EV42Stream(StreamModule):
-    writer_module = attr.ib(type=str, default=WriterModules.EV42.value, init=False)
-    adc_pulse_debug = attr.ib(type=bool, default=None)
-    cue_interval = attr.ib(type=int, default=None)
-    chunk_size = attr.ib(type=int, default=None)
+    writer_module: str = attr.ib(default=WriterModules.EV42.value, init=False)
+    adc_pulse_debug: bool = attr.ib(default=None)
+    cue_interval: int = attr.ib(default=None)
+    chunk_size: int = attr.ib(default=None)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -138,17 +138,17 @@ class EV42Stream(StreamModule):
 
 @attr.s
 class EV44Stream(EV42Stream):
-    writer_module = attr.ib(type=str, default=WriterModules.EV44.value, init=False)
+    writer_module: str = attr.ib(default=WriterModules.EV44.value, init=False)
 
 
 @attr.s
 class F142Stream(StreamModule):
-    type = attr.ib(type=str)
-    cue_interval = attr.ib(type=int, default=None)
-    chunk_size = attr.ib(type=int, default=None)
-    value_units = attr.ib(type=str, default=None)
-    array_size = attr.ib(type=list, default=None)
-    writer_module = attr.ib(type=str, default=WriterModules.F142.value, init=False)
+    type: str = attr.ib()
+    cue_interval: int = attr.ib(default=None)
+    chunk_size: int = attr.ib(default=None)
+    value_units: str = attr.ib(default=None)
+    array_size: list = attr.ib(default=None)
+    writer_module: str = attr.ib(default=WriterModules.F142.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -167,17 +167,15 @@ class F142Stream(StreamModule):
 
 @attr.s
 class F144Stream(F142Stream):
-    writer_module = attr.ib(type=str, default=WriterModules.F144.value, init=False)
+    writer_module: str = attr.ib(default=WriterModules.F144.value, init=False)
 
 
 @attr.s
 class FileWriter(FileWriterModule):
-    name = attr.ib(type=str)
-    type = attr.ib(type=str, default="string")
-    values = attr.ib(type=str, default=None)
-    writer_module = attr.ib(
-        type=str, default=WriterModules.FILEWRITER.value, init=False
-    )
+    name: str = attr.ib()
+    type: str = attr.ib(default="string")
+    values: str = attr.ib(default=None)
+    writer_module: str = attr.ib(default=WriterModules.FILEWRITER.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
         return {
@@ -192,9 +190,9 @@ class FileWriter(FileWriterModule):
 
 @attr.s
 class Link(FileWriterModule):
-    name = attr.ib(type=str)
-    source = attr.ib(type=str)
-    writer_module = attr.ib(type=str, default=WriterModules.LINK.value, init=False)
+    name: str = attr.ib()
+    source: str = attr.ib()
+    writer_module: str = attr.ib(default=WriterModules.LINK.value, init=False)
     values = None
 
     def as_dict(self, error_collector: List[str]):
@@ -210,10 +208,10 @@ class Link(FileWriterModule):
 
 @attr.s
 class Dataset(FileWriterModule):
-    name = attr.ib(type=str)
-    values = attr.ib(type=Union[List[ValueType], ValueType])
-    type = attr.ib(type=str, default=None)
-    writer_module = attr.ib(type=str, default=WriterModules.DATASET.value, init=False)
+    name: str = attr.ib()
+    values: Union[List[ValueType], ValueType] = attr.ib()
+    type: str = attr.ib(default=None)
+    writer_module: str = attr.ib(default=WriterModules.DATASET.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
         values = self.values
@@ -252,8 +250,8 @@ class Dataset(FileWriterModule):
 
 @attr.s
 class ADARStream(StreamModule):
-    array_size = attr.ib(type=list, init=False)
-    writer_module = attr.ib(type=str, default=WriterModules.ADAR.value, init=False)
+    array_size: list = attr.ib(init=False)
+    writer_module: str = attr.ib(default=WriterModules.ADAR.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
@@ -275,11 +273,11 @@ DATASET_NAME = "dataset_name"
 
 @attr.s
 class HS01Shape:
-    size = attr.ib(type=int)
-    label = attr.ib(type=str)
-    unit = attr.ib(type=str)
-    edges = attr.ib(type=List[int])
-    dataset_name = attr.ib(type=str)
+    size: int = attr.ib()
+    label: str = attr.ib()
+    unit: str = attr.ib()
+    edges: List[int] = attr.ib()
+    dataset_name: str = attr.ib()
 
     def as_dict(self, error_collector: List[str]):
         return {
@@ -293,11 +291,11 @@ class HS01Shape:
 
 @attr.s
 class HS01Stream(StreamModule):
-    type = attr.ib(type=str, default=None)
-    error_type = attr.ib(type=str, default=None)
-    edge_type = attr.ib(type=str, default=None)
-    shape = attr.ib(type=List[HS01Shape], default=[])
-    writer_module = attr.ib(type=str, default=WriterModules.HS01.value, init=False)
+    type: str = attr.ib(default=None)
+    error_type: str = attr.ib(default=None)
+    edge_type: str = attr.ib(default=None)
+    shape: List[HS01Shape] = attr.ib(default=[])
+    writer_module: str = attr.ib(default=WriterModules.HS01.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
         module_dict = StreamModule.as_dict(self, error_collector)
