@@ -71,7 +71,7 @@ PLACEHOLDER_WITH_NX_CLASSES = {v: k for k, v in NX_CLASSES_WITH_PLACEHOLDERS.ite
 
 class JSONReader:
     def __init__(self):
-        self.entry_node: Group = None
+        self.entry_node: Optional[Group] = None
         self.model = Model()
         self.sample_name: str = ""
         self.warnings = JsonWarningsContainer()
