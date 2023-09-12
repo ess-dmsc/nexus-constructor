@@ -88,8 +88,6 @@ class Component(Group):
     has_link = attr.ib(type=bool, default=None)
     component_info: "ComponentInfo" = None
     stored_transforms: list = None
-    name: str = None
-    parent_node: str = None
 
     @property
     def stored_items(self) -> List:
@@ -273,7 +271,7 @@ class Component(Group):
         units: str,
         vector: QVector3D,
         depends_on: Transformation,
-        values: Union[Dataset, Group, StreamModule],
+        values: Union[Dataset, Group],
         target_pos: int = -1,
     ) -> Transformation:
         if name is None:

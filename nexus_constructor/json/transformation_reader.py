@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from PySide6.QtGui import QVector3D
 
@@ -127,7 +127,7 @@ class TransformationReader:
         self,
         attribute_name: Union[str, List[str]],
         json_transformation: dict,
-        transform_name: str = "",
+        transform_name: str = None,
         failure_value: Any = None,
     ) -> Any:
         """
@@ -326,11 +326,11 @@ class TransformationReader:
 
             transform = self.parent_component._create_and_add_transform(
                 name=name,
-                transformation_type=cast(str, transformation_type),
+                transformation_type= transformation_type,
                 angle_or_magnitude=angle_or_magnitude,
                 units=units,
                 vector=QVector3D(*vector),
-                depends_on=cast(Transformation, None),
+                depends_on=None,
                 values=values,
             )
             offset = self._find_attribute_in_list(CommonAttrs.OFFSET, name, attributes)

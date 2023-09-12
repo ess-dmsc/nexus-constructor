@@ -1,6 +1,6 @@
 import json
 from json import JSONDecodeError
-from typing import Dict, Optional, Tuple, Union, cast
+from typing import Dict, Optional, Tuple, Union
 
 from nexus_constructor.common_attrs import (
     NX_CLASSES_WITH_PLACEHOLDERS,
@@ -71,7 +71,7 @@ PLACEHOLDER_WITH_NX_CLASSES = {v: k for k, v in NX_CLASSES_WITH_PLACEHOLDERS.ite
 
 class JSONReader:
     def __init__(self):
-        self.entry_node: Group = cast(Group, None)
+        self.entry_node: Group = None
         self.model = Model()
         self.sample_name: str = ""
         self.warnings = JsonWarningsContainer()
@@ -204,14 +204,14 @@ class JSONReader:
             return self._load_from_json_dict(json_dict)
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
-        self.entry_node = cast(Group, self._read_json_object(json_dict[CommonKeys.CHILDREN][0]))
+        self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
         self.model.entry.attributes = self.entry_node.attributes
         for child in self.entry_node.children:
             if isinstance(child, (Dataset, Link, FileWriter, Group)):
                 self.model.entry[child.name] = child
             else:
                 self.model.entry.children.append(child)
-            child.parent_node = cast(str, self.model.entry)
+            child.parent_node = self.model.entry
         self._set_transforms_depends_on()
         self._set_components_depends_on()
         self._append_transformations_to_nx_group()
@@ -236,16 +236,16 @@ class JSONReader:
             }
         return None
 
-    def _read_json_object(self, json_object: Dict, parent_node: Group = cast(Group, None)):
+    def _read_json_object(self, json_object: Dict, parent_node: Group = None):
         """
         Tries to create a component based on the contents of the JSON file.
         :param json_object: A component from the JSON dictionary.
         :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
-        nexus_object: Union[Group, FileWriterModule] = cast(Group, None)
+        nexus_object: Union[Group, FileWriterModule] = None
         use_placeholder = False
         if isinstance(json_object, str) and json_object in PLACEHOLDER_WITH_NX_CLASSES:
-            json_object = cast(Dict, self._replace_placeholder(json_object))
+            json_object = self._replace_placeholder(json_object)
             if not json_object:
                 return
             use_placeholder = True
@@ -258,13 +258,13 @@ class JSONReader:
             except KeyError:
                 self._add_object_warning(CommonKeys.NAME, parent_node)
                 return None
-            nx_class = _find_nx_class(cast(list, json_object.get(CommonKeys.ATTRIBUTES)))
+            nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
             if nx_class == SAMPLE_CLASS_NAME:
                 self.sample_name = name
             if not self._validate_nx_class(name, nx_class):
                 self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
             if nx_class in COMPONENT_TYPES:
-                nexus_object = Component(name=name, parent_node=cast(str, parent_node))
+                nexus_object = Component(name=name, parent_node=parent_node)
                 children_dict = json_object[CommonKeys.CHILDREN]
                 self._add_transform_and_shape_to_component(nexus_object, children_dict)
                 self.model.append_component(nexus_object)
@@ -287,12 +287,12 @@ class JSONReader:
             ) and json_object[NodeType.CONFIG][
                 CommonKeys.NAME
             ] == CommonAttrs.DEPENDS_ON:
-                nexus_object = cast(Group, None)
+                nexus_object = None
             elif module_type in [x.value for x in WriterModules]:
                 nexus_object = create_fw_module_object(
                     module_type, json_object[NodeType.CONFIG], parent_node
                 )
-                nexus_object.parent_node = cast(str, parent_node)
+                nexus_object.parent_node = parent_node
             else:
                 self._add_object_warning("valid module type", parent_node)
                 return None
