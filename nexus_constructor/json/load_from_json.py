@@ -115,9 +115,17 @@ class JSONReader:
                 self.warnings.append(
                     TransformDependencyMissing(
                         f"Component {component_name} depends on "
-                        + (depends_on_id.transform_name if depends_on_id is not None else "Unknown")
+                        + (
+                            depends_on_id.transform_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
                         + " in component "
-                        + (depends_on_id.component_name if depends_on_id is not None else "Unknown")
+                        + (
+                            depends_on_id.component_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
                         + ", but that transform was not successfully loaded from the JSON"
                     )
                 )
@@ -143,9 +151,17 @@ class JSONReader:
                 self.warnings.append(
                     TransformDependencyMissing(
                         f"Transformation {transform_id.transform_name} in component {transform_id.component_name} depends on "
-                        + (depends_on_id.transform_name if depends_on_id is not None else "Unknown")
+                        + (
+                            depends_on_id.transform_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
                         + " in component "
-                        + (depends_on_id.component_name if depends_on_id is not None else "Unknown")
+                        + (
+                            depends_on_id.component_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
                         + ", but that transform was not successfully loaded from the JSON"
                     )
                 )
@@ -381,18 +397,18 @@ class JSONReader:
         )
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
-        depends_on: str = cast(str, _find_depends_on_path(children_dict, component.name))
+        depends_on: str = cast(
+            str, _find_depends_on_path(children_dict, component.name)
+        )
         if depends_on not in [".", "", None]:
             if depends_on[0] != "/":
                 #   we are always in the NXtransformations group but the path could be anything
                 if len(depends_on.split("/")) == 2:
-                    depends_on = depends_on.split('/')[1]
+                    depends_on = depends_on.split("/")[1]
                 depends_on = component.absolute_path + "/transformations/" + depends_on
 
         if depends_on not in DEPENDS_ON_IGNORE:
-            depends_on_id = TransformId(
-                *get_component_and_transform_name(depends_on)
-            )
+            depends_on_id = TransformId(*get_component_and_transform_name(depends_on))
             self._components_depends_on[component.name] = (component, depends_on_id)
         else:
             self._components_depends_on[component.name] = (component, None)

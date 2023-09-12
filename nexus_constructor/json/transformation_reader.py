@@ -308,7 +308,11 @@ class TransformationReader:
             )
             if depends_on not in [".", "", None]:
                 if depends_on[0] != "/":
-                    depends_on = self.parent_component.absolute_path + "/transformations/" + depends_on
+                    depends_on = (
+                        self.parent_component.absolute_path
+                        + "/transformations/"
+                        + depends_on
+                    )
 
             if module == DATASET:
                 values = self._get_transformation_attribute(
@@ -326,7 +330,7 @@ class TransformationReader:
 
             transform = self.parent_component._create_and_add_transform(
                 name=name,
-                transformation_type= transformation_type,
+                transformation_type=transformation_type,
                 angle_or_magnitude=angle_or_magnitude,
                 units=units,
                 vector=QVector3D(*vector),

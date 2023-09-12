@@ -300,7 +300,9 @@ def test_GIVEN_component_with_nx_class_WHEN_loading_from_json_THEN_new_model_con
     json_dict_with_component, json_reader
 ):
     component_class = "NXcrystal"
-    json_dict_with_component["children"][0]["children"][0]["children"][0]["attributes"][0]["values"] = component_class
+    json_dict_with_component["children"][0]["children"][0]["children"][0]["attributes"][
+        0
+    ]["values"] = component_class
     node = json_reader._read_json_object(
         json_dict_with_component["children"][0]["children"][0]
     )
@@ -338,8 +340,9 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
     assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
 
 
-def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_THEN_model_updated(json_dict_with_component, json_reader):
-
+def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_THEN_model_updated(
+    json_dict_with_component, json_reader
+):
     # Add depends_on dataset which points to a transformation which does not exist in the JSON
     depends_on_dataset_str = """
     {
@@ -358,7 +361,15 @@ def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_T
         "children"
     ].append(depends_on_dataset)
     json_reader._load_from_json_dict(json_dict_with_component)
-    assert json_reader.model.entry.children[0].children[0].stored_items[0].children[0].attributes[1].name == "depends_on"
+    assert (
+        json_reader.model.entry.children[0]
+        .children[0]
+        .stored_items[0]
+        .children[0]
+        .attributes[1]
+        .name
+        == "depends_on"
+    )
 
 
 def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
