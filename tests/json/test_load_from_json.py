@@ -396,7 +396,7 @@ def test_GIVEN_json_with_no_path_to_depends_on_WHEN_loaded_THEN_skip_addition_in
     with pytest.raises(AttributeError):
         json_reader.model.entry.children[0].children[0].stored_items[0].children[
             0
-        ].attributes[1] == None
+        ].attributes[1]
 
 
 def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
