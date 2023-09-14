@@ -30,6 +30,11 @@ class TransformDependencyMissing:
 
 
 @attr.s
+class RelativeDependsonWrong:
+    message = attr.ib(type=str)
+
+
+@attr.s
 class NameFieldMissing:
     message = attr.ib(type=str)
 
@@ -44,6 +49,7 @@ JsonWarning = Union[
     InvalidShape,
     InvalidTransformation,
     TransformDependencyMissing,
+    RelativeDependsonWrong,
     NameFieldMissing,
     NXClassAttributeMissing,
 ]

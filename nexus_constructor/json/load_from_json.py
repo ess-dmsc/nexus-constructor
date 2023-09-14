@@ -23,6 +23,7 @@ from nexus_constructor.json.json_warnings import (
     NameFieldMissing,
     NXClassAttributeMissing,
     TransformDependencyMissing,
+    RelativeDependsonWrong
 )
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
@@ -403,6 +404,12 @@ class JSONReader:
                 #   we are always in the NXtransformations group but the path could be anything
                 if len(depends_on.split("/")) <= 2:
                     depends_on = "/transformations/" + depends_on.split("/")[-1]
+                else:
+                    self.warnings.append(
+                        RelativeDependsonWrong(
+                            f"depends_on in component {component.name} is relative, but we only support relative paths of length 1 or 2"
+                        )
+                    )
                 depends_on = component.absolute_path + depends_on
             depends_on_id = TransformId(*get_component_and_transform_name(depends_on))
             self._components_depends_on[component.name] = (component, depends_on_id)
