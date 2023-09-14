@@ -361,42 +361,8 @@ def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_T
         "children"
     ].append(depends_on_dataset)
     json_reader._load_from_json_dict(json_dict_with_component)
-    assert (
-        json_reader.model.entry.children[0]
-        .children[0]
-        .stored_items[0]
-        .children[0]
-        .attributes[1]
-        .name
-        == "depends_on"
-    )
-
-
-def test_GIVEN_json_with_no_path_to_depends_on_WHEN_loaded_THEN_skip_addition_in_tree(
-    json_dict_with_component, json_reader
-):
-    # Add depends_on dataset which points to a transformation in the JSON
-    depends_on_dataset_str = """
-    {
-      "module":"dataset",
-      "attributes":[],
-      "config":{
-        "type":"string",
-        "values": "some/random/path",
-        "name":"depends_on"
-      }
-    }
-    """
-    depends_on_dataset = json.loads(depends_on_dataset_str)
-
-    json_dict_with_component["children"][0]["children"][0]["children"][0][
-        "children"
-    ].append(depends_on_dataset)
-    json_reader._load_from_json_dict(json_dict_with_component)
-    with pytest.raises(AttributeError):
-        json_reader.model.entry.children[0].children[0].stored_items[0].children[
-            0
-        ].attributes[1]
+    assert (json_reader._components_depends_on["componentname"][1].component_name == "componentname")
+    assert (json_reader._components_depends_on["componentname"][1].transform_name == "slit0")
 
 
 def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):
