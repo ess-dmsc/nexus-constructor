@@ -395,16 +395,29 @@ def test_GIVEN_invalid_transformation_type_WHEN_attempting_to_create_transformat
     transformation_reader.parent_component._create_and_add_transform.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "depends_on_path",
+    [
+        "entry/instrument/{depends_on_component_name}/transformations/{depends_on_transform_name}",
+        "transformations/{depends_on_transform_name}",
+        "{depends_on_transform_name}",
+    ],
+)
 def test_GIVEN_transformation_has_depends_on_WHEN_creating_transformations_THEN_details_are_stored_in_dictionary(
-    transformation_reader, transformation_json
+    transformation_reader, transformation_json, depends_on_path
 ):
     depends_on_component_name = "test_component"
     depends_on_transform_name = "transformation1"
-    depends_on_path = f"entry/instrument/{depends_on_component_name}/transformations/{depends_on_transform_name}"
+    undertest_depends_on_path = depends_on_path.format(
+        depends_on_component_name=depends_on_component_name,
+        depends_on_transform_name=depends_on_transform_name,
+    )
     transformation_json["children"][0]["config"][
         "name"
     ] = transformation_name = "TransformationName"
-    transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
+    transformation_json["children"][0]["attributes"][3][
+        "values"
+    ] = undertest_depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 
     transform1 = transformation_reader._transforms_with_dependencies[
