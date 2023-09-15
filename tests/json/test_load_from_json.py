@@ -340,6 +340,7 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
 
     assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
 
+
 @pytest.mark.parametrize(
     "depends_on_path",
     [
