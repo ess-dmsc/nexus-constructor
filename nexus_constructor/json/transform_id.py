@@ -8,5 +8,5 @@ class TransformId:
     Uniquely identifies a Transformation
     """
 
-    component_name = attr.ib(type=str)
-    transform_name = attr.ib(type=str)
+    component_name: str = attr.ib()
+    transform_name: str = attr.ib()
