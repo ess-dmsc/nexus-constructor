@@ -308,9 +308,7 @@ class JSONReader:
                     f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
                 )
         else:
-            self._add_object_warning(
-                "!!No json_object!!", parent_node
-            )
+            self._add_object_warning("!!No json_object!!", parent_node)
 
         # Add attributes to nexus_object.
         if nexus_object and json_object:
