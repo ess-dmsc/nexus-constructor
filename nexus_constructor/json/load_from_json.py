@@ -23,7 +23,7 @@ from nexus_constructor.json.json_warnings import (
     NameFieldMissing,
     NXClassAttributeMissing,
     TransformDependencyMissing,
-    RelativeDependsonWrong
+    RelativeDependsonWrong,
 )
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
