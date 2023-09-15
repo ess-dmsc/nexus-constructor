@@ -39,10 +39,14 @@ class Group:
 
     name: str = attr.ib()
     parent_node: Optional["Group"] = attr.ib(default=None)
-    children: List[Union["FileWriterModule", "Group"]] = attr.ib(factory=list, init=False)
+    children: List[Union["FileWriterModule", "Group"]] = attr.ib(
+        factory=list, init=False
+    )
     attributes: Attributes = attr.ib(factory=Attributes, init=False)
     values = None
-    possible_stream_modules: List[str] = attr.ib(default=attr.Factory(create_list_of_possible_streams))
+    possible_stream_modules: List[str] = attr.ib(
+        default=attr.Factory(create_list_of_possible_streams)
+    )
     _group_placeholder: bool = False
 
     def __getitem__(self, key: str):

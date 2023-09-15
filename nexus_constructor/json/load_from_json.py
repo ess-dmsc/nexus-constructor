@@ -231,7 +231,9 @@ class JSONReader:
             }
         return None
 
-    def _read_json_object(self, json_object: Optional[Dict], parent_node: Optional[Group] = None):
+    def _read_json_object(
+        self, json_object: Optional[Dict], parent_node: Optional[Group] = None
+    ):
         """
         Tries to create a component based on the contents of the JSON file.
         :param json_object: A component from the JSON dictionary.
@@ -258,11 +260,15 @@ class JSONReader:
                 if nx_class == SAMPLE_CLASS_NAME:
                     self.sample_name = name
                 if not self._validate_nx_class(name, nx_class):
-                    self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
+                    self._add_object_warning(
+                        f"valid Nexus class {nx_class}", parent_node
+                    )
                 if nx_class in COMPONENT_TYPES:
                     nexus_object = Component(name=name, parent_node=parent_node)
                     children_dict = json_object[CommonKeys.CHILDREN]
-                    self._add_transform_and_shape_to_component(nexus_object, children_dict)
+                    self._add_transform_and_shape_to_component(
+                        nexus_object, children_dict
+                    )
                     self.model.append_component(nexus_object)
                 else:
                     nexus_object = Group(name=name, parent_node=parent_node)
@@ -281,7 +287,9 @@ class JSONReader:
                 if (
                     module_type == WriterModules.DATASET.value
                     or module_type == WriterModules.FILEWRITER.value
-                ) and json_object[NodeType.CONFIG][CommonKeys.NAME] == CommonAttrs.DEPENDS_ON:
+                ) and json_object[NodeType.CONFIG][
+                    CommonKeys.NAME
+                ] == CommonAttrs.DEPENDS_ON:
                     nexus_object = None
                 elif module_type in [x.value for x in WriterModules]:
                     nexus_object = create_fw_module_object(
