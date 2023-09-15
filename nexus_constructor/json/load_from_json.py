@@ -71,7 +71,6 @@ PLACEHOLDER_WITH_NX_CLASSES = {v: k for k, v in NX_CLASSES_WITH_PLACEHOLDERS.ite
 
 class JSONReader:
     def __init__(self):
-        self.entry_node: Group = None
         self.model = Model()
         self.sample_name: str = ""
         self.warnings = JsonWarningsContainer()
@@ -199,14 +198,15 @@ class JSONReader:
             return self._load_from_json_dict(json_dict)
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
-        self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
-        self.model.entry.attributes = self.entry_node.attributes
-        for child in self.entry_node.children:
-            if isinstance(child, (Dataset, Link, FileWriter, Group)):
-                self.model.entry[child.name] = child
-            else:
-                self.model.entry.children.append(child)
-            child.parent_node = self.model.entry
+        entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        if entry_node:
+            self.model.entry.attributes = entry_node.attributes
+            for child in entry_node.children:
+                if isinstance(child, (Dataset, Link, FileWriter, Group)):
+                    self.model.entry[child.name] = child
+                else:
+                    self.model.entry.children.append(child)
+                child.parent_node = self.model.entry
         self._set_transforms_depends_on()
         self._set_components_depends_on()
         self._append_transformations_to_nx_group()
@@ -231,76 +231,87 @@ class JSONReader:
             }
         return None
 
-    def _read_json_object(self, json_object: Dict, parent_node: Group = None):
+    def _read_json_object(
+        self, json_object: Optional[Dict], parent_node: Optional[Group] = None
+    ):
         """
         Tries to create a component based on the contents of the JSON file.
         :param json_object: A component from the JSON dictionary.
         :param parent_name: The name of the parent object. Used for warning messages if something goes wrong.
         """
-        nexus_object: Union[Group, FileWriterModule] = None
+        nexus_object: Union[Group, FileWriterModule, None] = None
         use_placeholder = False
         if isinstance(json_object, str) and json_object in PLACEHOLDER_WITH_NX_CLASSES:
             json_object = self._replace_placeholder(json_object)
             if not json_object:
-                return
+                return None
             use_placeholder = True
-        if (
-            CommonKeys.TYPE in json_object
-            and json_object[CommonKeys.TYPE] == NodeType.GROUP
-        ):
-            try:
-                name = json_object[CommonKeys.NAME]
-            except KeyError:
-                self._add_object_warning(CommonKeys.NAME, parent_node)
-                return None
-            nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
-            if nx_class == SAMPLE_CLASS_NAME:
-                self.sample_name = name
-            if not self._validate_nx_class(name, nx_class):
-                self._add_object_warning(f"valid Nexus class {nx_class}", parent_node)
-            if nx_class in COMPONENT_TYPES:
-                nexus_object = Component(name=name, parent_node=parent_node)
-                children_dict = json_object[CommonKeys.CHILDREN]
-                self._add_transform_and_shape_to_component(nexus_object, children_dict)
-                self.model.append_component(nexus_object)
-            else:
-                nexus_object = Group(name=name, parent_node=parent_node)
-            nexus_object.nx_class = nx_class
-            if CommonKeys.CHILDREN in json_object:
-                for child in json_object[CommonKeys.CHILDREN]:
-                    node = self._read_json_object(child, nexus_object)
-                    if node and isinstance(node, StreamModule):
-                        nexus_object.children.append(node)
-                        nexus_object.remove_stream_module(node.writer_module)
-                    elif node and node.name not in nexus_object:
-                        nexus_object[node.name] = node
-        elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
-            module_type = json_object[CommonKeys.MODULE]
+        if json_object:
             if (
-                module_type == WriterModules.DATASET.value
-                or module_type == WriterModules.FILEWRITER.value
-            ) and json_object[NodeType.CONFIG][
-                CommonKeys.NAME
-            ] == CommonAttrs.DEPENDS_ON:
-                nexus_object = None
-            elif module_type in [x.value for x in WriterModules]:
-                nexus_object = create_fw_module_object(
-                    module_type, json_object[NodeType.CONFIG], parent_node
-                )
-                nexus_object.parent_node = parent_node
-            else:
-                self._add_object_warning("valid module type", parent_node)
+                CommonKeys.TYPE in json_object
+                and json_object[CommonKeys.TYPE] == NodeType.GROUP
+            ):
+                try:
+                    name = json_object[CommonKeys.NAME]
+                except KeyError:
+                    self._add_object_warning(CommonKeys.NAME, parent_node)
+                    return None
+                nx_class = _find_nx_class(json_object.get(CommonKeys.ATTRIBUTES))
+                if nx_class == SAMPLE_CLASS_NAME:
+                    self.sample_name = name
+                if not self._validate_nx_class(name, nx_class):
+                    self._add_object_warning(
+                        f"valid Nexus class {nx_class}", parent_node
+                    )
+                if nx_class in COMPONENT_TYPES:
+                    nexus_object = Component(name=name, parent_node=parent_node)
+                    children_dict = json_object[CommonKeys.CHILDREN]
+                    self._add_transform_and_shape_to_component(
+                        nexus_object, children_dict
+                    )
+                    self.model.append_component(nexus_object)
+                else:
+                    nexus_object = Group(name=name, parent_node=parent_node)
+                if nexus_object:
+                    nexus_object.nx_class = nx_class
+                    if CommonKeys.CHILDREN in json_object:
+                        for child in json_object[CommonKeys.CHILDREN]:
+                            node = self._read_json_object(child, nexus_object)
+                            if node and isinstance(node, StreamModule):
+                                nexus_object.children.append(node)
+                                nexus_object.remove_stream_module(node.writer_module)
+                            elif node and node.name not in nexus_object:
+                                nexus_object[node.name] = node
+            elif CommonKeys.MODULE in json_object and NodeType.CONFIG in json_object:
+                module_type = json_object[CommonKeys.MODULE]
+                if (
+                    module_type == WriterModules.DATASET.value
+                    or module_type == WriterModules.FILEWRITER.value
+                ) and json_object[NodeType.CONFIG][
+                    CommonKeys.NAME
+                ] == CommonAttrs.DEPENDS_ON:
+                    nexus_object = None
+                elif module_type in [x.value for x in WriterModules]:
+                    nexus_object = create_fw_module_object(
+                        module_type, json_object[NodeType.CONFIG], parent_node
+                    )
+                    if nexus_object:
+                        nexus_object.parent_node = parent_node
+                else:
+                    self._add_object_warning("valid module type", parent_node)
+                    return None
+            elif json_object == USERS_PLACEHOLDER:
+                self.model.entry.users_placeholder = True
                 return None
-        elif json_object == USERS_PLACEHOLDER:
-            self.model.entry.users_placeholder = True
-            return None
+            else:
+                self._add_object_warning(
+                    f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
+                )
         else:
-            self._add_object_warning(
-                f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
-            )
+            self._add_object_warning("!!No json_object!!", parent_node)
 
         # Add attributes to nexus_object.
-        if nexus_object:
+        if nexus_object and json_object:
             json_attrs = json_object.get(CommonKeys.ATTRIBUTES)
             if json_attrs:
                 attributes = Attributes()

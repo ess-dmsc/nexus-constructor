@@ -64,7 +64,7 @@ def _find_attribute_from_dict(attribute_name: str, entry: dict) -> Any:
 
 def _find_attribute_from_list_or_dict(
     attribute_name: str,
-    entry: Union[list, dict],
+    entry: Optional[Union[list, dict, str]],
 ) -> Any:
     """
     Attempts to determine the value of an attribute in a dictionary or a list of dictionaries.
@@ -81,7 +81,7 @@ def _find_attribute_from_list_or_dict(
         return _find_attribute_from_dict(attribute_name, entry)
 
 
-def _find_nx_class(entry: Union[list, dict]) -> str:
+def _find_nx_class(entry: Union[list, dict, str, None]) -> str:
     """
     Tries to find the NX class value from a dictionary or a list of dictionaries.
     :param entry: A dictionary or list of dictionaries.

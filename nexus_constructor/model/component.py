@@ -84,10 +84,12 @@ class Component(Group):
     Base class for a component object. In the NeXus file this would translate to the component group.
     """
 
-    _depends_on = attr.ib(type=Transformation, default=None)
-    has_link = attr.ib(type=bool, default=None)
-    component_info: "ComponentInfo" = None
-    stored_transforms: list = None
+    _depends_on: Transformation = attr.ib(default=None)
+    has_link: bool = attr.ib(default=None)
+    component_info: Optional["ComponentInfo"] = None
+    stored_transforms: list = []
+    name: str = ""
+    parent_node: Optional[Group] = None
 
     @property
     def stored_items(self) -> List:
@@ -271,7 +273,7 @@ class Component(Group):
         units: str,
         vector: QVector3D,
         depends_on: Transformation,
-        values: Union[Dataset, Group],
+        values: Union[Dataset, Group, StreamModule],
         target_pos: int = -1,
     ) -> Transformation:
         if name is None:

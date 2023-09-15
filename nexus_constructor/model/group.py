@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 import attr
 
@@ -19,7 +19,7 @@ from nexus_constructor.model.module import Dataset, StreamModules
 from nexus_constructor.model.value_type import ValueTypes
 
 if TYPE_CHECKING:
-    from nexus_constructor.model.module import FileWriterModule  # noqa: F401
+    from nexus_constructor.model.module import FileWriterModule
 
 TRANSFORMS_GROUP_NAME = "transformations"
 
@@ -37,15 +37,15 @@ class Group:
     Base class for any group which has a set of children and an nx_class attribute.
     """
 
-    name = attr.ib(type=str)
-    parent_node = attr.ib(type="Group", default=None)
-    children: List[Union["FileWriterModule", "Group"]] = attr.ib(  # noqa: F821
+    name: str = attr.ib()
+    parent_node: Optional["Group"] = attr.ib(default=None)
+    children: List[Union["FileWriterModule", "Group"]] = attr.ib(
         factory=list, init=False
     )
-    attributes = attr.ib(type=Attributes, factory=Attributes, init=False)
+    attributes: Attributes = attr.ib(factory=Attributes, init=False)
     values = None
-    possible_stream_modules = attr.ib(
-        type=List[str], default=attr.Factory(create_list_of_possible_streams)
+    possible_stream_modules: List[str] = attr.ib(
+        default=attr.Factory(create_list_of_possible_streams)
     )
     _group_placeholder: bool = False
 
