@@ -430,7 +430,7 @@ def test_GIVEN_transformation_has_depends_on_WHEN_creating_transformations_THEN_
     ), "Expected to find details of dependency stored in dictionary"
 
 
-@pytest.mark.parametrize("depends_on_path", [".", None])
+@pytest.mark.parametrize("depends_on_path", [".", None, ""])
 def test_GIVEN_transformation_has_no_depends_on_WHEN_creating_transformations_THEN_details_arent_stored_in_dictionary(
     transformation_reader, transformation_json, depends_on_path
 ):
