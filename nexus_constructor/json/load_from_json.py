@@ -198,10 +198,10 @@ class JSONReader:
             return self._load_from_json_dict(json_dict)
 
     def _load_from_json_dict(self, json_dict: Dict) -> bool:
-        self.entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
-        if self.entry_node:
-            self.model.entry.attributes = self.entry_node.attributes
-            for child in self.entry_node.children:
+        entry_node = self._read_json_object(json_dict[CommonKeys.CHILDREN][0])
+        if entry_node:
+            self.model.entry.attributes = entry_node.attributes
+            for child in entry_node.children:
                 if isinstance(child, (Dataset, Link, FileWriter, Group)):
                     self.model.entry[child.name] = child
                 else:
@@ -299,6 +299,10 @@ class JSONReader:
                 self._add_object_warning(
                     f"valid {CommonKeys.TYPE} or {CommonKeys.MODULE}", parent_node
                 )
+        else:
+            self._add_object_warning(
+                "!!No json_object!!", parent_node
+            )
 
         # Add attributes to nexus_object.
         if nexus_object and json_object:

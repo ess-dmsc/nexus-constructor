@@ -361,7 +361,7 @@ def test_GIVEN_json_with_sample_WHEN_loading_from_json_THEN_new_model_contains_n
     nexus_json_dictionary["children"][0]["children"][1]["name"] = sample_name
     json_reader._load_from_json_dict(nexus_json_dictionary)
 
-    assert json_reader.entry_node[sample_name].name == sample_name
+    assert json_reader.model.entry.children[1].name == sample_name
 
 
 def test_GIVEN_component_with_name_WHEN_loading_from_json_THEN_new_model_contains_component_with_json_name(
