@@ -9,7 +9,7 @@ from nexus_constructor.common_attrs import (
     NodeType,
 )
 
-DEPENDS_ON_IGNORE = [None, ".", ""]
+DEPENDS_ON_IGNORE = [None, 'None', ".", ""]
 
 
 def _find_shape_information(children: List[Dict]) -> Union[Dict, None]:

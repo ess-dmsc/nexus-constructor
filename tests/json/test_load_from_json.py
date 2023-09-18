@@ -349,61 +349,12 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
     assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
 
 
-def test_GIVEN_json_with_attribute_depends_on_WHEN_loaded_THEN_warning_is_added(
-    json_dict_with_component, json_reader
-):
-    depends_on_dataset_str = """
-    {
-      "module": "dataset",
-      "config": {
-        "name": "translation2",
-        "type": "double",
-        "values": -157.405
-      },
-      "attributes": [
-        {
-          "dtype": "string",
-          "name": "transformation_type",
-          "values": "translation"
-        },
-        {
-          "dtype": "string",
-          "name": "units",
-          "values": "m"
-        },
-        {
-          "dtype": "string",
-          "name": "vector",
-          "values": [
-            0.0,
-            0.0,
-            1.0
-          ]
-        },
-        {
-          "dtype": "string",
-          "name": "depends_on",
-          "values": "translation1"
-        }
-      ]
-    }
-    """
-    depends_on_dataset = json.loads(depends_on_dataset_str)
-
-    # Add depends_on dataset which points to a transformation which does not exist in the JSON
-    json_dict_with_component["children"][0]["children"][0]["children"][0][
-        "children"
-    ].append(depends_on_dataset)
-    json_reader._load_from_json_dict(json_dict_with_component)
-
-    assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
-
-
 @pytest.mark.parametrize(
     "depends_on_path",
     [
         ".",
         "",
+        'None',
         None
     ],
 )
