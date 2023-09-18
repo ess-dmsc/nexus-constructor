@@ -321,7 +321,7 @@ def contains_warning_of_type(
     [
         "/entry/instrument/test_component/transformations/location",
         "transformations/location",
-        "location"
+        "location",
     ],
 )
 def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
@@ -413,7 +413,7 @@ def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_T
     if depends_on_path is not None:
         transform_name = depends_on_path.split("/")[-1]
     else:
-        transform_name = 'None'
+        transform_name = "None"
 
     json_dict_with_component["children"][0]["children"][0]["children"][0][
         "children"
@@ -429,7 +429,8 @@ def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_T
         == "componentname"
     )
     assert (
-        json_reader._components_depends_on["componentname"][1].transform_name == transform_name
+        json_reader._components_depends_on["componentname"][1].transform_name
+        == transform_name
     )
 
 
