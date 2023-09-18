@@ -12,6 +12,7 @@ from nexus_constructor.json.json_warnings import (
     TransformDependencyMissing,
 )
 from nexus_constructor.json.load_from_json import JSONReader
+from nexus_constructor.json.load_from_json_utils import DEPENDS_ON_IGNORE
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.module import Dataset
 from nexus_constructor.model.value_type import ValueTypes
@@ -120,10 +121,43 @@ def json_dict_with_component():
                   ],
                   "children":[
                     {
-                      "type":"group",
                       "name":"transformations",
+                      "type":"group",
                       "children":[
-
+                        {
+                          "module": "dataset",
+                          "config": {
+                              "name": "slit0",
+                              "values": 10.0,
+                              "type": "float"
+                          },
+                          "attributes": [
+                            {
+                                "name": "vector",
+                                "dtype": "float",
+                                "values": [
+                                    0.0,
+                                    0.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "name": "depends_on",
+                                "dtype": "string",
+                                "values": "."
+                            },
+                            {
+                                "name": "transformation_type",
+                                "dtype": "string",
+                                "values": "translation"
+                            },
+                            {
+                                "name": "units",
+                                "dtype": "string",
+                                "values": "metre"
+                            }
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -144,122 +178,7 @@ def json_dict_with_component():
                 {
                   "type":"group",
                   "name":"transformations",
-                  "children":[
-
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-    """
-    return json.loads(json_string)
-
-
-@pytest.fixture(scope="function")
-def json_dict_with_component_and_transform():
-    json_string = """
-    {
-      "children":[
-        {
-          "name":"entry",
-          "type":"group",
-          "attributes":[
-            {
-              "name":"NX_class",
-              "type":"String",
-              "values":"NXentry"
-            }
-          ],
-          "children":[
-            {
-              "name":"instrument",
-              "type":"group",
-              "attributes":[
-                {
-                  "name":"NX_class",
-                  "type":"String",
-                  "values":"NXinstrument"
-                }
-              ],
-              "children":[
-                {
-                  "name":"test_component",
-                  "type":"group",
-                  "attributes":[
-                    {
-                      "name":"NX_class",
-                      "type":"String",
-                      "values":"NXaperture"
-                    }
-                  ],
-                  "children":[
-                    {
-                      "module":"dataset",
-                      "attributes":[],
-                      "config":{
-                        "name":"depends_on",
-                        "type":"string",
-                        "values": "/entry/instrument/test_component/transformations/location"
-                      }
-                    },
-                    {
-                      "type":"group",
-                      "name":"transformations",
-                      "children":[
-                        {
-                          "module":"dataset",
-                          "config":{
-                            "type":"double",
-                            "values":1.0,
-                            "name":"location"
-                          },
-                          "attributes":[
-                            {
-                              "name":"units",
-                              "values":"m"
-                            },
-                            {
-                              "name":"transformation_type",
-                              "values":"translation"
-                            },
-                            {
-                              "name":"vector",
-                              "values":[
-                                0.0,
-                                0.0,
-                                0.0
-                              ],
-                              "type":"double"
-                            },
-                            {
-                              "name":"depends_on",
-                              "values":"."
-                            }
-                          ]
-                        }
-                      ],
-                      "attributes":[
-                        {
-                          "name":"NX_class",
-                          "values":"NXtransformations"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name":"sample",
-              "type":"group",
-              "attributes":[
-                {
-                  "name":"NX_class",
-                  "type":"String",
-                  "values":"NXsample"
+                  "children":[]
                 }
               ]
             }
@@ -397,19 +316,27 @@ def contains_warning_of_type(
     return any(isinstance(json_warning, warning_type) for json_warning in json_warnings)
 
 
+@pytest.mark.parametrize(
+    "depends_on_path",
+    [
+        "/entry/instrument/test_component/transformations/location",
+        "transformations/location",
+        "location",
+    ],
+)
 def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_loaded_THEN_warning_is_added(
-    json_dict_with_component, json_reader
+    json_dict_with_component, json_reader, depends_on_path
 ):
-    depends_on_dataset_str = """
-    {
+    depends_on_dataset_str = f"""
+    {{
       "module":"dataset",
       "attributes":[],
-      "config":{
+      "config":{{
         "type":"string",
-        "values": "/entry/instrument/test_component/transformations/location",
+        "values": "{depends_on_path}",
         "name":"depends_on"
-      }
-    }
+      }}
+    }}
     """
     depends_on_dataset = json.loads(depends_on_dataset_str)
 
@@ -420,6 +347,91 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
     json_reader._load_from_json_dict(json_dict_with_component)
 
     assert contains_warning_of_type(json_reader.warnings, TransformDependencyMissing)
+
+
+@pytest.mark.parametrize(
+    "depends_on_path",
+    [
+        ".",
+        "",
+        'None',
+        None
+    ],
+)
+def test_GIVEN_json_with_component_with_null_depends_on_WHEN_loaded_THEN_no_effect(
+    json_dict_with_component, json_reader, depends_on_path
+):
+    # Add depends_on dataset which points to a transformation in the JSON
+    depends_on_dataset_str = f"""
+    {{
+      "module":"dataset",
+      "attributes":[],
+      "config":{{
+        "type":"string",
+        "values": "{depends_on_path}",
+        "name":"depends_on"
+      }}
+    }}
+    """
+    depends_on_dataset = json.loads(depends_on_dataset_str)
+    json_dict_with_component["children"][0]["children"][0]["children"][0][
+        "children"
+    ].append(depends_on_dataset)
+    json_reader._load_from_json_dict(json_dict_with_component)
+    success = False
+    try:
+        json_reader._components_depends_on["componentname"][1].component_name
+    except AttributeError:
+        success = True
+    assert success
+
+
+@pytest.mark.parametrize(
+    "depends_on_path",
+    [
+        "/entry/instrument/componentname/transformations/slit0",
+        "transformations/slit0",
+        "slit0",
+    ],
+)
+def test_GIVEN_json_with_component_depending_on_relative_transform_WHEN_loaded_THEN_model_updated(
+    json_dict_with_component, json_reader, depends_on_path
+):
+    # Add depends_on dataset which points to a transformation in the JSON
+    depends_on_dataset_str = f"""
+    {{
+      "module":"dataset",
+      "attributes":[],
+      "config":{{
+        "type":"string",
+        "values": "{depends_on_path}",
+        "name":"depends_on"
+      }}
+    }}
+    """
+    depends_on_dataset = json.loads(depends_on_dataset_str)
+    if depends_on_path is not None:
+        transform_name = depends_on_path.split("/")[-1]
+    else:
+        transform_name = "None"
+
+    json_dict_with_component["children"][0]["children"][0]["children"][0][
+        "children"
+    ].append(depends_on_dataset)
+    json_reader._load_from_json_dict(json_dict_with_component)
+    if depends_on_path in DEPENDS_ON_IGNORE:
+        try:
+            json_reader._components_depends_on["componentname"][1].component_name
+        except AttributeError:
+            assert True
+    assert (
+        json_reader._components_depends_on["componentname"][1].component_name
+        == "componentname"
+    )
+    assert (
+        json_reader._components_depends_on["componentname"][1].transform_name
+        == transform_name
+    )
 
 
 def test_when_experiment_id_in_json_then_it_is_added_to_entry(json_reader):

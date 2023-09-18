@@ -23,6 +23,7 @@ from nexus_constructor.json.json_warnings import (
     NameFieldMissing,
     NXClassAttributeMissing,
     TransformDependencyMissing,
+    RelativeDependsonWrong,
 )
 from nexus_constructor.json.load_from_json_utils import (
     DEPENDS_ON_IGNORE,
@@ -113,8 +114,19 @@ class JSONReader:
             except KeyError:
                 self.warnings.append(
                     TransformDependencyMissing(
-                        f"Component {component_name} depends on {depends_on_id.transform_name} in component "
-                        f"{depends_on_id.component_name}, but that transform was not successfully loaded from the JSON"
+                        f"Component {component_name} depends on "
+                        + (
+                            depends_on_id.transform_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
+                        + " in component "
+                        + (
+                            depends_on_id.component_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
+                        + ", but that transform was not successfully loaded from the JSON"
                     )
                 )
 
@@ -138,9 +150,19 @@ class JSONReader:
             except KeyError:
                 self.warnings.append(
                     TransformDependencyMissing(
-                        f"Transformation {transform_id.transform_name} in component {transform_id.component_name} "
-                        f"depends on {depends_on_id.transform_name} in component {depends_on_id.component_name}, "
-                        f"but that transform was not successfully loaded from the JSON"
+                        f"Transformation {transform_id.transform_name} in component {transform_id.component_name} depends on "
+                        + (
+                            depends_on_id.transform_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
+                        + " in component "
+                        + (
+                            depends_on_id.component_name
+                            if depends_on_id is not None
+                            else "Unknown"
+                        )
+                        + ", but that transform was not successfully loaded from the JSON"
                     )
                 )
 
@@ -387,11 +409,20 @@ class JSONReader:
         )
         transformation_reader.add_transformations_to_component()
         self.warnings += transformation_reader.warnings
-        depends_on_path = _find_depends_on_path(children_dict, component.name)
-        if depends_on_path not in DEPENDS_ON_IGNORE:
-            depends_on_id = TransformId(
-                *get_component_and_transform_name(depends_on_path)
-            )
+        depends_on = _find_depends_on_path(children_dict, component.name)
+        if depends_on not in DEPENDS_ON_IGNORE:
+            if depends_on[0] != "/":
+                #   we are always in the NXtransformations group but the path could be anything
+                if len(depends_on.split("/")) <= 2:
+                    depends_on = "/transformations/" + depends_on.split("/")[-1]
+                else:
+                    self.warnings.append(
+                        RelativeDependsonWrong(
+                            f"depends_on in component {component.name} is relative, but we only support relative paths of length 1 or 2"
+                        )
+                    )
+                depends_on = component.absolute_path + depends_on
+            depends_on_id = TransformId(*get_component_and_transform_name(depends_on))
             self._components_depends_on[component.name] = (component, depends_on_id)
         else:
             self._components_depends_on[component.name] = (component, None)
