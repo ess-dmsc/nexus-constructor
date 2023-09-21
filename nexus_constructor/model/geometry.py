@@ -6,7 +6,7 @@ import numpy as np
 from PySide6.QtGui import QMatrix4x4, QVector3D
 
 from nexus_constructor.common_attrs import (
-    GEOMETRY_NX_CLASS,
+    OFF_GEOMETRY_NX_CLASS,
     NX_BOX,
     SHAPE_GROUP_NAME,
     SHAPE_NX_CLASS,
@@ -191,11 +191,11 @@ class BoxGeometry(Group):
         Group.__init__(self, name)
         self._size = [length, width, height]
         self._units = units
-        self.nx_class = GEOMETRY_NX_CLASS
+        self.nx_class = OFF_GEOMETRY_NX_CLASS
         self._create_datasets_and_add_to_shape_group()
 
     @property
-    def detector_number(self) -> List[int]:
+    def detector_number(self) -> Optional[List[int]]:
         if self._detector is None:
             return None
         return self._detector.tolist()

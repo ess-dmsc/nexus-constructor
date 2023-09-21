@@ -210,7 +210,7 @@ class Link(FileWriterModule):
 class Dataset(FileWriterModule):
     name: str = attr.ib()
     values: Union[List[ValueType], ValueType] = attr.ib()
-    type: str = attr.ib(default=None)
+    type: Optional[str] = attr.ib(default=None)
     writer_module: str = attr.ib(default=WriterModules.DATASET.value, init=False)
 
     def as_dict(self, error_collector: List[str]):
