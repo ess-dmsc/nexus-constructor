@@ -116,7 +116,7 @@ class InstrumentView(QWidget):
         }
         self.current_camera_settings = deepcopy(self.default_camera_settings)
         self.camera_entity = self.view.camera()
-        self.cam_controller = Qt3DExtras.QFirstPersonCameraController(self.root_entity)
+        self.cam_controller = Qt3DExtras.QOrbitCameraController(self.root_entity)
         self.switch_to_perspective()
 
         # Make sure that the size of the gnomon stays the same when the 3D view is resized
