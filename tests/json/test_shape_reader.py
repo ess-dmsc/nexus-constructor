@@ -720,7 +720,7 @@ def test_GIVEN_box_shape_json_WHEN_reading_shape_THEN_geometry_object_has_expect
     assert isinstance(shape, OFFGeometryNexus)
     assert shape.name == name
     assert shape.nx_class == OFF_GEOMETRY_NX_CLASS
-    assert len(shape.faces[0]) == 3
+    assert len(shape.faces[0]) == 4
     assert len(shape.faces) == 6
     assert shape.units == "m"
     assert shape.name == GEOMETRY_GROUP_NAME
