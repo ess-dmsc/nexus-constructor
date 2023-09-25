@@ -278,7 +278,7 @@ def off_shape_json() -> Dict:
 def box_shape_json() -> dict:
     box_shape = """
     {
-      "name":"MyDemonstrationShape",
+      "name":"geometry",
       "attributes":[
         {
           "name":"NX_class",
