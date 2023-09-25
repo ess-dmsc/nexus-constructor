@@ -431,9 +431,7 @@ class ShapeReader:
         )
         return False
 
-    def _get_values_attribute(
-        self, dataset: Dict, parent_name: str
-    ) -> Optional[List]:
+    def _get_values_attribute(self, dataset: Dict, parent_name: str) -> Optional[List]:
         """
         Attempts to get the values attribute in a dataset. Creates an error message if it cannot be found.
         :param dataset: The dataset we hope to find the values attribute in.
@@ -575,7 +573,11 @@ class ShapeReader:
             detector_faces_dataset = self._get_shape_dataset_from_list(
                 DETECTOR_FACES, shape_group[CommonKeys.CHILDREN], False
             )
-            if detector_faces_dataset and not isinstance(self.shape, BoxGeometry) and not isinstance(self.shape, CylindricalGeometry):
+            if (
+                detector_faces_dataset
+                and not isinstance(self.shape, BoxGeometry)
+                and not isinstance(self.shape, CylindricalGeometry)
+            ):
                 self.shape.detector_faces = detector_faces_dataset[CommonKeys.VALUES]
 
     def _find_and_add_pixel_offsets_to_component(

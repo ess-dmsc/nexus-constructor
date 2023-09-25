@@ -351,12 +351,7 @@ def test_GIVEN_json_with_component_depending_on_non_existent_transform_WHEN_load
 
 @pytest.mark.parametrize(
     "depends_on_path",
-    [
-        ".",
-        "",
-        'None',
-        None
-    ],
+    [".", "", "None", None],
 )
 def test_GIVEN_json_with_component_with_null_depends_on_WHEN_loaded_THEN_no_effect(
     json_dict_with_component, json_reader, depends_on_path
