@@ -1,12 +1,10 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from PySide6.QtGui import QVector3D
 
 from nexus_constructor.common_attrs import (
     CYLINDRICAL_GEOMETRY_NX_CLASS,
-    GEOMETRY_NX_CLASS,
-    NX_BOX,
     OFF_GEOMETRY_NX_CLASS,
     PIXEL_SHAPE_GROUP_NAME,
     SHAPE_GROUP_NAME,
@@ -84,13 +82,6 @@ class ShapeReader:
             self._add_off_shape_to_component()
         elif shape_type == CYLINDRICAL_GEOMETRY_NX_CLASS:
             self._add_cylindrical_shape_to_component()
-        elif shape_type == GEOMETRY_NX_CLASS:
-            for child in self.shape_info[CommonKeys.CHILDREN][0][CommonKeys.CHILDREN]:
-                if (
-                    child[NodeType.CONFIG][CommonKeys.NAME] == SHAPE_GROUP_NAME
-                    and child[NodeType.CONFIG][CommonKeys.VALUES] == NX_BOX
-                ):
-                    self._add_box_shape_to_component()
         else:
             self.warnings.append(
                 InvalidShape(
@@ -203,9 +194,11 @@ class ShapeReader:
         information can be found and passes validation then the geometry is created and written to the component,
         otherwise the function just returns without changing the component.
         """
-        children = self.children[0][CommonKeys.CHILDREN]
         name = self.name
-        if not children:
+        children = False
+        if self.children and self.children[0][CommonKeys.CHILDREN]:
+            children = self.children[0][CommonKeys.CHILDREN]
+        else:
             return
         tmp_dict = {}
         for child in children:
@@ -217,7 +210,7 @@ class ShapeReader:
         size = tmp_dict[SIZE][CommonKeys.VALUES]
         box_geometry = BoxGeometry(size[0], size[1], size[2], name, units)
         self.component[name] = box_geometry
-        self.shape = box_geometry  # type:ignore
+        self.shape = box_geometry
 
     @staticmethod
     def __get_units(children):
@@ -226,7 +219,7 @@ class ShapeReader:
                 for attr in child[CommonKeys.ATTRIBUTES]:
                     if attr[CommonKeys.NAME] == CommonAttrs.UNITS:
                         return attr[CommonKeys.VALUES]
-        return None
+        return ""
 
     def _add_cylindrical_shape_to_component(self):
         """
@@ -297,7 +290,7 @@ class ShapeReader:
 
     def _get_shape_dataset_from_list(
         self, dataset_name: str, children: List[Dict], warning: bool = True
-    ) -> Union[Dict, None]:
+    ) -> Optional[Dict]:
         """
         Tries to find a given shape dataset from a list of datasets.
         :param dataset_name: The name of the dataset that the function will search for.
@@ -320,7 +313,7 @@ class ShapeReader:
 
     def _find_and_validate_data_type(
         self, dataset: Dict, expected_types: List[str], parent_name: str
-    ) -> Union[str, None]:
+    ) -> Optional[str]:
         """
         Checks if the type in the dataset attribute has an expected value. Failing this check does not stop the geometry
         creation.
@@ -358,7 +351,7 @@ class ShapeReader:
 
         return None
 
-    def _find_and_validate_units(self, vertices_dataset: Dict) -> Union[str, None]:
+    def _find_and_validate_units(self, vertices_dataset: Dict) -> Optional[str]:
         """
         Attempts to retrieve and validate the units data.
         :param vertices_dataset: The vertices dataset.
@@ -438,9 +431,7 @@ class ShapeReader:
         )
         return False
 
-    def _get_values_attribute(
-        self, dataset: Dict, parent_name: str
-    ) -> Union[List, None]:
+    def _get_values_attribute(self, dataset: Dict, parent_name: str) -> Optional[List]:
         """
         Attempts to get the values attribute in a dataset. Creates an error message if it cannot be found.
         :param dataset: The dataset we hope to find the values attribute in.
@@ -475,7 +466,7 @@ class ShapeReader:
         return False
 
     @property
-    def children(self) -> Union[List, None]:
+    def children(self) -> Optional[List]:
         """
         Attempts to get the children list from the shape dictionary.
         :return: The children list if it could be found, otherwise None is returned.
@@ -508,7 +499,7 @@ class ShapeReader:
 
     def _find_and_validate_values_list(
         self, dataset: Dict, expected_types: List[str], attribute_name: str
-    ) -> Union[List, None]:
+    ) -> Optional[List]:
         """
         Attempts to find and validate the contents of the values attribute from the dataset.
         :param dataset: The dataset containing the values list.
@@ -582,7 +573,12 @@ class ShapeReader:
             detector_faces_dataset = self._get_shape_dataset_from_list(
                 DETECTOR_FACES, shape_group[CommonKeys.CHILDREN], False
             )
-            self.shape.detector_faces = detector_faces_dataset[CommonKeys.VALUES]
+            if (
+                detector_faces_dataset
+                and not isinstance(self.shape, BoxGeometry)
+                and not isinstance(self.shape, CylindricalGeometry)
+            ):
+                self.shape.detector_faces = detector_faces_dataset[CommonKeys.VALUES]
 
     def _find_and_add_pixel_offsets_to_component(
         self, offset_name: str, children: List[Dict]

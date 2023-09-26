@@ -64,7 +64,7 @@ NX_CLASSES = {
     "NXfilter",
     "NXflipper",
     "NXfresnel_zone_plate",
-    "NXgeometry",
+    # "NXgeometry", # depreceated
     "NXgrating",
     "NXguide",
     "NXinsertion_device",

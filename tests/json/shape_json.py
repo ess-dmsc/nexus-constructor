@@ -278,54 +278,91 @@ def off_shape_json() -> Dict:
 def box_shape_json() -> dict:
     box_shape = """
     {
-      "name": "geometry",
-      "type": "group",
-      "attributes": [
+      "name":"geometry",
+      "attributes":[
         {
-          "name": "NX_class",
-          "dtype": "string",
-          "values": "NXgeometry"
+          "name":"NX_class",
+          "type":"string",
+          "values":"NXoff_geometry"
         }
       ],
-      "children": [
+      "type":"group",
+      "children":[
         {
-          "name": "shape",
-          "type": "group",
-          "attributes": [
+          "module":"dataset",
+          "config":{
+            "name":"faces",
+            "type":"int32",
+            "values":[
+              0, 4, 8, 12, 16, 20
+            ]
+          }
+        },
+        {
+          "module":"dataset",
+          "attributes":[
             {
-              "name": "NX_class",
-              "dtype": "string",
-              "values": "NXshape"
+              "name":"units",
+              "type":"string",
+              "values":"m"
             }
           ],
-          "children": [
-            {
-              "module": "dataset",
-              "config": {
-                "name": "size",
-                "values": [
-                  6.0,
-                  12.0,
-                  15.0
-                ],
-                "type": "double"
-              },
-              "attributes": [
-                {
-                  "name": "units",
-                  "dtype": "string",
-                  "values": "m"
-                }
+          "config":{
+            "name":"vertices",
+            "type":"float",
+            "values":[
+              [
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                1.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                1.0,
+                1.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0
               ]
-            },
-            {
-              "module": "dataset",
-              "config": {
-                "name": "shape",
-                "values": "nxbox"
-              }
-            }
-          ]
+            ]
+          }
+        },
+        {
+          "module":"dataset",
+          "config":{
+            "name":"winding_order",
+            "type":"int32",
+            "values":[
+              0, 1, 2, 3, 4, 5, 6, 7, 0, 3, 7, 4, 1, 2, 6, 5, 0, 1, 5, 4, 3, 2, 6, 7
+            ]
+          }
         }
       ]
     }
