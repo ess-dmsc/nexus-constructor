@@ -107,6 +107,10 @@ class Transformation(Dataset):
         if not offset:
             offset = 0.0
         if self.transform_type == TransformationType.ROTATION:
+            #   noramlise offset to get axis, then apply a rotation offset first to translate it, and then apply rotation
+            #   try setTranslation (to modify ({}.4))
+            # ORRRR
+            #   self.vector + offset
             quaternion = transform.fromAxisAndAngle(
                 self.vector, (self.ui_value + offset) * self._ui_scale_factor
             )
