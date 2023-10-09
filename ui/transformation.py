@@ -49,22 +49,25 @@ class UiTransformation:
             hide_name_field=True,
             show_only_f142_stream=True,
         )
+        self.magnitude_widget.field_type_combo.setMaximumWidth(0)
+        self.magnitude_widget.value_type_combo.setMaximumWidth(0)
+        self.magnitude_widget.attrs_button.setMaximumWidth(0)
         self.magnitude_widget.setFrameShape(QFrame.NoFrame)
         self.magnitude_widget.setMinimumHeight(40)
 
         self.ui_placeholder_layout = QVBoxLayout()
 
-        self.offset_box = QDoubleSpinBox(transformation)
-        self.offset_box.setToolTip("Offset to the transformation.")
-        self.offset_box.setMinimumWidth(100)
-        self.offset_box.setMinimum(-1000)
-        self.offset_box.setDecimals(5)
+        # self.offset_box = QDoubleSpinBox(transformation)
+        # self.offset_box.setToolTip("Offset to the transformation.")
+        # self.offset_box.setMinimumWidth(100)
+        # self.offset_box.setMinimum(-1000)
+        # self.offset_box.setDecimals(5)
         offset_font = QFont()
         offset_font.setBold(True)
         self.offset_label = QLabel("Offset")
         self.offset_label.setFont(offset_font)
-        self.ui_placeholder_layout.addWidget(self.offset_label)
-        self.ui_placeholder_layout.addWidget(self.offset_box)
+        # self.ui_placeholder_layout.addWidget(self.offset_label)
+        # self.ui_placeholder_layout.addWidget(self.offset_box)
 
         self.depends_on_text_box = QLineEdit(transformation)
         self.depends_on_text_box.setToolTip("depends_on for transformation.")
@@ -79,6 +82,7 @@ class UiTransformation:
 
         self.setup_name_layout()
         self.setup_vector_layout(transformation)
+        self.setup_offset_layout(transformation)
         self.setup_value_and_magnitude()
         self.set_spinbox_ranges()
 
@@ -94,6 +98,11 @@ class UiTransformation:
 
     def setup_vector_layout(self, transformation):
         self.main_layout.addWidget(self.vector_label)
+        self._set_up_vector_box(transformation)
+        self._add_line()
+
+    def setup_offset_layout(self, transformation):
+        self.main_layout.addWidget(self.offset_label)
         self._set_up_vector_box(transformation)
         self._add_line()
 

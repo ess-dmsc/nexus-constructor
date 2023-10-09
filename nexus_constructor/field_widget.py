@@ -123,7 +123,7 @@ class FieldWidget(QFrame):
         self.unit_validator = UnitValidator()
         self.units_line_edit.setValidator(self.unit_validator)
         self.units_line_edit.setMinimumWidth(20)
-        self.units_line_edit.setMaximumWidth(50)
+        #   self.units_line_edit.setMaximumWidth(50)
         unit_size_policy = QSizePolicy()
         unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
         unit_size_policy.setHorizontalStretch(1)
@@ -133,6 +133,8 @@ class FieldWidget(QFrame):
             partial(validate_line_edit, self.units_line_edit)
         )
         self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
+        fix_horizontal_size = QSizePolicy()
+        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
 
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
@@ -140,9 +142,6 @@ class FieldWidget(QFrame):
         self.field_type_combo.currentTextChanged.connect(
             self._open_edit_dialog_if_stream
         )
-
-        fix_horizontal_size = QSizePolicy()
-        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
         self.value_type_combo: QComboBox = QComboBox()
@@ -179,14 +178,8 @@ class FieldWidget(QFrame):
         self.attrs_button.clicked.connect(self.show_attrs_dialog)
 
         self.layout = QHBoxLayout()
-        self.layout.addWidget(self.field_name_edit)
-        self.layout.addWidget(self.field_type_combo)
-        self.layout.addWidget(self.value_line_edit)
-        self.layout.addWidget(self.nx_class_combo)
-        self.layout.addWidget(self.edit_button)
-        self.layout.addWidget(self.value_type_combo)
-        self.layout.addWidget(self.units_line_edit)
-        self.layout.addWidget(self.attrs_button)
+        for widget in [self.field_name_edit, self.field_type_combo, self.value_line_edit, self.nx_class_combo, self.edit_button, self.value_type_combo, self.units_line_edit, self.attrs_button]:
+            self.layout.addWidget(widget)
 
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
