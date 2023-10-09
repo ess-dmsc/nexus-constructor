@@ -96,7 +96,7 @@ class EditTransformation(QGroupBox):
             self.transformation_frame.depends_on_text_box.setText(".")
 
     def save_magnitude(self):
-5        self.transformation.values = self.transformation_frame.magnitude_widget.value
+        self.transformation.values = self.transformation_frame.magnitude_widget.value
         self.transformation.units = self.transformation_frame.magnitude_widget.units
         self.model.signals.transformation_changed.emit()
 
