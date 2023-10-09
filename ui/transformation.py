@@ -103,7 +103,7 @@ class UiTransformation:
 
     def setup_offset_layout(self, transformation):
         self.main_layout.addWidget(self.offset_label)
-        self._set_up_vector_box(transformation)
+        self._set_up_vector_box_offset(transformation)
         self._add_line()
 
     def setup_name_layout(self):
@@ -113,6 +113,26 @@ class UiTransformation:
         self._add_line()
 
     def _set_up_vector_box(self, transformation):
+        self.xyz_layout = QHBoxLayout()
+
+        self.x_layout = QFormLayout()
+        self.x_spinbox = QDoubleSpinBox(transformation)
+        self.x_layout.addRow("x:", self.x_spinbox)
+        self.xyz_layout.addLayout(self.x_layout)
+
+        self.y_layout = QFormLayout()
+        self.y_spinbox = QDoubleSpinBox(transformation)
+        self.y_layout.addRow("y:", self.y_spinbox)
+        self.xyz_layout.addLayout(self.y_layout)
+
+        self.z_layout = QFormLayout()
+        self.z_spinbox = QDoubleSpinBox(transformation)
+        self.z_layout.addRow("z:", self.z_spinbox)
+        self.xyz_layout.addLayout(self.z_layout)
+
+        self.main_layout.addLayout(self.xyz_layout)
+
+    def _set_up_vector_box_offset(self, transformation):
         self.xyz_layout_offset = QHBoxLayout()
 
         self.x_layout_offset = QFormLayout()

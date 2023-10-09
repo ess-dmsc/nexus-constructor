@@ -62,7 +62,9 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.magnitude_widget.units = self.transformation.units
         offset = self.transformation.attributes.get_attribute_value(CommonAttrs.OFFSET)
         if offset:
-            self.transformation_frame.offset_box.setValue(offset)
+            self.transformation_frame.x_spinbox_offset.setValue(offset[0])
+            self.transformation_frame.x_spinbox_offset.setValue(offset[1])
+            self.transformation_frame.x_spinbox_offset.setValue(offset[2])
         self.update_depends_on_ui()
 
     def disable(self):
@@ -94,7 +96,7 @@ class EditTransformation(QGroupBox):
             self.transformation_frame.depends_on_text_box.setText(".")
 
     def save_magnitude(self):
-        self.transformation.values = self.transformation_frame.magnitude_widget.value
+5        self.transformation.values = self.transformation_frame.magnitude_widget.value
         self.transformation.units = self.transformation_frame.magnitude_widget.units
         self.model.signals.transformation_changed.emit()
 
