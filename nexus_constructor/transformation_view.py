@@ -129,8 +129,7 @@ class EditTranslation(EditTransformation):
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             METRES
         )
-        transformation_text(self)
-        self.setTitle(TransformationType.TRANSLATION)
+        transformation_text(self, TransformationType.TRANSLATION)
 
 
 class EditRotation(EditTransformation):
@@ -139,14 +138,14 @@ class EditRotation(EditTransformation):
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             RADIANS
         )
-        transformation_text(self)
-        self.setTitle(TransformationType.ROTATION)
+        transformation_text(self, TransformationType.ROTATION)
 
 
-def transformation_text(self):
-    self.transformation_frame.vector_label.setText("Direction")
-    self.transformation_frame.value_label.setText("Distance (m)")
-    self.transformation_frame.offset_label.setText("Offset (m)")
+def transformation_text(self, transformation_type):
+    self.transformation_frame.vector_label.setText("Vector")
+    self.transformation_frame.value_label.setText("Magnitude")
+    self.transformation_frame.offset_label.setText("Offset")
+    self.setTitle(transformation_type)
 
 
 def links_back_to_component(reference: Component, comparison: Component):
