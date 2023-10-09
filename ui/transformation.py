@@ -113,24 +113,24 @@ class UiTransformation:
         self._add_line()
 
     def _set_up_vector_box(self, transformation):
-        self.xyz_layout = QHBoxLayout()
+        self.xyz_layout_offset = QHBoxLayout()
 
-        self.x_layout = QFormLayout()
-        self.x_spinbox = QDoubleSpinBox(transformation)
-        self.x_layout.addRow("x:", self.x_spinbox)
-        self.xyz_layout.addLayout(self.x_layout)
+        self.x_layout_offset = QFormLayout()
+        self.x_spinbox_offset = QDoubleSpinBox(transformation)
+        self.x_layout_offset.addRow("x:", self.x_spinbox_offset)
+        self.xyz_layout_offset.addLayout(self.x_layout_offset)
 
-        self.y_layout = QFormLayout()
-        self.y_spinbox = QDoubleSpinBox(transformation)
-        self.y_layout.addRow("y:", self.y_spinbox)
-        self.xyz_layout.addLayout(self.y_layout)
+        self.y_layout_offset = QFormLayout()
+        self.y_spinbox_offset = QDoubleSpinBox(transformation)
+        self.y_layout_offset.addRow("y:", self.y_spinbox_offset)
+        self.xyz_layout_offset.addLayout(self.y_layout_offset)
 
-        self.z_layout = QFormLayout()
-        self.z_spinbox = QDoubleSpinBox(transformation)
-        self.z_layout.addRow("z:", self.z_spinbox)
-        self.xyz_layout.addLayout(self.z_layout)
+        self.z_layout_offset = QFormLayout()
+        self.z_spinbox_offset = QDoubleSpinBox(transformation)
+        self.z_layout_offset.addRow("z:", self.z_spinbox_offset)
+        self.xyz_layout_offset.addLayout(self.z_layout_offset)
 
-        self.main_layout.addLayout(self.xyz_layout)
+        self.main_layout.addLayout(self.xyz_layout_offset)
 
     def _add_line(self):
         line = QFrame()
