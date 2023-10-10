@@ -162,9 +162,14 @@ class UiTransformation:
         self.spinboxes = [
             self.x_spinbox,
             self.y_spinbox,
-            self.z_spinbox,
+            self.z_spinbox
         ]
-        for spinbox in self.spinboxes:
+        self.offset_spinboxes = [
+            self.x_spinbox_offset,
+            self.y_spinbox_offset,
+            self.z_spinbox_offset,
+        ]
+        for spinbox in self.spinboxes + self.offset_spinboxes:
             spinbox.setRange(-10000000, 10000000)
             spinbox.setDecimals(5)
 

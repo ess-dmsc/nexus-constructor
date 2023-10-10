@@ -60,11 +60,11 @@ class EditTransformation(QGroupBox):
                 self.transformation.values, self.transformation_frame.magnitude_widget
             )
         self.transformation_frame.magnitude_widget.units = self.transformation.units
-        offset = self.transformation.attributes.get_attribute_value(CommonAttrs.OFFSET)
+        offset = QVector3D() #self.transformation.attributes.get_attribute_value(CommonAttrs.OFFSET)
         if offset:
             self.transformation_frame.x_spinbox_offset.setValue(offset[0])
-            self.transformation_frame.x_spinbox_offset.setValue(offset[1])
-            self.transformation_frame.x_spinbox_offset.setValue(offset[2])
+            self.transformation_frame.y_spinbox_offset.setValue(offset[1])
+            self.transformation_frame.z_spinbox_offset.setValue(offset[2])
         self.update_depends_on_ui()
 
     def disable(self):
@@ -112,7 +112,8 @@ class EditTransformation(QGroupBox):
             self.model.signals.transformation_changed.emit()
 
     def save_offset(self):
-        offset_value = self.transformation_frame.offset_box.value()
+
+        offset_value = self.transformation_frame.x_spinbox_offset.value()
         if offset_value is not None:
             self.transformation.attributes.set_attribute_value(
                 CommonAttrs.OFFSET, offset_value
