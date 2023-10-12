@@ -115,22 +115,22 @@ class Transformation(Dataset):
         """
         transform = Qt3DCore.QTransform()
         transform.matrix()
-        offset = self.attributes.get_attribute_value(CommonAttrs.OFFSET)
-        if not offset:
-            offset = 0.0
+        offset = QVector3D()  # self.attributes.get_attribute_value(CommonAttrs.OFFSET)
+        # if not offset:
+        #     offset = 0.0
         if self.transform_type == TransformationType.ROTATION:
             #   noramlise offset to get axis, then apply a rotation offset first to translate it, and then apply rotation
             #   try setTranslation (to modify ({}.4))
             # ORRRR
             #   self.vector + offset
             quaternion = transform.fromAxisAndAngle(
-                self.vector, (self.ui_value + offset) * self._ui_scale_factor
+                self.vector, self.ui_value * self._ui_scale_factor  #(self.ui_value + offset) * self._ui_scale_factor
             )
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
             transform.setTranslation(
                 self.vector.normalized()
-                * (self.ui_value + offset)
+                * (self.ui_value)  # + offset)
                 * self._ui_scale_factor
             )
         else:
