@@ -49,9 +49,9 @@ class UiTransformation:
             hide_name_field=True,
             show_only_f142_stream=True,
         )
-        # self.magnitude_widget.field_type_combo.setMaximumWidth(0)
-        # self.magnitude_widget.value_type_combo.setMaximumWidth(0)
-        # self.magnitude_widget.attrs_button.setMaximumWidth(0)
+        self.magnitude_widget.field_type_combo.setMaximumWidth(0)
+        self.magnitude_widget.value_type_combo.setMaximumWidth(0)
+        self.magnitude_widget.attrs_button.setMaximumWidth(0)
         self.magnitude_widget.setFrameShape(QFrame.NoFrame)
         self.magnitude_widget.setMinimumHeight(40)
 

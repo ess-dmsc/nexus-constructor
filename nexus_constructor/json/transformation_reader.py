@@ -301,6 +301,9 @@ class TransformationReader:
             vector = self._find_attribute_in_list(
                 CommonAttrs.VECTOR, name, attributes, [0.0, 0.0, 0.0]
             )
+            offset_vector = self._find_attribute_in_list(
+                CommonAttrs.OFFSET, name, attributes, [0.0, 0.0, 0.0]
+            )
             # This attribute is allowed to be missing, missing is equivalent to the value "." which means
             # depends on origin (end of dependency chain)
             depends_on = _find_attribute_from_list_or_dict(
@@ -337,6 +340,7 @@ class TransformationReader:
                 vector=QVector3D(*vector),
                 depends_on=None,
                 values=values,
+                offset_vector=QVector3D(*offset_vector)
             )
             offset = self._find_attribute_in_list(CommonAttrs.OFFSET, name, attributes)
             if offset:

@@ -28,6 +28,7 @@ class EditTransformation(QGroupBox):
         self.transformation_parent = transformation.parent_component
         current_vector = self.transformation.vector
         self._fill_in_existing_fields(current_vector)
+        self._fill_in_existing_fields(self.transformation.offset_vector)
         self.transformation_frame.depends_on_text_box.setEnabled(False)
         self.disable()
         self._init_connections()
@@ -60,11 +61,11 @@ class EditTransformation(QGroupBox):
                 self.transformation.values, self.transformation_frame.magnitude_widget
             )
         self.transformation_frame.magnitude_widget.units = self.transformation.units
-        offset = QVector3D() #self.transformation.attributes.get_attribute_value(CommonAttrs.OFFSET)
+        offset = QVector3D(1, 2, 3)  #   self.transformation.attributes.get_attribute_value(CommonAttrs.OFFSET)
         if offset:
-            self.transformation_frame.x_spinbox_offset.setValue(offset[0])
-            self.transformation_frame.y_spinbox_offset.setValue(offset[1])
-            self.transformation_frame.z_spinbox_offset.setValue(offset[2])
+            self.transformation_frame.x_spinbox_offset.setValue(offset.x())
+            self.transformation_frame.y_spinbox_offset.setValue(offset.y())
+            self.transformation_frame.z_spinbox_offset.setValue(offset.z())
         self.update_depends_on_ui()
 
     def disable(self):
@@ -112,17 +113,15 @@ class EditTransformation(QGroupBox):
             self.model.signals.transformation_changed.emit()
 
     def save_offset(self):
-
-        offset_value = self.transformation_frame.x_spinbox_offset.value()
-        if offset_value is not None:
-            self.transformation.attributes.set_attribute_value(
-                CommonAttrs.OFFSET, offset_value
-            )
+        self.transformation.offset_vector = QVector3D(
+            *[spinbox.value() for spinbox in self.transformation_frame.offset_spinboxes]
+        )
+        self.model.signals.transformation_changed.emit()
 
     def save_all_changes(self):
         self.save_transformation_name()
         self.save_transformation_vector()
-#        self.save_offset()
+        self.save_offset()
         self.save_magnitude()
 
 

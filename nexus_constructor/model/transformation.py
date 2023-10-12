@@ -68,6 +68,18 @@ class Transformation(Dataset):
         self.attributes.set_attribute_value(CommonAttrs.VECTOR, vector_as_np_array)
 
     @property
+    def offset_vector(self) -> QVector3D:
+        vector = self.attributes.get_attribute_value(CommonAttrs.OFFSET)
+        return (
+            QVector3D(vector[0], vector[1], vector[2]) if vector is not None else None
+        )
+
+    @offset_vector.setter
+    def offset_vector(self, new_vector: QVector3D):
+        vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
+        self.attributes.set_attribute_value(CommonAttrs.OFFSET, vector_as_np_array)
+
+    @property
     def ui_value(self) -> float:
         try:
             if isinstance(self.values, Dataset):
