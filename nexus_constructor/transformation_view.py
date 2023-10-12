@@ -122,7 +122,7 @@ class EditTransformation(QGroupBox):
     def save_all_changes(self):
         self.save_transformation_name()
         self.save_transformation_vector()
-        self.save_offset()
+#        self.save_offset()
         self.save_magnitude()
 
 
