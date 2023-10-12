@@ -87,7 +87,7 @@ class Component(Group):
     _depends_on: Transformation = attr.ib(default=None)
     has_link: bool = attr.ib(default=None)
     component_info: Optional["ComponentInfo"] = None
-    stored_transforms: list = []
+    stored_transforms: Optional[list] = None
     name: str = ""
     parent_node: Optional[Group] = None
 
