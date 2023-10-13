@@ -123,7 +123,6 @@ class FieldWidget(QFrame):
         self.unit_validator = UnitValidator()
         self.units_line_edit.setValidator(self.unit_validator)
         self.units_line_edit.setMinimumWidth(20)
-        #   self.units_line_edit.setMaximumWidth(50)
         unit_size_policy = QSizePolicy()
         unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
         unit_size_policy.setHorizontalStretch(1)

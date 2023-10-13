@@ -57,17 +57,10 @@ class UiTransformation:
 
         self.ui_placeholder_layout = QVBoxLayout()
 
-        # self.offset_box = QDoubleSpinBox(transformation)
-        # self.offset_box.setToolTip("Offset to the transformation.")
-        # self.offset_box.setMinimumWidth(100)
-        # self.offset_box.setMinimum(-1000)
-        # self.offset_box.setDecimals(5)
         offset_font = QFont()
         offset_font.setBold(True)
         self.offset_label = QLabel("Offset")
         self.offset_label.setFont(offset_font)
-        # self.ui_placeholder_layout.addWidget(self.offset_label)
-        # self.ui_placeholder_layout.addWidget(self.offset_box)
 
         self.depends_on_text_box = QLineEdit(transformation)
         self.depends_on_text_box.setToolTip("depends_on for transformation.")
