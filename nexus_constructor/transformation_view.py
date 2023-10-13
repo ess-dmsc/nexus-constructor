@@ -38,8 +38,11 @@ class EditTransformation(QGroupBox):
             self.save_transformation_name
         )
 
-        for box in self.transformation_frame.spinboxes[:-1]:
+        for box in self.transformation_frame.spinboxes:
             box.textChanged.connect(self.save_transformation_vector)
+
+        for box in self.transformation_frame.offset_spinboxes:
+            box.textChanged.connect(self.save_offset)
 
         self.transformation_frame.magnitude_widget.value_line_edit.textChanged.connect(
             self.save_magnitude
