@@ -176,7 +176,7 @@ class TransformationReader:
         :return: The value of the attribute if is is found in the list, otherwise the failure value is returned.
         """
         attribute = _find_attribute_from_list_or_dict(attribute_name, attributes_list)
-        if not attribute and attribute_name not in [CommonAttrs.OFFSET]:
+        if not attribute:
             self.warnings.append(
                 TransformDependencyMissing(
                     f"Unable to find {attribute_name} attribute in transformation"
