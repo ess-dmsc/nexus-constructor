@@ -127,6 +127,12 @@ class EditTransformation(QGroupBox):
         self.save_offset()
         self.save_magnitude()
 
+    def transformation_text(self, transformation_type):
+        self.transformation_frame.vector_label.setText("Vector")
+        self.transformation_frame.value_label.setText("Magnitude")
+        self.transformation_frame.offset_label.setText("Offset")
+        self.setTitle(transformation_type)
+
 
 class EditTranslation(EditTransformation):
     def __init__(self, parent: QWidget, transformation: Transformation, model: Model):
@@ -134,7 +140,7 @@ class EditTranslation(EditTransformation):
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             METRES
         )
-        transformation_text(self, TransformationType.TRANSLATION)
+        self.transformation_text(TransformationType.TRANSLATION)
 
 
 class EditRotation(EditTransformation):
@@ -143,14 +149,7 @@ class EditRotation(EditTransformation):
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             RADIANS
         )
-        transformation_text(self, TransformationType.ROTATION)
-
-
-def transformation_text(self, transformation_type):
-    self.transformation_frame.vector_label.setText("Vector")
-    self.transformation_frame.value_label.setText("Magnitude")
-    self.transformation_frame.offset_label.setText("Offset")
-    self.setTitle(transformation_type)
+        self.transformation_text(TransformationType.ROTATION)
 
 
 def links_back_to_component(reference: Component, comparison: Component):

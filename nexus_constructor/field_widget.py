@@ -438,7 +438,7 @@ class FieldWidget(QFrame):
         self.edit_dialog = QDialog(parent=self)
         self.edit_dialog.setModal(True)
         self._set_up_value_validator(False)
-        if self.streams_widget and self.streams_widget._old_schema:
+        if self._node_parent and self.streams_widget and self.streams_widget._old_schema:
             self._node_parent.add_stream_module(self.streams_widget._old_schema)
         if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)

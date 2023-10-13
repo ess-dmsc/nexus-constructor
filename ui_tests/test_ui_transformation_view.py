@@ -12,6 +12,7 @@ from nexus_constructor.model.model import Model
 from nexus_constructor.model.module import Dataset, F142Stream, Link
 from nexus_constructor.transformation_view import EditRotation, EditTranslation
 from nexus_constructor.validators import FieldType
+from nexus_constructor.ui_utils import qvector3d_to_numpy_array
 
 
 @pytest.fixture
@@ -37,7 +38,7 @@ def create_corresponding_value_dataset(value: Any):
 def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled_correctly(
     qtbot, model, component
 ):
-    x = 1
+    x = 0
     y = 0
     z = 0
     value = 0.0
@@ -62,9 +63,9 @@ def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled
 def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
     qtbot, model, component
 ):
-    x = 1
-    y = 2
-    z = 3
+    x = 0
+    y = 0
+    z = 0
     angle = 90
 
     transform = component.add_rotation(angle=angle, axis=QVector3D(x, y, z))
@@ -93,11 +94,10 @@ def test_UI_GIVEN_a_translation_with_zero_offset_WHEN_setting_the_offset_to_nonz
     view = EditTranslation(parent=None, transformation=transform, model=model)
     qtbot.addWidget(view)
 
-    view.transformation_frame.offset_box.setValue(9)
+    view.transformation_frame.offset_spinboxes[0].setValue(9)
     view.save_offset()
-
-    assert transform.attributes.get_attribute_value(CommonAttrs.OFFSET) == 9
-    assert view.transformation_frame.offset_box.value() == 9
+    assert all(transform.attributes.get_attribute_value(CommonAttrs.OFFSET) == qvector3d_to_numpy_array(QVector3D(9, 0, 0)))
+    assert view.transformation_frame.offset_spinboxes[0].value() == 9
 
 
 def test_UI_GIVEN_a_translation_with_nonzero_offset_WHEN_setting_the_offset_to_zero_THEN_ui_is_filled_correctly(
@@ -106,15 +106,15 @@ def test_UI_GIVEN_a_translation_with_nonzero_offset_WHEN_setting_the_offset_to_z
     transform = component.add_translation(QVector3D(0, 0, 1), name="test")
     transform.values = create_corresponding_value_dataset(123)
     view = EditTranslation(parent=None, transformation=transform, model=model)
-    view.transformation_frame.offset_box.setValue(10)
+    view.transformation_frame.offset_spinboxes[0].setValue(10)
     qtbot.addWidget(view)
     view.save_offset()
 
-    view.transformation_frame.offset_box.setValue(0)
+    view.transformation_frame.offset_spinboxes[0].setValue(0)
     view.save_offset()
 
-    assert transform.attributes.get_attribute_value(CommonAttrs.OFFSET) == 0
-    assert view.transformation_frame.offset_box.value() == 0
+    assert all(transform.attributes.get_attribute_value(CommonAttrs.OFFSET) == qvector3d_to_numpy_array(QVector3D(0, 0, 0)))
+    assert view.transformation_frame.offset_spinboxes[0].value() == 0
 
 
 def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_is_filled_correctly(
@@ -122,7 +122,7 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
 ):
     array = np.array([1, 2, 3, 4])
 
-    x = 1
+    x = 0
     y = 0
     z = 0
     transform = component.add_translation(QVector3D(x, y, z), name="test")
