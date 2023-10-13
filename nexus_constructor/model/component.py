@@ -243,7 +243,7 @@ class Component(Group):
             type=ValueTypes.DOUBLE,
         ),
         target_pos: int = -1,
-        offset: QVector3D = QVector3D()
+        offset: QVector3D = QVector3D(),
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -264,7 +264,7 @@ class Component(Group):
             depends_on,
             values,
             target_pos,
-            offset
+            offset,
         )
 
     def _create_and_add_transform(
@@ -277,7 +277,7 @@ class Component(Group):
         depends_on: Transformation,
         values: Union[Dataset, Group, StreamModule],
         target_pos: int = -1,
-        offset_vector: QVector3D = QVector3D()
+        offset_vector: QVector3D = QVector3D(),
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)

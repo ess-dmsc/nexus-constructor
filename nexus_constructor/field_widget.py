@@ -178,7 +178,16 @@ class FieldWidget(QFrame):
         self.attrs_button.clicked.connect(self.show_attrs_dialog)
 
         self.layout = QHBoxLayout()
-        for widget in [self.field_name_edit, self.field_type_combo, self.value_line_edit, self.nx_class_combo, self.edit_button, self.value_type_combo, self.units_line_edit, self.attrs_button]:
+        for widget in [
+            self.field_name_edit,
+            self.field_type_combo,
+            self.value_line_edit,
+            self.nx_class_combo,
+            self.edit_button,
+            self.value_type_combo,
+            self.units_line_edit,
+            self.attrs_button,
+        ]:
             self.layout.addWidget(widget)
 
         self.layout.setAlignment(Qt.AlignLeft)

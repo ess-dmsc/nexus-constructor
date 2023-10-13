@@ -350,7 +350,7 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
         vector=QVector3D(*vector),
         depends_on=depends_on,
         values=values,
-        offset_vector=QVector3D(*offset_vector)
+        offset_vector=QVector3D(*offset_vector),
     )
 
 

@@ -340,7 +340,7 @@ class TransformationReader:
                 vector=QVector3D(*vector),
                 depends_on=None,
                 values=values,
-                offset_vector=QVector3D(*offset_vector)
+                offset_vector=QVector3D(*offset_vector),
             )
             # offset = self._find_attribute_in_list(CommonAttrs.OFFSET, name, attributes)
             # if offset:

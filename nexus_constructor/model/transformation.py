@@ -117,9 +117,7 @@ class Transformation(Dataset):
         transform.matrix()
         if self.transform_type == TransformationType.ROTATION:
             # apply offset first to translate it, and then apply rotation
-            transform.setTranslation(
-                self.offset_vector
-            )
+            transform.setTranslation(self.offset_vector)
             quaternion = transform.fromAxisAndAngle(
                 self.vector, self.ui_value * self._ui_scale_factor
             )
@@ -127,9 +125,7 @@ class Transformation(Dataset):
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
             transform.setTranslation(
-                self.vector.normalized()
-                * self.ui_value
-                * self._ui_scale_factor
+                self.vector.normalized() * self.ui_value * self._ui_scale_factor
                 + self.offset_vector
             )
         else:

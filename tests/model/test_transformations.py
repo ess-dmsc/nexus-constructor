@@ -20,7 +20,7 @@ def create_transform(
     type="translation",
     values=Dataset(parent_node=None, name="", values=None, type=ValueTypes.DOUBLE),
     units="m",
-    offset_vector=QVector3D(0., 0., 0.)
+    offset_vector=QVector3D(0.0, 0.0, 0.0),
 ):
     translation = Transformation(
         name=name,
