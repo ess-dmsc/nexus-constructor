@@ -71,7 +71,9 @@ class Transformation(Dataset):
     def offset_vector(self) -> QVector3D:
         vector = self.attributes.get_attribute_value(CommonAttrs.OFFSET)
         return (
-            QVector3D(vector[0], vector[1], vector[2]) if vector is not None else QVector3D(0., 0., 0.)
+            QVector3D(vector[0], vector[1], vector[2])
+            if vector is not None
+            else QVector3D(0.0, 0.0, 0.0)
         )
 
     @offset_vector.setter

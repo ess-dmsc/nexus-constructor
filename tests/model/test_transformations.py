@@ -31,7 +31,9 @@ def create_transform(
     )
 
     translation.vector = vector if vector is not None else QVector3D(1.0, 0.0, 0.0)
-    translation.offset_vector = offset_vector if offset_vector is not None else QVector3D(0.0, 0.0, 0.0)
+    translation.offset_vector = (
+        offset_vector if offset_vector is not None else QVector3D(0.0, 0.0, 0.0)
+    )
     translation.transform_type = type
     translation.ui_value = ui_value
     translation.units = units

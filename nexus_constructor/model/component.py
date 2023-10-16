@@ -264,7 +264,7 @@ class Component(Group):
             depends_on,
             values,
             target_pos,
-            offset_vector if offset_vector is not None else QVector3D(0., 0., 0.),
+            offset_vector if offset_vector is not None else QVector3D(0.0, 0.0, 0.0),
         )
 
     def _create_and_add_transform(
@@ -300,7 +300,9 @@ class Component(Group):
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
-        transform.offset_vector = offset_vector if offset_vector is not None else QVector3D(0., 0., 0.)
+        transform.offset_vector = (
+            offset_vector if offset_vector is not None else QVector3D(0.0, 0.0, 0.0)
+        )
         transform.depends_on = depends_on
         transform.parent_component = self
         if target_pos:
