@@ -277,7 +277,7 @@ class Component(Group):
         depends_on: Transformation,
         values: Union[Dataset, Group, StreamModule],
         target_pos: int = -1,
-        offset_vector: QVector3D = QVector3D(),
+        offset_vector: Optional[QVector3D] = None,
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)
@@ -300,7 +300,7 @@ class Component(Group):
         transform.ui_value = angle_or_magnitude
         transform.units = units
         transform.vector = vector
-        transform.offset_vector = offset_vector
+        transform.offset_vector = offset_vector if offset_vector is not None else QVector3D(0., 0., 0.)
         transform.depends_on = depends_on
         transform.parent_component = self
         if target_pos:
