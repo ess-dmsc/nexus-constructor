@@ -95,6 +95,9 @@ class FieldWidget(QFrame):
     ):
         super(FieldWidget, self).__init__(parent)
 
+        fix_horizontal_size = QSizePolicy()
+        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
+
         possible_field_names = []
         self.default_field_types_dict = {}
         self.streams_widget: StreamFieldsWidget = None
@@ -127,13 +130,10 @@ class FieldWidget(QFrame):
         unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
         unit_size_policy.setHorizontalStretch(1)
         self.units_line_edit.setSizePolicy(unit_size_policy)
-
         self.unit_validator.is_valid.connect(
             partial(validate_line_edit, self.units_line_edit)
         )
         self.units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
-        fix_horizontal_size = QSizePolicy()
-        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
 
         self.field_type_combo: QComboBox = QComboBox()
         self.field_type_combo.addItems([item.value for item in FieldType])
