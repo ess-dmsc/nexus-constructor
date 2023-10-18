@@ -19,6 +19,7 @@ from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
 from nexus_constructor.ui_utils import validate_line_edit
 from nexus_constructor.validators import UnitValidator
+from nexus_constructor.unit_utils import METRES
 
 if TYPE_CHECKING:
     from nexus_constructor.transformation_view import EditTransformation
@@ -104,13 +105,14 @@ class UiTransformation:
         self.main_layout.addWidget(self.offset_label)
         self._set_up_vector_box_offset(transformation)
         self.offset_units_line_edit = QLineEdit()
-        self.offset_unit_validator = UnitValidator()
+        self.offset_unit_validator = UnitValidator(expected_dimensionality=METRES)
         self.offset_units_line_edit.setValidator(self.offset_unit_validator)
         self.offset_units_line_edit.setMinimumWidth(20)
         offset_unit_size_policy = QSizePolicy()
         offset_unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
         offset_unit_size_policy.setHorizontalStretch(1)
         self.offset_units_line_edit.setSizePolicy(offset_unit_size_policy)
+        self.offset_units_line_edit.setText("m")
         self.offset_unit_validator.is_valid.connect(
             partial(validate_line_edit, self.offset_units_line_edit)
         )
