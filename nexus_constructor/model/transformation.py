@@ -145,6 +145,15 @@ class Transformation(Dataset):
         self._evaluate_ui_scale_factor(new_units)
         self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
 
+    @property
+    def offset_units(self):
+        return self.attributes.get_attribute_value(CommonAttrs.OFFSET_UNITS)
+
+    @offset_units.setter
+    def offset_units(self, new_units):
+        self._evaluate_ui_scale_factor(new_units)
+        self.attributes.set_attribute_value(CommonAttrs.OFFSET_UNITS, new_units)
+
     def _evaluate_ui_scale_factor(self, units):
         try:
             if self.transform_type == TransformationType.TRANSLATION:

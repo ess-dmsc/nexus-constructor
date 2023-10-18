@@ -7,6 +7,7 @@ class CommonAttrs:
     NX_CLASS = "NX_class"
     DEPENDS_ON = "depends_on"
     TRANSFORMATION_TYPE = "transformation_type"
+    OFFSET_UNITS = "offset_units"
     VECTOR = "vector"
     UNITS = "units"
     VERTICES = "vertices"

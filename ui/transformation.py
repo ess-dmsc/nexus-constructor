@@ -116,7 +116,7 @@ class UiTransformation:
         self.offset_unit_validator.is_valid.connect(
             partial(validate_line_edit, self.offset_units_line_edit)
         )
-        self.offset_units_line_edit.setPlaceholderText(CommonAttrs.UNITS)
+        self.offset_units_line_edit.setPlaceholderText(CommonAttrs.OFFSET_UNITS)
         self.main_layout.addWidget(self.offset_units_line_edit)
         self._add_line()
 
@@ -186,6 +186,14 @@ class UiTransformation:
         for spinbox in self.spinboxes + self.offset_spinboxes:
             spinbox.setRange(-10000000, 10000000)
             spinbox.setDecimals(5)
+
+    @property
+    def offset_units(self) -> str:
+        return self.offset_units_line_edit.text()
+
+    @offset_units.setter
+    def offset_units(self, new_units: str):
+        self.offset_units_line_edit.setText(new_units)
 
     @staticmethod
     def _make_text_bold(label: QLabel):

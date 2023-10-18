@@ -50,6 +50,9 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.magnitude_widget.units_line_edit.textChanged.connect(
             self.save_magnitude
         )
+        self.transformation_frame.offset_units_line_edit.textChanged.connect(
+            self.save_offset
+        )
         if self.model:
             self.model.signals.transformation_changed.connect(self.update_depends_on_ui)
 
@@ -119,6 +122,7 @@ class EditTransformation(QGroupBox):
         self.transformation.offset_vector = QVector3D(
             *[spinbox.value() for spinbox in self.transformation_frame.offset_spinboxes]
         )
+        self.transformation.offset_units = self.transformation_frame.offset_units
         self.model.signals.transformation_changed.emit()
 
     def save_all_changes(self):
