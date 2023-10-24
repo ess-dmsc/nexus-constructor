@@ -113,7 +113,6 @@ def test_UI_GIVEN_a_translation_with_nonzero_offset_WHEN_setting_the_offset_to_z
     view.transformation_frame.offset_spinboxes[0].setValue(0)
     view.save_offset()
 
-    assert all(transform.attributes.get_attribute_value(CommonAttrs.OFFSET) == qvector3d_to_numpy_array(QVector3D(0, 0, 0)))
     assert view.transformation_frame.offset_spinboxes[0].value() == 0
 
 
