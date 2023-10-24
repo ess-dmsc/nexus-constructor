@@ -278,7 +278,7 @@ class Component(Group):
         values: Union[Dataset, Group, StreamModule],
         target_pos: int = -1,
         offset_vector: Optional[QVector3D] = None,
-        offset_units: str = ""
+        offset_units: str = "",
     ) -> Transformation:
         if name is None:
             name = _generate_incremental_name(transformation_type, self.transforms)

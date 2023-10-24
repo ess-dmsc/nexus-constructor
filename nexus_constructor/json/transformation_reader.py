@@ -349,7 +349,7 @@ class TransformationReader:
                 depends_on=None,
                 values=values,
                 offset_vector=QVector3D(*offset_vector),
-                offset_units=offset_units
+                offset_units=offset_units,
             )
             if depends_on not in DEPENDS_ON_IGNORE:
                 depends_on_id = TransformId(
