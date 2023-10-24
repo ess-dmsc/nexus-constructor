@@ -72,6 +72,7 @@ class EditTransformation(QGroupBox):
             self.transformation_frame.x_spinbox_offset.setValue(offset[0])
             self.transformation_frame.y_spinbox_offset.setValue(offset[1])
             self.transformation_frame.z_spinbox_offset.setValue(offset[2])
+        self.transformation_frame.offset_units_line_edit.setText(self.transformation.offset_units)
         self.update_depends_on_ui()
 
     def disable(self):

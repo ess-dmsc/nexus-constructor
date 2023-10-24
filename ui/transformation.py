@@ -112,7 +112,12 @@ class UiTransformation:
         offset_unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
         offset_unit_size_policy.setHorizontalStretch(1)
         self.offset_units_line_edit.setSizePolicy(offset_unit_size_policy)
-        self.offset_units_line_edit.setText("m")
+        if self.offset_units:
+            self.offset_units_line_edit.setText(
+                self.offset_units
+            )
+        else:
+            self.offset_units_line_edit.setText("m")
         self.offset_unit_validator.is_valid.connect(
             partial(validate_line_edit, self.offset_units_line_edit)
         )

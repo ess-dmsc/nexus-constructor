@@ -285,6 +285,10 @@ class TransformationReader:
             if not units:
                 continue
 
+            offset_units = self._find_attribute_in_list(CommonAttrs.OFFSET_UNITS, name, attributes)
+            if not offset_units:
+                continue
+
             transformation_type = self._find_attribute_in_list(
                 CommonAttrs.TRANSFORMATION_TYPE,
                 name,
@@ -341,6 +345,7 @@ class TransformationReader:
                 depends_on=None,
                 values=values,
                 offset_vector=QVector3D(*offset_vector),
+                offset_units=offset_units
             )
             if depends_on not in DEPENDS_ON_IGNORE:
                 depends_on_id = TransformId(
