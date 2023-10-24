@@ -26,9 +26,7 @@ class EditTransformation(QGroupBox):
         self.transformation_frame = UiTransformation(self)
         self.transformation = transformation
         self.transformation_parent = transformation.parent_component
-        current_vector = self.transformation.vector
-        self._fill_in_existing_fields(current_vector)
-        self._fill_in_existing_fields(self.transformation.offset_vector)
+        self._fill_in_existing_fields()
         self.transformation_frame.depends_on_text_box.setEnabled(False)
         self.disable()
         self._init_connections()
@@ -56,11 +54,11 @@ class EditTransformation(QGroupBox):
         if self.model:
             self.model.signals.transformation_changed.connect(self.update_depends_on_ui)
 
-    def _fill_in_existing_fields(self, current_vector):
+    def _fill_in_existing_fields(self):
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
-        self.transformation_frame.x_spinbox.setValue(current_vector.x())
-        self.transformation_frame.y_spinbox.setValue(current_vector.y())
-        self.transformation_frame.z_spinbox.setValue(current_vector.z())
+        self.transformation_frame.x_spinbox.setValue(self.transformation.vector.x())
+        self.transformation_frame.y_spinbox.setValue(self.transformation.vector.y())
+        self.transformation_frame.z_spinbox.setValue(self.transformation.vector.z())
         update_function = find_field_type(self.transformation.values)
         if update_function is not None:
             update_function(
