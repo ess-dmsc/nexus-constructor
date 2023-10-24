@@ -285,10 +285,6 @@ class TransformationReader:
             if not units:
                 continue
 
-            offset_units = self._find_attribute_in_list(CommonAttrs.OFFSET_UNITS, name, attributes)
-            if not offset_units:
-                continue
-
             transformation_type = self._find_attribute_in_list(
                 CommonAttrs.TRANSFORMATION_TYPE,
                 name,
@@ -308,6 +304,14 @@ class TransformationReader:
             offset_vector = self._find_attribute_in_list(
                 CommonAttrs.OFFSET, name, attributes, [0.0, 0.0, 0.0]
             )
+
+            offset_units = self._find_attribute_in_list(CommonAttrs.OFFSET_UNITS, name, attributes)
+            if not offset_units:
+                if offset_vector is [0.0, 0.0, 0.0]:
+                    continue
+                else:
+                    offset_units = ""
+
             # This attribute is allowed to be missing, missing is equivalent to the value "." which means
             # depends on origin (end of dependency chain)
             depends_on = _find_attribute_from_list_or_dict(
