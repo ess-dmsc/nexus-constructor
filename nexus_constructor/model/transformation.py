@@ -4,6 +4,7 @@ import attr
 import numpy as np
 from PySide6.Qt3DCore import Qt3DCore
 from PySide6.QtGui import QMatrix4x4, QVector3D
+from typing import Optional
 
 from nexus_constructor.common_attrs import (
     CommonAttrs,
@@ -77,9 +78,10 @@ class Transformation(Dataset):
         )
 
     @offset_vector.setter
-    def offset_vector(self, new_vector: QVector3D):
-        vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
-        self.attributes.set_attribute_value(CommonAttrs.OFFSET, vector_as_np_array)
+    def offset_vector(self, new_vector: Optional[QVector3D]):
+        if new_vector:
+            vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
+            self.attributes.set_attribute_value(CommonAttrs.OFFSET, vector_as_np_array)
 
     @property
     def ui_value(self) -> float:
