@@ -337,6 +337,7 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
         5.0,
         6.0,
     ]
+    transformation_json["children"][0]["attributes"][2]["offset_units"] = offset_units = "mm"
     depends_on = None
 
     values = _create_transformation_dataset(angle_or_magnitude, "double", name)
@@ -351,6 +352,7 @@ def test_GIVEN_all_information_present_WHEN_attempting_to_create_translation_THE
         depends_on=depends_on,
         values=values,
         offset_vector=QVector3D(*offset_vector),
+        offset_units=offset_units
     )
 
 
