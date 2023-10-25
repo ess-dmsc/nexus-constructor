@@ -80,7 +80,9 @@ class Transformation(Dataset):
     @offset_vector.setter
     def offset_vector(self, new_vector: Optional[QVector3D]):
         if new_vector:
-            vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
+            vector_as_np_array = np.array(
+                [new_vector.x(), new_vector.y(), new_vector.z()]
+            )
             self.attributes.set_attribute_value(CommonAttrs.OFFSET, vector_as_np_array)
 
     @property

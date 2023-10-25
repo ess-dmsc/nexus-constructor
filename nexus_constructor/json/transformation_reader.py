@@ -305,7 +305,9 @@ class TransformationReader:
                 CommonAttrs.OFFSET, name, attributes, [0.0, 0.0, 0.0]
             )
 
-            offset_units = self._find_attribute_in_list(CommonAttrs.OFFSET_UNITS, name, attributes)
+            offset_units = self._find_attribute_in_list(
+                CommonAttrs.OFFSET_UNITS, name, attributes
+            )
             if not offset_units:
                 if offset_vector is [0.0, 0.0, 0.0]:
                     continue
