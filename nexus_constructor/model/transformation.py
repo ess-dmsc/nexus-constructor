@@ -123,7 +123,7 @@ class Transformation(Dataset):
         transform.matrix()
         if self.transform_type == TransformationType.ROTATION:
             # apply offset first to translate it, and then apply rotation
-            transform.setTranslation(self.offset_vector)
+            transform.setTranslation(self.offset_vector * self._ui_offset_scale_factor)
             quaternion = transform.fromAxisAndAngle(
                 self.vector, self.ui_value * self._ui_scale_factor
             )
@@ -132,7 +132,7 @@ class Transformation(Dataset):
         elif self.transform_type == TransformationType.TRANSLATION:
             transform.setTranslation(
                 self.vector.normalized() * self.ui_value * self._ui_scale_factor
-                + self.offset_vector
+                + self.offset_vector * self._ui_offset_scale_factor
             )
         else:
             raise (
@@ -155,7 +155,7 @@ class Transformation(Dataset):
 
     @offset_units.setter
     def offset_units(self, new_units):
-        self._evaluate_ui_scale_factor(new_units)
+        self._evaluate_ui_offset_scale_factor(new_units)
         self.attributes.set_attribute_value(CommonAttrs.OFFSET_UNITS, new_units)
 
     def _evaluate_ui_scale_factor(self, units):
@@ -164,6 +164,13 @@ class Transformation(Dataset):
                 self._ui_scale_factor = calculate_unit_conversion_factor(units, METRES)
             elif self.transform_type == TransformationType.ROTATION:
                 self._ui_scale_factor = calculate_unit_conversion_factor(units, DEGREES)
+        except Exception:
+            pass
+
+    def _evaluate_ui_offset_scale_factor(self, units):
+        try:
+            if self.transform_type == TransformationType.TRANSLATION:
+                self._ui_offset_scale_factor = calculate_unit_conversion_factor(units, METRES)
         except Exception:
             pass
 

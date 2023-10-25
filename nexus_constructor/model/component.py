@@ -244,6 +244,7 @@ class Component(Group):
         ),
         target_pos: int = -1,
         offset_vector: Optional[QVector3D] = None,
+        offset_units: str = ""
     ) -> Transformation:
         """
         Note, currently assumes angle is in degrees
@@ -265,6 +266,7 @@ class Component(Group):
             values,
             target_pos,
             offset_vector if offset_vector is not None else QVector3D(0.0, 0.0, 0.0),
+            offset_units
         )
 
     def _create_and_add_transform(

@@ -67,7 +67,6 @@ class UiTransformation:
         offset_font.setBold(True)
         self.offset_label = QLabel("Offset")
         self.offset_label.setFont(offset_font)
-        self.offset_line_edit = QLineEdit(transformation)
 
         self.depends_on_text_box = QLineEdit(transformation)
         self.depends_on_text_box.setToolTip("depends_on for transformation.")

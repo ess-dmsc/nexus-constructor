@@ -38,7 +38,7 @@ def create_corresponding_value_dataset(value: Any):
 def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled_correctly(
     qtbot, model, component
 ):
-    x = 0
+    x = 1
     y = 0
     z = 0
     value = 0.0
@@ -63,7 +63,7 @@ def test_UI_GIVEN_scalar_vector_WHEN_creating_translation_view_THEN_ui_is_filled
 def test_UI_GIVEN_scalar_angle_WHEN_creating_rotation_view_THEN_ui_is_filled_correctly(
     qtbot, model, component
 ):
-    x = 0
+    x = 1
     y = 0
     z = 0
     angle = 90
@@ -121,7 +121,7 @@ def test_UI_GIVEN_array_dataset_as_magnitude_WHEN_creating_translation_THEN_ui_i
 ):
     array = np.array([1, 2, 3, 4])
 
-    x = 0
+    x = 1
     y = 0
     z = 0
     transform = component.add_translation(QVector3D(x, y, z), name="test")
