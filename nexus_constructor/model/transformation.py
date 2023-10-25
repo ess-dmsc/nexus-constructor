@@ -39,6 +39,7 @@ class Transformation(Dataset):
     _dependents = attr.ib(type=list, init=False)
     _ui_value = attr.ib(type=float, default=None)
     _ui_scale_factor = attr.ib(type=float, default=1.0, init=False)
+    _ui_offset_scale_factor = attr.ib(type=float, default=1.0, init=False)
 
     @property
     def absolute_path(self):
@@ -168,11 +169,7 @@ class Transformation(Dataset):
             pass
 
     def _evaluate_ui_offset_scale_factor(self, units):
-        try:
-            if self.transform_type == TransformationType.TRANSLATION:
-                self._ui_offset_scale_factor = calculate_unit_conversion_factor(units, METRES)
-        except Exception:
-            pass
+        self._ui_offset_scale_factor = calculate_unit_conversion_factor(units, METRES)
 
     @property
     def depends_on(self) -> "Transformation":
