@@ -131,7 +131,6 @@ class ComponentTreeViewTab(QWidget):
         )
         self.component_tree_view.setItemDelegate(self.component_delegate)
         self.component_tree_view.setModel(self.component_model)
-        self.parameters_widget.set_up_model(model)
 
     def reset_model(self):
         self.set_up_model(self.component_model.model)
