@@ -38,6 +38,9 @@ class NexusTreeModel(QAbstractItemModel):
         super().__init__(parent)
         self.model = model
         self.tree_root = self.model.entry
+        self.model.entry.proposal_id = ("", True)
+        self.model.entry.title = ("", True)
+        self.model.entry.users_placeholder = True
         self.current_nxs_obj: Optional[
             Tuple[Union[Group, FileWriterModule], QModelIndex]
         ] = (self.model.entry, None)

@@ -87,19 +87,6 @@ class Group:
     def has_pixel_shape(self):
         return False
 
-    @property
-    def description(self) -> str:
-        try:
-            return self.get_field_value(CommonAttrs.DESCRIPTION)
-        except AttributeError:
-            return ""
-
-    @description.setter
-    def description(self, new_description: str):
-        self.set_field_value(
-            CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING
-        )
-
     def number_of_children(self):
         return len(self.children)
 

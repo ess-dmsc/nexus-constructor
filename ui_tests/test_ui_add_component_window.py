@@ -1633,7 +1633,6 @@ def test_UI_GIVEN_component_name_and_description_WHEN_editing_component_THEN_cor
             qtbot.addWidget(dialog)
 
             assert dialog.nameLineEdit.text() == name
-            assert dialog.descriptionPlainTextEdit.text() == desc
             assert dialog.componentTypeComboBox.currentText() == nx_class
 
 

@@ -3,7 +3,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QDialog
 
 from nexus_constructor.model import GroupContainer
-from nexus_constructor.widgets import ClassDropDownList, DescriptionEdit, GroupNameEdit
+from nexus_constructor.widgets import ClassDropDownList, GroupNameEdit
 
 
 class Ui_AddComponentDialog(QDialog):
@@ -91,23 +91,11 @@ class Ui_AddComponentDialog(QDialog):
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        self.label_2 = QtWidgets.QLabel(self.widget)
-        self.label_2.setObjectName("label_2")
-        self.horizontalLayout_6.addWidget(self.label_2)
-        self.descriptionPlainTextEdit = DescriptionEdit(
-            self.widget, self._group_container
-        )
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.descriptionPlainTextEdit.sizePolicy().hasHeightForWidth()
-        )
-        self.descriptionPlainTextEdit.setSizePolicy(sizePolicy)
-        self.descriptionPlainTextEdit.setObjectName("descriptionPlainTextEdit")
-        self.horizontalLayout_6.addWidget(self.descriptionPlainTextEdit)
         self.verticalLayout_2.addLayout(self.horizontalLayout_6)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
@@ -298,7 +286,7 @@ class Ui_AddComponentDialog(QDialog):
         self.gridLayout_3.addWidget(self.widget, 0, 0, 1, 1)
         self.set_web_engine_view(sizePolicy)
         self.retranslateUi()
-        self.descriptionPlainTextEdit.setFocus()
+        self.nameLineEdit.setFocus()
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def set_web_engine_view(self, sizePolicy):
@@ -319,11 +307,6 @@ class Ui_AddComponentDialog(QDialog):
         )
         self.label.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Name:", None, -1)
-        )
-        self.label_2.setText(
-            QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Description:", None, -1
-            )
         )
         self.label_3.setText(
             QtWidgets.QApplication.translate(
