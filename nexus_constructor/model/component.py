@@ -303,7 +303,7 @@ class Component(Group):
         if offset_units != "":
             transform.offset_units = offset_units
         transform.vector = vector
-        transform.offset_vector = offset_vector# if offset_vector is not None else QVector3D(0.0, 0.0, 0.0)
+        transform.offset_vector = offset_vector
         transform.depends_on = depends_on
         transform.parent_component = self
         if target_pos:
