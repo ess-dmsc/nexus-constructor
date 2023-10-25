@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from functools import partial
 
 from PySide6.QtCore import QMetaObject, QSize
 from PySide6.QtGui import QFont
@@ -11,9 +12,14 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QVBoxLayout,
+    QSizePolicy
 )
 
+from nexus_constructor.common_attrs import CommonAttrs
 from nexus_constructor.field_widget import FieldWidget
+from nexus_constructor.ui_utils import validate_line_edit
+from nexus_constructor.validators import UnitValidator
+from nexus_constructor.unit_utils import METRES
 
 if TYPE_CHECKING:
     from nexus_constructor.transformation_view import EditTransformation
@@ -49,22 +55,18 @@ class UiTransformation:
             hide_name_field=True,
             show_only_f142_stream=True,
         )
+        self.magnitude_widget.field_type_combo.setMaximumWidth(0)
+        self.magnitude_widget.value_type_combo.setMaximumWidth(0)
+        self.magnitude_widget.attrs_button.setMaximumWidth(0)
         self.magnitude_widget.setFrameShape(QFrame.NoFrame)
         self.magnitude_widget.setMinimumHeight(40)
 
         self.ui_placeholder_layout = QVBoxLayout()
 
-        self.offset_box = QDoubleSpinBox(transformation)
-        self.offset_box.setToolTip("Offset to the transformation.")
-        self.offset_box.setMinimumWidth(100)
-        self.offset_box.setMinimum(-1000)
-        self.offset_box.setDecimals(5)
         offset_font = QFont()
         offset_font.setBold(True)
         self.offset_label = QLabel("Offset")
         self.offset_label.setFont(offset_font)
-        self.ui_placeholder_layout.addWidget(self.offset_label)
-        self.ui_placeholder_layout.addWidget(self.offset_box)
 
         self.depends_on_text_box = QLineEdit(transformation)
         self.depends_on_text_box.setToolTip("depends_on for transformation.")
@@ -79,6 +81,7 @@ class UiTransformation:
 
         self.setup_name_layout()
         self.setup_vector_layout(transformation)
+        self.setup_offset_layout(transformation)
         self.setup_value_and_magnitude()
         self.set_spinbox_ranges()
 
@@ -95,6 +98,30 @@ class UiTransformation:
     def setup_vector_layout(self, transformation):
         self.main_layout.addWidget(self.vector_label)
         self._set_up_vector_box(transformation)
+        self._add_line()
+
+    def setup_offset_layout(self, transformation):
+        self.main_layout.addWidget(self.offset_label)
+        self._set_up_vector_box_offset(transformation)
+        self.offset_units_line_edit = QLineEdit()
+        self.offset_unit_validator = UnitValidator(expected_dimensionality=METRES)
+        self.offset_units_line_edit.setValidator(self.offset_unit_validator)
+        self.offset_units_line_edit.setMinimumWidth(20)
+        offset_unit_size_policy = QSizePolicy()
+        offset_unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
+        offset_unit_size_policy.setHorizontalStretch(1)
+        self.offset_units_line_edit.setSizePolicy(offset_unit_size_policy)
+        if self.offset_units:
+            self.offset_units_line_edit.setText(
+                self.offset_units
+            )
+        else:
+            self.offset_units_line_edit.setText("m")
+        self.offset_unit_validator.is_valid.connect(
+            partial(validate_line_edit, self.offset_units_line_edit)
+        )
+        self.offset_units_line_edit.setPlaceholderText(CommonAttrs.OFFSET_UNITS)
+        self.main_layout.addWidget(self.offset_units_line_edit)
         self._add_line()
 
     def setup_name_layout(self):
@@ -123,6 +150,26 @@ class UiTransformation:
 
         self.main_layout.addLayout(self.xyz_layout)
 
+    def _set_up_vector_box_offset(self, transformation):
+        self.xyz_layout_offset = QHBoxLayout()
+
+        self.x_layout_offset = QFormLayout()
+        self.x_spinbox_offset = QDoubleSpinBox(transformation)
+        self.x_layout_offset.addRow("x:", self.x_spinbox_offset)
+        self.xyz_layout_offset.addLayout(self.x_layout_offset)
+
+        self.y_layout_offset = QFormLayout()
+        self.y_spinbox_offset = QDoubleSpinBox(transformation)
+        self.y_layout_offset.addRow("y:", self.y_spinbox_offset)
+        self.xyz_layout_offset.addLayout(self.y_layout_offset)
+
+        self.z_layout_offset = QFormLayout()
+        self.z_spinbox_offset = QDoubleSpinBox(transformation)
+        self.z_layout_offset.addRow("z:", self.z_spinbox_offset)
+        self.xyz_layout_offset.addLayout(self.z_layout_offset)
+
+        self.main_layout.addLayout(self.xyz_layout_offset)
+
     def _add_line(self):
         line = QFrame()
         line.setFrameShape(QFrame.HLine)
@@ -133,11 +180,24 @@ class UiTransformation:
         self.spinboxes = [
             self.x_spinbox,
             self.y_spinbox,
-            self.z_spinbox,
+            self.z_spinbox
         ]
-        for spinbox in self.spinboxes:
+        self.offset_spinboxes = [
+            self.x_spinbox_offset,
+            self.y_spinbox_offset,
+            self.z_spinbox_offset,
+        ]
+        for spinbox in self.spinboxes + self.offset_spinboxes:
             spinbox.setRange(-10000000, 10000000)
             spinbox.setDecimals(5)
+
+    @property
+    def offset_units(self) -> str:
+        return self.offset_units_line_edit.text()
+
+    @offset_units.setter
+    def offset_units(self, new_units: str):
+        self.offset_units_line_edit.setText(new_units)
 
     @staticmethod
     def _make_text_bold(label: QLabel):

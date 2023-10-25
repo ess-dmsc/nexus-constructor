@@ -4,6 +4,7 @@ import attr
 import numpy as np
 from PySide6.Qt3DCore import Qt3DCore
 from PySide6.QtGui import QMatrix4x4, QVector3D
+from typing import Optional
 
 from nexus_constructor.common_attrs import (
     CommonAttrs,
@@ -38,6 +39,7 @@ class Transformation(Dataset):
     _dependents = attr.ib(type=list, init=False)
     _ui_value = attr.ib(type=float, default=None)
     _ui_scale_factor = attr.ib(type=float, default=1.0, init=False)
+    _ui_offset_scale_factor = attr.ib(type=float, default=1.0, init=False)
 
     @property
     def absolute_path(self):
@@ -66,6 +68,23 @@ class Transformation(Dataset):
     def vector(self, new_vector: QVector3D):
         vector_as_np_array = np.array([new_vector.x(), new_vector.y(), new_vector.z()])
         self.attributes.set_attribute_value(CommonAttrs.VECTOR, vector_as_np_array)
+
+    @property
+    def offset_vector(self) -> QVector3D:
+        vector = self.attributes.get_attribute_value(CommonAttrs.OFFSET)
+        return (
+            QVector3D(vector[0], vector[1], vector[2])
+            if vector is not None
+            else QVector3D(0.0, 0.0, 0.0)
+        )
+
+    @offset_vector.setter
+    def offset_vector(self, new_vector: Optional[QVector3D]):
+        if new_vector:
+            vector_as_np_array = np.array(
+                [new_vector.x(), new_vector.y(), new_vector.z()]
+            )
+            self.attributes.set_attribute_value(CommonAttrs.OFFSET, vector_as_np_array)
 
     @property
     def ui_value(self) -> float:
@@ -103,19 +122,18 @@ class Transformation(Dataset):
         """
         transform = Qt3DCore.QTransform()
         transform.matrix()
-        offset = self.attributes.get_attribute_value(CommonAttrs.OFFSET)
-        if not offset:
-            offset = 0.0
         if self.transform_type == TransformationType.ROTATION:
+            # apply offset first to translate it, and then apply rotation
+            transform.setTranslation(self.offset_vector * self._ui_offset_scale_factor)
             quaternion = transform.fromAxisAndAngle(
-                self.vector, (self.ui_value + offset) * self._ui_scale_factor
+                self.vector, self.ui_value * self._ui_scale_factor
             )
+
             transform.setRotation(quaternion)
         elif self.transform_type == TransformationType.TRANSLATION:
             transform.setTranslation(
-                self.vector.normalized()
-                * (self.ui_value + offset)
-                * self._ui_scale_factor
+                self.vector.normalized() * self.ui_value * self._ui_scale_factor
+                + self.offset_vector * self._ui_offset_scale_factor
             )
         else:
             raise (
@@ -132,6 +150,15 @@ class Transformation(Dataset):
         self._evaluate_ui_scale_factor(new_units)
         self.attributes.set_attribute_value(CommonAttrs.UNITS, new_units)
 
+    @property
+    def offset_units(self):
+        return self.attributes.get_attribute_value(CommonAttrs.OFFSET_UNITS)
+
+    @offset_units.setter
+    def offset_units(self, new_units):
+        self._evaluate_ui_offset_scale_factor(new_units)
+        self.attributes.set_attribute_value(CommonAttrs.OFFSET_UNITS, new_units)
+
     def _evaluate_ui_scale_factor(self, units):
         try:
             if self.transform_type == TransformationType.TRANSLATION:
@@ -140,6 +167,9 @@ class Transformation(Dataset):
                 self._ui_scale_factor = calculate_unit_conversion_factor(units, DEGREES)
         except Exception:
             pass
+
+    def _evaluate_ui_offset_scale_factor(self, units):
+        self._ui_offset_scale_factor = calculate_unit_conversion_factor(units, METRES)
 
     @property
     def depends_on(self) -> "Transformation":

@@ -16,10 +16,11 @@ from nexus_constructor.unit_utils import (
 def create_transform(
     name="test translation",
     ui_value=42.0,
-    vector=QVector3D(1.0, 0.0, 0.0),
+    vector=None,
     type="translation",
     values=Dataset(parent_node=None, name="", values=None, type=ValueTypes.DOUBLE),
     units="m",
+    offset_vector=None,
 ):
     translation = Transformation(
         name=name,
@@ -29,7 +30,10 @@ def create_transform(
         parent_component=None,
     )
 
-    translation.vector = vector
+    translation.vector = vector if vector is not None else QVector3D(1.0, 0.0, 0.0)
+    translation.offset_vector = (
+        offset_vector if offset_vector is not None else QVector3D(0.0, 0.0, 0.0)
+    )
     translation.transform_type = type
     translation.ui_value = ui_value
     translation.units = units

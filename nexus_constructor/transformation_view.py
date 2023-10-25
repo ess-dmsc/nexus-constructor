@@ -26,8 +26,7 @@ class EditTransformation(QGroupBox):
         self.transformation_frame = UiTransformation(self)
         self.transformation = transformation
         self.transformation_parent = transformation.parent_component
-        current_vector = self.transformation.vector
-        self._fill_in_existing_fields(current_vector)
+        self._fill_in_existing_fields()
         self.transformation_frame.depends_on_text_box.setEnabled(False)
         self.disable()
         self._init_connections()
@@ -37,8 +36,11 @@ class EditTransformation(QGroupBox):
             self.save_transformation_name
         )
 
-        for box in self.transformation_frame.spinboxes[:-1]:
+        for box in self.transformation_frame.spinboxes:
             box.textChanged.connect(self.save_transformation_vector)
+
+        for box in self.transformation_frame.offset_spinboxes:
+            box.textChanged.connect(self.save_offset)
 
         self.transformation_frame.magnitude_widget.value_line_edit.textChanged.connect(
             self.save_magnitude
@@ -46,14 +48,17 @@ class EditTransformation(QGroupBox):
         self.transformation_frame.magnitude_widget.units_line_edit.textChanged.connect(
             self.save_magnitude
         )
+        self.transformation_frame.offset_units_line_edit.textChanged.connect(
+            self.save_offset
+        )
         if self.model:
             self.model.signals.transformation_changed.connect(self.update_depends_on_ui)
 
-    def _fill_in_existing_fields(self, current_vector):
+    def _fill_in_existing_fields(self):
         self.transformation_frame.name_line_edit.setText(self.transformation.name)
-        self.transformation_frame.x_spinbox.setValue(current_vector.x())
-        self.transformation_frame.y_spinbox.setValue(current_vector.y())
-        self.transformation_frame.z_spinbox.setValue(current_vector.z())
+        self.transformation_frame.x_spinbox.setValue(self.transformation.vector.x())
+        self.transformation_frame.y_spinbox.setValue(self.transformation.vector.y())
+        self.transformation_frame.z_spinbox.setValue(self.transformation.vector.z())
         update_function = find_field_type(self.transformation.values)
         if update_function is not None:
             update_function(
@@ -61,8 +66,14 @@ class EditTransformation(QGroupBox):
             )
         self.transformation_frame.magnitude_widget.units = self.transformation.units
         offset = self.transformation.attributes.get_attribute_value(CommonAttrs.OFFSET)
-        if offset:
-            self.transformation_frame.offset_box.setValue(offset)
+        if offset is not None:
+            self.transformation_frame.x_spinbox_offset.setValue(offset[0])
+            self.transformation_frame.y_spinbox_offset.setValue(offset[1])
+            self.transformation_frame.z_spinbox_offset.setValue(offset[2])
+        if self.transformation.offset_units:
+            self.transformation_frame.offset_units_line_edit.setText(
+                self.transformation.offset_units
+            )
         self.update_depends_on_ui()
 
     def disable(self):
@@ -110,17 +121,24 @@ class EditTransformation(QGroupBox):
             self.model.signals.transformation_changed.emit()
 
     def save_offset(self):
-        offset_value = self.transformation_frame.offset_box.value()
-        if offset_value is not None:
-            self.transformation.attributes.set_attribute_value(
-                CommonAttrs.OFFSET, offset_value
-            )
+        self.transformation.offset_vector = QVector3D(
+            *[spinbox.value() for spinbox in self.transformation_frame.offset_spinboxes]
+        )
+        if self.transformation_frame.offset_units:
+            self.transformation.offset_units = self.transformation_frame.offset_units
+        self.model.signals.transformation_changed.emit()
 
     def save_all_changes(self):
         self.save_transformation_name()
         self.save_transformation_vector()
         self.save_offset()
         self.save_magnitude()
+
+    def transformation_text(self, transformation_type):
+        self.transformation_frame.vector_label.setText("Vector")
+        self.transformation_frame.value_label.setText("Magnitude")
+        self.transformation_frame.offset_label.setText("Offset")
+        self.setTitle(transformation_type)
 
 
 class EditTranslation(EditTransformation):
@@ -129,10 +147,7 @@ class EditTranslation(EditTransformation):
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             METRES
         )
-        self.transformation_frame.vector_label.setText("Direction")
-        self.transformation_frame.value_label.setText("Distance (m)")
-        self.transformation_frame.offset_label.setText("Offset (m)")
-        self.setTitle(TransformationType.TRANSLATION)
+        self.transformation_text(TransformationType.TRANSLATION)
 
 
 class EditRotation(EditTransformation):
@@ -141,10 +156,7 @@ class EditRotation(EditTransformation):
         self.transformation_frame.magnitude_widget.unit_validator.expected_dimensionality = (
             RADIANS
         )
-        self.transformation_frame.vector_label.setText("Rotation Axis")
-        self.transformation_frame.value_label.setText("Angle (°)")
-        self.transformation_frame.offset_label.setText("Offset (°)")
-        self.setTitle(TransformationType.ROTATION)
+        self.transformation_text(TransformationType.ROTATION)
 
 
 def links_back_to_component(reference: Component, comparison: Component):

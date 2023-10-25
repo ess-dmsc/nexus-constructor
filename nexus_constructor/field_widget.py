@@ -95,6 +95,9 @@ class FieldWidget(QFrame):
     ):
         super(FieldWidget, self).__init__(parent)
 
+        fix_horizontal_size = QSizePolicy()
+        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
+
         possible_field_names = []
         self.default_field_types_dict = {}
         self.streams_widget: StreamFieldsWidget = None
@@ -123,12 +126,10 @@ class FieldWidget(QFrame):
         self.unit_validator = UnitValidator()
         self.units_line_edit.setValidator(self.unit_validator)
         self.units_line_edit.setMinimumWidth(20)
-        self.units_line_edit.setMaximumWidth(50)
         unit_size_policy = QSizePolicy()
         unit_size_policy.setHorizontalPolicy(QSizePolicy.Preferred)
         unit_size_policy.setHorizontalStretch(1)
         self.units_line_edit.setSizePolicy(unit_size_policy)
-
         self.unit_validator.is_valid.connect(
             partial(validate_line_edit, self.units_line_edit)
         )
@@ -140,9 +141,6 @@ class FieldWidget(QFrame):
         self.field_type_combo.currentTextChanged.connect(
             self._open_edit_dialog_if_stream
         )
-
-        fix_horizontal_size = QSizePolicy()
-        fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Fixed)
         self.field_type_combo.setSizePolicy(fix_horizontal_size)
 
         self.value_type_combo: QComboBox = QComboBox()
@@ -179,14 +177,17 @@ class FieldWidget(QFrame):
         self.attrs_button.clicked.connect(self.show_attrs_dialog)
 
         self.layout = QHBoxLayout()
-        self.layout.addWidget(self.field_name_edit)
-        self.layout.addWidget(self.field_type_combo)
-        self.layout.addWidget(self.value_line_edit)
-        self.layout.addWidget(self.nx_class_combo)
-        self.layout.addWidget(self.edit_button)
-        self.layout.addWidget(self.value_type_combo)
-        self.layout.addWidget(self.units_line_edit)
-        self.layout.addWidget(self.attrs_button)
+        for widget in [
+            self.field_name_edit,
+            self.field_type_combo,
+            self.value_line_edit,
+            self.nx_class_combo,
+            self.edit_button,
+            self.value_type_combo,
+            self.units_line_edit,
+            self.attrs_button,
+        ]:
+            self.layout.addWidget(widget)
 
         self.layout.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout)
@@ -437,7 +438,11 @@ class FieldWidget(QFrame):
         self.edit_dialog = QDialog(parent=self)
         self.edit_dialog.setModal(True)
         self._set_up_value_validator(False)
-        if self.streams_widget and self.streams_widget._old_schema:
+        if (
+            self._node_parent
+            and self.streams_widget
+            and self.streams_widget._old_schema
+        ):
             self._node_parent.add_stream_module(self.streams_widget._old_schema)
         if self.field_type == FieldType.scalar_dataset:
             self.set_visibility(True, False, False, True)
