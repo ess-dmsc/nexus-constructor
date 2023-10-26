@@ -1,12 +1,12 @@
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QWidget
 
 from nexus_constructor.model import GroupContainer
 from nexus_constructor.widgets import ClassDropDownList, GroupNameEdit
 
 
-class Ui_AddComponentDialog(QDialog):
+class Ui_AddComponentDialog(QWidget):
     def __init__(self, parent: QtWidgets.QWidget, container: GroupContainer):
         super().__init__(parent)
         self._group_container = container

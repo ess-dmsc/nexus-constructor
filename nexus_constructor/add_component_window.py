@@ -95,7 +95,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
         self.setupUi()
-        self.setModal(True)
+#        self.setModal(True)
         self.setWindowModality(Qt.WindowModal)
         if self.initial_edit:
             self.ok_button.setText("Add group")
@@ -104,7 +104,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self._handle_class_change
             )
             self.cancel_button.clicked.connect(self._cancel_new_group)
-            self.rejected.connect(self._rejected)
+#            self.rejected.connect(self._rejected)
         else:
             self.cancel_button.setVisible(True)
             self.cancel_button.clicked.connect(self._cancel_edit_group)
