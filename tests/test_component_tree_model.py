@@ -63,13 +63,14 @@ def create_component_tree_model(
 def test_number_of_groups_0():
     test_component_tree_model, _ = create_component_tree_model()
     test_index = test_component_tree_model.index(0, 0, QModelIndex())
-    assert test_component_tree_model.rowCount(test_index) == 0
+    # 2 because we always have the proposal and title holder
+    assert test_component_tree_model.rowCount(test_index) == 2
 
 
 def test_number_of_groups_1():
     test_component_tree_model, _ = create_component_tree_model([get_component()])
     test_index = test_component_tree_model.index(0, 0, QModelIndex())
-    assert test_component_tree_model.rowCount(test_index) == 1
+    assert test_component_tree_model.rowCount(test_index) == 3
 
 
 def test_number_of_groups_2():
@@ -78,7 +79,7 @@ def test_number_of_groups_2():
     )
     test_index = test_component_tree_model.index(0, 0, QModelIndex())
 
-    assert test_component_tree_model.rowCount(test_index) == 2
+    assert test_component_tree_model.rowCount(test_index) == 4
 
 
 def test_component_has_0_rows():
@@ -273,4 +274,4 @@ def test_add_group():
     assert test_component_tree_model.rowCount(QModelIndex()) == 1
     test_component_tree_model.add_group(get_component())
     index = test_component_tree_model.index(0, 0, QModelIndex())
-    assert test_component_tree_model.rowCount(index) == 1
+    assert test_component_tree_model.rowCount(index) == 3

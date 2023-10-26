@@ -16,7 +16,6 @@ from nexus_constructor.model.helpers import (
     get_absolute_path,
 )
 from nexus_constructor.model.module import Dataset, StreamModules
-from nexus_constructor.model.value_type import ValueTypes
 
 if TYPE_CHECKING:
     from nexus_constructor.model.module import FileWriterModule
@@ -86,19 +85,6 @@ class Group:
 
     def has_pixel_shape(self):
         return False
-
-    @property
-    def description(self) -> str:
-        try:
-            return self.get_field_value(CommonAttrs.DESCRIPTION)
-        except AttributeError:
-            return ""
-
-    @description.setter
-    def description(self, new_description: str):
-        self.set_field_value(
-            CommonAttrs.DESCRIPTION, new_description, ValueTypes.STRING
-        )
 
     def number_of_children(self):
         return len(self.children)
