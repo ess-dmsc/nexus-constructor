@@ -32,7 +32,7 @@ class Ui_MainWindow(object):
         self.main_grid_layout.setSizeConstraint(QLayout.SetDefaultConstraint)
 
         self.tab_widget = QTabWidget(self.central_widget)
-        self.tab_widget.setMinimumSize(QSize(500, 0))
+        self.tab_widget.setMinimumSize(QSize(800, 0))
         self._set_up_component_tree_view()
         self.splitter.addWidget(self.tab_widget)
 
@@ -47,7 +47,7 @@ class Ui_MainWindow(object):
         self.splitter.setStretchFactor(1, 1)
 
     def _set_up_3d_view(self):
-        self.sceneWidget.setMinimumSize(QSize(600, 0))
+        self.sceneWidget.setMinimumSize(QSize(800, 0))
         self.splitter.addWidget(self.sceneWidget)
 
     def _set_up_component_tree_view(self):

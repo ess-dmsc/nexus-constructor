@@ -503,28 +503,36 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cad_file_name = filename
         self.fileLineEdit.setText(filename)
 
+    def height_reset(self, height):
+#        minimumHeight = self.sizeHint().height()
+        self.setFixedHeight(self.shapeOptionsBox.sizeHint().height() + self.fieldsBox.sizeHint().height() + self.unitsbox.sizeHint().height() + height)
+
     def show_cylinder_fields(self):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
         self.boxOptionsBox.setVisible(False)
+        self.height_reset(self.cylinderOptionsBox.sizeHint().height())
 
     def show_box_fields(self):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(False)
         self.boxOptionsBox.setVisible(True)
+        self.height_reset(self.boxOptionsBox.sizeHint().height())
 
     def show_no_geometry_fields(self):
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.ok_button.setEnabled(True)
+        self.height_reset(0)
 
     def show_mesh_fields(self):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
         self.boxOptionsBox.setVisible(False)
+        self.height_reset(self.geometryFileBox.sizeHint().height())
 
     def _disable_fields_and_buttons(self, placeholder_state: bool):
         self.noShapeRadioButton.setEnabled(not placeholder_state)
@@ -534,6 +542,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.shapeOptionsBox.setEnabled(not placeholder_state)
         self.addFieldPushButton.setEnabled(not placeholder_state)
         self.removeFieldPushButton.setEnabled(not placeholder_state)
+        self.height_reset(0)
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None

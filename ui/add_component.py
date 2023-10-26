@@ -13,7 +13,7 @@ class Ui_AddComponentDialog(QWidget):
 
     def setupUi(self):
         self.setObjectName("AddComponentDialog")
-        self.resize(1600, 900)
+#        self.resize(1600, 900)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
@@ -21,6 +21,8 @@ class Ui_AddComponentDialog(QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(sizePolicy)
+        self.setMaximumHeight(820)
+        self.setMinimumHeight(400)
         self.gridLayout_3 = QtWidgets.QGridLayout(self)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.buttonLayout = QtWidgets.QHBoxLayout()

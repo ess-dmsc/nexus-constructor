@@ -250,6 +250,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             nx_classes=self.nx_classes,
             tree_view_updater=self._update_model,
         )
+        self.add_component_window.setMinimumHeight(self.add_component_window.sizeHint().height())
         self.main_grid_layout.addWidget(self.add_component_window)
 #        self.add_component_window.show()
 
