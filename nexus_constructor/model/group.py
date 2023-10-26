@@ -16,7 +16,6 @@ from nexus_constructor.model.helpers import (
     get_absolute_path,
 )
 from nexus_constructor.model.module import Dataset, StreamModules
-from nexus_constructor.model.value_type import ValueTypes
 
 if TYPE_CHECKING:
     from nexus_constructor.model.module import FileWriterModule
