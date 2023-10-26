@@ -114,7 +114,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             return
         new_group = Group("", parent_node=selected_component)
         selected_component.children.append(new_group)
-        self.show_add_component_window(new_group, new_group=True)
+        try:
+            if not self.add_component_window.isVisible():
+                self.show_add_component_window(new_group, new_group=True)
+        except (RuntimeError, AttributeError):
+            self.show_add_component_window(new_group, new_group=True)
 
     def show_edit_component_dialog(self):
         try:
@@ -250,7 +254,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             nx_classes=self.nx_classes,
             tree_view_updater=self._update_model,
         )
-        self.add_component_window.setMinimumHeight(self.add_component_window.sizeHint().height())
         self.main_grid_layout.addWidget(self.add_component_window)
 #        self.add_component_window.show()
 

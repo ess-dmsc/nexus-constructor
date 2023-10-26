@@ -65,6 +65,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         initial_edit: bool,
         nx_classes=None,
         tree_view_updater: Callable = None,
+        use_dialogs: bool = False
     ):
         self._tree_view_updater = tree_view_updater
         self._scene_widget = scene_widget
@@ -95,6 +96,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
         self.setupUi()
+        self.use_dialogs = use_dialogs
 #        self.setModal(True)
         self.setWindowModality(Qt.WindowModal)
         if self.initial_edit:
@@ -114,6 +116,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self._group_parent.children.remove(self._group_container.group)
 
     def _confirm_cancel(self) -> bool:
+        if not self.use_dialogs:
+            return True
+
         quit_msg = "Do you want to close the group editor?"
         reply = QMessageBox.question(
             self,
