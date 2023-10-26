@@ -19,7 +19,6 @@ from nexus_constructor.treeview_utils import (
     expand_transformation_list,
     set_button_states,
 )
-from ui.parameters_widget import ParametersView
 
 
 class QNexusTreeView(QTreeView):
@@ -37,8 +36,6 @@ class ComponentTreeViewTab(QWidget):
         self.setParent(parent)
         self.componentsTabLayout = QVBoxLayout()
         self.component_tree_view = QNexusTreeView()
-        self.parameters_widget = ParametersView(parent)
-        self.componentsTabLayout.addWidget(self.parameters_widget)
         self.componentsTabLayout.addWidget(self.component_tree_view)
 
         self.layout().addLayout(self.componentsTabLayout)
