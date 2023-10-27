@@ -387,9 +387,6 @@ class Ui_AddComponentDialog(QWidget):
         self.unitsLineEdit.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1)
         )
-        self.fieldsBox.setTitle(
-            QtWidgets.QApplication.translate("AddComponentDialog", "Fields", None, -1)
-        )
         self.addFieldPushButton.setText(
             QtWidgets.QApplication.translate(
                 "AddComponentDialog", "Add field", None, -1
