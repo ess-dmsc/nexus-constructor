@@ -97,7 +97,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.pixel_options: PixelOptions = None
         self.setupUi()
         self.use_dialogs = use_dialogs
-#        self.setModal(True)
         self.setWindowModality(Qt.WindowModal)
         if self.initial_edit:
             self.ok_button.setText("Add group")
@@ -510,6 +509,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def height_reset(self, height):
 #        minimumHeight = self.sizeHint().height()
+        print(self.shapeOptionsBox.sizeHint().height() + self.fieldsBox.sizeHint().height() + self.unitsbox.sizeHint().height() + height)
+        print(self.shapeOptionsBox.sizeHint().height())
         self.setFixedHeight(self.shapeOptionsBox.sizeHint().height() + self.fieldsBox.sizeHint().height() + self.unitsbox.sizeHint().height() + height)
 
     def show_cylinder_fields(self):
@@ -530,7 +531,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.ok_button.setEnabled(True)
-        self.height_reset(0)
+        self.height_reset(-self.shapeOptionsBox.sizeHint().height())
 
     def show_mesh_fields(self):
         self.shapeOptionsBox.setVisible(True)
@@ -547,7 +548,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.shapeOptionsBox.setEnabled(not placeholder_state)
         self.addFieldPushButton.setEnabled(not placeholder_state)
         self.removeFieldPushButton.setEnabled(not placeholder_state)
-        self.height_reset(0)
 
     def generate_geometry_model(
         self, component: Component, pixel_data: PixelData = None
