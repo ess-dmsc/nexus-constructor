@@ -98,6 +98,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.setupUi()
         self.use_dialogs = use_dialogs
         self.setWindowModality(Qt.WindowModal)
+        self.setHidden(False)
         if self.initial_edit:
             self.ok_button.setText("Add group")
             self.cancel_button.setVisible(True)
@@ -137,6 +138,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self._refresh_tree(group)
             else:
                 self._refresh_tree(self._group_to_edit_backup)
+            self.setHidden(True)
             self.close()
 
     def _cancel_edit_group(self):
@@ -626,7 +628,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if not self.initial_edit:
             self.signals.transformation_changed.emit()
         self.model.signals.group_edited.emit(index, True)
-        self.hide()
+        self.setHidden(True)
 
     def keyPressEvent(self, arg__1: QKeyEvent) -> None:
         if arg__1.key() == Qt.Key_Escape:
