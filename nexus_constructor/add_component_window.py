@@ -508,9 +508,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.fileLineEdit.setText(filename)
 
     def height_reset(self, height):
-#        minimumHeight = self.sizeHint().height()
-        print(self.shapeOptionsBox.sizeHint().height() + self.fieldsBox.sizeHint().height() + self.unitsbox.sizeHint().height() + height)
-        print(self.shapeOptionsBox.sizeHint().height())
         self.setFixedHeight(self.shapeOptionsBox.sizeHint().height() + self.fieldsBox.sizeHint().height() + self.unitsbox.sizeHint().height() + height)
 
     def show_cylinder_fields(self):
