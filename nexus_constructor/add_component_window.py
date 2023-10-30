@@ -6,7 +6,7 @@ from typing import Callable, List
 
 from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QKeyEvent, QVector3D
-from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QWidget
 
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
