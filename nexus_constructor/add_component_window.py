@@ -106,7 +106,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self._handle_class_change
             )
             self.cancel_button.clicked.connect(self._cancel_new_group)
-#            self.rejected.connect(self._rejected)
         else:
             self.cancel_button.setVisible(True)
             self.cancel_button.clicked.connect(self._cancel_edit_group)
@@ -133,6 +132,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def _cancel_new_group(self):
         if self._confirm_cancel():
+            self._rejected()
             group, _ = self.component_model.current_nxs_obj
             if isinstance(group, Group):
                 self._refresh_tree(group)
