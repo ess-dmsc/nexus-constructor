@@ -65,7 +65,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         initial_edit: bool,
         nx_classes=None,
         tree_view_updater: Callable = None,
-        use_dialogs: bool = False,
     ):
         self._tree_view_updater = tree_view_updater
         self._scene_widget = scene_widget
@@ -96,7 +95,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
         self.setupUi()
-        self.use_dialogs = use_dialogs
         self.setWindowModality(Qt.WindowModal)
         self.setHidden(True)
         if self.initial_edit:
@@ -114,45 +112,27 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if self.initial_edit:
             self._group_parent.children.remove(self._group_container.group)
 
-    def _confirm_cancel(self) -> bool:
-        if not self.use_dialogs:
-            return True
-
-        quit_msg = "Do you want to close the group editor?"
-        reply = QMessageBox.question(
-            self,
-            "Really quit?",
-            quit_msg,
-            QMessageBox.Close | QMessageBox.Ignore,
-            QMessageBox.Close,
-        )
-        if reply == QMessageBox.Close:
-            return True
-        return False
-
     def _cancel_new_group(self):
-        if self._confirm_cancel():
-            self._rejected()
-            group, _ = self.component_model.current_nxs_obj
-            if isinstance(group, Group):
-                self._refresh_tree(group)
-            else:
-                self._refresh_tree(self._group_to_edit_backup)
-            self.setHidden(True)
+        self._rejected()
+        group, _ = self.component_model.current_nxs_obj
+        if isinstance(group, Group):
+            self._refresh_tree(group)
+        else:
+            self._refresh_tree(self._group_to_edit_backup)
+        self.setHidden(True)
 
     def _cancel_edit_group(self):
-        if self._confirm_cancel():
-            self._rejected()
-            if self._group_parent:
-                self._group_parent.children.remove(self._group_container.group)
-                self._group_parent[
-                    self._group_to_edit_backup.name
-                ] = self._group_to_edit_backup
-            else:
-                self.model.entry = self._group_to_edit_backup  # type: ignore
-                self.component_model.tree_root = self.model.entry
-            self._refresh_tree(self._group_to_edit_backup)
-            self.setHidden(True)
+        self._rejected()
+        if self._group_parent:
+            self._group_parent.children.remove(self._group_container.group)
+            self._group_parent[
+                self._group_to_edit_backup.name
+            ] = self._group_to_edit_backup
+        else:
+            self.model.entry = self._group_to_edit_backup  # type: ignore
+            self.component_model.tree_root = self.model.entry
+        self._refresh_tree(self._group_to_edit_backup)
+        self.setHidden(True)
 
     def _refresh_tree(self, group: Group):
         if self._tree_view_updater:
