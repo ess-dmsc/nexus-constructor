@@ -98,7 +98,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.setupUi()
         self.use_dialogs = use_dialogs
         self.setWindowModality(Qt.WindowModal)
-        self.setHidden(False)
+        self.setHidden(True)
         if self.initial_edit:
             self.ok_button.setText("Add group")
             self.cancel_button.setVisible(True)
@@ -139,10 +139,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
             else:
                 self._refresh_tree(self._group_to_edit_backup)
             self.setHidden(True)
-            self.close()
 
     def _cancel_edit_group(self):
         if self._confirm_cancel():
+            self._rejected()
             if self._group_parent:
                 self._group_parent.children.remove(self._group_container.group)
                 self._group_parent[
@@ -152,7 +152,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
                 self.model.entry = self._group_to_edit_backup  # type: ignore
                 self.component_model.tree_root = self.model.entry
             self._refresh_tree(self._group_to_edit_backup)
-            self.close()
+            self.setHidden(True)
 
     def _refresh_tree(self, group: Group):
         if self._tree_view_updater:

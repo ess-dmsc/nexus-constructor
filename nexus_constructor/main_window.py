@@ -240,6 +240,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_transformation(component)
 
     def show_add_component_window(self, group: Group, new_group: bool):
+        if hasattr(self, "add_component_window") and not self.add_component_window.isHidden():
+            self.add_component_window._rejected()
+            self.add_component_window.setHidden(True)
+
         self.add_component_window = AddComponentDialog(
             self.central_widget,
             self.model,
@@ -250,8 +254,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             nx_classes=self.nx_classes,
             tree_view_updater=self._update_model,
         )
-        if not self.add_component_window.isHidden():
-            self.main_grid_layout.addWidget(self.add_component_window)
+        self.main_grid_layout.addWidget(self.add_component_window)
         self.add_component_window.setHidden(False)
 
     def _show_attributes_list_window(
