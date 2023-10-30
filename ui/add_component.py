@@ -13,7 +13,6 @@ class Ui_AddComponentDialog(QWidget):
 
     def setupUi(self):
         self.setObjectName("AddComponentDialog")
-#        self.resize(1600, 900)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
