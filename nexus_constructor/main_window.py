@@ -4,7 +4,7 @@ from weakref import WeakKeyDictionary
 
 import h5py
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
@@ -60,6 +60,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view_tab.set_up_model(self.model)
         self._update_views()
         self.simple_tree_view.triggered.emit()
+        self.add_component_window = QWidget()
 
     def _setup_model_signals(self):
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
@@ -240,7 +241,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_transformation(component)
 
     def show_add_component_window(self, group: Group, new_group: bool):
-        if hasattr(self, "add_component_window") and not self.add_component_window.isHidden():
+        if not self.add_component_window.isHidden():
             self.add_component_window._rejected()
             self.add_component_window.setHidden(True)
 
