@@ -11,6 +11,9 @@ class Ui_AddComponentDialog(QWidget):
         super().__init__(parent)
         self._group_container = container
 
+    def setGroupContainer(self, container: GroupContainer):
+        self._group_container = container
+
     def setupUi(self):
         self.setObjectName("AddComponentDialog")
         sizePolicy = QtWidgets.QSizePolicy(

@@ -60,7 +60,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view_tab.set_up_model(self.model)
         self._update_views()
         self.simple_tree_view.triggered.emit()
-        self.add_component_window = QWidget()
+        self.add_component_window = AddComponentDialog(self.central_widget, self.model, self.component_tree_view_tab.component_model, self.sceneWidget)
+        self.main_grid_layout.addWidget(self.add_component_window)
 
     def _setup_model_signals(self):
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
@@ -245,7 +246,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.add_component_window._rejected()
             self.add_component_window.setHidden(True)
 
-        self.add_component_window = AddComponentDialog(
+        self.add_component_window.refresh_widget_values(
             self.central_widget,
             self.model,
             self.component_tree_view_tab.component_model,
@@ -255,7 +256,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             nx_classes=self.nx_classes,
             tree_view_updater=self._update_model,
         )
-        self.main_grid_layout.addWidget(self.add_component_window)
         self.add_component_window.setHidden(False)
 
     def _show_attributes_list_window(

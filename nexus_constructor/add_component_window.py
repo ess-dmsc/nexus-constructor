@@ -55,7 +55,31 @@ class AddComponentDialog(Ui_AddComponentDialog):
     nx_class_changed = Signal("QVariant")
     suggest_group_name_from_parent_fields = Signal("QVariant")
 
-    def __init__(
+    def __init__(self, parent, model, component_model, sceneW):
+        fakegroup = Group("!fakeGroup!", parent_node=0)
+        self._group_to_edit_backup: Group = deepcopy(fakegroup)
+        self._group_parent = None
+        super().__init__(parent, GroupContainer(fakegroup))
+        self.setHidden(True)
+        self.initial_edit = True
+        nx_classes = {}
+        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
+        file_dir = path.dirname(__file__)
+        self.local_url_root = path.join(
+            file_dir,
+            "..",
+            "nx-class-documentation",
+            "html",
+            "classes",
+            "base_classes",
+        )
+        super().setupUi()
+        self.setupUi()
+        self.refresh_widget_values(parent, model, component_model, fakegroup, sceneW, True)
+        self.setWindowModality(Qt.WindowModal)
+        self.setHidden(True)
+
+    def refresh_widget_values(
         self,
         parent: QWidget,
         model: Model,
@@ -71,32 +95,19 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self._group_to_edit_backup: Group = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
-        file_dir = path.dirname(__file__)
-        self.local_url_root = path.join(
-            file_dir,
-            "..",
-            "nx-class-documentation",
-            "html",
-            "classes",
-            "base_classes",
-        )
-        super().__init__(parent, self._group_container)
-        super().setupUi()
+        self.initial_edit = initial_edit
+        super().setGroupContainer(self._group_container)
         if nx_classes is None:
             nx_classes = {}
+        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
         self.signals = model.signals
         self.model = model
         self.component_model = component_model
-        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
-        self.initial_edit = initial_edit
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
-        self.setupUi()
-        self.setWindowModality(Qt.WindowModal)
-        self.setHidden(True)
         if self.initial_edit:
             self.ok_button.setText("Add group")
             self.cancel_button.setVisible(True)
@@ -451,7 +462,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.placeholder_checkbox.setVisible(c_nx_class in NX_CLASSES_WITH_PLACEHOLDERS)
         if c_nx_class not in NX_CLASSES_WITH_PLACEHOLDERS:
             self.placeholder_checkbox.setChecked(False)
-        if not c_nx_class or c_nx_class not in self.nx_component_classes:
+        if not c_nx_class or c_nx_class not in self.nx_component_classes or self._group_container == 0:
             return
         self._set_html_docs_and_possible_fields(c_nx_class)
 
@@ -465,7 +476,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def _set_html_docs_and_possible_fields(self, c_nx_class):
         nx_class_docs_to_display = c_nx_class
         if c_nx_class in STREAM_MODULE_GROUPS or not c_nx_class:
-            nx_class_docs_to_display = self._group_parent.nx_class
+            try:
+                nx_class_docs_to_display = self._group_parent.nx_class
+            except AttributeError:
+                nx_class_docs_to_display = "NXentry"
         if self._group_parent:
             possible_fields = self.nx_component_classes[self._group_parent.nx_class]
             possible_field_names, _, _ = zip(*possible_fields)
