@@ -65,7 +65,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         initial_edit: bool,
         nx_classes=None,
         tree_view_updater: Callable = None,
-        use_dialogs: bool = False
+        use_dialogs: bool = False,
     ):
         self._tree_view_updater = tree_view_updater
         self._scene_widget = scene_widget
@@ -510,7 +510,12 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.fileLineEdit.setText(filename)
 
     def height_reset(self, height):
-        self.setFixedHeight(self.shapeOptionsBox.sizeHint().height() + self.fieldsBox.sizeHint().height() + self.unitsbox.sizeHint().height() + height)
+        self.setFixedHeight(
+            self.shapeOptionsBox.sizeHint().height()
+            + self.fieldsBox.sizeHint().height()
+            + self.unitsbox.sizeHint().height()
+            + height
+        )
 
     def show_cylinder_fields(self):
         self.shapeOptionsBox.setVisible(True)
