@@ -66,7 +66,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     ):
         frame = NexusQFrame()
         frame.setAutoFillBackground(True)
-        SizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        SizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         SizePolicy.setHorizontalStretch(0)
         SizePolicy.setVerticalStretch(0)
         frame.setSizePolicy(SizePolicy)
@@ -97,7 +97,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             self._dict_frames[index] = frame
         else:
             frame = self._dict_frames[index]
-        frame.setFixedSize(option.rect.size())
+#        frame.setFixedSize(option.rect.size())
         ratio = self.parent().devicePixelRatioF()
         pixmap = QPixmap(frame.size() * ratio)
         pixmap.setDevicePixelRatio(ratio)

@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QStatusBar,
     QTabWidget,
     QWidget,
+    QSizePolicy
 )
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
@@ -29,10 +30,13 @@ class Ui_MainWindow(object):
 
         self.main_grid_layout = QGridLayout(self.central_widget)
         self.main_grid_layout.addWidget(self.splitter)
-        self.main_grid_layout.setSizeConstraint(QLayout.SetDefaultConstraint)
+#        self.main_grid_layout.setSizeConstraint(QLayout.SetDefaultConstraint)
 
         self.tab_widget = QTabWidget(self.central_widget)
-        self.tab_widget.setMinimumSize(QSize(800, 0))
+        self.tab_widget.setMinimumSize(QSize(100, 0))
+        fix_vertical_size = QSizePolicy()
+        fix_vertical_size.setVerticalPolicy(QSizePolicy.Fixed)
+        self.tab_widget.setSizePolicy(fix_vertical_size)
         self._set_up_component_tree_view()
         self.splitter.addWidget(self.tab_widget)
 
@@ -47,7 +51,7 @@ class Ui_MainWindow(object):
         self.splitter.setStretchFactor(1, 1)
 
     def _set_up_3d_view(self):
-        self.sceneWidget.setMinimumSize(QSize(800, 0))
+        self.sceneWidget.setMinimumSize(QSize(100, 0))
         self.splitter.addWidget(self.sceneWidget)
 
     def _set_up_component_tree_view(self):

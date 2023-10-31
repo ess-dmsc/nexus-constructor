@@ -14,17 +14,19 @@ from PySide6 import QtCore, QtWidgets
 class Ui_PixelOptionsWidget(object):
     def setupUi(self, PixelOptionsWidget):
         PixelOptionsWidget.setObjectName("PixelOptionsWidget")
-        PixelOptionsWidget.resize(560, 403)
+#        PixelOptionsWidget.resize(560, 403)
 
-        PixelOptionsWidget.setMinimumSize(QtCore.QSize(560, 20))
+#        PixelOptionsWidget.setMinimumSize(QtCore.QSize(560, 20))
+        self.main_layout = QtWidgets.QVBoxLayout(PixelOptionsWidget)
+        self.main_layout.setObjectName("verticalLayout_2")
         self.pixel_options_group_box = QtWidgets.QGroupBox(PixelOptionsWidget)
 
-        self.pixel_options_group_box.setMinimumSize(QtCore.QSize(0, 20))
+#        self.pixel_options_group_box.setMinimumSize(QtCore.QSize(0, 20))
         self.pixel_options_group_box.setObjectName("pixelOptionsBox")
         self.group_box_layout = QtWidgets.QVBoxLayout(self.pixel_options_group_box)
         self.group_box_layout.setObjectName("verticalLayout_3")
         self.pixel_layout_group_box = QtWidgets.QGroupBox(self.pixel_options_group_box)
-        self.pixel_layout_group_box.setMinimumSize(QtCore.QSize(0, 63))
+        self.pixel_layout_group_box.setMinimumSize(QtCore.QSize(0, 20))
         self.pixel_layout_group_box.setObjectName("pixelLayoutBox")
         self.pixel_layout_group_box_layout = QtWidgets.QHBoxLayout(
             self.pixel_layout_group_box
@@ -80,7 +82,7 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_options_stack = QtWidgets.QStackedWidget(
             self.pixel_options_group_box
         )
-        self.pixel_options_stack.setMinimumSize(QtCore.QSize(518, 192))
+        self.pixel_options_stack.setMinimumSize(QtCore.QSize(518, 20))
         self.pixel_options_stack.setObjectName("pixelOptionsStack")
         self.pixel_grid_page = QtWidgets.QWidget()
         self.pixel_grid_page.setObjectName("pixelGridPage")
@@ -95,7 +97,7 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_grid_group_box_layout = QtWidgets.QGridLayout(
             self.pixel_grid_group_box
         )
-        self.pixel_grid_group_box_layout.setVerticalSpacing(6)
+        self.pixel_grid_group_box_layout.setVerticalSpacing(1)
         self.pixel_grid_group_box_layout.setObjectName("gridLayout_5")
         self.row_label = QtWidgets.QLabel(self.pixel_grid_group_box)
         self.row_label.setObjectName("rowLabel")
@@ -258,16 +260,16 @@ class Ui_PixelOptionsWidget(object):
         PixelOptionsWidget.setWindowTitle(
             QtWidgets.QApplication.translate("PixelOptionsWidget", "Form", None, -1)
         )
-        self.pixel_options_group_box.setTitle(
-            QtWidgets.QApplication.translate(
-                "PixelOptionsWidget", "Pixel options", None, -1
-            )
-        )
-        self.pixel_layout_group_box.setTitle(
-            QtWidgets.QApplication.translate(
-                "PixelOptionsWidget", "Pixel layout:", None, -1
-            )
-        )
+        # self.pixel_options_group_box.setTitle(
+        #     QtWidgets.QApplication.translate(
+        #         "PixelOptionsWidget", "Pixel options", None, -1
+        #     )
+        # )
+        # self.pixel_layout_group_box.setTitle(
+        #     QtWidgets.QApplication.translate(
+        #         "PixelOptionsWidget", "Pixel layout:", None, -1
+        #     )
+        # )
         self.single_pixel_radio_button.setToolTip(
             QtWidgets.QApplication.translate(
                 "PixelOptionsWidget",
@@ -307,11 +309,11 @@ class Ui_PixelOptionsWidget(object):
                 "PixelOptionsWidget", "No Pixels", None, -1
             )
         )
-        self.pixel_grid_group_box.setTitle(
-            QtWidgets.QApplication.translate(
-                "PixelOptionsWidget", "Pixel grid:", None, -1
-            )
-        )
+        # self.pixel_grid_group_box.setTitle(
+        #     QtWidgets.QApplication.translate(
+        #         "PixelOptionsWidget", "Pixel grid:", None, -1
+        #     )
+        # )
         self.row_label.setText(
             QtWidgets.QApplication.translate("PixelOptionsWidget", "Rows:", None, -1)
         )

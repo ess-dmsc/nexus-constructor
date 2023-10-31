@@ -2,7 +2,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from functools import partial
 from os import path
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QKeyEvent, QVector3D
@@ -192,8 +192,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self._group_container.group.nx_class = c_nx_class
             self._group_parent.children.append(self._group_container.group)
 
-    def setupUi(self, pixel_options: PixelOptions = PixelOptions()):
+    def setupUi(self, pixel_options: Optional[PixelOptions] = None):
         """Sets up push buttons and validators for the add component window."""
+
+        if not pixel_options:
+            pixel_options = PixelOptions(self.pixelOptionsWidget)
 
         # Connect the button calls with functions
         self.ok_button.clicked.connect(self.on_ok)
@@ -243,7 +246,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.pixel_options = pixel_options
         if self.pixel_options:
-            self.pixel_options.setupUi(self.pixelOptionsWidget)
+            self.pixel_options.setupUi()
         self.pixelOptionsWidget.ui = self.pixel_options
 
         self.ok_validator = OkValidator(
@@ -337,6 +340,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.populate_pixel_mapping_if_necessary()
 
         self.update_pixel_input_validity()
+        self.height_reset(0)
 
     def clear_previous_mapping_table(self):
         """
@@ -503,8 +507,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.fileLineEdit.setText(filename)
 
     def height_reset(self, height):
+        print(self.pixelOptionsWidget.isVisible())
         self.setFixedHeight(
             self.shapeOptionsBox.sizeHint().height()
+            + (self.pixelOptionsWidget.sizeHint().height() if self.pixelOptionsWidget.isVisible() else 0)
             + self.fieldsBox.sizeHint().height()
             + self.unitsbox.sizeHint().height()
             + height

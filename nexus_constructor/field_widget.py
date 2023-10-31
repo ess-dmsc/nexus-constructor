@@ -51,7 +51,7 @@ class FieldNameLineEdit(QLineEdit):
         ]
         self.update_possible_fields(possible_field_names)
         self.setPlaceholderText("Name of new field")
-        self.setMinimumWidth(60)
+        self.setMinimumWidth(20)
         fix_horizontal_size = QSizePolicy()
         fix_horizontal_size.setHorizontalPolicy(QSizePolicy.Expanding)
         fix_horizontal_size.setHorizontalStretch(3)

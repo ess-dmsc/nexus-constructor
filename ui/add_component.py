@@ -17,14 +17,12 @@ class Ui_AddComponentDialog(QWidget):
     def setupUi(self):
         self.setObjectName("AddComponentDialog")
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
         sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
+        sizePolicy.setVerticalStretch(1)
+#        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(sizePolicy)
-#        self.setMaximumHeight(820)
-        self.setMinimumHeight(100)
         self.gridLayout_3 = QtWidgets.QGridLayout(self)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.buttonLayout = QtWidgets.QHBoxLayout()
@@ -74,8 +72,8 @@ class Ui_AddComponentDialog(QWidget):
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
         sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
+        sizePolicy.setVerticalStretch(1)
+#        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
         self.widget.setSizePolicy(sizePolicy)
         self.widget.setObjectName("widget")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.widget)
@@ -173,11 +171,11 @@ class Ui_AddComponentDialog(QWidget):
         self.boxWidthLineEdit = QtWidgets.QDoubleSpinBox(self.boxOptionsBox)
         self.boxWidthLineEdit.setMaximum(100000.0)
         self.boxWidthLineEdit.setObjectName("boxWidthLineEdit")
-        self.gridLayout_box.addWidget(self.boxWidthLineEdit, 1, 1, 1, 1)
+        self.gridLayout_box.addWidget(self.boxWidthLineEdit, 0, 3, 1, 1)
         self.boxHeightLineEdit = QtWidgets.QDoubleSpinBox(self.boxOptionsBox)
         self.boxHeightLineEdit.setMaximum(100000.0)
         self.boxHeightLineEdit.setObjectName("boxHeightLineEdit")
-        self.gridLayout_box.addWidget(self.boxHeightLineEdit, 2, 1, 1, 1)
+        self.gridLayout_box.addWidget(self.boxHeightLineEdit, 0, 5, 1, 1)
         self.gridLayout_box.setColumnStretch(1, 1)
         self.gridLayout_box.setColumnStretch(3, 1)
         self.gridLayout_box.setColumnStretch(5, 1)
@@ -186,10 +184,10 @@ class Ui_AddComponentDialog(QWidget):
         self.gridLayout_box.addWidget(self.label_9, 0, 0, 1, 1)
         self.label_10 = QtWidgets.QLabel(self.boxOptionsBox)
         self.label_10.setObjectName("label_10")
-        self.gridLayout_box.addWidget(self.label_10, 1, 0, 1, 1)
+        self.gridLayout_box.addWidget(self.label_10, 0, 2, 1, 1)
         self.label_11 = QtWidgets.QLabel(self.boxOptionsBox)
         self.label_11.setObjectName("label_11")
-        self.gridLayout_box.addWidget(self.label_11, 2, 0, 1, 1)
+        self.gridLayout_box.addWidget(self.label_11, 0, 4, 1, 1)
         self.gridLayout_2.addWidget(self.boxOptionsBox, 1, 0, 1, 1)
 
         self.cylinderOptionsBox = QtWidgets.QGroupBox(self.shapeOptionsBox)
@@ -240,31 +238,30 @@ class Ui_AddComponentDialog(QWidget):
         self.cylinderCountSpinBox.setMinimum(1)
         self.cylinderCountSpinBox.setMaximum(999999999)
         self.cylinderCountSpinBox.setObjectName("cylinderCountSpinBox")
-        self.gridLayout.addWidget(self.cylinderCountSpinBox, 3, 1, 1, 1)
+        self.gridLayout.addWidget(self.cylinderCountSpinBox, 1, 6, 1, 1)
         self.gridLayout.setColumnStretch(1, 1)
         self.gridLayout.setColumnStretch(3, 1)
         self.gridLayout.setColumnStretch(5, 1)
         self.gridLayout_2.addWidget(self.cylinderOptionsBox, 3, 0, 1, 1)
         self.unitsbox = QtWidgets.QGroupBox(self.shapeOptionsBox)
         self.unitsbox.setObjectName("unitsbox")
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.unitsbox)
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.unitsLineEdit = QtWidgets.QLineEdit(self.unitsbox)
         self.unitsLineEdit.setPlaceholderText("")
         self.unitsLineEdit.setObjectName("unitsLineEdit")
-        self.horizontalLayout_3.addWidget(self.unitsLineEdit)
-        self.gridLayout_2.addWidget(self.unitsbox, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.unitsbox, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.unitsLineEdit, 1, 1, 1, 1)
         self.pixelOptionsWidget = QtWidgets.QWidget(self.shapeOptionsBox)
         self.gridLayout_2.addWidget(self.pixelOptionsWidget, 4, 0, 1, 1)
         self.verticalLayout_2.addWidget(self.shapeOptionsBox)
         self.fieldsBox = QtWidgets.QGroupBox(self.widget)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.fieldsBox.sizePolicy().hasHeightForWidth())
+#        sizePolicy.setHeightForWidth(self.fieldsBox.sizePolicy().hasHeightForWidth())
         self.fieldsBox.setSizePolicy(sizePolicy)
+        self.fieldsBox.setMaximumHeight(50)
         self.fieldsBox.setObjectName("fieldsBox")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.fieldsBox)
         self.gridLayout_5.setObjectName("gridLayout_5")
@@ -295,9 +292,9 @@ class Ui_AddComponentDialog(QWidget):
 
     def set_web_engine_view(self, sizePolicy):
         self.webEngineView = QWebEngineView(self.widget)
-        sizePolicy.setHeightForWidth(
-            self.webEngineView.sizePolicy().hasHeightForWidth()
-        )
+        # sizePolicy.setHeightForWidth(
+        #     self.webEngineView.sizePolicy().hasHeightForWidth()
+        # )
         self.webEngineView.setSizePolicy(sizePolicy)
         self.webEngineView.setProperty("url", QtCore.QUrl("about:blank"))
         self.webEngineView.setObjectName("webEngineView")
@@ -317,11 +314,11 @@ class Ui_AddComponentDialog(QWidget):
                 "AddComponentDialog", "Group type:", None, -1
             )
         )
-        self.shapeTypeBox.setTitle(
-            QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Shape type:", None, -1
-            )
-        )
+        # self.shapeTypeBox.setTitle(
+        #     QtWidgets.QApplication.translate(
+        #         "AddComponentDialog", "Shape type:", None, -1
+        #     )
+        # )
         self.noShapeRadioButton.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Auto", None, -1)
         )
@@ -334,24 +331,24 @@ class Ui_AddComponentDialog(QWidget):
         self.CylinderRadioButton.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1)
         )
-        self.shapeOptionsBox.setTitle(
-            QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Shape options:", None, -1
-            )
-        )
-        self.geometryFileBox.setTitle(
-            QtWidgets.QApplication.translate("AddComponentDialog", "CAD file", None, -1)
-        )
+        # self.shapeOptionsBox.setTitle(
+        #     QtWidgets.QApplication.translate(
+        #         "AddComponentDialog", "Shape options:", None, -1
+        #     )
+        # )
+        # self.geometryFileBox.setTitle(
+        #     QtWidgets.QApplication.translate("AddComponentDialog", "CAD file", None, -1)
+        # )
         self.fileBrowseButton.setText(
             QtWidgets.QApplication.translate(
                 "AddComponentDialog", "Browse...", None, -1
             )
         )
-        self.cylinderOptionsBox.setTitle(
-            QtWidgets.QApplication.translate(
-                "AddComponentDialog", "Cylinder options", None, -1
-            )
-        )
+        # self.cylinderOptionsBox.setTitle(
+        #     QtWidgets.QApplication.translate(
+        #         "AddComponentDialog", "Cylinder options", None, -1
+        #     )
+        # )
         self.label_6.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "X:", None, -1)
         )
@@ -384,7 +381,7 @@ class Ui_AddComponentDialog(QWidget):
             )
         )
         self.unitsbox.setTitle(
-            QtWidgets.QApplication.translate("AddComponentDialog", "Units", None, -1)
+            QtWidgets.QApplication.translate("AddComponentDialog", "Dimensions", None, -1)
         )
         self.unitsLineEdit.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "m", None, -1)

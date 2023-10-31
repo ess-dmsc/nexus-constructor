@@ -85,6 +85,8 @@ if __name__ == "__main__":
     surfaceFormat.setSwapBehavior(QSurfaceFormat.DoubleBuffer)
     QSurfaceFormat.setDefaultFormat(surfaceFormat)
     app = QApplication(sys.argv)
+    app.setStyleSheet("QWidget{padding:0px;margin:0px;}QLayout{QWidget{padding:0px;margin:0px;}}")
+    print(app.styleSheet())
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = NexusConstructorMainWindow()
     definitions_dir = os.path.abspath(os.path.join(root_dir, "definitions"))
