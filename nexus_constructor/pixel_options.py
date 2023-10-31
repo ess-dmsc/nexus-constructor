@@ -2,6 +2,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 from PySide6.QtCore import QObject, Qt, Signal
+from PySide6 import QtWidgets
 from PySide6.QtWidgets import QDoubleSpinBox, QMessageBox, QSpinBox, QTableWidgetItem
 
 from nexus_constructor.geometry.geometry_loader import load_geometry
@@ -63,6 +64,7 @@ class PixelOptions(Ui_PixelOptionsWidget, QObject):
         QObject.__init__(self)
         self._pixel_validator = None
         self.current_mapping_filename = None
+        self.main_layout = QtWidgets.QVBoxLayout()
 
     def setupUi(self, parent_widget):
         super().setupUi(parent_widget)

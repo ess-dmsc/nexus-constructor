@@ -17,8 +17,6 @@ class Ui_PixelOptionsWidget(object):
         PixelOptionsWidget.resize(560, 403)
 
         PixelOptionsWidget.setMinimumSize(QtCore.QSize(560, 20))
-        self.main_layout = QtWidgets.QVBoxLayout(PixelOptionsWidget)
-        self.main_layout.setObjectName("verticalLayout_2")
         self.pixel_options_group_box = QtWidgets.QGroupBox(PixelOptionsWidget)
 
         self.pixel_options_group_box.setMinimumSize(QtCore.QSize(0, 20))

@@ -56,7 +56,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
     suggest_group_name_from_parent_fields = Signal("QVariant")
 
     def __init__(self, parent, model, component_model, sceneW):
-        fakegroup = Group("!fakeGroup!", parent_node=0)
+        fakegroup = Group("", parent_node=None)
         self._group_to_edit_backup: Group = deepcopy(fakegroup)
         self._group_parent = None
         super().__init__(parent, GroupContainer(fakegroup))
@@ -74,8 +74,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             "base_classes",
         )
         super().setupUi()
-        self.setupUi()
-        self.refresh_widget_values(parent, model, component_model, fakegroup, sceneW, True)
+#        self.refresh_widget_values(parent, model, component_model, fakegroup, sceneW, True)
         self.setWindowModality(Qt.WindowModal)
         self.setHidden(True)
 
@@ -103,28 +102,46 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.signals = model.signals
         self.model = model
         self.component_model = component_model
+        c_group = self._group_container.group
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
+        self.setupUi()
+
         if self.initial_edit:
             self.ok_button.setText("Add group")
+            self.ok_validator.set_nx_class_valid(False)
             self.cancel_button.setVisible(True)
             self.componentTypeComboBox.currentIndexChanged.connect(
                 self._handle_class_change
             )
             self.cancel_button.clicked.connect(self._cancel_new_group)
         else:
+            self.setWindowTitle(f"Edit group: {c_group.name}")
+            self.placeholder_checkbox.setChecked(c_group.group_placeholder)
+
+            self._fill_existing_entries()
+            if (
+                self.get_pixel_visibility_condition()
+                and self.pixel_options
+                and isinstance(c_group, Component)
+            ):
+                self.pixel_options.fill_existing_entries(c_group)
+            if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
+                self.placeholder_checkbox.setVisible(True)
             self.cancel_button.setVisible(True)
             self.cancel_button.clicked.connect(self._cancel_edit_group)
+
+        self._set_html_docs_and_possible_fields(self._group_to_edit_backup.nx_class)
 
     def _rejected(self):
         if self.initial_edit:
             self._group_parent.children.remove(self._group_container.group)
 
     def _cancel_new_group(self):
-        self._rejected()
+#        self._rejected()
         group, _ = self.component_model.current_nxs_obj
         if isinstance(group, Group):
             self._refresh_tree(group)
@@ -242,22 +259,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         c_group = self._group_container.group
 
-        if not self.initial_edit:
-            self.setWindowTitle(f"Edit group: {c_group.name}")
-            self.placeholder_checkbox.setChecked(c_group.group_placeholder)
-
-            self._fill_existing_entries()
-            if (
-                self.get_pixel_visibility_condition()
-                and self.pixel_options
-                and isinstance(c_group, Component)
-            ):
-                self.pixel_options.fill_existing_entries(c_group)
-            if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
-                self.placeholder_checkbox.setVisible(True)
-        else:
-            self.ok_validator.set_nx_class_valid(False)
-
         self.componentTypeComboBox.validator().is_valid.connect(
             self.ok_validator.set_nx_class_valid
         )
@@ -322,8 +323,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.change_pixel_options_visibility()
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.ok_validator.validate_field_widget_list()
-
-        self._set_html_docs_and_possible_fields(self._group_to_edit_backup.nx_class)
 
     def set_pixel_related_changes(self):
         """

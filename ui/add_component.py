@@ -23,7 +23,7 @@ class Ui_AddComponentDialog(QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(sizePolicy)
-        self.setMaximumHeight(820)
+#        self.setMaximumHeight(820)
         self.setMinimumHeight(100)
         self.gridLayout_3 = QtWidgets.QGridLayout(self)
         self.gridLayout_3.setObjectName("gridLayout_3")
