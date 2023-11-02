@@ -21,9 +21,7 @@ from ui.treeview_tab import ComponentTreeViewTab
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.resize(1280, 720)
-#        MainWindow.setStyleSheet("* {color: #000000;background-color: #999999;}")  #   style set instead in nexus-constructor.py:78:QApplication.setStyle("Fusion")
-        fix_vertical_size = QSizePolicy()
-        fix_vertical_size.setVerticalPolicy(QSizePolicy.Fixed)
+        fix_vertical_size = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.central_widget = QWidget(MainWindow)
         self.central_widget.setSizePolicy(fix_vertical_size)
 

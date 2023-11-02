@@ -127,7 +127,7 @@ class InstrumentView(QWidget):
         self.gnomon_viewport = None
 
         # Choose a fixed height and width for the gnomon so that this can be preserved when the 3D view is resized
-        self.gnomon_height = self.gnomon_width = 60
+        self.gnomon_height = self.gnomon_width = 100
 
         # Create the gnomon resources
         self.gnomon = Gnomon(self.gnomon_root_entity, self.view.camera())
