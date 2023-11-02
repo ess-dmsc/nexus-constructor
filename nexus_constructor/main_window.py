@@ -60,7 +60,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view_tab.set_up_model(self.model)
         self._update_views()
         self.simple_tree_view.triggered.emit()
-        self.add_component_window = AddComponentDialog(self.central_widget, self.model, self.component_tree_view_tab.component_model, self.sceneWidget)
+        self.add_component_window = AddComponentDialog(
+            self.central_widget,
+            self.model,
+            self.component_tree_view_tab.component_model,
+            self.sceneWidget,
+        )
         self.main_grid_layout.addWidget(self.add_component_window, 1, 0)
 
     def _setup_model_signals(self):

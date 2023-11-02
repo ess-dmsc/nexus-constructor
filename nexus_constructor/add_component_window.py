@@ -74,7 +74,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             "base_classes",
         )
         super().setupUi()
-#        self.refresh_widget_values(parent, model, component_model, fakegroup, sceneW, True)
+        #        self.refresh_widget_values(parent, model, component_model, fakegroup, sceneW, True)
         self.setWindowModality(Qt.WindowModal)
         self.setHidden(True)
 
@@ -141,7 +141,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self._group_parent.children.remove(self._group_container.group)
 
     def _cancel_new_group(self):
-#        self._rejected()
+        #        self._rejected()
         group, _ = self.component_model.current_nxs_obj
         if isinstance(group, Group):
             self._refresh_tree(group)
@@ -340,7 +340,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.populate_pixel_mapping_if_necessary()
 
         self.update_pixel_input_validity()
-#        self.height_reset(0)
+
+    #        self.height_reset(0)
 
     def clear_previous_mapping_table(self):
         """
@@ -465,7 +466,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.placeholder_checkbox.setVisible(c_nx_class in NX_CLASSES_WITH_PLACEHOLDERS)
         if c_nx_class not in NX_CLASSES_WITH_PLACEHOLDERS:
             self.placeholder_checkbox.setChecked(False)
-        if not c_nx_class or c_nx_class not in self.nx_component_classes or self._group_container == 0:
+        if (
+            not c_nx_class
+            or c_nx_class not in self.nx_component_classes
+            or self._group_container == 0
+        ):
             return
         self._set_html_docs_and_possible_fields(c_nx_class)
 
@@ -508,6 +513,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
     def height_reset(self, height):
         pass
+
     #     print(self.pixelOptionsWidget.isVisible())
     #     print(self.shapeOptionsBox.sizeHint().height()
     #         + (self.pixelOptionsWidget.sizeHint().height() if self.pixelOptionsWidget.isVisible() else 0)
