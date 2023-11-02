@@ -13,13 +13,16 @@ from PySide6 import QtCore, QtWidgets
 
 class Ui_PixelOptionsWidget(object):
     def setupUi(self, PixelOptionsWidget):
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         PixelOptionsWidget.setObjectName("PixelOptionsWidget")
+        PixelOptionsWidget.setSizePolicy(sizePolicy)
 #        PixelOptionsWidget.resize(560, 403)
 
 #        PixelOptionsWidget.setMinimumSize(QtCore.QSize(560, 20))
         self.main_layout = QtWidgets.QVBoxLayout(PixelOptionsWidget)
         self.main_layout.setObjectName("verticalLayout_2")
         self.pixel_options_group_box = QtWidgets.QGroupBox(PixelOptionsWidget)
+        self.pixel_options_group_box.setSizePolicy(sizePolicy)
 
 #        self.pixel_options_group_box.setMinimumSize(QtCore.QSize(0, 20))
         self.pixel_options_group_box.setObjectName("pixelOptionsBox")
@@ -28,6 +31,7 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_layout_group_box = QtWidgets.QGroupBox(self.pixel_options_group_box)
         self.pixel_layout_group_box.setMinimumSize(QtCore.QSize(0, 20))
         self.pixel_layout_group_box.setObjectName("pixelLayoutBox")
+        self.pixel_layout_group_box.setSizePolicy(sizePolicy)
         self.pixel_layout_group_box_layout = QtWidgets.QHBoxLayout(
             self.pixel_layout_group_box
         )
@@ -64,8 +68,10 @@ class Ui_PixelOptionsWidget(object):
         self.pixel_layout_group_box_layout.addWidget(self.no_pixels_button)
 
     def _set_up_pixel_mapping(self):
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.pixel_mapping_page = QtWidgets.QWidget()
         self.pixel_mapping_page.setObjectName("pixelMappingPage")
+        self.pixel_mapping_page.setSizePolicy(sizePolicy)
         self.pixel_mapping_page_layout = QtWidgets.QVBoxLayout(self.pixel_mapping_page)
         self.pixel_mapping_page_layout.setObjectName("verticalLayout_4")
         self.pixel_mapping_label = QtWidgets.QLabel(self.pixel_mapping_page)
@@ -75,25 +81,32 @@ class Ui_PixelOptionsWidget(object):
             self.pixel_mapping_page
         )
         self.pixel_mapping_table_widget.setObjectName("pixelMappingListWidget")
+        self.pixel_mapping_table_widget.setSizePolicy(sizePolicy)
+        self.pixel_mapping_table_widget.setMaximumHeight(50)
         self.pixel_mapping_page_layout.addWidget(self.pixel_mapping_table_widget)
         self.pixel_options_stack.addWidget(self.pixel_mapping_page)
 
     def _set_up_pixel_options_stack(self):
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.pixel_options_stack = QtWidgets.QStackedWidget(
             self.pixel_options_group_box
         )
+        self.pixel_options_stack.setSizePolicy(sizePolicy)
         self.pixel_options_stack.setMinimumSize(QtCore.QSize(518, 20))
         self.pixel_options_stack.setObjectName("pixelOptionsStack")
         self.pixel_grid_page = QtWidgets.QWidget()
         self.pixel_grid_page.setObjectName("pixelGridPage")
+        self.pixel_grid_page.setSizePolicy(sizePolicy)
         self.pixel_grid_page_layout = QtWidgets.QVBoxLayout(self.pixel_grid_page)
         self.pixel_grid_page_layout.setObjectName("verticalLayout")
         self._set_up_pixel_grid_group_box()
         self.pixel_options_stack.addWidget(self.pixel_grid_page)
 
     def _set_up_pixel_grid_group_box(self):
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.pixel_grid_group_box = QtWidgets.QGroupBox(self.pixel_grid_page)
         self.pixel_grid_group_box.setObjectName("pixelGridBox")
+        self.pixel_grid_group_box.setSizePolicy(sizePolicy)
         self.pixel_grid_group_box_layout = QtWidgets.QGridLayout(
             self.pixel_grid_group_box
         )

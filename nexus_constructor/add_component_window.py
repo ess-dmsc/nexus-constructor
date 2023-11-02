@@ -6,7 +6,7 @@ from typing import Callable, List, Optional
 
 from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QKeyEvent, QVector3D
-from PySide6.QtWidgets import QListWidget, QListWidgetItem, QWidget
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QWidget, QSizePolicy
 
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
@@ -340,7 +340,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self.populate_pixel_mapping_if_necessary()
 
         self.update_pixel_input_validity()
-        self.height_reset(0)
+#        self.height_reset(0)
 
     def clear_previous_mapping_table(self):
         """
@@ -507,14 +507,21 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.fileLineEdit.setText(filename)
 
     def height_reset(self, height):
-        print(self.pixelOptionsWidget.isVisible())
-        self.setFixedHeight(
-            self.shapeOptionsBox.sizeHint().height()
-            + (self.pixelOptionsWidget.sizeHint().height() if self.pixelOptionsWidget.isVisible() else 0)
-            + self.fieldsBox.sizeHint().height()
-            + self.unitsbox.sizeHint().height()
-            + height
-        )
+        pass
+    #     print(self.pixelOptionsWidget.isVisible())
+    #     print(self.shapeOptionsBox.sizeHint().height()
+    #         + (self.pixelOptionsWidget.sizeHint().height() if self.pixelOptionsWidget.isVisible() else 0)
+    #         + self.fieldsBox.sizeHint().height()
+    #         + self.unitsbox.sizeHint().height()
+    #         + height)
+    #     self.setFixedHeight(
+    #         self.shapeOptionsBox.sizeHint().height()
+    #         + (self.cylinderOptionsBox.sizeHint().height() if self.cylinderOptionsBox.isVisible() else 0)
+    #         + (self.pixelOptionsWidget.sizeHint().height() if self.pixelOptionsWidget.isVisible() else 0)
+    #         + self.fieldsBox.sizeHint().height()
+    #         + self.unitsbox.sizeHint().height()
+    #         + height
+    #     )
 
     def show_cylinder_fields(self):
         self.shapeOptionsBox.setVisible(True)
@@ -531,10 +538,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.height_reset(self.boxOptionsBox.sizeHint().height())
 
     def show_no_geometry_fields(self):
+        self.height_reset(-self.shapeOptionsBox.sizeHint().height())
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.ok_button.setEnabled(True)
-        self.height_reset(-self.shapeOptionsBox.sizeHint().height())
 
     def show_mesh_fields(self):
         self.shapeOptionsBox.setVisible(True)

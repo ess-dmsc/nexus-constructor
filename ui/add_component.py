@@ -69,10 +69,10 @@ class Ui_AddComponentDialog(QWidget):
 
         self.widget = QtWidgets.QWidget(self)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed
         )
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(1)
+#        sizePolicy.setHorizontalStretch(1)
+#        sizePolicy.setVerticalStretch(1)
 #        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
         self.widget.setSizePolicy(sizePolicy)
         self.widget.setObjectName("widget")
@@ -94,7 +94,7 @@ class Ui_AddComponentDialog(QWidget):
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -117,6 +117,7 @@ class Ui_AddComponentDialog(QWidget):
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
         self.shapeTypeBox = QtWidgets.QGroupBox(self.widget)
         self.shapeTypeBox.setObjectName("shapeTypeBox")
+        self.shapeTypeBox.setSizePolicy(sizePolicy)
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.shapeTypeBox)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.noShapeRadioButton = QtWidgets.QRadioButton(self.shapeTypeBox)

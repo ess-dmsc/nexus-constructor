@@ -22,20 +22,22 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.resize(1280, 720)
 #        MainWindow.setStyleSheet("* {color: #000000;background-color: #999999;}")  #   style set instead in nexus-constructor.py:78:QApplication.setStyle("Fusion")
+        fix_vertical_size = QSizePolicy()
+        fix_vertical_size.setVerticalPolicy(QSizePolicy.Fixed)
         self.central_widget = QWidget(MainWindow)
+        self.central_widget.setSizePolicy(fix_vertical_size)
 
         self.splitter = QSplitter(self.central_widget)
         self.splitter.setChildrenCollapsible(False)
         self.splitter.setOpaqueResize(True)
+        self.splitter.setSizePolicy(fix_vertical_size)
 
         self.main_grid_layout = QGridLayout(self.central_widget)
         self.main_grid_layout.addWidget(self.splitter)
-#        self.main_grid_layout.setSizeConstraint(QLayout.SetDefaultConstraint)
+        self.main_grid_layout.setSizeConstraint(QLayout.SetDefaultConstraint)
 
         self.tab_widget = QTabWidget(self.central_widget)
         self.tab_widget.setMinimumSize(QSize(100, 0))
-        fix_vertical_size = QSizePolicy()
-        fix_vertical_size.setVerticalPolicy(QSizePolicy.Fixed)
         self.tab_widget.setSizePolicy(fix_vertical_size)
         self._set_up_component_tree_view()
         self.splitter.addWidget(self.tab_widget)

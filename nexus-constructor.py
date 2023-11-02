@@ -85,7 +85,7 @@ if __name__ == "__main__":
     surfaceFormat.setSwapBehavior(QSurfaceFormat.DoubleBuffer)
     QSurfaceFormat.setDefaultFormat(surfaceFormat)
     app = QApplication(sys.argv)
-    app.setStyleSheet("QWidget{padding:0px;margin:0px;}QLayout{QWidget{padding:0px;margin:0px;}}")
+    app.setStyleSheet("QWidget{padding:0px;margin:0px;}QLayout{QWidget{padding:0;margin:0;border:0;}}")
     print(app.styleSheet())
     app.setWindowIcon(QIcon(os.path.join("ui", "icon.png")))
     window = NexusConstructorMainWindow()
