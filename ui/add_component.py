@@ -71,9 +71,8 @@ class Ui_AddComponentDialog(QWidget):
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed
         )
-#        sizePolicy.setHorizontalStretch(1)
-#        sizePolicy.setVerticalStretch(1)
-#        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
         self.widget.setSizePolicy(sizePolicy)
         self.widget.setObjectName("widget")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.widget)

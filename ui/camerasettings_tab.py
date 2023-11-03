@@ -1,5 +1,5 @@
 from PySide6.QtGui import QVector3D
-from PySide6.QtWidgets import QDoubleSpinBox, QGridLayout, QLabel, QPushButton, QWidget
+from PySide6.QtWidgets import QDoubleSpinBox, QGridLayout, QLabel, QPushButton, QSizePolicy, QWidget
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 
@@ -9,6 +9,8 @@ class CameraSettingsTab(QWidget):
         super().__init__()
 
         self.setParent(parent)
+        fix_vertical_size = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setSizePolicy(fix_vertical_size)
         self.cameraSettingsLayout = QGridLayout()
 
         self.sceneWidget = scene_widget

@@ -51,7 +51,7 @@ class FieldAttrsDialog(QDialog):
         self.setWindowTitle("Edit Attributes")
 
         self.list_widget = QListWidget()
-        self.list_widget.setMinimumSize(20, 20)
+        self.list_widget.setMinimumSize(600, 400)
         self.add_button = QPushButton("Add attr")
         self.add_button.clicked.connect(self.__add_attr)
         self.remove_button = QPushButton("Remove attr")
@@ -139,7 +139,7 @@ class FieldAttrsDialog(QDialog):
 class FieldAttrFrame(QFrame):
     def __init__(self, attr=None, parent=None):
         super().__init__(parent)
-        self.setMinimumHeight(10)
+        self.setMinimumHeight(20)
         self.setLayout(QHBoxLayout())
         self.attr_name_lineedit = QLineEdit()
         self.attr_value_lineedit = QLineEdit()

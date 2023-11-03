@@ -341,8 +341,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.update_pixel_input_validity()
 
-    #        self.height_reset(0)
-
     def clear_previous_mapping_table(self):
         """
         Wipes the previous table of pixel mapping table widgets. Required if the file has changed, or if the shape type has
