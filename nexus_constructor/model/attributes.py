@@ -8,7 +8,7 @@ from nexus_constructor.model.value_type import ValueType, ValueTypes
 
 
 class Attributes:
-    """Class used for storing attributes."""
+    """List-like class used for storing attributes."""
 
     def __init__(self):
         self._attributes = []
