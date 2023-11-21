@@ -32,7 +32,7 @@ class InstrumentViewAxes(object):
             )
 
             self.set_mesh_properties(mesh, geometry)
-            material, hoover_material, material_family = create_material(
+            material, hover_material, material_family = create_material(
                 material_name, component_root_entity
             )
             self.entities.append(

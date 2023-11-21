@@ -406,7 +406,7 @@ class InstrumentView(QWidget):
                 for e in entity.entities:
                     if isinstance(e, tuple):
                         e = e[0]
-                    if not e.hoover_material:
+                    if not e.hover_material:
                         continue
                     try:
                         if key == name:
@@ -495,14 +495,14 @@ class InstrumentView(QWidget):
                 if material_family == material_name:
                     (
                         new_default_material,
-                        new_hoover_material,
+                        new_hover_material,
                         new_material_family,
                     ) = create_material(
                         material_name,
                         parent_entity,
                     )
                     entity.default_material = new_default_material
-                    entity.hoover_material = new_hoover_material
+                    entity.hover_material = new_hover_material
                     if entity.clicked or entity.inside:
                         entity.switch_to_normal()
                         entity.switch_to_highlight()
