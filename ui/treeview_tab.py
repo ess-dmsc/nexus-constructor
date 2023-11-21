@@ -2,6 +2,7 @@ from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QSizePolicy,
+    QStyleOptionViewItem,
     QToolBar,
     QTreeView,
     QVBoxLayout,
@@ -54,10 +55,11 @@ class ComponentTreeViewTab(QWidget):
 
         self.component_tool_bar = QToolBar("Actions", self)
         self.component_tool_bar.setMinimumWidth(480)
+        self.set_up_model(parent.model)
         self.new_component_action = create_and_add_toolbar_action(
             "new_component.png",
             "Group",
-            self.parent().show_add_component_dialog,
+            self.component_delegate.get_frame,
             self.component_tool_bar,
             self,
             False,

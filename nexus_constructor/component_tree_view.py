@@ -29,6 +29,7 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.treeview_utils import (
     fill_selection,
+    get_component_frame,
     get_group_frame,
     get_group_info_frame,
     get_link_transformation_frame,
@@ -63,6 +64,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             LinkTransformation,
             TransformationsList,
             FileWriterModule,
+            None
         ],
     ):
         frame = NexusQFrame()
@@ -74,7 +76,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.setLayout(QVBoxLayout())
         frame.layout().setContentsMargins(0, 0, 0, 0)
 
-        if isinstance(value, Group):
+        if isinstance(value, Group) and value.name != "wazzup":
             get_group_frame(frame, value)
         elif isinstance(value, TransformationsList):
             get_transformations_list_frame(frame)
@@ -87,9 +89,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, FileWriterModule):
             get_module_frame(frame, self.model, value, self._use_simple_tree_view)
         else:
-            main_window = self.parent().parent().parent()
-            main_window.add_component_window = AddComponentDialog(main_window.central_widget, self.model, main_window.component_tree_view_tab.component_model, main_window.sceneWidget)
-            frame.layout().addChildLayout(main_window.add_component_window)
+            get_component_frame(frame, self.model, self.parent().parent().component_model, self.model.entry, self.parent().parent().sceneWidget, True)
         return frame
 
     def paint(

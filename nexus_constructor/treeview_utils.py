@@ -2,10 +2,11 @@ import os
 import sys
 from collections.abc import Callable
 
-from PySide6.QtCore import QModelIndex, Qt
-from PySide6.QtGui import QAction, QColor, QIcon
+from PySide6.QtCore import QModelIndex, Qt, QPoint
+from PySide6.QtGui import QAction, QColor, QIcon, QPixmap, QRegion
 from PySide6.QtWidgets import QFrame, QLabel, QToolBar, QToolButton, QTreeView, QWidget
 
+from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.common_attrs import NX_TRANSFORMATIONS, TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
@@ -271,6 +272,17 @@ def get_link_transformation_frame(
     frame.transformation_frame = EditTransformationLink(frame, value, model)
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
+
+def get_component_frame(frame: QFrame, model, component_model, group_to_edit, scene_widget, initial_edit):
+    my_add_component_window = AddComponentDialog(frame)
+    my_add_component_window.refresh_widget_values(
+            frame,
+            model,
+            component_model, group_to_edit, scene_widget, initial_edit
+        )
+    frame.layout().addWidget(my_add_component_window)
+    pixmap = QPixmap(frame.size())
+    frame.render(pixmap, QPoint(), QRegion())
 
 def get_transformation_frame(frame: QFrame, model: Model, value: Transformation):
     if value.transform_type == TransformationType.TRANSLATION:

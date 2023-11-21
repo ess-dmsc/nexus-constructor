@@ -55,12 +55,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
     nx_class_changed = Signal("QVariant")
     suggest_group_name_from_parent_fields = Signal("QVariant")
 
-    def __init__(self, parent, model, component_model, sceneW):
+    def __init__(self, parent):
         fakegroup = Group("", parent_node=None)
         self._group_to_edit_backup: Group = deepcopy(fakegroup)
         self._group_parent = None
         super().__init__(parent, GroupContainer(fakegroup))
-        self.setHidden(True)
         self.initial_edit = True
         nx_classes = {}
         self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
@@ -75,7 +74,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
         super().setupUi()
         self.setWindowModality(Qt.WindowModal)
-        self.setHidden(True)
+#        self.setHidden(True)
 
     def refresh_widget_values(
         self,
