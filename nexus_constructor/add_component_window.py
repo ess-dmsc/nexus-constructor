@@ -74,7 +74,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
             "base_classes",
         )
         super().setupUi()
-        #        self.refresh_widget_values(parent, model, component_model, fakegroup, sceneW, True)
         self.setWindowModality(Qt.WindowModal)
         self.setHidden(True)
 

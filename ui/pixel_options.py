@@ -273,16 +273,6 @@ class Ui_PixelOptionsWidget(object):
         PixelOptionsWidget.setWindowTitle(
             QtWidgets.QApplication.translate("PixelOptionsWidget", "Form", None, -1)
         )
-        # self.pixel_options_group_box.setTitle(
-        #     QtWidgets.QApplication.translate(
-        #         "PixelOptionsWidget", "Pixel options", None, -1
-        #     )
-        # )
-        # self.pixel_layout_group_box.setTitle(
-        #     QtWidgets.QApplication.translate(
-        #         "PixelOptionsWidget", "Pixel layout:", None, -1
-        #     )
-        # )
         self.single_pixel_radio_button.setToolTip(
             QtWidgets.QApplication.translate(
                 "PixelOptionsWidget",
@@ -322,11 +312,6 @@ class Ui_PixelOptionsWidget(object):
                 "PixelOptionsWidget", "No Pixels", None, -1
             )
         )
-        # self.pixel_grid_group_box.setTitle(
-        #     QtWidgets.QApplication.translate(
-        #         "PixelOptionsWidget", "Pixel grid:", None, -1
-        #     )
-        # )
         self.row_label.setText(
             QtWidgets.QApplication.translate("PixelOptionsWidget", "Rows:", None, -1)
         )

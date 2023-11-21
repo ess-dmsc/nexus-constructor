@@ -21,7 +21,6 @@ class Ui_AddComponentDialog(QWidget):
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(1)
-#        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(sizePolicy)
         self.gridLayout_3 = QtWidgets.QGridLayout(self)
         self.gridLayout_3.setObjectName("gridLayout_3")
@@ -259,7 +258,6 @@ class Ui_AddComponentDialog(QWidget):
         )
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
-#        sizePolicy.setHeightForWidth(self.fieldsBox.sizePolicy().hasHeightForWidth())
         self.fieldsBox.setSizePolicy(sizePolicy)
         self.fieldsBox.setMaximumHeight(50)
         self.fieldsBox.setObjectName("fieldsBox")
@@ -292,9 +290,6 @@ class Ui_AddComponentDialog(QWidget):
 
     def set_web_engine_view(self, sizePolicy):
         self.webEngineView = QWebEngineView(self.widget)
-        # sizePolicy.setHeightForWidth(
-        #     self.webEngineView.sizePolicy().hasHeightForWidth()
-        # )
         self.webEngineView.setSizePolicy(sizePolicy)
         self.webEngineView.setProperty("url", QtCore.QUrl("about:blank"))
         self.webEngineView.setObjectName("webEngineView")
@@ -314,11 +309,6 @@ class Ui_AddComponentDialog(QWidget):
                 "AddComponentDialog", "Group type:", None, -1
             )
         )
-        # self.shapeTypeBox.setTitle(
-        #     QtWidgets.QApplication.translate(
-        #         "AddComponentDialog", "Shape type:", None, -1
-        #     )
-        # )
         self.noShapeRadioButton.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Auto", None, -1)
         )
@@ -331,24 +321,11 @@ class Ui_AddComponentDialog(QWidget):
         self.CylinderRadioButton.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "Cylinder", None, -1)
         )
-        # self.shapeOptionsBox.setTitle(
-        #     QtWidgets.QApplication.translate(
-        #         "AddComponentDialog", "Shape options:", None, -1
-        #     )
-        # )
-        # self.geometryFileBox.setTitle(
-        #     QtWidgets.QApplication.translate("AddComponentDialog", "CAD file", None, -1)
-        # )
         self.fileBrowseButton.setText(
             QtWidgets.QApplication.translate(
                 "AddComponentDialog", "Browse...", None, -1
             )
         )
-        # self.cylinderOptionsBox.setTitle(
-        #     QtWidgets.QApplication.translate(
-        #         "AddComponentDialog", "Cylinder options", None, -1
-        #     )
-        # )
         self.label_6.setText(
             QtWidgets.QApplication.translate("AddComponentDialog", "X:", None, -1)
         )

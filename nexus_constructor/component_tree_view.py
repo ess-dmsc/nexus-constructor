@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
@@ -66,7 +67,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
     ):
         frame = NexusQFrame()
         frame.setAutoFillBackground(True)
-        SizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        SizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         SizePolicy.setHorizontalStretch(0)
         SizePolicy.setVerticalStretch(0)
         frame.setSizePolicy(SizePolicy)
@@ -85,6 +86,10 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             get_link_transformation_frame(frame, self.model, value)
         elif isinstance(value, FileWriterModule):
             get_module_frame(frame, self.model, value, self._use_simple_tree_view)
+        else:
+            main_window = self.parent().parent().parent()
+            main_window.add_component_window = AddComponentDialog(main_window.central_widget, self.model, main_window.component_tree_view_tab.component_model, main_window.sceneWidget)
+            frame.layout().addChildLayout(main_window.add_component_window)
         return frame
 
     def paint(

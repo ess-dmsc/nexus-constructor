@@ -60,13 +60,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.component_tree_view_tab.set_up_model(self.model)
         self._update_views()
         self.simple_tree_view.triggered.emit()
-        self.add_component_window = AddComponentDialog(
-            self.central_widget,
-            self.model,
-            self.component_tree_view_tab.component_model,
-            self.sceneWidget,
-        )
-        self.main_grid_layout.addWidget(self.add_component_window, 1, 0)
+        self.add_component_window = AddComponentDialog(self.central_widget, self.model, self.component_tree_view_tab.component_model, self.sceneWidget)
+#        self.component_tree_view_tab.component_delegate.get_frame(Component("empty")).layout().addWidget(self.add_component_window)
+#        .componentsTabLayout.insertWidget(1, self.add_component_window)
 
     def _setup_model_signals(self):
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
