@@ -15,11 +15,8 @@ class Attributes:
 
     def _find_item_index(self, item_name: str):
         for count, element in enumerate(self._attributes):
-            try:
-                if element.name == item_name:
-                    return count
-            except AttributeError:
-                continue
+            if element.name == item_name:
+                return count
         return None
 
     def _get_item(self, item_name: str) -> Any:
