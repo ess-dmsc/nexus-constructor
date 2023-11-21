@@ -74,7 +74,8 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
         super().setupUi()
         self.setWindowModality(Qt.WindowModal)
-#        self.setHidden(True)
+
+    #        self.setHidden(True)
 
     def refresh_widget_values(
         self,

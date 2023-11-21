@@ -64,7 +64,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             LinkTransformation,
             TransformationsList,
             FileWriterModule,
-            None
+            None,
         ],
     ):
         frame = NexusQFrame()
@@ -89,7 +89,14 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         elif isinstance(value, FileWriterModule):
             get_module_frame(frame, self.model, value, self._use_simple_tree_view)
         else:
-            get_component_frame(frame, self.model, self.parent().parent().component_model, self.model.entry, self.parent().parent().sceneWidget, True)
+            get_component_frame(
+                frame,
+                self.model,
+                self.parent().parent().component_model,
+                self.model.entry,
+                self.parent().parent().sceneWidget,
+                True,
+            )
         return frame
 
     def paint(
