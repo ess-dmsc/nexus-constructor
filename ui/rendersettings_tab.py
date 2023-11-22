@@ -33,8 +33,8 @@ class RenderSettingsTab(QWidget):
         self.boxTypeTuples = [
             ("normal_state", "shadows"),
             ("normal_state", "highlights"),
-            ("hoover_state", "shadows"),
-            ("hoover_state", "highlights"),
+            ("hover_state", "shadows"),
+            ("hover_state", "highlights"),
         ]
 
         self.subTitle_1 = QLabel("Mesh Settings")
@@ -48,17 +48,17 @@ class RenderSettingsTab(QWidget):
 
         self.normalShadowsLabel = QLabel("Shadows")
         self.normalHighlightsLabel = QLabel("Highlights")
-        self.hooverShadowsLabel = QLabel("Hoover Shadows")
-        self.hooverHighlightsLabel = QLabel("Hoover Highlights")
+        self.hoverShadowsLabel = QLabel("Hover Shadows")
+        self.hoverHighlightsLabel = QLabel("Hover Highlights")
 
         self.normalShadowsBtn = QPushButton("")
         self.normalHighlightsBtn = QPushButton("")
-        self.hooverShadowsBtn = QPushButton("")
-        self.hooverHighlightsBtn = QPushButton("")
+        self.hoverShadowsBtn = QPushButton("")
+        self.hoverHighlightsBtn = QPushButton("")
         self.normalShadowsBtn.clicked.connect(lambda: self._pick_color(0))
         self.normalHighlightsBtn.clicked.connect(lambda: self._pick_color(1))
-        self.hooverShadowsBtn.clicked.connect(lambda: self._pick_color(2))
-        self.hooverHighlightsBtn.clicked.connect(lambda: self._pick_color(3))
+        self.hoverShadowsBtn.clicked.connect(lambda: self._pick_color(2))
+        self.hoverHighlightsBtn.clicked.connect(lambda: self._pick_color(3))
 
         self.subTitle_2 = QLabel("Material Color Settings")
 
@@ -69,13 +69,13 @@ class RenderSettingsTab(QWidget):
 
         self.colorBoxLayout.addWidget(self.normalShadowsLabel, 0, 0)
         self.colorBoxLayout.addWidget(self.normalHighlightsLabel, 0, 1)
-        self.colorBoxLayout.addWidget(self.hooverShadowsLabel, 2, 0)
-        self.colorBoxLayout.addWidget(self.hooverHighlightsLabel, 2, 1)
+        self.colorBoxLayout.addWidget(self.hoverShadowsLabel, 2, 0)
+        self.colorBoxLayout.addWidget(self.hoverHighlightsLabel, 2, 1)
 
         self.colorBoxLayout.addWidget(self.normalShadowsBtn, 1, 0)
         self.colorBoxLayout.addWidget(self.normalHighlightsBtn, 1, 1)
-        self.colorBoxLayout.addWidget(self.hooverShadowsBtn, 3, 0)
-        self.colorBoxLayout.addWidget(self.hooverHighlightsBtn, 3, 1)
+        self.colorBoxLayout.addWidget(self.hoverShadowsBtn, 3, 0)
+        self.colorBoxLayout.addWidget(self.hoverHighlightsBtn, 3, 1)
 
         separator_line = QFrame()
         separator_line.setFrameShape(QFrame.HLine)
@@ -125,12 +125,12 @@ class RenderSettingsTab(QWidget):
             MATERIAL_DICT[self.current_material]["normal_state"]["highlights"],
         )
         self._changeBoxColor(
-            self.hooverShadowsBtn,
-            MATERIAL_DICT[self.current_material]["hoover_state"]["shadows"],
+            self.hoverShadowsBtn,
+            MATERIAL_DICT[self.current_material]["hover_state"]["shadows"],
         )
         self._changeBoxColor(
-            self.hooverHighlightsBtn,
-            MATERIAL_DICT[self.current_material]["hoover_state"]["highlights"],
+            self.hoverHighlightsBtn,
+            MATERIAL_DICT[self.current_material]["hover_state"]["highlights"],
         )
 
     def setMaterialColor(self, color_state, color_type, new_color):

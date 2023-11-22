@@ -46,17 +46,17 @@ class Gnomon:
 
         (
             self.x_material,
-            self.x_hoover_material,
+            self.x_hover_material,
             self.x_material_family,
         ) = create_material("x_material", root_entity, remove_shininess=True)
         (
             self.y_material,
-            self.y_hoover_material,
+            self.y_hover_material,
             self.y_material_family,
         ) = create_material("y_material", root_entity, remove_shininess=True)
         (
             self.z_material,
-            self.z_hoover_material,
+            self.z_hover_material,
             self.z_material_family,
         ) = create_material("z_material", root_entity, remove_shininess=True)
 
@@ -377,7 +377,7 @@ class Gnomon:
             cylinder_mesh, 1.5, self.neutron_animation_length, 2
         )
         self.set_beam_transform(cylinder_transform, self.neutron_animation_length)
-        beam_material, beam_hoover_material, beam_material_family = create_material(
+        beam_material, beam_hover_material, beam_material_family = create_material(
             "beam_material", self.gnomon_root_entity
         )
         entity = create_qentity(
@@ -452,7 +452,7 @@ class Gnomon:
 
             (
                 neutron_material,
-                neutron_hoover_material,
+                neutron_hover_material,
                 neutron_material_family,
             ) = create_material("neutron_material", self.gnomon_root_entity)
 
