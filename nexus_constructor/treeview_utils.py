@@ -306,6 +306,7 @@ def get_component_frame(frame: QFrame, model, component_model, group_to_edit, sc
 #    frame.render(pixmap, QPoint(), QRegion())
 
 
+
 def get_transformation_frame(frame: QFrame, model: Model, value: Transformation):
     if value.transform_type == TransformationType.TRANSLATION:
         frame.transformation_frame = EditTranslation(frame, value, model)
