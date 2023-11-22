@@ -248,7 +248,7 @@ def expand_component_list(
     component_tree_view: QTreeView,
     component_model: NexusTreeModel,
 ):
-#    current_pointer = node.internalPointer()
+    #    current_pointer = node.internalPointer()
     component_tree_view.expand(node)
 
 
@@ -293,18 +293,21 @@ def get_link_transformation_frame(
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
-def get_component_frame(frame: QFrame, model, component_model, group_to_edit, scene_widget, initial_edit):
-#    my_add_component_window = AddComponentDialog(frame)
-#    my_add_component_window.refresh_widget_values(
-        #     frame,
-        #     model,
-        #     component_model, group_to_edit, scene_widget, initial_edit
-        # )
+def get_component_frame(
+    frame: QFrame, model, component_model, group_to_edit, scene_widget, initial_edit
+):
+    #    my_add_component_window = AddComponentDialog(frame)
+    #    my_add_component_window.refresh_widget_values(
+    #     frame,
+    #     model,
+    #     component_model, group_to_edit, scene_widget, initial_edit
+    # )
     frame.component_frame = EditTranslation(frame, Transformation(), model)
     frame.layout().addWidget(frame.component_frame)
+
+
 #    pixmap = QPixmap(frame.size())
 #    frame.render(pixmap, QPoint(), QRegion())
-
 
 
 def get_transformation_frame(frame: QFrame, model: Model, value: Transformation):
