@@ -12,7 +12,7 @@ def test_GIVEN_material_properties_WHEN_calling_set_material_properties_THEN_pro
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material, mock_hoover_material = create_material("x_material", None)
+    mock_material, mock_hover_material = create_material("x_material", None)
 
     mock_material.setAmbient.assert_called_once_with(ambient)
     mock_material.setDiffuse.assert_called_once_with(diffuse)
@@ -26,7 +26,7 @@ def test_GIVEN_alpha_material_properties_WHEN_calling_set_material_properties_TH
     diffuse = Mock()
     alpha = 0.5
 
-    mock_alpha_material, mock_hoover_material = create_material("beam_material", None)
+    mock_alpha_material, mock_hover_material = create_material("beam_material", None)
 
     mock_alpha_material.setAmbient.assert_called_once_with(ambient)
     mock_alpha_material.setDiffuse.assert_called_once_with(diffuse)
@@ -39,7 +39,7 @@ def test_GIVEN_shininess_argument_WHEN_calling_set_material_properties_THEN_shin
     ambient = Mock()
     diffuse = Mock()
 
-    mock_material, mock_hoover_material = create_material(
+    mock_material, mock_hover_material = create_material(
         "x_material", None, remove_shininess=True
     )
 

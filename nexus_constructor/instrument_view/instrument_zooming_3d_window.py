@@ -52,8 +52,8 @@ class InstrumentZooming3DWindow(Qt3DExtras.Qt3DWindow):
                         e.clicked = True
                         self.main_window.model.signals.entity_selected.emit(e)
                     elif not e.inside:
-                        if e.hoover_material:
-                            e.removeComponent(e.hoover_material)
+                        if e.hover_material:
+                            e.removeComponent(e.hover_material)
                             e.addComponent(e.default_material)
                         e.clicked = False
                 except Exception:
