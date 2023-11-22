@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.component_tree_model import ComponentInfo, LinkTransformation
 from nexus_constructor.model.component import Component
 from nexus_constructor.model.group import Group
@@ -28,6 +29,7 @@ from nexus_constructor.model.transformation import Transformation
 from nexus_constructor.transformations_list import TransformationsList
 from nexus_constructor.treeview_utils import (
     fill_selection,
+    get_component_frame,
     get_group_frame,
     get_group_info_frame,
     get_link_transformation_frame,
@@ -62,6 +64,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             LinkTransformation,
             TransformationsList,
             FileWriterModule,
+            None,
         ],
     ):
         frame = NexusQFrame()
@@ -73,7 +76,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.setLayout(QVBoxLayout())
         frame.layout().setContentsMargins(0, 0, 0, 0)
 
-        if isinstance(value, Group):
+        if isinstance(value, Group) and value.name != "wazzup":
             get_group_frame(frame, value)
         elif isinstance(value, TransformationsList):
             get_transformations_list_frame(frame)
@@ -85,6 +88,15 @@ class ComponentEditorDelegate(QStyledItemDelegate):
             get_link_transformation_frame(frame, self.model, value)
         elif isinstance(value, FileWriterModule):
             get_module_frame(frame, self.model, value, self._use_simple_tree_view)
+        else:
+            get_component_frame(
+                frame,
+                self.model,
+                self.parent().parent().component_model,
+                self.model.entry,
+                self.parent().parent().sceneWidget,
+                True,
+            )
         return frame
 
     def paint(

@@ -33,10 +33,10 @@ class UiTransformation:
 
     def setup_ui(self, transformation):
         self.main_layout = QVBoxLayout()
-        self.main_layout.setSpacing(4)
+        self.main_layout.setSpacing(1)
 
         self.frame_layout = QVBoxLayout(transformation)
-        self.frame_layout.setContentsMargins(4, 4, 4, 4)
+        self.frame_layout.setContentsMargins(0, 0, 0, 0)
 
         self.name_layout = QHBoxLayout()
         self.name_layout.setSpacing(-1)
@@ -59,7 +59,7 @@ class UiTransformation:
         self.magnitude_widget.value_type_combo.setMaximumWidth(0)
         self.magnitude_widget.attrs_button.setMaximumWidth(0)
         self.magnitude_widget.setFrameShape(QFrame.NoFrame)
-        self.magnitude_widget.setMinimumHeight(40)
+        self.magnitude_widget.setMinimumHeight(20)
 
         self.ui_placeholder_layout = QVBoxLayout()
 

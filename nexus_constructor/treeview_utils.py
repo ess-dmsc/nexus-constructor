@@ -2,10 +2,11 @@ import os
 import sys
 from collections.abc import Callable
 
-from PySide6.QtCore import QModelIndex, Qt
-from PySide6.QtGui import QAction, QColor, QIcon
+from PySide6.QtCore import QModelIndex, Qt, QPoint
+from PySide6.QtGui import QAction, QColor, QIcon, QPixmap, QRegion
 from PySide6.QtWidgets import QFrame, QLabel, QToolBar, QToolButton, QTreeView, QWidget
 
+from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.common_attrs import NX_TRANSFORMATIONS, TransformationType
 from nexus_constructor.component_tree_model import NexusTreeModel
 from nexus_constructor.link_transformation import LinkTransformation
@@ -242,6 +243,26 @@ def expand_transformation_list(
         component_tree_view.expand(component_index)
 
 
+def expand_component_list(
+    node: QModelIndex,
+    component_tree_view: QTreeView,
+    component_model: NexusTreeModel,
+):
+    #    current_pointer = node.internalPointer()
+    component_tree_view.expand(node)
+
+
+def add_component(
+    component_tree_view: QTreeView,
+    component_model: NexusTreeModel,
+):
+    selected = component_tree_view.selectedIndexes()
+    if len(selected) > 0:
+        current_index = selected[0]
+        AddComponentDialog(component_tree_view)
+        expand_component_list(current_index, component_tree_view, component_model)
+
+
 def add_transformation(
     transformation_type: str,
     component_tree_view: QTreeView,
@@ -270,6 +291,23 @@ def get_link_transformation_frame(
 ):
     frame.transformation_frame = EditTransformationLink(frame, value, model)
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
+
+
+def get_component_frame(
+    frame: QFrame, model, component_model, group_to_edit, scene_widget, initial_edit
+):
+    #    my_add_component_window = AddComponentDialog(frame)
+    #    my_add_component_window.refresh_widget_values(
+    #     frame,
+    #     model,
+    #     component_model, group_to_edit, scene_widget, initial_edit
+    # )
+    frame.component_frame = EditTranslation(frame, Transformation(), model)
+    frame.layout().addWidget(frame.component_frame)
+
+
+#    pixmap = QPixmap(frame.size())
+#    frame.render(pixmap, QPoint(), QRegion())
 
 
 def get_transformation_frame(frame: QFrame, model: Model, value: Transformation):

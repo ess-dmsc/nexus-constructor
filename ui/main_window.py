@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QStatusBar,
     QTabWidget,
     QWidget,
+    QSizePolicy
 )
 
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
@@ -20,19 +21,22 @@ from ui.treeview_tab import ComponentTreeViewTab
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.resize(1280, 720)
-#        MainWindow.setStyleSheet("* {color: #000000;background-color: #999999;}")  #   style set instead in nexus-constructor.py:78:QApplication.setStyle("Fusion")
+        fix_vertical_size = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.central_widget = QWidget(MainWindow)
+        self.central_widget.setSizePolicy(fix_vertical_size)
 
         self.splitter = QSplitter(self.central_widget)
         self.splitter.setChildrenCollapsible(False)
         self.splitter.setOpaqueResize(True)
+        self.splitter.setSizePolicy(fix_vertical_size)
 
         self.main_grid_layout = QGridLayout(self.central_widget)
         self.main_grid_layout.addWidget(self.splitter)
         self.main_grid_layout.setSizeConstraint(QLayout.SetDefaultConstraint)
 
         self.tab_widget = QTabWidget(self.central_widget)
-        self.tab_widget.setMinimumSize(QSize(500, 0))
+        self.tab_widget.setMinimumSize(QSize(100, 0))
+        self.tab_widget.setSizePolicy(fix_vertical_size)
         self._set_up_component_tree_view()
         self.splitter.addWidget(self.tab_widget)
 
@@ -47,7 +51,7 @@ class Ui_MainWindow(object):
         self.splitter.setStretchFactor(1, 1)
 
     def _set_up_3d_view(self):
-        self.sceneWidget.setMinimumSize(QSize(600, 0))
+        self.sceneWidget.setMinimumSize(QSize(100, 0))
         self.splitter.addWidget(self.sceneWidget)
 
     def _set_up_component_tree_view(self):

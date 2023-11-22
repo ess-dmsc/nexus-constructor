@@ -2,6 +2,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 from PySide6.QtCore import QObject, Qt, Signal
+from PySide6 import QtWidgets
 from PySide6.QtWidgets import QDoubleSpinBox, QMessageBox, QSpinBox, QTableWidgetItem
 
 from nexus_constructor.geometry.geometry_loader import load_geometry
@@ -59,16 +60,16 @@ def data_is_an_array_with_more_than_one_element(data) -> bool:
 
 
 class PixelOptions(Ui_PixelOptionsWidget, QObject):
-    def __init__(self):
+    def __init__(self, parent_widget):
         QObject.__init__(self)
         self._pixel_validator = None
         self.current_mapping_filename = None
+        self.parent_widget = parent_widget
+        super().setupUi(self.parent_widget)
 
-    def setupUi(self, parent_widget):
-        super().setupUi(parent_widget)
-
+    def setupUi(self):
         self._pixel_validator = PixelValidator(
-            parent_widget,
+            self.parent_widget,
             self.single_pixel_radio_button,
             self.entire_shape_radio_button,
         )

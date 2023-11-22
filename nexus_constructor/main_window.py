@@ -4,7 +4,7 @@ from weakref import WeakKeyDictionary
 
 import h5py
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 
 from nexus_constructor.add_component_window import AddComponentDialog
 from nexus_constructor.json.load_from_json import JSONReader
@@ -61,6 +61,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self._update_views()
         self.simple_tree_view.triggered.emit()
 
+    #        self.add_component_window = AddComponentDialog(self.central_widget, self.model, self.component_tree_view_tab.component_model, self.sceneWidget)
+    #        self.component_tree_view_tab.component_delegate.get_frame(Component("empty")).layout().addWidget(self.add_component_window)
+    #        .componentsTabLayout.insertWidget(1, self.add_component_window)
+
     def _setup_model_signals(self):
         self.model.signals.component_added.connect(self.sceneWidget.add_component)
         self.model.signals.component_removed.connect(self.sceneWidget.delete_component)
@@ -114,7 +118,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             return
         new_group = Group("", parent_node=selected_component)
         selected_component.children.append(new_group)
-        self.show_add_component_window(new_group, new_group=True)
+
+    #        self.show_add_component_window(new_group, new_group=True)
 
     def show_edit_component_dialog(self):
         try:
@@ -123,7 +128,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     0
                 ].internalPointer()
             )
-            self.show_add_component_window(selected_component, False)
+        #            self.show_add_component_window(selected_component, False)
         except IndexError:
             print("Select a valid group in the NeXus tree view before editing.")
 
@@ -240,7 +245,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             self.sceneWidget.add_transformation(component)
 
     def show_add_component_window(self, group: Group, new_group: bool):
-        self.add_component_window = AddComponentDialog(
+        if not self.add_component_window.isHidden():
+            self.add_component_window._rejected()
+            self.add_component_window.setHidden(True)
+
+        self.add_component_window.refresh_widget_values(
             self.central_widget,
             self.model,
             self.component_tree_view_tab.component_model,
@@ -250,7 +259,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             nx_classes=self.nx_classes,
             tree_view_updater=self._update_model,
         )
-        self.add_component_window.show()
+        self.add_component_window.setHidden(False)
 
     def _show_attributes_list_window(
         self, selected_object: Union[Group, FileWriterModule]

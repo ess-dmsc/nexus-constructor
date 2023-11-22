@@ -2,11 +2,11 @@ from collections import OrderedDict
 from copy import deepcopy
 from functools import partial
 from os import path
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QKeyEvent, QVector3D
-from PySide6.QtWidgets import QListWidget, QListWidgetItem, QMessageBox, QWidget
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QWidget, QSizePolicy
 
 from nexus_constructor.common_attrs import NX_CLASSES_WITH_PLACEHOLDERS, CommonAttrs
 from nexus_constructor.component_tree_model import NexusTreeModel
@@ -55,7 +55,29 @@ class AddComponentDialog(Ui_AddComponentDialog):
     nx_class_changed = Signal("QVariant")
     suggest_group_name_from_parent_fields = Signal("QVariant")
 
-    def __init__(
+    def __init__(self, parent):
+        fakegroup = Group("", parent_node=None)
+        self._group_to_edit_backup: Group = deepcopy(fakegroup)
+        self._group_parent = None
+        super().__init__(parent, GroupContainer(fakegroup))
+        self.initial_edit = True
+        nx_classes = {}
+        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
+        file_dir = path.dirname(__file__)
+        self.local_url_root = path.join(
+            file_dir,
+            "..",
+            "nx-class-documentation",
+            "html",
+            "classes",
+            "base_classes",
+        )
+        super().setupUi()
+        self.setWindowModality(Qt.WindowModal)
+
+    #        self.setHidden(True)
+
+    def refresh_widget_values(
         self,
         parent: QWidget,
         model: Model,
@@ -71,82 +93,73 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self._group_to_edit_backup: Group = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
-        file_dir = path.dirname(__file__)
-        self.local_url_root = path.join(
-            file_dir,
-            "..",
-            "nx-class-documentation",
-            "html",
-            "classes",
-            "base_classes",
-        )
-        super().__init__(parent, self._group_container)
-        super().setupUi()
+        self.initial_edit = initial_edit
+        super().setGroupContainer(self._group_container)
         if nx_classes is None:
             nx_classes = {}
+        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
         self.signals = model.signals
         self.model = model
         self.component_model = component_model
-        self.nx_component_classes = OrderedDict(sorted(nx_classes.items()))
+        c_group = self._group_container.group
 
         self.cad_file_name = None
         self.possible_fields: List[str] = []
-        self.initial_edit = initial_edit
         self.valid_file_given = False
         self.pixel_options: PixelOptions = None
         self.setupUi()
-        self.setModal(True)
-        self.setWindowModality(Qt.WindowModal)
+
         if self.initial_edit:
             self.ok_button.setText("Add group")
+            self.ok_validator.set_nx_class_valid(False)
             self.cancel_button.setVisible(True)
             self.componentTypeComboBox.currentIndexChanged.connect(
                 self._handle_class_change
             )
             self.cancel_button.clicked.connect(self._cancel_new_group)
-            self.rejected.connect(self._rejected)
         else:
+            self.setWindowTitle(f"Edit group: {c_group.name}")
+            self.placeholder_checkbox.setChecked(c_group.group_placeholder)
+
+            self._fill_existing_entries()
+            if (
+                self.get_pixel_visibility_condition()
+                and self.pixel_options
+                and isinstance(c_group, Component)
+            ):
+                self.pixel_options.fill_existing_entries(c_group)
+            if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
+                self.placeholder_checkbox.setVisible(True)
             self.cancel_button.setVisible(True)
             self.cancel_button.clicked.connect(self._cancel_edit_group)
+
+        self._set_html_docs_and_possible_fields(self._group_to_edit_backup.nx_class)
 
     def _rejected(self):
         if self.initial_edit:
             self._group_parent.children.remove(self._group_container.group)
 
-    def _confirm_cancel(self) -> bool:
-        quit_msg = "Do you want to close the group editor?"
-        reply = QMessageBox.question(
-            self,
-            "Really quit?",
-            quit_msg,
-            QMessageBox.Close | QMessageBox.Ignore,
-            QMessageBox.Close,
-        )
-        if reply == QMessageBox.Close:
-            return True
-        return False
-
     def _cancel_new_group(self):
-        if self._confirm_cancel():
-            group, _ = self.component_model.current_nxs_obj
-            if isinstance(group, Group):
-                self._refresh_tree(group)
-            else:
-                self._refresh_tree(self._group_to_edit_backup)
-            self.close()
+        #        self._rejected()
+        group, _ = self.component_model.current_nxs_obj
+        if isinstance(group, Group):
+            self._refresh_tree(group)
+        else:
+            self._refresh_tree(self._group_to_edit_backup)
+        self.setHidden(True)
 
     def _cancel_edit_group(self):
-        if self._confirm_cancel():
-            if self._group_parent:
-                self._group_parent.children.remove(self._group_container.group)
-                self._group_parent[
-                    self._group_to_edit_backup.name
-                ] = self._group_to_edit_backup
-            else:
-                self.model.entry = self._group_to_edit_backup  # type: ignore
-                self.component_model.tree_root = self.model.entry
-            self._refresh_tree(self._group_to_edit_backup)
-            self.close()
+        self._rejected()
+        if self._group_parent:
+            self._group_parent.children.remove(self._group_container.group)
+            self._group_parent[
+                self._group_to_edit_backup.name
+            ] = self._group_to_edit_backup
+        else:
+            self.model.entry = self._group_to_edit_backup  # type: ignore
+            self.component_model.tree_root = self.model.entry
+        self._refresh_tree(self._group_to_edit_backup)
+        self.setHidden(True)
 
     def _refresh_tree(self, group: Group):
         if self._tree_view_updater:
@@ -178,8 +191,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
             self._group_container.group.nx_class = c_nx_class
             self._group_parent.children.append(self._group_container.group)
 
-    def setupUi(self, pixel_options: PixelOptions = PixelOptions()):
+    def setupUi(self, pixel_options: Optional[PixelOptions] = None):
         """Sets up push buttons and validators for the add component window."""
+
+        if not pixel_options:
+            pixel_options = PixelOptions(self.pixelOptionsWidget)
 
         # Connect the button calls with functions
         self.ok_button.clicked.connect(self.on_ok)
@@ -229,7 +245,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
 
         self.pixel_options = pixel_options
         if self.pixel_options:
-            self.pixel_options.setupUi(self.pixelOptionsWidget)
+            self.pixel_options.setupUi()
         self.pixelOptionsWidget.ui = self.pixel_options
 
         self.ok_validator = OkValidator(
@@ -244,22 +260,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         )
 
         c_group = self._group_container.group
-
-        if not self.initial_edit:
-            self.setWindowTitle(f"Edit group: {c_group.name}")
-            self.placeholder_checkbox.setChecked(c_group.group_placeholder)
-
-            self._fill_existing_entries()
-            if (
-                self.get_pixel_visibility_condition()
-                and self.pixel_options
-                and isinstance(c_group, Component)
-            ):
-                self.pixel_options.fill_existing_entries(c_group)
-            if c_group.nx_class in NX_CLASSES_WITH_PLACEHOLDERS:
-                self.placeholder_checkbox.setVisible(True)
-        else:
-            self.ok_validator.set_nx_class_valid(False)
 
         self.componentTypeComboBox.validator().is_valid.connect(
             self.ok_validator.set_nx_class_valid
@@ -325,8 +325,6 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.change_pixel_options_visibility()
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.ok_validator.validate_field_widget_list()
-
-        self._set_html_docs_and_possible_fields(self._group_to_edit_backup.nx_class)
 
     def set_pixel_related_changes(self):
         """
@@ -465,7 +463,11 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.placeholder_checkbox.setVisible(c_nx_class in NX_CLASSES_WITH_PLACEHOLDERS)
         if c_nx_class not in NX_CLASSES_WITH_PLACEHOLDERS:
             self.placeholder_checkbox.setChecked(False)
-        if not c_nx_class or c_nx_class not in self.nx_component_classes:
+        if (
+            not c_nx_class
+            or c_nx_class not in self.nx_component_classes
+            or self._group_container == 0
+        ):
             return
         self._set_html_docs_and_possible_fields(c_nx_class)
 
@@ -479,7 +481,10 @@ class AddComponentDialog(Ui_AddComponentDialog):
     def _set_html_docs_and_possible_fields(self, c_nx_class):
         nx_class_docs_to_display = c_nx_class
         if c_nx_class in STREAM_MODULE_GROUPS or not c_nx_class:
-            nx_class_docs_to_display = self._group_parent.nx_class
+            try:
+                nx_class_docs_to_display = self._group_parent.nx_class
+            except AttributeError:
+                nx_class_docs_to_display = "NXentry"
         if self._group_parent:
             possible_fields = self.nx_component_classes[self._group_parent.nx_class]
             possible_field_names, _, _ = zip(*possible_fields)
@@ -503,19 +508,40 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.cad_file_name = filename
         self.fileLineEdit.setText(filename)
 
+    def height_reset(self, height):
+        pass
+
+    #     print(self.pixelOptionsWidget.isVisible())
+    #     print(self.shapeOptionsBox.sizeHint().height()
+    #         + (self.pixelOptionsWidget.sizeHint().height() if self.pixelOptionsWidget.isVisible() else 0)
+    #         + self.fieldsBox.sizeHint().height()
+    #         + self.unitsbox.sizeHint().height()
+    #         + height)
+    #     self.setFixedHeight(
+    #         self.shapeOptionsBox.sizeHint().height()
+    #         + (self.cylinderOptionsBox.sizeHint().height() if self.cylinderOptionsBox.isVisible() else 0)
+    #         + (self.pixelOptionsWidget.sizeHint().height() if self.pixelOptionsWidget.isVisible() else 0)
+    #         + self.fieldsBox.sizeHint().height()
+    #         + self.unitsbox.sizeHint().height()
+    #         + height
+    #     )
+
     def show_cylinder_fields(self):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(True)
         self.boxOptionsBox.setVisible(False)
+        self.height_reset(self.cylinderOptionsBox.sizeHint().height())
 
     def show_box_fields(self):
         self.shapeOptionsBox.setVisible(True)
         self.geometryFileBox.setVisible(False)
         self.cylinderOptionsBox.setVisible(False)
         self.boxOptionsBox.setVisible(True)
+        self.height_reset(self.boxOptionsBox.sizeHint().height())
 
     def show_no_geometry_fields(self):
+        self.height_reset(-self.shapeOptionsBox.sizeHint().height())
         self.shapeOptionsBox.setVisible(False)
         if self.nameLineEdit.text():
             self.ok_button.setEnabled(True)
@@ -525,6 +551,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         self.geometryFileBox.setVisible(True)
         self.cylinderOptionsBox.setVisible(False)
         self.boxOptionsBox.setVisible(False)
+        self.height_reset(self.geometryFileBox.sizeHint().height())
 
     def _disable_fields_and_buttons(self, placeholder_state: bool):
         self.noShapeRadioButton.setEnabled(not placeholder_state)
@@ -615,7 +642,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if not self.initial_edit:
             self.signals.transformation_changed.emit()
         self.model.signals.group_edited.emit(index, True)
-        self.hide()
+        self.setHidden(True)
 
     def keyPressEvent(self, arg__1: QKeyEvent) -> None:
         if arg__1.key() == Qt.Key_Escape:

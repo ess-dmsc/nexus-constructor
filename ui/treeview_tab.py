@@ -14,6 +14,7 @@ from nexus_constructor.component_tree_view import ComponentEditorDelegate
 from nexus_constructor.instrument_view.instrument_view import InstrumentView
 from nexus_constructor.model.model import Model
 from nexus_constructor.treeview_utils import (
+    add_component,
     add_transformation,
     create_and_add_toolbar_action,
     expand_transformation_list,
@@ -54,10 +55,11 @@ class ComponentTreeViewTab(QWidget):
 
         self.component_tool_bar = QToolBar("Actions", self)
         self.component_tool_bar.setMinimumWidth(480)
+        self.set_up_model(parent.model)
         self.new_component_action = create_and_add_toolbar_action(
             "new_component.png",
             "Group",
-            self.parent().show_add_component_dialog,
+            self._add_component,
             self.component_tool_bar,
             self,
             False,
@@ -158,6 +160,12 @@ class ComponentTreeViewTab(QWidget):
 
     def _expand_transformation_list(self, node: QModelIndex):
         expand_transformation_list(node, self.component_tree_view, self.component_model)
+
+    def _add_component(self):
+        add_component(
+            self.component_tree_view, self.component_model
+        )
+        self._set_button_state()
 
     def _add_transformation(self, transformation_type: str):
         add_transformation(
