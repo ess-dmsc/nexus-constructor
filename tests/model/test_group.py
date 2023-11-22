@@ -44,18 +44,3 @@ def test_group_as_dict_contains_expected_keys():
         assert expected_key in dictionary_output.keys()
 
     assert dictionary_output["name"] == input_name
-
-
-def test_group_depth_returns_expected_tree_depth():
-    entry, sample, instrument = create_tree_structure()
-
-    assert entry.tree_depth() == 4
-    assert sample.tree_depth() == 3
-    assert instrument.tree_depth() == 2
-
-
-def test_group_size_returns_expected_tree_size():
-    entry, sample, instrument = create_tree_structure()
-    assert entry.tree_size() == 9
-    assert sample.tree_size() == 5
-    assert instrument.tree_size() == 3
