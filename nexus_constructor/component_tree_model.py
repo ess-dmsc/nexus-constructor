@@ -432,6 +432,7 @@ class NexusTreeModel(QAbstractItemModel):
 
     def add_component(self, parent_index: QModelIndex):
 #        parent_item = parent_index.internalPointer()
+        self.model.append_component(Component("testjhsdf"))
         self.model.signals.component_added.emit(Component("testjhsdf"))
 
     def add_transformation(self, parent_index: QModelIndex, transformation_type: str):
