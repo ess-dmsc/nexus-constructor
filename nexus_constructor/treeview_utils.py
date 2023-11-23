@@ -259,8 +259,11 @@ def add_component(
     selected = component_tree_view.selectedIndexes()
     if len(selected) > 0:
         current_index = selected[0]
-        AddComponentDialog(component_tree_view)
+        component_model.add_component(current_index)
         expand_component_list(current_index, component_tree_view, component_model)
+        component_tree_view.expand(current_index)
+    else:
+        raise ValueError(f"To add a new group or component, select an entry to add it")
 
 
 def add_transformation(
@@ -293,13 +296,14 @@ def get_link_transformation_frame(
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
-def get_component_frame(frame: QFrame, model, component_model, group_to_edit, scene_widget, initial_edit):
+#, component_model, group_to_edit, scene_widget, initial_edit):
 #    my_add_component_window = AddComponentDialog(frame)
 #    my_add_component_window.refresh_widget_values(
         #     frame,
         #     model,
         #     component_model, group_to_edit, scene_widget, initial_edit
         # )
+def get_component_frame(frame: QFrame, model: Model):
     frame.component_frame = EditTranslation(frame, Transformation(), model)
     frame.layout().addWidget(frame.component_frame)
 #    pixmap = QPixmap(frame.size())

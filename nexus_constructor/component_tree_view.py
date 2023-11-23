@@ -91,11 +91,11 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         else:
             get_component_frame(
                 frame,
-                self.model,
-                self.parent().parent().component_model,
-                self.model.entry,
-                self.parent().parent().sceneWidget,
-                True,
+                self.model, value
+#                self.parent().parent().component_model,
+#                self.model.entry,
+#                self.parent().parent().sceneWidget,
+#                True,
             )
         return frame
 
