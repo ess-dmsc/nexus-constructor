@@ -30,7 +30,7 @@ class Ui_AddComponentDialog(QWidget):
             QtWidgets.QSpacerItem(0, 0, hData=QtWidgets.QSizePolicy.Expanding)
         )
         self.ok_button = QtWidgets.QPushButton(self)
-        self.ok_button.setText("Done")
+        self.ok_button.setText("DoneTest")
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
         )

@@ -262,7 +262,8 @@ def add_component(
         component_model.add_component(current_index, component_tree_view)
         expand_component_list(current_index, component_tree_view, component_model)
         mynewwidget = AddComponentDialog(component_tree_view)
-        component_tree_view.setIndexWidget(current_index, mynewwidget)
+        group, mynewindex = component_model.current_nxs_obj
+        component_tree_view.setIndexWidget(mynewindex, mynewwidget)
     else:
         raise ValueError(f"To add a new group or component, select an entry to add it")
 
