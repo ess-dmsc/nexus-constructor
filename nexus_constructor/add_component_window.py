@@ -83,13 +83,13 @@ class AddComponentDialog(Ui_AddComponentDialog):
         model: Model,
         component_model: NexusTreeModel,
         group_to_edit: Group,
-        scene_widget: QWidget,
+#        scene_widget: QWidget,
         initial_edit: bool,
         nx_classes=None,
         tree_view_updater: Callable = None,
     ):
         self._tree_view_updater = tree_view_updater
-        self._scene_widget = scene_widget
+#        self._scene_widget = scene_widget
         self._group_to_edit_backup: Group = deepcopy(group_to_edit)
         self._group_container = GroupContainer(group_to_edit)
         self._group_parent = group_to_edit.parent_node
@@ -672,7 +672,7 @@ class AddComponentDialog(Ui_AddComponentDialog):
         add_fields_to_component(c_group, self.fieldsListWidget, self.component_model)
         if isinstance(c_group, Component):
             # remove the previous object from the qt3d view
-            self._scene_widget.delete_component(old_group_name)
+#            self._scene_widget.delete_component(old_group_name)
             self.component_model.model.append_component(c_group)
             self.generate_geometry_model(c_group, pixel_data)
             self.write_pixel_data_to_component(c_group, pixel_data)

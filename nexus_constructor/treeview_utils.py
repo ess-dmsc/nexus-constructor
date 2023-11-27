@@ -259,9 +259,10 @@ def add_component(
     selected = component_tree_view.selectedIndexes()
     if len(selected) > 0:
         current_index = selected[0]
-        component_model.add_component(current_index, component_tree_view)
+        mynewcomponent = component_model.add_component(current_index, component_tree_view)
         expand_component_list(current_index, component_tree_view, component_model)
         mynewwidget = AddComponentDialog(component_tree_view)
+#        mynewwidget.refresh_widget_values(component_tree_view, component_tree_view.model, component_model, mynewcomponent, False)
         group, mynewindex = component_model.current_nxs_obj
         component_tree_view.setIndexWidget(mynewindex, mynewwidget)
     else:
