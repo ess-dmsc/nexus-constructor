@@ -76,7 +76,7 @@ class ComponentEditorDelegate(QStyledItemDelegate):
         frame.setLayout(QVBoxLayout())
         frame.layout().setContentsMargins(0, 0, 0, 0)
 
-        if isinstance(value, Group) and value.name != "wazzup":
+        if isinstance(value, Group):
             get_group_frame(frame, value)
         elif isinstance(value, TransformationsList):
             get_transformations_list_frame(frame)
