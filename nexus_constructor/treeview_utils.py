@@ -261,10 +261,11 @@ def add_component(
         current_index = selected[0]
         mynewcomponent = component_model.add_component(current_index, component_tree_view)
         expand_component_list(current_index, component_tree_view, component_model)
-        mynewwidget = AddComponentDialog(component_tree_view)
+#       the following lines show the widget, in place, but not correctly
+#        mynewwidget = AddComponentDialog(component_tree_view)
 #        mynewwidget.refresh_widget_values(component_tree_view, component_tree_view.model, component_model, mynewcomponent, False)
-        group, mynewindex = component_model.current_nxs_obj
-        component_tree_view.setIndexWidget(mynewindex, mynewwidget)
+#        group, mynewindex = component_model.current_nxs_obj
+#        component_tree_view.setIndexWidget(mynewindex, mynewwidget)
     else:
         raise ValueError(f"To add a new group or component, select an entry to add it")
 
