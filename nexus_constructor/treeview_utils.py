@@ -259,8 +259,19 @@ def add_component(
     selected = component_tree_view.selectedIndexes()
     if len(selected) > 0:
         current_index = selected[0]
-        AddComponentDialog(component_tree_view)
+        mynewcomponent = component_model.add_component(current_index, component_tree_view)
         expand_component_list(current_index, component_tree_view, component_model)
+#       the following lines show the widget, in place, but not correctly
+#        mynewwidget = AddComponentDialog(component_tree_view.parent().parent().parent().parent().parent().parent())
+#        mynewwidget.refresh_widget_values(component_tree_view, component_tree_view.model, component_model, mynewcomponent, False)
+#        if not component_model.current_nxs_obj[0].children:
+#            mynewindex = component_model.current_nxs_obj[1]
+#        else:
+#            mynewindex = component_model.index_from_component(component_model.current_nxs_obj[0].children[-1])
+#
+#        component_tree_view.setIndexWidget(mynewindex, mynewwidget)
+    else:
+        raise ValueError(f"To add a new group or component, select an entry to add it")
 
 
 def add_transformation(
@@ -293,15 +304,13 @@ def get_link_transformation_frame(
     frame.layout().addWidget(frame.transformation_frame, Qt.AlignTop)
 
 
-def get_component_frame(
-    frame: QFrame, model, component_model, group_to_edit, scene_widget, initial_edit
-):
-    #    my_add_component_window = AddComponentDialog(frame)
-    #    my_add_component_window.refresh_widget_values(
-    #     frame,
-    #     model,
-    #     component_model, group_to_edit, scene_widget, initial_edit
-    # )
+def get_component_frame(frame: QFrame, model, component_model, group_to_edit, scene_widget, initial_edit):
+#    my_add_component_window = AddComponentDialog(frame)
+#    my_add_component_window.refresh_widget_values(
+        #     frame,
+        #     model,
+        #     component_model, group_to_edit, scene_widget, initial_edit
+        # )
     frame.component_frame = EditTranslation(frame, Transformation(), model)
     frame.layout().addWidget(frame.component_frame)
 
