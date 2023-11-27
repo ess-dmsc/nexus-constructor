@@ -259,9 +259,10 @@ def add_component(
     selected = component_tree_view.selectedIndexes()
     if len(selected) > 0:
         current_index = selected[0]
-        component_model.add_component(current_index)
+        component_model.add_component(current_index, component_tree_view)
         expand_component_list(current_index, component_tree_view, component_model)
-        component_tree_view.expand(current_index)
+        mynewwidget = AddComponentDialog(component_tree_view)
+        component_tree_view.setIndexWidget(current_index, mynewwidget)
     else:
         raise ValueError(f"To add a new group or component, select an entry to add it")
 

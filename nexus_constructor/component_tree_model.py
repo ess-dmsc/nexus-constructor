@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Tuple, Union
 import PySide6.QtGui
 from PySide6.QtCore import QAbstractItemModel, QByteArray, QMimeData, QModelIndex, Qt
 from PySide6.QtGui import QVector3D
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QTreeView
 
 from nexus_constructor.common_attrs import (
     NX_TRANSFORMATIONS,
@@ -430,13 +430,15 @@ class NexusTreeModel(QAbstractItemModel):
         transformation_list.has_link = True
         self.endInsertRows()
 
-    def add_component(self, index: QModelIndex):
+    def add_component(self, index: QModelIndex, component_tree_view: QTreeView):
         self.model.signals.group_edited.emit(index, False)
         something = index.internalPointer()
-        c_group = Component("testjhsdf", parent_node=something)
+        c_group = Group("New Component", parent_node=something)
+        something.children.append(c_group)
+        # ok so let's do something instead of appending a nothing group!
         self.model.append_component(c_group)
         self.model.signals.component_added.emit(c_group)
-        self.model.signals.group_edited.emit(index, True)
+        self.model.signals.group_edited.emit(component_tree_view, True)
 
     def add_transformation(self, parent_index: QModelIndex, transformation_type: str):
         parent_item = parent_index.internalPointer()
