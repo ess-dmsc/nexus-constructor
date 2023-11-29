@@ -12,7 +12,7 @@ MATERIAL_DICT = {
             "shadows": QColor("#9f9f9f"),
             "highlights": QColor("#dbdbdb"),
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor("#275fff"),
             "highlights": QColor("#99e6ff"),
         },
@@ -23,7 +23,7 @@ MATERIAL_DICT = {
             "shadows": QColor("#f8dd9e"),
             "highlights": QColor("#b69442"),
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor("#f8dd9e"),
             "highlights": QColor("#b69442"),
         },
@@ -35,7 +35,7 @@ MATERIAL_DICT = {
             "highlights": QColor("darkgreen"),
             "alpha": 0.75,
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor("green"),
             "highlights": QColor("darkgreen"),
             "alpha": 1.0,
@@ -48,7 +48,7 @@ MATERIAL_DICT = {
             "highlights": QColor("grey"),
             "alpha": 0.5,
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor("red"),
             "highlights": QColor("grey"),
             "alpha": 0.75,
@@ -60,7 +60,7 @@ MATERIAL_DICT = {
             "shadows": QColor(255, 0, 0),
             "highlights": QColor(255, 100, 100),
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor(255, 0, 0),
             "highlights": QColor(255, 100, 100),
         },
@@ -71,7 +71,7 @@ MATERIAL_DICT = {
             "shadows": QColor(0, 255, 0),
             "highlights": QColor(100, 255, 100),
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor(0, 255, 0),
             "highlights": QColor(100, 255, 100),
         },
@@ -82,7 +82,7 @@ MATERIAL_DICT = {
             "shadows": QColor(0, 0, 255),
             "highlights": QColor(100, 100, 255),
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor(0, 0, 255),
             "highlights": QColor(100, 100, 255),
         },
@@ -94,7 +94,7 @@ MATERIAL_DICT = {
             "highlights": QColor("lightblue"),
             "alpha": 0.5,
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor("blue"),
             "highlights": QColor("lightblue"),
             "alpha": 0.75,
@@ -106,7 +106,7 @@ MATERIAL_DICT = {
             "shadows": QColor("black"),
             "highlights": QColor("grey"),
         },
-        "hoover_state": {
+        "hover_state": {
             "shadows": QColor("black"),
             "highlights": QColor("grey"),
         },
@@ -123,7 +123,7 @@ class Entity(Qt3DCore.QEntity):
         self.inside = False
         self.old_mesh = None
         self.default_material = None
-        self.hoover_material = None
+        self.hover_material = None
         self.material_family = None
 
         if picker:
@@ -137,13 +137,13 @@ class Entity(Qt3DCore.QEntity):
     def switch_to_highlight(self):
         try:
             self.removeComponent(self.default_material)
-            self.addComponent(self.hoover_material)
+            self.addComponent(self.hover_material)
         except Exception:
             pass
 
     def switch_to_normal(self):
         try:
-            self.removeComponent(self.hoover_material)
+            self.removeComponent(self.hover_material)
             self.addComponent(self.default_material)
         except Exception:
             pass
@@ -186,15 +186,15 @@ def create_material(
 ]:
     if material_name not in MATERIAL_DICT.keys():
         normal_material = MATERIAL_DICT["DEFAULT"]["material_type"].__call__(parent)
-        hoover_material = MATERIAL_DICT["DEFAULT"]["material_type"].__call__(parent)
+        hover_material = MATERIAL_DICT["DEFAULT"]["material_type"].__call__(parent)
         normal_material.setCool(MATERIAL_DICT["DEFAULT"]["normal_state"]["shadows"])
         normal_material.setWarm(MATERIAL_DICT["DEFAULT"]["normal_state"]["highlights"])
-        hoover_material.setCool(MATERIAL_DICT["DEFAULT"]["hoover_state"]["shadows"])
-        hoover_material.setWarm(MATERIAL_DICT["DEFAULT"]["hoover_state"]["highlights"])
+        hover_material.setCool(MATERIAL_DICT["DEFAULT"]["hover_state"]["shadows"])
+        hover_material.setWarm(MATERIAL_DICT["DEFAULT"]["hover_state"]["highlights"])
         material_family = "DEFAULT"
     else:
         normal_material = MATERIAL_DICT[material_name]["material_type"].__call__(parent)
-        hoover_material = MATERIAL_DICT[material_name]["material_type"].__call__(parent)
+        hover_material = MATERIAL_DICT[material_name]["material_type"].__call__(parent)
         material_family = material_name
         if isinstance(normal_material, Qt3DExtras.QGoochMaterial):
             normal_material.setCool(
@@ -203,11 +203,11 @@ def create_material(
             normal_material.setWarm(
                 MATERIAL_DICT[material_name]["normal_state"]["highlights"]
             )
-            hoover_material.setCool(
-                MATERIAL_DICT[material_name]["hoover_state"]["shadows"]
+            hover_material.setCool(
+                MATERIAL_DICT[material_name]["hover_state"]["shadows"]
             )
-            hoover_material.setWarm(
-                MATERIAL_DICT[material_name]["hoover_state"]["highlights"]
+            hover_material.setWarm(
+                MATERIAL_DICT[material_name]["hover_state"]["highlights"]
             )
         elif isinstance(
             normal_material, (Qt3DExtras.QPhongMaterial, Qt3DExtras.QPhongAlphaMaterial)
@@ -218,26 +218,26 @@ def create_material(
             normal_material.setDiffuse(
                 MATERIAL_DICT[material_name]["normal_state"]["highlights"]
             )
-            hoover_material.setAmbient(
-                MATERIAL_DICT[material_name]["hoover_state"]["shadows"]
+            hover_material.setAmbient(
+                MATERIAL_DICT[material_name]["hover_state"]["shadows"]
             )
-            hoover_material.setDiffuse(
-                MATERIAL_DICT[material_name]["hoover_state"]["highlights"]
+            hover_material.setDiffuse(
+                MATERIAL_DICT[material_name]["hover_state"]["highlights"]
             )
 
         if isinstance(normal_material, Qt3DExtras.QPhongAlphaMaterial):
             normal_material.setAlpha(
                 MATERIAL_DICT[material_name]["normal_state"]["alpha"]
             )
-            hoover_material.setAlpha(
-                MATERIAL_DICT[material_name]["hoover_state"]["alpha"]
+            hover_material.setAlpha(
+                MATERIAL_DICT[material_name]["hover_state"]["alpha"]
             )
 
     if remove_shininess:
         normal_material.setShininess(0)
-        hoover_material.setShininess(0)
+        hover_material.setShininess(0)
 
-    return normal_material, hoover_material, material_family
+    return normal_material, hover_material, material_family
 
 
 def create_qentity(

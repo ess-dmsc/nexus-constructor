@@ -24,7 +24,7 @@ class EntityCollection(ABC):
         ] = []
         (
             self.default_material,
-            self.hoover_material,
+            self.hover_material,
             self.material_family,
         ) = self._create_default_material()
 
@@ -57,7 +57,7 @@ class OffMeshEntityCollection(EntityCollection):
         self._mesh = mesh
         (
             self.default_material,
-            self.hoover_material,
+            self.hover_material,
             self.material_family,
         ) = create_material(nx_class, root_entity)
 
@@ -66,7 +66,7 @@ class OffMeshEntityCollection(EntityCollection):
             create_qentity([self._mesh, self.default_material], self.root_entity)
         )
         self.entities[-1].default_material = self.default_material
-        self.entities[-1].hoover_material = self.hoover_material
+        self.entities[-1].hover_material = self.hover_material
         self.entities[-1].material_family = self.material_family
 
     def add_transformation(self, transformation: Qt3DCore.QComponent):
@@ -135,7 +135,7 @@ class NeutronSourceEntityCollection(EntityCollection):
         cone_transform.setMatrix(self._get_cylinder_transformation_matrix())
         (
             cylinder_material,
-            cylinder_hoover_material,
+            cylinder_hover_material,
             cylinder_material_family,
         ) = create_material("beam_material", self.root_entity)
 
@@ -149,7 +149,7 @@ class NeutronSourceEntityCollection(EntityCollection):
             )
         )
         self.entities[-1][0].default_material = cylinder_material
-        self.entities[-1][0].hoover_material = cylinder_hoover_material
+        self.entities[-1][0].hover_material = cylinder_hover_material
         self.entities[-1][0].material_family = cylinder_material_family
 
     def _setup_neutrons(self):
@@ -163,7 +163,7 @@ class NeutronSourceEntityCollection(EntityCollection):
             )
             (
                 neutron_material,
-                neutron_hoover_material,
+                neutron_hover_material,
                 neutron_material_family,
             ) = create_material("neutron_material", self.root_entity)
             entity = create_qentity(
@@ -223,7 +223,7 @@ class GroundEntityCollection(EntityCollection):
         )
         (
             self.default_material,
-            self.hoover_material,
+            self.hover_material,
             self.material_family,
         ) = create_material("ground", root_entity)
 
