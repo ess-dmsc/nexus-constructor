@@ -90,10 +90,10 @@ def validate_line_edit(
     :param tooltip_on_reject: Tooltip to display if line edit is invalid.
     :return: None.
     """
-    colour = "#FFFFFF" if is_valid else "#f6989d"
-    if platform == "darwin" and colour == "#FFFFFF":
-        colour = "#333333"
-    line_edit.setStyleSheet(f"QLineEdit {{ background-color: {colour} }}")
+    if is_valid:
+        line_edit.setStyleSheet("")
+    else:
+        line_edit.setStyleSheet("QLineEdit {{ background-color: #f6989d }}")
     if "Suggestion" in tooltip_on_reject and callable(suggestion_callable):
         tooltip_on_reject += suggestion_callable()
     line_edit.setToolTip(tooltip_on_accept) if is_valid else line_edit.setToolTip(
