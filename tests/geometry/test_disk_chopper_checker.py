@@ -278,9 +278,9 @@ def test_GIVEN_slit_edges_list_is_not_in_order_WHEN_validating_chopper_input_THE
 def test_GIVEN_slit_edges_list_contains_repeated_values_WHEN_validating_chopper_input_THEN_returns_false(
     chopper_checker,
 ):
-    chopper_checker.fields_dict[SLIT_EDGES_NAME].values[
-        0
-    ] = chopper_checker.fields_dict[SLIT_EDGES_NAME].values[1]
+    chopper_checker.fields_dict[SLIT_EDGES_NAME].values[0] = (
+        chopper_checker.fields_dict[SLIT_EDGES_NAME].values[1]
+    )
 
     assert chopper_checker.required_fields_present()
     assert chopper_checker._data_has_correct_type()

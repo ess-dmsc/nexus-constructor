@@ -480,9 +480,9 @@ class NexusTreeModel(QAbstractItemModel):
         if transformation_list.has_link:
             transformation_list.link.linked_component = linked_component
             if linked_component is not None:
-                transformation_list[
-                    -1
-                ].depends_on = transformation_list.link.linked_component.transforms[0]
+                transformation_list[-1].depends_on = (
+                    transformation_list.link.linked_component.transforms[0]
+                )
         self.model.signals.transformation_changed.emit()
         self.model.signals.group_edited.emit(component_index, True)
 

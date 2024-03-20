@@ -139,9 +139,9 @@ class AddComponentDialog(Ui_AddComponentDialog):
         if self._confirm_cancel():
             if self._group_parent:
                 self._group_parent.children.remove(self._group_container.group)
-                self._group_parent[
-                    self._group_to_edit_backup.name
-                ] = self._group_to_edit_backup
+                self._group_parent[self._group_to_edit_backup.name] = (
+                    self._group_to_edit_backup
+                )
             else:
                 self.model.entry = self._group_to_edit_backup  # type: ignore
                 self.component_model.tree_root = self.model.entry
