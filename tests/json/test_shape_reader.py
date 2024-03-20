@@ -136,9 +136,9 @@ def test_GIVEN_off_shape_WHEN_reading_shape_information_THEN_error_and_issue_mes
 def test_GIVEN_unrecognised_shape_WHEN_reading_shape_information_THEN_warning_message_is_created(
     off_shape_reader, off_shape_json
 ):
-    off_shape_json[CommonKeys.ATTRIBUTES][0][
-        CommonKeys.VALUES
-    ] = bad_geometry_type = "NotAValidGeometry"
+    off_shape_json[CommonKeys.ATTRIBUTES][0][CommonKeys.VALUES] = bad_geometry_type = (
+        "NotAValidGeometry"
+    )
     off_shape_reader.add_shape_to_component()
 
     assert _any_warning_message_has_substrings(

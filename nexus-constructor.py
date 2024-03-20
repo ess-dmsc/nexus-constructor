@@ -1,6 +1,7 @@
 """
 Entry script for the nexus constructor application.
 """
+
 import argparse
 import logging
 import os

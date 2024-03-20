@@ -411,9 +411,9 @@ def test_GIVEN_transformation_has_depends_on_WHEN_creating_transformations_THEN_
     depends_on_component_name = "test_component"
     depends_on_transform_name = "transformation1"
     depends_on_path = f"entry/instrument/{depends_on_component_name}/transformations/{depends_on_transform_name}"
-    transformation_json["children"][0]["config"][
-        "name"
-    ] = transformation_name = "TransformationName"
+    transformation_json["children"][0]["config"]["name"] = transformation_name = (
+        "TransformationName"
+    )
     transformation_json["children"][0]["attributes"][3]["values"] = depends_on_path
     transformation_reader._create_transformations(transformation_json["children"])
 

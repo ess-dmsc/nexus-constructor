@@ -5,6 +5,7 @@ Based off of a qml custom mesh example at https://github.com/iLya84a/qt3d/blob/m
 and a PyQt5 example from
 https://github.com/geehalel/npindi/blob/57c092200dd9cb259ac1c730a1258a378a1a6342/apps/mount3D/world3D-starspheres.py#L86
 """
+
 import itertools
 import struct
 from typing import List, Tuple
@@ -182,9 +183,11 @@ class QtOFFGeometry(Qt3DCore.QGeometry):
 
         triangles = convert_faces_into_triangles(
             faces,
-            ProgressBar(len(faces), "Shape conversion progress")
-            if use_progress_bar
-            else None,
+            (
+                ProgressBar(len(faces), "Shape conversion progress")
+                if use_progress_bar
+                else None
+            ),
         )
 
         if len(triangles) > 100000 and allow_simplification:
@@ -214,16 +217,20 @@ class QtOFFGeometry(Qt3DCore.QGeometry):
         normal_buffer_values = create_normal_buffer(
             vertices,
             triangles,
-            ProgressBar(len(triangles), "Vector buffer creation")
-            if use_progress_bar
-            else None,
+            (
+                ProgressBar(len(triangles), "Vector buffer creation")
+                if use_progress_bar
+                else None
+            ),
         )
         color_buffer_values = create_color_buffer(
             self.vertex_count,
             model.colors,
-            ProgressBar(len(model.colors), "Material creation")
-            if use_progress_bar
-            else None,
+            (
+                ProgressBar(len(model.colors), "Material creation")
+                if use_progress_bar
+                else None
+            ),
         )
         positionAttribute = self.create_attribute(
             vertex_buffer_values, self.q_attribute.defaultPositionAttributeName()
